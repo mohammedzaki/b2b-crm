@@ -1,0 +1,46 @@
+    /******************
+        General
+    ****************************************************************/
+    
+    .legend label {
+        font-weight: normal;
+        cursor: pointer;
+    }
+    
+    .legend {
+        display: block;
+        width: 100%;
+        padding: 0;
+        margin-bottom: 20px;
+        font-size: 21px;
+        line-height: inherit;
+        color: #333;
+        border: 0;
+        border-bottom: 1px solid #e5e5e5;
+    }
+    /******************
+        Client
+    ****************************************************************/
+    
+    .authorized_person {
+        padding: 5px;
+        margin-bottom: 10px;
+        border-bottom: 1px solid #e5e5e5;
+    }
+    
+    .authorized_person:last-child {
+        margin-bottom: 0;
+        border: none;
+    }
+    
+    .authorized_person .delete {
+        margin-bottom: 10px;
+    }
+    /******************
+        Process - Client
+    ****************************************************************/
+    
+    .price {
+        position: absolute;
+        right: 160px
+    }

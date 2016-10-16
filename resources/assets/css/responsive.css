@@ -1,0 +1,182 @@
+@media(min-width:320px) and (max-width:1295px) {
+    #dataTables-example_wrapper .col-sm-12 form {
+        overflow: auto;
+    }
+    .index .dataTables_wrapper .row {
+        margin-bottom: 10px;
+    }
+}
+
+@media(min-width:320px) and (max-width:768px) {
+    .operationdes table input.form-control,
+    .addopsource table input.form-control {
+        width: 100px;
+    }
+    .table-responsive {
+        overflow: auto;
+    }
+    table.dataTable thead .sorting::after,
+    table.dataTable thead .sorting_asc::after {
+        content: none;
+    }
+    .index .dataTables_wrapper .date {
+        display: block;
+    }
+    .index .dataTables_wrapper .date #clock {
+        text-align: center;
+    }
+    .index .dataTables_wrapper .col-sm-6.text-left {
+        text-align: center;
+    }
+    .index #datepicker {
+        display: inline-table;
+        margin-top: 10px;
+    }
+    .index .col-md-6.text-left {
+        text-align: center;
+    }
+    .addclient .col-lg-12.clearboth {
+        text-align: center;
+    }
+    .buttonsdiv {
+        text-align: center;
+    }
+    .buttonsdiv button {
+        margin-top: 5px;
+    }
+    .attendance .col-lg-6 {
+        width: 50%;
+    }
+    .attendance .col-lg-6 {
+        width: 100%;
+    }
+    .attendance .col-lg-6.no-padding-right {
+        padding-right: 15px;
+    }
+    .attendance .col-lg-6.no-padding-left {
+        padding-left: 15px;
+    }
+    .attendance .col-lg-2,
+    .attendance .col-lg-7 {
+        float: right;
+        width: 32%;
+    }
+    .attendance .col-lg-1 {
+        float: right;
+        width: 2%;
+    }
+    .searchbdiv {
+        overflow: hidden;
+    }
+    #dataTables-example_length,
+    #dataTables-example1_length {
+        margin-top: 5px;
+    }
+    .searchbdiv .col-lg-2,
+    .searchbdiv .col-lg-6,
+    .searchbdiv .col-lg-4 {
+        width: 30%;
+        float: right;
+    }
+    .closebills form .col-lg-12,
+    .closebills form .col-lg-4 {
+        float: none;
+    }
+    .billoutcome .no-padding-left,
+    .billoutcome .no-padding-right,
+    .permission .no-padding-left,
+    .permission .no-padding-right,
+    .profloss .no-padding-left,
+    .profloss .no-padding-right,
+    .recexpbank .no-padding-left,
+    .recexpbank .no-padding-right,
+    .reportexp .no-padding-left,
+    .reportexp .no-padding-right {
+        padding: 0px;
+    }
+    .feasibility-study .panel-default .panel-body .col-lg-6 {
+        width: 50%;
+        float: right;
+    }
+    .feasibility-study .panel-default .panel-body .col-lg-6 input.form-control {
+        width: 77%!important;
+    }
+    .feasibility-study .panel-default .panel-body .col-lg-6 .label {
+        display: block;
+    }
+    .feasibility-study .dataTables_wrapper .col-sm-12,
+    .permission .dataTables_wrapper .col-sm-12,
+    .printbill .dataTable_wrapper,
+    .recexpbank .dataTable_wrapper .col-sm-12,
+    .reportclient .dataTable_wrapper,
+    .reportcostcenter .dataTable_wrapper,
+    .reportexpense .dataTable_wrapper,
+    .reportopclient .dataTable_wrapper,
+    .reportoperation .dataTable_wrapper,
+    .reportopresource .dataTable_wrapper,
+    .reportresource .dataTable_wrapper {
+        overflow: auto;
+        padding: 0px;
+    }
+    .reportclient .col-lg-12.no-padding .panel-body,
+    .reportcostcenter .col-lg-12.no-padding .panel-body,
+    .reportexpense .col-lg-12.no-padding .panel-body,
+    .salery .no-padding-left,
+    .salery .no-padding-right {
+        padding: 0px;
+    }
+}
+
+@media(min-width:769px) and (max-width:1199px) {
+    .permission .dataTables_wrapper .col-sm-12,
+    .printbill .dataTable_wrapper,
+    .recexpbank .dataTable_wrapper .col-sm-12,
+    .reportclient .dataTable_wrapper,
+    .reportcostcenter .dataTable_wrapper,
+    .reportexpense .dataTable_wrapper,
+    .reportopclient .dataTable_wrapper,
+    .reportoperation .dataTable_wrapper,
+    .reportopresource .dataTable_wrapper,
+    .reportresource .dataTable_wrapper {
+        overflow: auto;
+        padding: 0px;
+    }
+    .permission .no-padding-left,
+    .permission .no-padding-right,
+    .profloss .no-padding-left,
+    .profloss .no-padding-right,
+    .recexpbank .no-padding-left,
+    .recexpbank .no-padding-right,
+    .reportexp .no-padding-left,
+    .reportexp .no-padding-right,
+    .salery .no-padding-left,
+    .salery .no-padding-right {
+        padding: 0px;
+    }
+    .feasibility-study .panel-default .panel-body .col-lg-6 {
+        width: 50%;
+        float: right;
+    }
+    .billoutcome .no-padding-left,
+    .billoutcome .no-padding-right {
+        padding: 0px;
+    }
+    .col-lg-6 {
+        width: 100%;
+    }
+    .companyinfodiv .col-lg-12,
+    .costcenter .col-lg-12,
+    .feasibility-study .col-lg-12 {
+        float: none;
+    }
+    .feasibility-study .col-lg-6 {
+        width: 100%;
+    }
+    .closebills form .col-lg-12,
+    .closebills form .col-lg-4 {
+        float: none;
+    }
+    .col-lg-2 {
+        width: 16.6667%;
+    }
+}
