@@ -25,7 +25,7 @@
                     {{ Form::label('client_id', 'اسم العميل') }} 
                     {{ Form::select('client_id', $clients, null, 
                         array(
-                            'class' => 'form-control selectpicker', 
+                            'class' => 'form-control',
                             'placeholder' => 'ادخل اسم العميل')
                         )
                     }}
@@ -38,12 +38,13 @@
 
                 <div class="form-group{{ $errors->has('employee_id') ? ' has-error' : '' }}">
                     {{ Form::label('employee_id', 'مشرف العملية') }} 
-                    {{ Form::select('employee_id', $employees, null, 
+                    {{ Form::select('employee_id', $employees, null,
                         array(
-                            'class' => 'form-control selectpicker', 
+                            'class' => 'form-control',
                             'placeholder' => 'ادخل مشرف العملية')
                         )
                     }}
+                    <pre>{{ var_dump($employees) }}</pre>
                     @if ($errors->has('employee_id'))
                     <label for="inputError" class="control-label">
                         {{ $errors->first('employee_id') }}
