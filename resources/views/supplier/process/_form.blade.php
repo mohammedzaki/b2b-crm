@@ -21,17 +21,17 @@
                     @endif
                 </div>
 
-                <div class="form-group{{ $errors->has('client_id') ? ' has-error' : '' }}">
-                    {{ Form::label('client_id', 'اسم العميل') }} 
-                    {{ Form::select('client_id', $clients, null, 
+                <div class="form-group{{ $errors->has('supplier_id') ? ' has-error' : '' }}">
+                    {{ Form::label('supplier_id', 'اسم المورد') }}
+                    {{ Form::select('supplier_id', $suppliers, null,
                         array(
                             'class' => 'form-control',
-                            'placeholder' => 'ادخل اسم العميل')
+                            'placeholder' => 'ادخل اسم المورد')
                         )
                     }}
-                    @if ($errors->has('client_id'))
+                    @if ($errors->has('supplier_id'))
                     <label for="inputError" class="control-label">
-                        {{ $errors->first('client_id') }}
+                        {{ $errors->first('supplier_id') }}
                     </label>
                     @endif
                 </div>

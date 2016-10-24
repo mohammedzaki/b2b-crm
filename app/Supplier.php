@@ -14,4 +14,10 @@ class Supplier extends Model
         'mobile', 
         'debit_limit'
     ];
+
+    public function processes()
+    {
+        return $this->hasMany('App\SupplierProcess');
+    }
+
 }

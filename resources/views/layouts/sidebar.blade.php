@@ -35,7 +35,12 @@
                 </ul>
             </li>
             <li>
-                <a href="index2.html"><i class="fa fa-share-square-o  fa-fw"></i> عملية جديدة مورد</a>
+                <a href="#"><i class="fa fa-share-square-o  fa-fw"></i> عملية جديدة مورد</a>
+                <ul>
+                    <li><a href="{{ URL::to('/supplier/process') }}">الكل</a></li>
+                    <li><a href="{{ URL::to('/supplier/process/create') }}">أضف جديد</a></li>
+                    <li><a href="{{ URL::to('/supplier/process/trash') }}">المحذوفات</a></li>
+                </ul>
             </li>
             <li>
                 <a href="{{ URL::to('/client') }}"><i class="fa fa-user fa-fw"></i> عميل جديد</a>
