@@ -58,7 +58,12 @@
                 </ul>
             </li>
             <li>
-                <a href="index2.html"><i class="fa fa-files-o fa-fw"></i> مصروف جديد</a>
+                <a href="{{ URL::to('/expenses') }}"><i class="fa fa-files-o fa-fw"></i> مصروف جديد</a>
+                <ul>
+                    <li><a href="{{ URL::to('/expenses') }}">الكل</a></li>
+                    <li><a href="{{ URL::to('/expenses/create') }}">أضف جديد</a></li>
+                </ul>
+
             </li>
             <li>
                 <a href="index2.html"><i class="fa fa-bank fa-fw"></i> بنك جديد</a>

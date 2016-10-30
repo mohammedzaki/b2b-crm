@@ -21,19 +21,29 @@ Route::get('/', 'DashboardController@index');
 Route::resource('facility', 'FacilityController');
 Route::resource('employee', 'EmployeeController');
 
+
+//3amalyat el 3amel
 Route::get('/client/process/trash', 'ClientProcessController@trash')->name('client.trash');
 Route::get('/client/process/restore/{id}', 'ClientProcessController@restore')->name('client.process.restore');
 Route::resource('client/process', 'ClientProcessController');
 
+//3amalyat el mowared
 Route::get('/supplier/process/trash', 'SupplierProcessController@trash')->name('supplier.trash');
 Route::get('/supplier/process/restore/{id}', 'SupplierProcessController@restore')->name('supplier.process.restore');
 Route::resource('supplier/process', 'SupplierProcessController');
 
+//3amel
 Route::get('/client/trash', 'ClientController@trash')->name('client.trash');
 Route::get('/client/restore/{id}', 'ClientController@restore')->name('client.restore');
 Route::resource('client', 'ClientController');
 
+//mowared
 Route::resource('supplier', 'SupplierController');
+
+//masrouf
+Route::resource('expenses', 'ExpensesController');
+
+//salafeyat
 
 
 /**
