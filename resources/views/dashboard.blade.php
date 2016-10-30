@@ -165,6 +165,7 @@
                                             <th  rowspan="1" colspan="1" >منصرف</th>
                                             <th  rowspan="1" colspan="1" >بيان</th>
                                             <th  rowspan="1" colspan="1" >اسم العملية</th>
+                                            <th  rowspan="1" colspan="1" >اسم العميل</th>
                                             <th  rowspan="1" colspan="1" >اسم المورد</th>
                                             <th  rowspan="1" colspan="1" >اسم الموظف</th>
                                             <th  rowspan="1" colspan="1" >اسم المصروف</th>
@@ -179,6 +180,15 @@
                                             <td><input style="width:85px" class="form-control"></td>
                                             <td><input style="width:85px" class="form-control"></td>
                                             <td><input style="width:85px" class="form-control"></td>
+                                            <td>
+                                                <select style="width:85px" class="form-control">
+                                                    <option>اختر</option>
+                                                    <option>اسم العملية اسم العملية</option>
+                                                    <option>اسم العملية اسم العملية</option>
+                                                    <option>اسم العملية اسم العملية</option>
+                                                    <option>اسم العملية اسم العملية</option>
+                                                </select>
+                                            </td>
                                             <td>
                                                 <select style="width:85px" class="form-control">
                                                     <option>اختر</option>

@@ -183,10 +183,11 @@
                                 <th>تحكم</th>
                             </tr>
                         </thead>
+                        
                         <tbody id="prcoess_items">
                         @if($items)
                             @for ($i = 0; $i < count($items); $i++)
-                            <tr class="@if($i != count($items) - 1) skip @endif">
+                            <tr class="{{ ($i != count($items) - 1) ? 'skip' : '' }}" >
                                 {{ Form::hidden('items['.$i.'][id]') }}
                                 <td>
                                     <div class="form-group{{ $errors->has('items.'.$i.'.description') ? ' has-error' : '' }}">

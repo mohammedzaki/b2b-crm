@@ -27,7 +27,7 @@
                     @endif
                 </div>
             </div>
-           
+
             <div class="col-lg-6">
                 <div class="form-group{{ $errors->has('ssn') ? ' has-error' : '' }}">
                     {{ Form::label('ssn', 'الرقم القومى') }} 
@@ -67,7 +67,7 @@
                     @endif
                 </div>
             </div>
-            
+
             <div class="clearboth"></div>
 
             <div class="col-lg-6">
@@ -111,7 +111,7 @@
                     @endif
                 </div>
             </div>
-            
+
             <div class="clearboth"></div>
 
             <div class="col-lg-6">
@@ -130,18 +130,18 @@
                     </label>
                     @endif
                     <script>
-                    $(function() {
-                      $( "#datepicker" ).datepicker({
-                        changeMonth: true,
-                        changeYear: true,
-                        yearRange: "-60:-15",
-                        dateFormat: 'yy-mm-dd'
-                      });
-                    });
+                        $(function () {
+                            $("#datepicker").datepicker({
+                                changeMonth: true,
+                                changeYear: true,
+                                yearRange: "-60:-15",
+                                dateFormat: 'yy-mm-dd'
+                            });
+                        });
                     </script>
                 </div>
             </div>
-            
+
             <div class="col-lg-6">
                 <div class="form-group{{ $errors->has('hiring_date') ? ' has-error' : '' }}">
                     {{ Form::label('hiring_date', 'تاريخ التعيين') }}
@@ -158,14 +158,14 @@
                     </label>
                     @endif
                     <script>
-                    $(function() {
-                      $( "#datepicker2" ).datepicker({
-                        changeMonth: true,
-                        changeYear: true,
-                        yearRange: "-20:+0",
-                        dateFormat: 'yy-mm-dd'
-                      });
-                    });
+                        $(function () {
+                            $("#datepicker2").datepicker({
+                                changeMonth: true,
+                                changeYear: true,
+                                yearRange: "-20:+0",
+                                dateFormat: 'yy-mm-dd'
+                            });
+                        });
                     </script>
                 </div>
             </div>
@@ -188,7 +188,7 @@
                     @endif
                 </div>
             </div>
-            
+
             <div class="col-lg-6">
                 <div class="form-group{{ $errors->has('telephone') ? ' has-error' : '' }}">
                     {{ Form::label('telephone', 'التليفون') }}
@@ -241,7 +241,7 @@
                     @endif
                 </div>
             </div>
-            
+
             <div class="clearboth"></div>
 
             <div class="col-lg-6 ">
@@ -277,9 +277,9 @@
                     @endif
                 </div>
             </div>
-            
+
             <div class="clearboth"></div>
-            
+
             <div class="col-lg-6"> 
                 <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
                     {{ Form::label('password', 'كلمة المرور') }}
@@ -310,9 +310,9 @@
                 <div class="hidden_input">
                     <div class="col-lg-6">
                         <div class="form-group">
-                                {{ Form::radio('value') }}
-                                قيمة
-                                {{ Form::text('number', null, array(
+                            {{ Form::radio('value') }}
+                            قيمة
+                            {{ Form::text('number', null, array(
                                     'class' => 'form-control',
                                     'style' => 'width:160px; display:inline;',
                                     'placeholder' => 'ادخل القيمة'
@@ -322,8 +322,8 @@
                     <div class="col-lg-6">
                         <div class="form-group">
                             {{ Form::radio('value') }}
-                                نسبة
-                                {{ Form::text('percentage', null, array(
+                            نسبة
+                            {{ Form::text('percentage', null, array(
                                     'class' => 'form-control',
                                     'style' => 'width:160px; display:inline;',
                                     'placeholder' => 'ادخل النسبة'
@@ -341,7 +341,7 @@
 <div class="col-lg-5">
     <div class="panel panel-default">
         <div class="panel-heading">
-           صلاحة شاشة النظام
+            صلاحة شاشة النظام
         </div>
         <!-- /.panel-heading -->
         <div class="panel-body">
@@ -356,19 +356,19 @@
                     </thead>
                     <tbody>
                         @forelse ($permissions as $permission)
-                            <tr role="row">
-                                <td class="text-center">{{ $permission->id }}</td>
-                                <td class="text-center">
+                        <tr role="row">
+                            <td class="text-center">{{ $permission->id }}</td>
+                            <td class="text-center">
                                 @if(isset($selectedPermissions))
-                                    {{ Form::checkbox('permissions[]', $permission->id, in_array($permission->id, $selectedPermissions)) }}
+                                {{ Form::checkbox('permissions[]', $permission->id, in_array($permission->id, $selectedPermissions)) }}
                                 @else
-                                    {{ Form::checkbox('permissions[]', $permission->id) }}
+                                {{ Form::checkbox('permissions[]', $permission->id) }}
                                 @endif
-                                </td>
-                                <td>{{ $permission->display_name }}</td>
-                            </tr>
+                            </td>
+                            <td>{{ $permission->display_name }}</td>
+                        </tr>
                         @empty
-                            <tr>ﻻ يوجد صﻻحيات.</tr>
+                        <tr>لا يوجد صلاحيات.</tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -387,9 +387,9 @@
     <div class="col-lg-7">
         <button class="btn btn-lg btn-block btn-success" type="submit">
             @if(isset($model))
-                تعديل بيانات موظف
+            تعديل بيانات موظف
             @else
-                أضف موظف جديد
+            أضف موظف جديد
             @endif
         </button>
     </div>

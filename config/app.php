@@ -39,7 +39,7 @@ return [
     |
     */
 
-    'url' => env('APP_URL', 'http://localhost/b2bpos'),
+    'url' => env('APP_URL', 'http://localhost/b2bposorgin'),
 
     /*
     |--------------------------------------------------------------------------
