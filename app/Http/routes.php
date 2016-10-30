@@ -40,3 +40,4 @@ Route::resource('supplier', 'SupplierController');
  * Ajax Routes
  */
 // Route::get('/getManagerList', 'AjaxController@getManagerList');
+Route::get('api/getClientProcesses', 'SupplierProcessController@getClientProcesses');

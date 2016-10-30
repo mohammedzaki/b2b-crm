@@ -6,21 +6,6 @@
             </div>
             <!-- /.panel-heading -->
             <div class="panel-body">
-                <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
-                    {{ Form::label('name', 'اسم العملية') }} 
-                    {{ Form::text('name', null, 
-                        array(
-                            'class' => 'form-control', 
-                            'placeholder' => 'ادخل اسم العملية')
-                        )
-                    }}
-                    @if ($errors->has('name'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('name') }}
-                    </label>
-                    @endif
-                </div>
-
                 <div class="form-group{{ $errors->has('supplier_id') ? ' has-error' : '' }}">
                     {{ Form::label('supplier_id', 'اسم المورد') }}
                     {{ Form::select('supplier_id', $suppliers, null,
@@ -36,7 +21,34 @@
                     @endif
                 </div>
 
-                <div class="form-group{{ $errors->has('employee_id') ? ' has-error' : '' }}">
+                <div class="form-group {{ $errors->has('client_id') ? ' has-error' : '' }}">
+                    {{ Form::label('client_id', 'اسم العميل') }}
+                    {{ Form::select('client_id', $clients, null,
+                        array(
+                            'class' => 'form-control',
+                            'placeholder' => 'ادخل اسم العميل')
+                        )
+                    }}
+                    @if ($errors->has('client_id'))
+                    <label for="inputError" class="control-label">
+                        {{ $errors->first('client_id') }}
+                    </label>
+                    @endif
+                </div>
+
+                <div class="form-group {{ $errors->has('clientprocesses') ? ' has-error' : '' }}">
+                    {{ Form::label('clientprocesses', 'اسم العملية') }} 
+                    <select id="clientprocesses" name="clientprocesses" class="form-control">
+                        <option value="">اختر اسم العملية</option>
+                    </select>
+                    @if ($errors->has('clientprocesses'))
+                    <label for="inputError" class="control-label">
+                        {{ $errors->first('clientprocesses') }}
+                    </label>
+                    @endif
+                </div>
+
+                <div class="form-group {{ $errors->has('employee_id') ? ' has-error' : '' }}">
                     {{ Form::label('employee_id', 'مشرف العملية') }} 
                     {{ Form::select('employee_id', $employees, null,
                         array(
@@ -51,12 +63,12 @@
                     @endif
                 </div>
 
-                <div class="form-group{{ $errors->has('notes') ? ' has-error' : '' }}">
-                    {{ Form::label('notes', 'مﻻحظات') }} 
+                <div class="form-group {{ $errors->has('notes') ? ' has-error' : '' }}">
+                    {{ Form::label('notes', 'ملاحظات') }} 
                     {{ Form::text('notes', null, 
                         array(
                             'class' => 'form-control', 
-                            'placeholder' => 'ادخل مﻻحظات')
+                            'placeholder' => 'ادخل ملاحظات')
                         )
                     }}
                     @if ($errors->has('notes'))
@@ -157,18 +169,18 @@
 
         <div style="margin-bottom: 20px;">
             <button class="btn btn-lg btn-block btn-success" type="submit">
-            @if(isset($model))
+                @if(isset($model))
                 تعديل بيانات عملية
-            @else
+                @else
                 أضف عملية جديد
-            @endif
-        </button>
+                @endif
+            </button>
         </div>
     </div>
     <div class="col-lg-8">
         <div class="panel panel-default">
             <div class="panel-heading">
-               مواصفات العملية
+                مواصفات العملية
             </div>
             <!-- /.panel-heading -->
             <div class="panel-body operationdes">
@@ -183,9 +195,9 @@
                                 <th>تحكم</th>
                             </tr>
                         </thead>
-                        
+
                         <tbody id="prcoess_items">
-                        @if($items)
+                            @if($items)
                             @for ($i = 0; $i < count($items); $i++)
                             <tr class="{{ ($i != count($items) - 1) ? 'skip' : '' }}" >
                                 {{ Form::hidden('items['.$i.'][id]') }}
@@ -253,7 +265,7 @@
                                 </td>
                             </tr>
                             @endfor
-                        @endif
+                            @endif
                         </tbody>
                     </table>
                 </div><!-- 
@@ -264,3 +276,18 @@
         <!-- /.panel -->
     </div>
 </div>
+
+<script>
+    $(document).ready(function ($) {
+        $('#client_id').change(function () {
+            $.get("{{ url('api/getClientProcesses/') }}", {option: $(this).val()},
+                function (data) {
+                    var clientprocesses = $('#clientprocesses');
+                    clientprocesses.empty();
+                    $.each(data, function (key, value) {
+                        clientprocesses.append($("<option></option>").attr("value", key).text(value));
+                    });
+                });
+        });
+    });
+</script>

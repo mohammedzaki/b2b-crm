@@ -3,36 +3,33 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Http\Requests;
 use App\Client;
 use App\AuthorizedPerson;
 use App\User;
 use Validator;
 
-class ClientController extends Controller
-{
-	public function __construct()
-	{
-	    $this->middleware('auth');
-	    $this->middleware('ability:admin,new-client');
-	}
+class ClientController extends Controller {
 
-    protected function validator(array $data, $id = null)
-    {
+    public function __construct() {
+        $this->middleware('auth');
+        $this->middleware('ability:admin,new-client');
+    }
+
+    protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-            'name' => 'required|unique:clients,name,'.$id.'|min:5|max:255',
-            'address' => 'required|string',
-            'telephone' => 'digits:8',
-            'mobile' => 'required|digits:11',
-            'referral' => 'required_without:is_client_company|exists:users,username',
-            'referral_percentage' => 'required_without:is_client_company|required_with:referral|numeric',
-            'credit_limit' => 'required|numeric',
-            'is_client_company' => 'boolean',
-            'authorized.*.name' => 'required|min:6|max:255',
-            'authorized.*.jobtitle' => 'required|string',
-            'authorized.*.telephone' => 'required|digits_between:8,14',
-            'authorized.*.email' => 'required|email'
+                    'name' => 'required|unique:clients,name,' . $id . '|min:5|max:255',
+                    'address' => 'required|string',
+                    'telephone' => 'digits:8',
+                    'mobile' => 'required|digits:11',
+                    'referral' => 'required_without:is_client_company|exists:users,username',
+                    'referral_percentage' => 'required_without:is_client_company|required_with:referral|numeric',
+                    'credit_limit' => 'required|numeric',
+                    'is_client_company' => 'boolean',
+                    'authorized.*.name' => 'required|min:6|max:255',
+                    'authorized.*.jobtitle' => 'required|string',
+                    'authorized.*.telephone' => 'required|digits_between:8,14',
+                    'authorized.*.email' => 'required|email'
         ]);
 
         $validator->setAttributeNames([
@@ -53,38 +50,35 @@ class ClientController extends Controller
         return $validator;
     }
 
-    public function index()
-    {
+    public function index() {
         $clients = Client::all();
-		return view('client.index', compact('clients'));
+        return view('client.index', compact('clients'));
     }
 
-    public function create()
-    {
-    	return view('client.create');
+    public function create() {
+        return view('client.create');
     }
 
-    public function store(Request $request)
-    {
-    	$validator = $this->validator( $request->all() );
+    public function store(Request $request) {
+        $validator = $this->validator($request->all());
 
-        if( $validator->fails() ){
+        if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
-        }else{
+        } else {
 
             $all = $request->all();
 
-            if($request->is_client_company){
+            if ($request->is_client_company) {
                 $all['referral_id'] = null;
                 $all['referral_percentage'] = null;
-            }else{
+            } else {
                 $all['referral_id'] = User::where('username', $all['referral'])->first()->id;
                 $all['is_client_company'] = false;
             }
 
             $client = Client::create($all);
-            if($request->authorized){
-                for ($i=0; $i < count($request->authorized); $i++) { 
+            if ($request->authorized) {
+                for ($i = 0; $i < count($request->authorized); $i++) {
                     $all['authorized'][$i]['client_id'] = $client->id;
                 }
                 AuthorizedPerson::insert($all['authorized']);
@@ -94,55 +88,53 @@ class ClientController extends Controller
         }
     }
 
-    public function edit($id)
-    {
-    	$client = Client::findOrFail($id);
+    public function edit($id) {
+        $client = Client::findOrFail($id);
         $authorized = AuthorizedPerson::where('client_id', $client->id)->get()->toArray();
-        
-        if($client->referral_id){
+
+        if ($client->referral_id) {
             $client->referral = User::find($client->referral_id)->username;
         }
         return view('client.edit', compact('client', 'authorized'));
     }
 
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         $client = Client::findOrFail($id);
         $all = $request->all();
-        $validator = $this->validator( $all, $client->id );
+        $validator = $this->validator($all, $client->id);
 
-        if( $validator->fails() ){
+        if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
-        }else{
-            
-            /*********************************************/
-            if($request->is_client_company){
+        } else {
+
+            /*             * ****************************************** */
+            if ($request->is_client_company) {
                 $all['referral_id'] = null;
                 $all['referral_percentage'] = null;
-            }else{
+            } else {
                 $all['referral_id'] = User::where('username', $all['referral'])->first()->id;
                 $all['is_client_company'] = false;
             }
-            /*********************************************/
+            /*             * ****************************************** */
             $client->update($all);
 
-            if($request->authorized){
+            if ($request->authorized) {
                 //recalculate array index
                 $authorized_request = array_values($all['authorized']);
                 $authorized_ids = [];
 
-                for ($i=0; $i < count($authorized_request); $i++) {
+                for ($i = 0; $i < count($authorized_request); $i++) {
                     /* if request does not have id, it means it's new one */
-                    if(isset($authorized_request[$i]['id'])){
+                    if (isset($authorized_request[$i]['id'])) {
                         /* update record */
                         $person = AuthorizedPerson::findOrFail(
-                            $authorized_request[$i]['id']
+                                        $authorized_request[$i]['id']
                         );
 
                         $authorized_ids[] = $authorized_request[$i]['id'];
 
                         $person->update($authorized_request[$i]);
-                    }else{
+                    } else {
                         /* create new record */
                         /* add client id */
                         $authorized_request[$i]['client_id'] = $client->id;
@@ -152,9 +144,8 @@ class ClientController extends Controller
                 }
                 /* delete others if exists */
                 AuthorizedPerson::where('client_id', $client->id)
-                    ->whereNotIn('id', $authorized_ids)->delete();
-
-            }else{
+                        ->whereNotIn('id', $authorized_ids)->delete();
+            } else {
                 /* delete all */
                 AuthorizedPerson::where('client_id', $client->id)->delete();
             }
@@ -163,23 +154,21 @@ class ClientController extends Controller
         }
     }
 
-    public function destroy($id)
-    {
-	   $client = Client::findOrFail($id);
-       $client->delete();
+    public function destroy($id) {
+        $client = Client::findOrFail($id);
+        $client->delete();
 
-       return redirect()->back()->with('success', 'تم حذف عميل.');
+        return redirect()->back()->with('success', 'تم حذف عميل.');
     }
 
-    public function trash()
-    {
+    public function trash() {
         $clients = Client::onlyTrashed()->get();
         return view('client.trash', compact('clients'));
     }
 
-    public function restore($id)
-    {
+    public function restore($id) {
         Client::withTrashed()->find($id)->restore();
         return redirect()->route('client.index')->with('success', 'تم استرجاع عميل جديد.');
     }
+
 }
