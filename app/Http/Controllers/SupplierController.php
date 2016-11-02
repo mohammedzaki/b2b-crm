@@ -82,4 +82,16 @@ class SupplierController extends Controller {
         return redirect()->back()->with('success', 'تم حذف مورد.');
     }
 
+    public function trash() {
+        $suppliers = Supplier::onlyTrashed()->get();
+        return view('supplier.trash', compact('suppliers'));
+    }
+
+    public function restore($id) {
+        Supplier::withTrashed()->find($id)->restore();
+        return redirect()->route('supplier.index')->with('success', 'تم استرجاع مورد جديد.');
+    }
+    
+    
+
 }

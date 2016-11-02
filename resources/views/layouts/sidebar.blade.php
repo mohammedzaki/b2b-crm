@@ -55,6 +55,7 @@
                 <ul>
                     <li><a href="{{ URL::to('/supplier') }}">الكل</a></li>
                     <li><a href="{{ URL::to('/supplier/create') }}">أضف جديد</a></li>
+                    <li><a href="{{ URL::to('/supplier/trash') }}">المحذوفات</a></li>
                 </ul>
             </li>
             <li>

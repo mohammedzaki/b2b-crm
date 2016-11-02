@@ -36,14 +36,14 @@
                     @endif
                 </div>
 
-                <div class="form-group {{ $errors->has('clientprocesses') ? ' has-error' : '' }}">
-                    {{ Form::label('clientprocesses', 'اسم العملية') }} 
-                    <select id="clientprocesses" name="clientprocesses" class="form-control">
+                <div class="form-group {{ $errors->has('client_process_id') ? ' has-error' : '' }}">
+                    {{ Form::label('client_process_id', 'اسم العملية') }} 
+                    <select id="clientprocesses" name="client_process_id" class="form-control">
                         <option value="">اختر اسم العملية</option>
                     </select>
-                    @if ($errors->has('clientprocesses'))
+                    @if ($errors->has('client_process_id'))
                     <label for="inputError" class="control-label">
-                        {{ $errors->first('clientprocesses') }}
+                        {{ $errors->first('client_process_id') }}
                     </label>
                     @endif
                 </div>

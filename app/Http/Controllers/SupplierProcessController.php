@@ -21,7 +21,8 @@ class SupplierProcessController extends Controller {
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-                    'name' => 'required|unique:supplier_processes,name,' . $id . '|min:5|max:255',
+                    'client_id' => 'required|exists:clients,id',
+                    'client_process_id' => 'required|exists:client_processes,id',
                     'supplier_id' => 'required|exists:suppliers,id',
                     'employee_id' => 'required|exists:employees,user_id',
                     'notes' => 'string',
@@ -37,7 +38,8 @@ class SupplierProcessController extends Controller {
         ]);
 
         $validator->setAttributeNames([
-            'name' => 'اسم العملية',
+            'client_id' => 'اسم العميل',
+            'client_process_id' => 'اسم العملية',
             'supplier_id' => 'اسم المورد',
             'employee_id' => 'مشرف العملية',
             'notes' => 'ملاحظات',
@@ -214,6 +216,17 @@ class SupplierProcessController extends Controller {
     public function getClientProcesses(Request $request) {
         $input = $request->input('option');
         $clientProcesses = ClientProcess::where('client_id', $input)->get();
+        $clientProcesses_tmp = [];
+        foreach ($clientProcesses as $process) {
+            $clientProcesses_tmp[$process->id] = $process->name;
+        }
+        $clientProcesses = $clientProcesses_tmp;
+        return response()->json($clientProcesses);
+    }
+
+    public function getSupplierProcesses(Request $request) {
+        $input = $request->input('option');
+        $clientProcesses = SupplierProcess::where('supplier_id', $input)->get();
         $clientProcesses_tmp = [];
         foreach ($clientProcesses as $process) {
             $clientProcesses_tmp[$process->id] = $process->name;

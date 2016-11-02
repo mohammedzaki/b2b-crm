@@ -17,6 +17,11 @@ Route::get('/mass', function () {
 Route::auth();
 
 Route::get('/', 'DashboardController@index');
+Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
+Route::get('/dashboard/store', 'DashboardController@store');
+Route::resource('dashboard', 'DashboardController');
+
+
 // Route::get('/facilities/info', 'FacilityController@index');
 Route::resource('facility', 'FacilityController');
 Route::resource('employee', 'EmployeeController');
@@ -38,6 +43,8 @@ Route::get('/client/restore/{id}', 'ClientController@restore')->name('client.res
 Route::resource('client', 'ClientController');
 
 //mowared
+Route::get('/supplier/trash', 'SupplierController@trash')->name('supplier.trash');
+Route::get('/supplier/restore/{id}', 'SupplierController@restore')->name('supplier.restore');
 Route::resource('supplier', 'SupplierController');
 
 //masrouf
@@ -51,3 +58,4 @@ Route::resource('expenses', 'ExpensesController');
  */
 // Route::get('/getManagerList', 'AjaxController@getManagerList');
 Route::get('api/getClientProcesses', 'SupplierProcessController@getClientProcesses');
+Route::get('api/getSupplierProcesses', 'SupplierProcessController@getSupplierProcesses');
