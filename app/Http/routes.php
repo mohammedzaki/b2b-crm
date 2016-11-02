@@ -51,7 +51,7 @@ Route::resource('supplier', 'SupplierController');
 Route::resource('expenses', 'ExpensesController');
 
 //salafeyat
-
+Route::resource('employee/borrow', 'EmployeeBorrowController');
 
 /**
  * Ajax Routes

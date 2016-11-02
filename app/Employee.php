@@ -13,4 +13,8 @@ class Employee extends Model
     {
         return $this->belongsTo('App\User', 'user_id');
     }
+
+    public function employeeBorrow(){
+        return $this->hasMany('App\EmployeeBorrow', 'user_id');
+    }
 }
