@@ -24,7 +24,10 @@
                 </ul>
             </li>
             <li>
-                <a href="index2.html"><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف</a>
+                <a href="{{ URL::to('/depositwithdraw') }}"><i class="fa fa-briefcase fa-fw"></i>وارد / منصرف</a>
+            </li>
+            <li>
+                <a href="#"><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف</a>
             </li>
             <li>
                 <a href="#"><i class="fa fa-edit fa-fw"></i> عملية جديدة عميل</a>

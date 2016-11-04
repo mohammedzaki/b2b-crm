@@ -21,6 +21,7 @@ class SupplierProcessController extends Controller {
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
+                    'name' => 'required|unique:client_processes,name,' . $id . '|min:5|max:255',
                     'client_id' => 'required|exists:clients,id',
                     'client_process_id' => 'required|exists:client_processes,id',
                     'supplier_id' => 'required|exists:suppliers,id',
@@ -38,6 +39,7 @@ class SupplierProcessController extends Controller {
         ]);
 
         $validator->setAttributeNames([
+            'name' => 'اسم العملية',
             'client_id' => 'اسم العميل',
             'client_process_id' => 'اسم العملية',
             'supplier_id' => 'اسم المورد',

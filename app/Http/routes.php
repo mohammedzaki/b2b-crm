@@ -17,14 +17,16 @@ Route::get('/mass', function () {
 Route::auth();
 
 Route::get('/', 'DashboardController@index');
-Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
-Route::get('/dashboard/store', 'DashboardController@store');
+//Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
+//Route::get('/dashboard/store', 'DashboardController@store');
+
+
 Route::resource('dashboard', 'DashboardController');
 
+Route::resource('/depositwithdraw', 'DepositWithdrawController');
 
-// Route::get('/facilities/info', 'FacilityController@index');
-Route::resource('facility', 'FacilityController');
-Route::resource('employee', 'EmployeeController');
+Route::resource('/facility', 'FacilityController');
+Route::resource('/employee', 'EmployeeController');
 
 
 //3amalyat el 3amel

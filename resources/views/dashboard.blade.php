@@ -99,59 +99,5 @@
         </div>
     </div>
 </div>
-<div class="row">
-    <div class="col-lg-12">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                وارد / منصرف
-            </div>
-            <!-- /.panel-heading -->
-            <div class="panel-body">
-                @if (session('success'))
-                <div class="alert alert-success">
-                    {{ session('success') }}
-                </div>
-                @endif
-
-                @if (session('error'))
-                <div class="alert alert-danger">
-                    {{ session('error') }}
-                </div>
-                @endif
-                {{ Form::open(['route' => 'dashboard.store']) }}
-                @include('_form')
-                {{ Form::close() }}
-
-            </div>
-            <!-- /.panel-body -->
-        </div>
-        <!-- /.panel -->
-    </div>
-    <!-- /.col-lg-12 -->
-</div>
-<script>
-    $(document).ready(function ($) {
-        $('#client_id').change(function () {
-            $.get("{{ url('api/getClientProcesses/') }}", {option: $(this).val()},
-                    function (data) {
-                        var clientprocesses = $('#cbo_processes');
-                        clientprocesses.empty();
-                        $.each(data, function (key, value) {
-                            clientprocesses.append($("<option></option>").attr("value", key).text(value));
-                        });
-                    });
-        });
-        $('#supplier_id').change(function () {
-            $.get("{{ url('api/getSupplierProcesses/') }}", {option: $(this).val()},
-                    function (data) {
-                        var clientprocesses = $('#cbo_processes');
-                        clientprocesses.empty();
-                        $.each(data, function (key, value) {
-                            clientprocesses.append($("<option></option>").attr("value", key).text(value));
-                        });
-                    });
-        });
-    });
-</script>
 @endsection
 
