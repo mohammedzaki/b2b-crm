@@ -208,7 +208,9 @@ $(document).ready(function() {
     update_prices();
 
     /******************
-        Process
+        Employee  -  Borrow
     ****************************************************************/
+
+
 
 });

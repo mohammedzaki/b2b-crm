@@ -12,10 +12,12 @@ class CreateEmployeeBorrowTable extends Migration
      */
     public function up()
     {
-        Schema::create('employeeBorrow', function (Blueprint $table) {
+        Schema::create('employee_borrows', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('user_id')->unsigned()->index();
+            $table->integer('employee_id')->unsigned()->index();
             $table->double('Amount');
+            $table->string('borrow_reason')->nullable();
+            $table->string('pay_amount')->nullable();
             $table->boolean('is_active');
             $table->timestamps();
         });
@@ -28,6 +30,6 @@ class CreateEmployeeBorrowTable extends Migration
      */
     public function down()
     {
-        Schema::drop('employeeBorrow');
+        Schema::drop('employee_borrows');
     }
 }

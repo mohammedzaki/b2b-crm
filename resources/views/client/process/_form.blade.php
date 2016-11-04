@@ -52,11 +52,11 @@
                 </div>
 
                 <div class="form-group{{ $errors->has('notes') ? ' has-error' : '' }}">
-                    {{ Form::label('notes', 'مﻻحظات') }} 
+                    {{ Form::label('notes', 'ملاحظات') }}
                     {{ Form::text('notes', null, 
                         array(
                             'class' => 'form-control', 
-                            'placeholder' => 'ادخل مﻻحظات')
+                            'placeholder' => 'ادخل ملاحظات')
                         )
                     }}
                     @if ($errors->has('notes'))
