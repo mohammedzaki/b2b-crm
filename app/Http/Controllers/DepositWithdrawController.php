@@ -44,10 +44,12 @@ class DepositWithdrawController extends Controller {
         $employees = Employee::select('user_id', 'name')->get();
         $suppliers = Supplier::select('id', 'name')->get();
         $expenses = Expenses::all();
+        $depositWithdraws = DepositWithdraw::all();
         $clients_tmp = [];
         $employees_tmp = [];
         $suppliers_tmp = [];
         $expenses_tmp = [];
+        //$depositWithdraws_tmp = [];
         
         //$clients_tmp[-1] = '';
         //$employees_tmp[-1] = '';
@@ -69,7 +71,7 @@ class DepositWithdrawController extends Controller {
         $employees = $employees_tmp;
         $suppliers = $suppliers_tmp;
         $expenses = $expenses_tmp;
-        return view('depositwithdraw', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses']));
+        return view('depositwithdraw', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws']));
     }
 
     

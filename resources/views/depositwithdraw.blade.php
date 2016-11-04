@@ -132,7 +132,7 @@
                                             <td>
                                                 <div class="form-group{{ $errors->has('cbo_processes') ? ' has-error' : '' }}">
                                                     <select id="cbo_processes" name="cbo_processes" style="width:85px" class="form-control">
-                                                        <option value="">اختر اسم العملية</option>
+                                                        <option value=''></option>
                                                     </select>
                                                     @if ($errors->has('cbo_processes'))
                                                     <label for="inputError" class="control-label">
@@ -148,7 +148,7 @@
                                                     {{ Form::select('client_id', $clients, null,
                         array(
                             'class' => 'form-control',
-                            'placeholder' => 'ادخل اسم العميل',
+                            'placeholder' => '',
                             'id' => 'client_id',
                             'style' => 'width:85px;')
                         )
@@ -166,7 +166,7 @@
                                                     {{ Form::select('supplier_id', $suppliers, null,
                         array(
                             'class' => 'form-control',
-                            'placeholder' => 'ادخل اسم المورد',
+                            'placeholder' => '',
                             'id' => 'supplier_id',
                             'style' => 'width:85px;')
                         )
@@ -183,7 +183,7 @@
                                                     {{ Form::select('employee_id', $employees, null,
                         array(
                             'class' => 'form-control',
-                            'placeholder' => 'ادخل اسم المورد',
+                            'placeholder' => '',
                             'id' => 'emplyee_id',
                             'style' => 'width:85px;')
                         )
@@ -201,7 +201,7 @@
                                                     {{ Form::select('expenses_id', $expenses, null,
                         array(
                             'class' => 'form-control',
-                            'placeholder' => 'اسم المصروف',
+                            'placeholder' => '',
                             'id' => 'expenses_id',
                             'style' => 'width:85px;')
                         )
@@ -216,7 +216,7 @@
                                             <td>
                                                 <div class="form-group{{ $errors->has('payMethod') ? ' has-error' : '' }}">
                                                     <select style="width:85px" id="payMethod" name="payMethod" class="form-control">
-                                                        <option>اختر</option>
+                                                        <option></option>
                                                         <option value="0">كاش</option>
                                                         <option value="1">شيك</option>
                                                     </select>
@@ -271,50 +271,109 @@
     </div>
     <!-- /.col-lg-12 -->
 </div>
+<div class="row">
+    <div class="col-lg-12">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                اليومية
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="dataTable_wrapper">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th  rowspan="1" colspan="1" >وارد</th>
+                                    <th  rowspan="1" colspan="1" >منصرف</th>
+                                    <th  rowspan="1" colspan="1" >بيان</th>
+                                    <th  rowspan="1" colspan="1" >اسم العملية</th>
+                                    <th  rowspan="1" colspan="1" >اسم العميل</th>
+                                    <th  rowspan="1" colspan="1" >اسم المورد</th>
+                                    <th  rowspan="1" colspan="1" >اسم الموظف</th>
+                                    <th  rowspan="1" colspan="1" >اسم المصروف</th>
+                                    <th  rowspan="1" colspan="1" >طريقة الدفع</th>
+                                    <th  rowspan="1" colspan="1" >ملاحظات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($depositWithdraws as $depositWithdraw)
+                                <tr role="row">
+                                    <td>{{ $depositWithdraw->depositValue }}</td>
+                                    <td>{{ $depositWithdraw->withdrawValue }}</td>
+                                    <td>{{ $depositWithdraw->recordDesc }}</td>
+                                    <td>{{ $depositWithdraw->cbo_processes }}</td>
+                                    <td>{{ $depositWithdraw->client_id }}</td>
+                                    <td>{{ $depositWithdraw->supplier_id }}</td>
+                                    <td>{{ $depositWithdraw->employee_id }}</td>
+                                    <td>{{ $depositWithdraw->expenses_id }}</td>
+                                    <td>{{ $depositWithdraw->payMethod }}</td>
+                                    <td>{{ $depositWithdraw->notes }}</td>
+                                </tr>
+                                @empty
+                                <tr>ﻻ يوجد عمﻻء.</tr>
+                                @endforelse
+                            </tbody>
+                        </table>  
+                    </div>
+                    <!-- /.table-responsive -->
+                </div>
+                <!-- /.panel-body -->
+            </div>
+            <!-- /.panel -->
+        </div>
+    </div>
+</div>
 <script>
     $(document).ready(function ($) {
         var canChoose = false;
         $('#client_id').change(function () {
-            
-            $('#supplier_id').val(-1);
-            
-                $.get("{{ url('api/getClientProcesses/') }}", {option: $(this).val()},
-                        function (data) {
-                            var clientprocesses = $('#cbo_processes');
-                            clientprocesses.empty();
-                            clientprocesses.append($("<option></option>").attr("value", -1).text(''));
-                            $.each(data, function (key, value) {
-                                clientprocesses.append($("<option></option>").attr("value", key).text(value));
-                            });
+
+            $('#supplier_id').val('');
+
+            $.get("{{ url('api/getClientProcesses/') }}", {option: $(this).val()},
+                    function (data) {
+                        var clientprocesses = $('#cbo_processes');
+                        clientprocesses.empty();
+                        clientprocesses.append($("<option></option>").attr("value", -1).text(''));
+                        $.each(data, function (key, value) {
+                            clientprocesses.append($("<option></option>").attr("value", key).text(value));
                         });
-            
+                    });
+
         });
         $('#supplier_id').change(function () {
-            $('#client_id').val(-1);
-            
-                $.get("{{ url('api/getSupplierProcesses/') }}", {option: $(this).val()},
-                        function (data) {
-                            var clientprocesses = $('#cbo_processes');
-                            clientprocesses.empty();
-                            clientprocesses.append($("<option></option>").attr("value", -1).text(''));
-                            $.each(data, function (key, value) {
-                                clientprocesses.append($("<option></option>").attr("value", key).text(value));
-                            });
+            $('#client_id').val('');
+
+            $.get("{{ url('api/getSupplierProcesses/') }}", {option: $(this).val()},
+                    function (data) {
+                        var clientprocesses = $('#cbo_processes');
+                        clientprocesses.empty();
+                        clientprocesses.append($("<option></option>").attr("value", -1).text(''));
+                        $.each(data, function (key, value) {
+                            clientprocesses.append($("<option></option>").attr("value", key).text(value));
                         });
-            
-        });
-
-        $('#supplyValue').change(function () {
+                    });
 
         });
-        $('#withdrawValue').change(function () {
 
+        $('#supplyValue').keypress(function () {
+            $('#withdrawValue').val('');
+        });
+        $('#withdrawValue').keypress(function () {
+            $('#supplyValue').val('');
         });
         $('#employee_id').change(function () {
-
+            $('#client_id').val('');
+            $('#supplier_id').val('');
+            var clientprocesses = $('#cbo_processes');
+            clientprocesses.empty();
         });
         $('#expenses_id').change(function () {
-
+            $('#client_id').val('');
+            $('#supplier_id').val('');
+            var clientprocesses = $('#cbo_processes');
+            clientprocesses.empty();
         });
         $('#cbo_processes').change(function () {
 
