@@ -24,8 +24,8 @@
                     <li>
                         <a href="#"><i class="fa fa-money fa-fw"></i> السلفيات </a>
                         <ul>
-                            <li><a href="{{ UEL::to('/employeeBorrow') }}">الكل</a> </li>
-                            <li><a href="{{ UEL::to('/employeeBorrow/create') }}">أضف جديد</a> </li>
+                            <li><a href="{{ URL::to('/employeeBorrow') }}">الكل</a> </li>
+                            <li><a href="{{ URL::to('/employeeBorrow/create') }}">أضف جديد</a> </li>
                         </ul>
                     </li>
                 </ul>

@@ -10,9 +10,6 @@
 | and give it the controller to call when that URI is requested.
 |
 */
-Route::get('/mass', function () {
-    return view('mass');
-});
 
 Route::auth();
 
@@ -23,6 +20,7 @@ Route::get('/', 'DashboardController@index');
 
 Route::resource('dashboard', 'DashboardController');
 
+Route::post('/depositwithdraw/LockSaveToAll', 'DepositWithdrawController@LockSaveToAll');
 Route::resource('/depositwithdraw', 'DepositWithdrawController');
 
 Route::resource('/facility', 'FacilityController');

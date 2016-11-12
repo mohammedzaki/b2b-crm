@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Carbon\Carbon;
 use App\Http\Requests;
-
 use App\Client;
 use App\Supplier;
 use App\ClientProcess;
@@ -24,9 +25,9 @@ class DepositWithdrawController extends Controller {
      */
     public function __construct() {
         $this->middleware('auth');
-	$this->middleware('ability:admin,deposit-withdraw');
+        $this->middleware('ability:admin,deposit-withdraw');
     }
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -44,17 +45,17 @@ class DepositWithdrawController extends Controller {
         $employees = Employee::select('user_id', 'name')->get();
         $suppliers = Supplier::select('id', 'name')->get();
         $expenses = Expenses::all();
-        $depositWithdraws = DepositWithdraw::all();
+        //$depositWithdraws = DepositWithdraw::select()->whereRaw('Date(created_at) = CURDATE()')->get();
+        $depositWithdraws = DepositWithdraw::where('created_at', ">=", Carbon::today())->get();
         $clients_tmp = [];
         $employees_tmp = [];
         $suppliers_tmp = [];
         $expenses_tmp = [];
+        $payMethod = [];
         //$depositWithdraws_tmp = [];
-        
-        //$clients_tmp[-1] = '';
-        //$employees_tmp[-1] = '';
-        //$suppliers_tmp[-1] = '';
-        //$expenses_tmp[-1] = '';
+        $payMethods = [];
+        $payMethods[0] = "كاش";
+        $payMethods[1] = "شيك";
         foreach ($clients as $client) {
             $clients_tmp[$client->id] = $client->name;
         }
@@ -71,10 +72,10 @@ class DepositWithdrawController extends Controller {
         $employees = $employees_tmp;
         $suppliers = $suppliers_tmp;
         $expenses = $expenses_tmp;
-        return view('depositwithdraw', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws']));
+
+        return view('depositwithdraw', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods']));
     }
 
-    
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
                     'depositValue' => 'numeric',
@@ -104,7 +105,7 @@ class DepositWithdrawController extends Controller {
 
         return $validator;
     }
-    
+
     /**
      * Show the form for creating a new resource.
      *
@@ -122,15 +123,46 @@ class DepositWithdrawController extends Controller {
      */
     public function store(Request $request) {
         $validator = $this->validator($request->all());
-        //$all = $request->all();
 
         if ($validator->fails()) {
-            return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
+            return response()->json(array(
+                        'success' => false,
+                        'message' => 'حدث حطأ في حفظ البيانات.',
+                        'errors' => $validator->getMessageBag()->toArray()
+            ));
         } else {
-            
-            DepositWithdraw::create($request->all());
-            return redirect()->route('dashboard.index')->with('success', 'تم اضافة وارد جديد.');
+            $id = DepositWithdraw::create($request->all())->id;
+            return response()->json(array(
+                        'success' => true,
+                        'id' => $id,
+                        'message' => 'تم اضافة وارد جديد.',
+                        'errors' => $validator->getMessageBag()->toArray()
+            ));
         }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function LockSaveToAll(Request $request) {
+        $validator = $this->validator($request->all());
+        $all = $request->all();
+
+        $rowsIds = [];
+        
+        foreach ($all['rowsIds'] as $id) {
+            DepositWithdraw::where('id', $id)->update(['saveStatus' => 2]);
+            $rowsIds[$id] = "Done";
+        }
+        return response()->json(array(
+                    'success' => true,
+                    'rowsIds' => $rowsIds,
+                    'message' => 'تم حفظ الوارد.',
+                    'errors' => $validator->getMessageBag()->toArray()
+        ));
     }
 
     /**
@@ -161,7 +193,25 @@ class DepositWithdrawController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
-        //
+        $depositWithdraw = DepositWithdraw::findOrFail($id);
+        $all = $request->all();
+        $validator = $this->validator($all, $depositWithdraw->id);
+
+        if ($validator->fails()) {
+            return response()->json(array(
+                        'success' => false,
+                        'message' => 'حدث حطأ في حفظ البيانات.',
+                        'errors' => $validator->getMessageBag()->toArray()
+            ));
+        } else {
+            $depositWithdraw->update($all);
+            return response()->json(array(
+                        'success' => true,
+                        'id' => $id,
+                        'message' => 'تم تعديل وارد جديد.',
+                        'errors' => $validator->getMessageBag()->toArray()
+            ));
+        }
     }
 
     /**
