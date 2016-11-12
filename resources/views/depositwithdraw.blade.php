@@ -609,24 +609,26 @@
                                         </tr>
                                     </tbody>
                                 </table>
-
+                                <input type="hidden" id="canEdit" name="canEdit" value="{{ $canEdit }}" />
                                 {{ Form::close() }}
                             </div>
                         </div>
                         <div class="col-md-6">
-                            <!--<button type="reset" class="btn btn-success">جديد</button>-->
-                            <button type="submit" class="btn btn-danger" onclick="RemoveSelected()">حذف</button>
-                            <button type="submit" class="btn btn-primary" onclick="LockSaveToAll()">حفظ</button>
+                            <a href="{{ url("/depositwithdraw") }}" class="btn btn-success">جديد</a>
+                            <button type="button" class="btn btn-danger" onclick="RemoveSelected()">حذف</button>
+                            <button type="button" class="btn btn-primary" onclick="LockSaveToAll()">حفظ</button>
                         </div>
                         <div class="col-md-6 text-left">
                             <!-- Date Picker-->
-                            <input type="text" style="width:100px"  id="datepicker" class="form-control">
+                            {{ Form::open(['route' => 'depositwithdraw.search', 'method' => 'get']) }}
+                            <input type="text" style="width:100px"  id="targetdate" name="targetdate" readonly class="form-control">
                             <script>
                                 $(function () {
-                                    $("#datepicker").datepicker();
+                                    $("#targetdate").datepicker();
                                 });
                             </script>
-                            <button type="button" class="btn btn-danger">بحث</button>
+                            <button type="submit" class="btn btn-danger">بحث</button>
+                            {{ Form::close() }}
                         </div>
                     </div>
                 </div> 
@@ -639,9 +641,10 @@
 </div>
 
 <script>
-    var checkDelete, depositValue, withdrawValue, clientprocesses, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag;
+    var checkDelete, depositValue, withdrawValue, clientprocesses, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit;
     var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
     SetIsNumberOnly();
+    LockAll();
 
     function OnRowFocus(CellChildInput) {
         SetCurrentRowIndex(CellChildInput);
@@ -690,9 +693,9 @@
         id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(11)').children(0);
         saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0);
         //console.log("saveStatus in IsValid: " + saveStatus.val());
-        if (saveStatus.val() == 2) {
-            return false;
-        }
+        /*if (saveStatus.val() == 0) {
+         return false;
+         }*/
         var flag = true;
         if (recordDesc.val() == '') {
             recordDesc.parent().addClass("has-error");
@@ -740,6 +743,7 @@
                 'X-CSRF-TOKEN': $('input[name="_token"]').val()
             }
         });
+        canEdit = $("#canEdit").val();
         var formData = {
             checkDelete: checkDelete.val(),
             depositValue: depositValue.val(),
@@ -757,7 +761,7 @@
         //used to determine the http verb to use [add=POST], [update=PUT]
         var type = "POST"; //for creating new resource
         var saveurl = '{{ url("/depositwithdraw") }}';
-        if (saveStatus.val() == 1) {
+        if (saveStatus.val() == 1 || (saveStatus.val() == 2 && canEdit == 1)) {
             type = "PUT"; //for updating existing resource
             saveurl += '/' + id.val();
         }
@@ -783,7 +787,56 @@
     }
 
     function RemoveSelected() {
-
+        var rowsCount = $('#grid_GuardianshipDetails').children().length;
+        var rowsIds = [];
+        var rowsIndexs = [];
+        flag = true;
+        for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
+            checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(0)').children(0).is(":checked");
+            id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(11)').children(0).val();
+            //console.log(checkDelete);
+            if (checkDelete) {
+                rowsIds.push(id);
+                //console.log(rowIndex);
+                rowsIndexs.push(rowIndex);
+            }
+        }
+        if (flag && rowsIndexs.length > 0) {
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('input[name="_token"]').val()
+                }
+            });
+            var formData = {
+                rowsIds: rowsIds
+            }
+            //used to determine the http verb to use [add=POST], [update=PUT]
+            var type = "POST"; //for creating new resource
+            var saveurl = '{{ url("/depositwithdraw/RemoveSelected") }}';
+            //console.log(formData);
+            $.ajax({
+                type: type,
+                url: saveurl,
+                data: formData,
+                dataType: 'json',
+                success: function (data) {
+                    //console.log("Success: " + data);
+                    //console.log("Success: " + data.message);
+                    if (data.success) {
+                        $.each(rowsIndexs, function (arrIndex, rowIndex) {
+                            //console.log(value);
+                            RemoveRowAtIndex(rowIndex);
+                        });
+                        console.log("message: " + data.message);
+                    }
+                },
+                error: function (error) {
+                    console.log('Error: ', error);
+                }
+            });
+        } else {
+            console.log("message: nothing to delete.");
+        }
     }
 
     function LockSaveToAll() {
@@ -799,7 +852,6 @@
                 flag = false;
             }
         }
-        //console.log(rowsIds);
         if (flag) {
             $.ajaxSetup({
                 headers: {
@@ -825,10 +877,11 @@
                         saveStatus.val(1);
                         //id.val(data.id);
                         //console.log(data.rowsIds);
-                        $.each(rowsIndexs, function (index) {
-                            //console.log(index);
-                            saveStatus = $('#grid_GuardianshipDetails tr:eq(' + index + ') td:eq(12)').children(0);
+                        $.each(rowsIndexs, function (arrIndex, rowIndex) {
+                            console.log(rowIndex);
+                            saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0);
                             saveStatus.val(2);
+                            SetRowReadonly(rowIndex);
                         });
                         console.log("message: " + data.message);
                     }
@@ -837,6 +890,17 @@
                     console.log('Error: ', error);
                 }
             });
+        }
+    }
+
+    function LockAll() {
+        if ($("#canEdit").val() != 1) {
+            var rowsCount = $('#grid_GuardianshipDetails').children().length;
+            for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
+                if ($('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0).val() == 2) {
+                    SetRowReadonly(rowIndex);
+                }
+            }
         }
     }
 
@@ -916,8 +980,8 @@
         }
     }
 
-    function RemoveRow(obj) {
-        $(obj).parent().parent().remove();
+    function RemoveRowAtIndex(rowIndex) {
+        $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ')').remove();
     }
 
     function isNumber(evt) {
@@ -956,6 +1020,34 @@
             AddNewRow(evt.currentTarget);
             return true;
         });
+    }
+
+    function SetRowReadonly(rowIndex) {
+        checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(0)').children(0);
+        depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(1)').children(0).children(0);
+        withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(2)').children(0).children(0);
+        recordDesc = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(3)').children(0).children(0);
+        clientprocesses = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
+        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(5)').children(0).children(0);
+        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(6)').children(0).children(0);
+        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(7)').children(0).children(0);
+        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(8)').children(0).children(0);
+        payMethod = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(9)').children(0).children(0);
+        notes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(10)').children(0).children(0);
+        id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(11)').children(0);
+        saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0);
+
+        checkDelete.attr("disabled", "disabled");
+        depositValue.attr("disabled", "disabled");
+        withdrawValue.attr("disabled", "disabled");
+        recordDesc.attr("disabled", "disabled");
+        clientprocesses.attr("disabled", "disabled");
+        client_id.attr("disabled", "disabled");
+        supplier_id.attr("disabled", "disabled");
+        employee_id.attr("disabled", "disabled");
+        expenses_id.attr("disabled", "disabled");
+        payMethod.attr("disabled", "disabled");
+        notes.attr("disabled", "disabled");
     }
 
 </script>

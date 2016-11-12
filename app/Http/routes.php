@@ -21,6 +21,8 @@ Route::get('/', 'DashboardController@index');
 Route::resource('dashboard', 'DashboardController');
 
 Route::post('/depositwithdraw/LockSaveToAll', 'DepositWithdrawController@LockSaveToAll');
+Route::post('/depositwithdraw/RemoveSelected', 'DepositWithdrawController@RemoveSelected');
+Route::get('/depositwithdraw/search', 'DepositWithdrawController@search')->name('depositwithdraw.search');
 Route::resource('/depositwithdraw', 'DepositWithdrawController');
 
 Route::resource('/facility', 'FacilityController');
