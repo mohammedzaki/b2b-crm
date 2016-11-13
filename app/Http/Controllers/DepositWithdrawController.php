@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use App\Http\Requests;
 use App\Client;
@@ -14,6 +15,7 @@ use App\Expenses;
 use App\SupplierProcess;
 use App\DepositWithdraw;
 use App\Facility;
+use App\User;
 use Validator;
 
 class DepositWithdrawController extends Controller {
@@ -26,7 +28,6 @@ class DepositWithdrawController extends Controller {
     public function __construct() {
         $this->middleware('auth');
         $this->middleware('ability:admin,deposit-withdraw');
-        //$this->middleware('ability:admin,deposit-withdraw-edit');
     }
 
     /**
@@ -39,8 +40,7 @@ class DepositWithdrawController extends Controller {
         $numbers['suppliers_number'] = Supplier::count();
         $numbers['process_number'] = ClientProcess::count();
         $numbers['Supplierprocess_number'] = SupplierProcess::count();
-        // TODO: must re-program
-        $numbers['current_amount'] = ((DepositWithdraw::sum('depositValue') + Facility::sum('opening_amount')) - DepositWithdraw::sum('withdrawValue'));
+        $numbers['current_amount'] = $this->CalculateCurrentAmount();
 
         $clients = Client::select('id', 'name')->get();
         $employees = Employee::select('user_id', 'name')->get();
@@ -133,9 +133,11 @@ class DepositWithdrawController extends Controller {
             ));
         } else {
             $id = DepositWithdraw::create($request->all())->id;
+            //$current_amount = $this->CalculateCurrentAmount();
             return response()->json(array(
                         'success' => true,
                         'id' => $id,
+                        'current_amount' => $this->CalculateCurrentAmount(),
                         'message' => 'تم اضافة وارد جديد.',
                         'errors' => $validator->getMessageBag()->toArray()
             ));
@@ -153,7 +155,7 @@ class DepositWithdrawController extends Controller {
         $all = $request->all();
 
         $rowsIds = [];
-        
+
         foreach ($all['rowsIds'] as $id) {
             DepositWithdraw::where('id', $id)->update(['saveStatus' => 2]);
             $rowsIds[$id] = "Done";
@@ -161,6 +163,7 @@ class DepositWithdrawController extends Controller {
         return response()->json(array(
                     'success' => true,
                     'rowsIds' => $rowsIds,
+                    'current_amount' => $this->CalculateCurrentAmount(),
                     'message' => 'تم حفظ الوارد.',
                     'errors' => $validator->getMessageBag()->toArray()
         ));
@@ -177,7 +180,7 @@ class DepositWithdrawController extends Controller {
         $all = $request->all();
 
         $rowsIds = [];
-        
+
         foreach ($all['rowsIds'] as $id) {
             DepositWithdraw::where('id', $id)->delete(); //->update(['saveStatus' => 2]);
             $rowsIds[$id] = "Done";
@@ -185,6 +188,7 @@ class DepositWithdrawController extends Controller {
         return response()->json(array(
                     'success' => true,
                     'rowsIds' => $rowsIds,
+                    'current_amount' => $this->CalculateCurrentAmount(),
                     'message' => 'تم حذف الوارد.',
                     'errors' => $validator->getMessageBag()->toArray()
         ));
@@ -197,12 +201,16 @@ class DepositWithdrawController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function search(Request $request) {
+        $user = Auth::user();
+        if (!$user->ability('admin', 'deposit-withdraw-edit')) {
+            return response()->view('errors.403', [], 403);
+        }
         $numbers['clients_number'] = Client::count();
         $numbers['suppliers_number'] = Supplier::count();
         $numbers['process_number'] = ClientProcess::count();
         $numbers['Supplierprocess_number'] = SupplierProcess::count();
         // TODO: must re-program
-        $numbers['current_amount'] = ((DepositWithdraw::sum('depositValue') + Facility::sum('opening_amount')) - DepositWithdraw::sum('withdrawValue'));
+        $numbers['current_amount'] = $this->CalculateCurrentAmount();
 
         $clients = Client::select('id', 'name')->get();
         $employees = Employee::select('user_id', 'name')->get();
@@ -211,7 +219,7 @@ class DepositWithdrawController extends Controller {
         $startDate = Carbon::parse($request['targetdate']);
         $endDate = Carbon::parse($request['targetdate'])->format('Y-m-d 11:59:59');
         $depositWithdraws = DepositWithdraw::whereBetween('created_at', [$startDate, $endDate])->get();
-        
+
         $clients_tmp = [];
         $employees_tmp = [];
         $suppliers_tmp = [];
@@ -284,6 +292,7 @@ class DepositWithdrawController extends Controller {
             return response()->json(array(
                         'success' => true,
                         'id' => $id,
+                        'current_amount' => $this->CalculateCurrentAmount(),
                         'message' => 'تم تعديل وارد جديد.',
                         'errors' => $validator->getMessageBag()->toArray()
             ));
@@ -298,6 +307,11 @@ class DepositWithdrawController extends Controller {
      */
     public function destroy($id) {
         //
+    }
+
+    private function CalculateCurrentAmount() {
+        // TODO: must re-program
+        return ((DepositWithdraw::sum('depositValue') + Facility::sum('opening_amount')) - DepositWithdraw::sum('withdrawValue'));
     }
 
 }

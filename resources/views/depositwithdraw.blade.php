@@ -159,7 +159,7 @@
                             <div class="col-sm-6 text-left">
                                 <div id="dataTables-example_filter" class="dataTables_filter">
                                     <button type="button" class="btn btn-primary disabled"> 
-                                        <label>الرصيد الحالى : {{ $numbers['current_amount'] }} جنيه</label>
+                                        <label>الرصيد الحالى : <span id="currentAmount">{{ $numbers['current_amount'] }}</span> جنيه</label>
                                     </button>
 
                                 </div>
@@ -619,6 +619,7 @@
                             <button type="button" class="btn btn-primary" onclick="LockSaveToAll()">حفظ</button>
                         </div>
                         <div class="col-md-6 text-left">
+                            @ability('admin', 'deposit-withdraw-edit')
                             <!-- Date Picker-->
                             {{ Form::open(['route' => 'depositwithdraw.search', 'method' => 'get']) }}
                             <input type="text" style="width:100px"  id="targetdate" name="targetdate" readonly class="form-control">
@@ -629,6 +630,7 @@
                             </script>
                             <button type="submit" class="btn btn-danger">بحث</button>
                             {{ Form::close() }}
+                            @endability
                         </div>
                     </div>
                 </div> 
@@ -641,7 +643,7 @@
 </div>
 
 <script>
-    var checkDelete, depositValue, withdrawValue, clientprocesses, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit;
+    var checkDelete, depositValue, withdrawValue, clientprocesses, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount;
     var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
     SetIsNumberOnly();
     LockAll();
@@ -692,6 +694,7 @@
         notes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(10)').children(0).children(0);
         id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(11)').children(0);
         saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0);
+        currentAmount = $("#currentAmount");
         //console.log("saveStatus in IsValid: " + saveStatus.val());
         /*if (saveStatus.val() == 0) {
          return false;
@@ -777,6 +780,7 @@
                 if (data.success) {
                     saveStatus.val(1);
                     id.val(data.id);
+                    currentAmount.html(data.current_amount);
                     console.log("message: " + data.message);
                 }
             },
@@ -827,6 +831,7 @@
                             //console.log(value);
                             RemoveRowAtIndex(rowIndex);
                         });
+                        currentAmount.html(data.current_amount);
                         console.log("message: " + data.message);
                     }
                 },
@@ -883,6 +888,7 @@
                             saveStatus.val(2);
                             SetRowReadonly(rowIndex);
                         });
+                        currentAmount.html(data.current_amount);
                         console.log("message: " + data.message);
                     }
                 },
@@ -927,9 +933,15 @@
         switch (cellName) {
             case "depositValue":
                 withdrawValue.val('');
+                supplier_id.val('');
+                employee_id.val('');
+                expenses_id.val('');
                 break;
             case "withdrawValue":
                 depositValue.val('');
+                client_id.val('');
+                employee_id.val('');
+                expenses_id.val('');
                 break;
             case "recordDesc":
                 break;
@@ -939,6 +951,7 @@
                 supplier_id.val('');
                 employee_id.val('');
                 expenses_id.val('');
+                withdrawValue.val('');
                 $.get("{{ url('api/getClientProcesses/') }}", {option: client_id.val()},
                         function (data) {
                             clientprocesses.empty();
@@ -952,6 +965,7 @@
                 client_id.val('');
                 employee_id.val('');
                 expenses_id.val('');
+                depositValue.val('');
                 $.get("{{ url('api/getSupplierProcesses/') }}", {option: supplier_id.val()},
                         function (data) {
                             clientprocesses.empty();
@@ -964,11 +978,14 @@
             case "employee_id":
                 client_id.val('');
                 supplier_id.val('');
+                expenses_id.val('');
+                depositValue.val('');
                 clientprocesses.empty();
                 break;
             case "expenses_id":
                 client_id.val('');
                 supplier_id.val('');
+                depositValue.val('');
                 clientprocesses.empty();
                 break;
             case "payMethod":
