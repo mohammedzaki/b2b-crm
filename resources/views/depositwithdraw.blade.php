@@ -647,6 +647,7 @@
     var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
     SetIsNumberOnly();
     LockAll();
+    currentAmount = $("#currentAmount");
 
     function OnRowFocus(CellChildInput) {
         SetCurrentRowIndex(CellChildInput);
@@ -694,7 +695,6 @@
         notes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(10)').children(0).children(0);
         id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(11)').children(0);
         saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0);
-        currentAmount = $("#currentAmount");
         //console.log("saveStatus in IsValid: " + saveStatus.val());
         /*if (saveStatus.val() == 0) {
          return false;
