@@ -26,6 +26,10 @@ Route::get('/depositwithdraw/search', 'DepositWithdrawController@search')->name(
 Route::resource('/depositwithdraw', 'DepositWithdrawController');
 
 Route::resource('/facility', 'FacilityController');
+
+//Employees
+Route::get('/employee/trash', 'EmployeeController@trash')->name('employee.trash');
+Route::get('/employee/restore/{id}', 'EmployeeController@restore')->name('employee.restore');
 Route::resource('/employee', 'EmployeeController');
 
 

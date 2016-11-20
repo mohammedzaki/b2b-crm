@@ -47,7 +47,7 @@
                             <tbody>
                                 @forelse ($employees as $employee)
                                     <tr role="row">
-                                        <td class="text-center">{{ $employee->user_id }}</td>
+                                        <td class="text-center">{{ $employee->emp_id }}</td>
                                         <td>{{ $employee->name }}</td>
                                         <td>{{ $employee->ssn }}</td>
                                         <td>
@@ -70,7 +70,7 @@
                                         </td>
                                         <td>{{ $employee->mobile }}</td>
                                         <td>
-                                            {{ Form::open(['method' => 'DELETE', 'route' => ['employee.destroy', $employee->user_id], 'onsubmit' => 'return ConfirmDelete()', 'style' => 'display: inline-block;']) }}
+                                            {{ Form::open(['method' => 'DELETE', 'route' => ['employee.destroy', $employee->id], 'onsubmit' => 'return ConfirmDelete()', 'style' => 'display: inline-block;']) }}
                                                 {{ Form::button('حذف', array('type' => 'submit', 'class' => 'btn btn-danger')) }}
                                             {{ Form::close() }}
 

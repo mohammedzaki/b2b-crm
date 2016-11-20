@@ -82,22 +82,10 @@ class EmployeeController extends Controller {
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
-            $user = new User();
-            if ($request->username) {
-                $user->username = $request->username;
-            } else {
-                $user->username = "user_" . str_random(5);
-            }
-
-            if ($request->password) {
-                $user->password = bcrypt($request->password);
-            } else {
-                $user->password = bcrypt(str_random(40));
-            }
-            $user->save();
             /* Create employee object */
             $employee = new Employee();
-            $employee->user_id = $user->id;
+            //$employee->user_id = $user->id;
+            $employee->emp_id = $employee->max('emp_id') + 1;
             $employee->name = $request->name;
             $employee->ssn = $request->ssn;
             $employee->gender = $request->gender;
@@ -116,9 +104,23 @@ class EmployeeController extends Controller {
             $employee->borrow_system = ($request->borrow_system) ? $request->borrow_system : false;
             $employee->save();
 
+            $user = new User();
+            if ($request->username) {
+                $user->username = $request->username;
+            } else {
+                $user->username = "user_" . str_random(5);
+            }
+            if ($request->password) {
+                $user->password = bcrypt($request->password);
+            } else {
+                $user->password = bcrypt(str_random(40));
+            }
+            $user->employee_id = $employee->id;
+            $user->save();
+            
             /* create new user role */
             $role = new Role();
-            $role->name = 'role_' . $employee->user_id;
+            $role->name = 'role_' . $employee->id;
             $role->save();
             /* attatch role to user */
             $user->attachRole($role);
@@ -134,19 +136,34 @@ class EmployeeController extends Controller {
     }
 
     public function destroy($id) {
-        $user = User::findOrFail($id);
+        $user = User::where('employee_id', $id)->firstOrFail();
         $roles = $user->roles;
         foreach ($roles as $role) {
             $role->detachPermissions($role->permissions);
             $user->detachRole($role);
             $role->delete();
         }
-        $employee = Employee::where('user_id', $id)->firstOrFail();
-        // dd($employee);
+        $employee = Employee::where('id', $id)->firstOrFail();
+        $employee->deleted_at_id = $employee->emp_id;
+        $employee->emp_id = NULL;
+        $employee->save();
         $employee->delete();
         $user->delete();
 
         return redirect()->back()->with('success', 'تم حذف موظف.');
+    }
+
+    public function trash() {
+        $employees = Employee::onlyTrashed()->get();
+        return view('employee.trash', compact('employees'));
+    }
+
+    public function restore($id) {
+        $employee = Employee::withTrashed()->find($id)->restore();
+        $employee->emp_id = $employee->deleted_at_id;
+        $employee->deleted_at_id = NULL;
+        $employee->save();
+        return redirect()->route('employee.index')->with('success', 'تم استرجاع عميل جديد.');
     }
 
     public function edit($id) {
@@ -163,7 +180,7 @@ class EmployeeController extends Controller {
 
     public function update(Request $request, $id) {
         $employee = Employee::findOrFail($id);
-        $user = User::findOrFail($id);
+        $user = User::where('employee_id', $id)->firstOrFail();
         /* copy request variables */
         $all = $request->all();
 

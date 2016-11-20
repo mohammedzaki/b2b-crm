@@ -21,6 +21,7 @@
                 <ul>
                     <li><a href="{{ URL::to('/employee') }}">الكل</a></li>
                     <li><a href="{{ URL::to('/employee/create') }}">أضف جديد</a></li>
+                    <li><a href="{{ URL::to('/employee/trash') }}">المحذوفات</a></li>
                     <li>
                         <a href="#"><i class="fa fa-money fa-fw"></i> السلفيات </a>
                         <ul>

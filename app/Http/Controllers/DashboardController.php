@@ -39,7 +39,7 @@ class DashboardController extends Controller {
         $numbers['current_amount'] = ((DepositWithdraw::sum('depositValue') + Facility::sum('opening_amount')) - DepositWithdraw::sum('withdrawValue'));
 
         $clients = Client::select('id', 'name')->get();
-        $employees = Employee::select('user_id', 'name')->get();
+        $employees = Employee::select('id', 'name')->get();
         $suppliers = Supplier::select('id', 'name')->get();
         $expenses = Expenses::all();
         $clients_tmp = [];

@@ -3,6 +3,25 @@
 @section('title', 'وارد / منصرف')
 
 @section('content')
+<style>
+    @media(min-width:320px) and (max-width:1440px) {
+        #dataTables-example_wrapper .col-sm-12 form {
+            overflow: auto;
+        }
+        .index .dataTables_wrapper .row {
+            margin-bottom: 10px;
+        }
+    }
+
+    @media(min-width:320px) and (max-width:1295px) {
+        #dataTables-example_wrapper .col-sm-12 form {
+            overflow: auto;
+        }
+        .index .dataTables_wrapper .row {
+            margin-bottom: 10px;
+        }
+    }
+</style>
 <div class="row">
     <div class="col-lg-12">
         <h1 class="page-header">وارد / منصرف</h1>
@@ -141,7 +160,7 @@
                                                                     var month = d.getMonth();
                                                                     var year = d.getFullYear();
                                                                     var days = new Array("الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت");
-                                                                    var months = new Array("ديسمبر", "نوفمبر", "اكتوبر", "سبتمبر", "أغسطس", "يوليو", "يونيو", "مايو", "ابريل", "مارس", "فبراير", "يناير");
+                                                                    var months = new Array("يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "اكتوبر", "نوفمبر", "ديسمبر");
                                                                     document.getElementById("clock").innerHTML = days[day] + " " + date + " " + months[month] + " " + year;
                                                                     setTimeout("refrClock()", 1000);
                                                                 }
@@ -167,7 +186,7 @@
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
-                                {{ Form::open(['route' => 'depositwithdraw.store', 'id' => 'depositwithdrawForm']) }}
+                                {{ Form::open(['route' => 'depositwithdraw.store', 'id' => 'depositwithdrawForm', "role" => "form"]) }}
 
                                 <table class="table table-striped table-bordered table-hover dataTable no-footer" id="depositwithdrawTable" role="grid" aria-describedby="dataTables-example_info">
                                     <thead>

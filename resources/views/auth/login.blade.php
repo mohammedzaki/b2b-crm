@@ -60,36 +60,36 @@
     </div>
 </div>
 <script type="text/javascript">
-function refrClock() {
-    var d = new Date();
-    var s = d.getSeconds();
-    var m = d.getMinutes();
-    var h = d.getHours();
-    var day = d.getDay();
-    var date = d.getDate();
-    var month = d.getMonth();
-    var year = d.getFullYear();
-    var days = new Array("الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت");
-    var months = new Array("ديسمبر", "نوفمبر", "اكتوبر", "سبتمبر", "أغسطس", "يوليو", "يونيو", "مايو", "ابريل", "مارس", "فبراير", "يناير");
-    var am_pm;
-    if (s < 10) {
-        s = "0" + s
+    function refrClock() {
+        var d = new Date();
+        var s = d.getSeconds();
+        var m = d.getMinutes();
+        var h = d.getHours();
+        var day = d.getDay();
+        var date = d.getDate();
+        var month = d.getMonth();
+        var year = d.getFullYear();
+        var days = new Array("الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت");
+        var months = new Array("يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "اكتوبر", "نوفمبر", "ديسمبر");
+        var am_pm;
+        if (s < 10) {
+            s = "0" + s
+        }
+        if (m < 10) {
+            m = "0" + m
+        }
+        if (h > 12) {
+            h -= 12;
+            am_pm = "مساءً"
+        } else {
+            am_pm = "صباحاً"
+        }
+        if (h < 10) {
+            h = "0" + h
+        }
+        document.getElementById("clock").innerHTML = days[day] + " " + date + " " + months[month] + " " + year + " - الساعة الآن " + h + ":" + m + ":" + s + " " + am_pm;
+        setTimeout("refrClock()", 1000);
     }
-    if (m < 10) {
-        m = "0" + m
-    }
-    if (h > 12) {
-        h -= 12;
-        am_pm = "مساءً"
-    } else {
-        am_pm = "صباحاً"
-    }
-    if (h < 10) {
-        h = "0" + h
-    }
-    document.getElementById("clock").innerHTML = days[day] + " " + date + " " + months[month] + " " + year + " - الساعة الآن " + h + ":" + m + ":" + s + " " + am_pm;
-    setTimeout("refrClock()", 1000);
-}
-refrClock();
+    refrClock();
 </script>
 @endsection

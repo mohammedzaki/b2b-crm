@@ -216,8 +216,8 @@ class DepositWithdrawController extends Controller {
         $employees = Employee::select('user_id', 'name')->get();
         $suppliers = Supplier::select('id', 'name')->get();
         $expenses = Expenses::all();
-        $startDate = Carbon::parse($request['targetdate']);
-        $endDate = Carbon::parse($request['targetdate'])->format('Y-m-d 11:59:59');
+        $startDate = Carbon::parse($request['targetdate'])->format('Y-m-d 00:00:00');
+        $endDate = Carbon::parse($request['targetdate'])->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::whereBetween('created_at', [$startDate, $endDate])->get();
 
         $clients_tmp = [];
