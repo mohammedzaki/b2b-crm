@@ -43,7 +43,7 @@ class DepositWithdrawController extends Controller {
         $numbers['current_amount'] = $this->CalculateCurrentAmount();
 
         $clients = Client::select('id', 'name')->get();
-        $employees = Employee::select('user_id', 'name')->get();
+        $employees = Employee::select('id', 'name')->get();
         $suppliers = Supplier::select('id', 'name')->get();
         $expenses = Expenses::all();
         //$depositWithdraws = DepositWithdraw::select()->whereRaw('Date(created_at) = CURDATE()')->get();
@@ -61,7 +61,7 @@ class DepositWithdrawController extends Controller {
             $clients_tmp[$client->id] = $client->name;
         }
         foreach ($employees as $employee) {
-            $employees_tmp[$employee->user_id] = $employee->name;
+            $employees_tmp[$employee->id] = $employee->name;
         }
         foreach ($suppliers as $supplier) {
             $suppliers_tmp[$supplier->id] = $supplier->name;
@@ -213,7 +213,7 @@ class DepositWithdrawController extends Controller {
         $numbers['current_amount'] = $this->CalculateCurrentAmount();
 
         $clients = Client::select('id', 'name')->get();
-        $employees = Employee::select('user_id', 'name')->get();
+        $employees = Employee::select('id', 'name')->get();
         $suppliers = Supplier::select('id', 'name')->get();
         $expenses = Expenses::all();
         $startDate = Carbon::parse($request['targetdate'])->format('Y-m-d 00:00:00');
@@ -233,7 +233,7 @@ class DepositWithdrawController extends Controller {
             $clients_tmp[$client->id] = $client->name;
         }
         foreach ($employees as $employee) {
-            $employees_tmp[$employee->user_id] = $employee->name;
+            $employees_tmp[$employee->id] = $employee->name;
         }
         foreach ($suppliers as $supplier) {
             $suppliers_tmp[$supplier->id] = $supplier->name;

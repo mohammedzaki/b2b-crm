@@ -215,7 +215,7 @@
                                                     {{ Form::text("depositValue", ($depositWithdraw->depositValue > 0 ? $depositWithdraw->depositValue : null), 
                                                                 array(
                                                                     "class" => "form-control IsNumberOnly", 
-                                                                    "id" => "client_id",
+                                                                    "id" => "depositValue",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",

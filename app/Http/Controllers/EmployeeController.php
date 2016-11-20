@@ -84,7 +84,6 @@ class EmployeeController extends Controller {
         } else {
             /* Create employee object */
             $employee = new Employee();
-            //$employee->user_id = $user->id;
             $employee->emp_id = $employee->max('emp_id') + 1;
             $employee->name = $request->name;
             $employee->ssn = $request->ssn;

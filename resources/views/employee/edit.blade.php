@@ -24,7 +24,7 @@
 
     {{ Form::model($employee, 
             array(
-                'route' => array('employee.update', $employee->user_id),
+                'route' => array('employee.update', $employee->id),
                 'method' => 'put'
             )
         ) 

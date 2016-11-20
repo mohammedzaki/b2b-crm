@@ -59,14 +59,14 @@ class ClientProcessController extends Controller {
 
     public function create() {
         $clients = Client::select('id', 'name')->get();
-        $employees = Employee::select('user_id', 'name')->get();
+        $employees = Employee::select('id', 'name')->get();
         $clients_tmp = [];
         $employees_tmp = [];
         foreach ($clients as $client) {
             $clients_tmp[$client->id] = $client->name;
         }
         foreach ($employees as $employee) {
-            $employees_tmp[$employee->user_id] = $employee->name;
+            $employees_tmp[$employee->id] = $employee->name;
         }
         $clients = $clients_tmp;
         $employees = $employees_tmp;
@@ -113,14 +113,14 @@ class ClientProcessController extends Controller {
     public function edit($id) {
         $process = ClientProcess::findOrFail($id);
         $clients = Client::select('id', 'name')->get();
-        $employees = Employee::select('user_id', 'name')->get();
+        $employees = Employee::select('id', 'name')->get();
         $clients_tmp = [];
         $employees_tmp = [];
         foreach ($clients as $client) {
             $clients_tmp[$client->id] = $client->name;
         }
         foreach ($employees as $employee) {
-            $employees_tmp[$employee->user_id] = $employee->name;
+            $employees_tmp[$employee->id] = $employee->name;
         }
         $clients = $clients_tmp;
         $employees = $employees_tmp;

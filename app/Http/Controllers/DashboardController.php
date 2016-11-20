@@ -50,7 +50,7 @@ class DashboardController extends Controller {
             $clients_tmp[$client->id] = $client->name;
         }
         foreach ($employees as $employee) {
-            $employees_tmp[$employee->user_id] = $employee->name;
+            $employees_tmp[$employee->id] = $employee->name;
         }
         foreach ($suppliers as $supplier) {
             $suppliers_tmp[$supplier->id] = $supplier->name;

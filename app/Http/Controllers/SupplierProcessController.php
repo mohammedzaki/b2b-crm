@@ -66,7 +66,7 @@ class SupplierProcessController extends Controller {
     public function create() {
         $suppliers = Supplier::select('id', 'name')->get();
         $clients = Client::all();
-        $employees = Employee::select('user_id', 'name')->get();
+        $employees = Employee::select('id', 'name')->get();
         $suppliers_tmp = [];
         $employees_tmp = [];
         $clients_tmp = [];
@@ -74,7 +74,7 @@ class SupplierProcessController extends Controller {
             $suppliers_tmp[$supplier->id] = $supplier->name;
         }
         foreach ($employees as $employee) {
-            $employees_tmp[$employee->user_id] = $employee->name;
+            $employees_tmp[$employee->id] = $employee->name;
         }
         foreach ($clients as $client) {
             $clients_tmp[$client->id] = $client->name;
@@ -128,14 +128,14 @@ class SupplierProcessController extends Controller {
     public function edit($id) {
         $process = SupplierProcess::findOrFail($id);
         $suppliers = Supplier::select('id', 'name')->get();
-        $employees = Employee::select('user_id', 'name')->get();
+        $employees = Employee::select('id', 'name')->get();
         $suppliers_tmp = [];
         $employees_tmp = [];
         foreach ($suppliers as $supplier) {
             $suppliers_tmp[$supplier->id] = $supplier->name;
         }
         foreach ($employees as $employee) {
-            $employees_tmp[$employee->user_id] = $employee->name;
+            $employees_tmp[$employee->id] = $employee->name;
         }
         $suppliers = $suppliers_tmp;
         $employees = $employees_tmp;

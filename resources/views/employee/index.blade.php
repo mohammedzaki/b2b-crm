@@ -74,7 +74,7 @@
                                                 {{ Form::button('حذف', array('type' => 'submit', 'class' => 'btn btn-danger')) }}
                                             {{ Form::close() }}
 
-                                            {{ link_to_route('employee.edit', 'تعديل', array('id' => $employee->user_id), array('class' => 'btn btn-primary')) }}
+                                            {{ link_to_route('employee.edit', 'تعديل', array('id' => $employee->id), array('class' => 'btn btn-primary')) }}
                                         </td>
                                     </tr>
                                 @empty

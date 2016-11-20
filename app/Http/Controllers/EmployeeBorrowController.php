@@ -53,13 +53,13 @@ class EmployeeBorrowController extends Controller
      */
     public function create()
     {
-        $employees = Employee::select('user_id', 'name', 'daily_salary')->get();
+        $employees = Employee::select('id', 'name', 'daily_salary')->get();
         $employees_tmp = [];
         $employees_salary_tmp = [];
 
         foreach ($employees as $employee) {
-            $employees_tmp[$employee->user_id] = $employee->name;
-            $employees_salary_tmp[$employee->user_id] = $employee->daily_salary;
+            $employees_tmp[$employee->id] = $employee->name;
+            $employees_salary_tmp[$employee->id] = $employee->daily_salary;
         }
         $employees = $employees_tmp;
         $employees_salary = $employees_salary_tmp;
