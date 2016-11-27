@@ -11,29 +11,30 @@ class Employee extends Model {
 
     protected $dates = ['deleted_at'];
     protected $fillable = [
-        'name', 
+        'name',
         'emp_id',
         'ssn',
         'gender',
-        'martial_status', 
-        'birth_date', 
-        'department', 
-        'hiring_date', 
-        'daily_salary', 
-        'working_hours', 
-        'job_title', 
-        'telephone', 
-        'mobile', 
-        'facility_id', 
+        'martial_status',
+        'birth_date',
+        'department',
+        'hiring_date',
+        'daily_salary',
+        'working_hours',
+        'job_title',
+        'telephone',
+        'mobile',
+        'facility_id',
         'can_not_use_program',
         'is_active',
         'borrow_system',
         'deleted_at_id'
     ];
 
-    /* public function user() {
-      return $this->belongsTo('App\User', 'user_id');
-      } */
+    public function users() {
+        //return $this->belongsTo('App\User', 'employee_id');
+        return $this->hasMany('App\User', 'employee_id');
+    }
 
     /* public function employeeBorrow() {
       return $this->hasMany('App\EmployeeBorrow', 'user_id');

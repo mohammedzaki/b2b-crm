@@ -167,8 +167,8 @@ class EmployeeController extends Controller {
 
     public function edit($id) {
         $employee = Employee::findOrFail($id);
-        $employee->username = $employee->user->username;
-        $employeePermissions = $employee->user->roles->first()->perms;
+        //$employee->username = $employee->user[0]->username;
+        $employeePermissions = $employee->users[0]->roles->first()->perms;
         $selectedPermissions = [];
         foreach ($employeePermissions as $p) {
             array_push($selectedPermissions, $p->id);

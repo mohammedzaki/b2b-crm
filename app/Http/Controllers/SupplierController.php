@@ -17,10 +17,10 @@ class SupplierController extends Controller {
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-                    'name' => 'required|unique:suppliers,name,' . $id . '|min:5|max:255',
+                    'name' => 'required|unique:suppliers,name,' . $id . '|string',
                     'address' => 'required|string',
-                    'telephone' => 'digits:8',
-                    'mobile' => 'required|digits:11',
+                    'telephone' => 'digits_between:8,14',
+                    'mobile' => 'required|numeric',
                     'debit_limit' => 'required|numeric'
         ]);
 

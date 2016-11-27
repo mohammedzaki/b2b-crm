@@ -215,17 +215,6 @@ class SupplierProcessController extends Controller {
         return redirect()->route('supplier.process.index')->with('success', 'تم استرجاع العملية.');
     }
 
-    public function getClientProcesses(Request $request) {
-        $input = $request->input('option');
-        $clientProcesses = ClientProcess::where('client_id', $input)->get();
-        $clientProcesses_tmp = [];
-        foreach ($clientProcesses as $process) {
-            $clientProcesses_tmp[$process->id] = $process->name;
-        }
-        $clientProcesses = $clientProcesses_tmp;
-        return response()->json($clientProcesses);
-    }
-
     public function getSupplierProcesses(Request $request) {
         $input = $request->input('option');
         $clientProcesses = SupplierProcess::where('supplier_id', $input)->get();

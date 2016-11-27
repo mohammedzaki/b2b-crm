@@ -86,6 +86,13 @@
             <li>
                 <a href="index2.html"><i class="fa fa-list-alt fa-fw"></i> دراسة جدوى العملية</a>
             </li>
+            <li>
+                <a href="{{ URL::to('/reports') }}"><i class="fa fa-files-o fa-fw"></i> التقارير</a>
+                <ul>
+                    <li><a href="{{ URL::to('/reports/client') }}">عميل</a></li>
+                </ul>
+
+            </li>
         </ul>
     </div>
 </div>

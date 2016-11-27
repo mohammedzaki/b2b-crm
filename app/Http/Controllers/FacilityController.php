@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Facility;
 use App\User;
+use App\Employee;
 use Validator;
 
 class FacilityController extends Controller
@@ -63,7 +64,7 @@ class FacilityController extends Controller
     public function edit($id)
     {
         $facility = Facility::findOrFail($id);
-        $facility->manager = User::find($facility->manager_id)->username;
+        $facility->manager = Employee::find($facility->manager_id)->name; //User::find($facility->manager_id)->username;
         return view('facility.edit', compact('facility'));
     }
 

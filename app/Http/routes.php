@@ -59,9 +59,17 @@ Route::resource('expenses', 'ExpensesController');
 //salafeyat
 Route::resource('employeeBorrow', 'EmployeeBorrowController');
 
-/**
- * Ajax Routes
- */
-// Route::get('/getManagerList', 'AjaxController@getManagerList');
-Route::get('api/getClientProcesses', 'SupplierProcessController@getClientProcesses');
-Route::get('api/getSupplierProcesses', 'SupplierProcessController@getSupplierProcesses');
+//api
+Route::group(['prefix' => 'api'], function() {
+    Route::get('getClientProcesses', 'ClientProcessController@getClientProcesses');
+    Route::get('getSupplierProcesses', 'SupplierProcessController@getSupplierProcesses');
+});
+
+//reports
+Route::group(['prefix' => 'reports'], function() {
+    Route::get('/', 'ReportsController@index');
+    Route::get('client/', 'ReportsController@client');
+    Route::get('client/viewClientReport', 'ReportsController@viewClientReport');
+    Route::get('client/getClientProcesses', 'ClientProcessController@getClientReportProcesses');
+});
+

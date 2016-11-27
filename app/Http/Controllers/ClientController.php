@@ -18,15 +18,15 @@ class ClientController extends Controller {
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-                    'name' => 'required|unique:clients,name,' . $id . '|min:5|max:255',
+                    'name' => 'required|unique:clients,name,' . $id . '|string',
                     'address' => 'required|string',
-                    'telephone' => 'digits:8',
-                    'mobile' => 'required|digits:11',
+                    'telephone' => 'digits_between:8,14',
+                    'mobile' => 'required|numeric',
                     'referral' => 'required_without:is_client_company|exists:users,username',
                     'referral_percentage' => 'required_without:is_client_company|required_with:referral|numeric',
                     'credit_limit' => 'required|numeric',
                     'is_client_company' => 'boolean',
-                    'authorized.*.name' => 'required|min:6|max:255',
+                    'authorized.*.name' => 'required|string',
                     'authorized.*.jobtitle' => 'required|string',
                     'authorized.*.telephone' => 'required|digits_between:8,14',
                     'authorized.*.email' => 'required|email'

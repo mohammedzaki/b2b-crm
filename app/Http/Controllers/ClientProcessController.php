@@ -21,7 +21,7 @@ class ClientProcessController extends Controller {
         $validator = Validator::make($data, [
                     'name' => 'required|unique:supplier_processes,name,' . $id . '|min:5|max:255',
                     'client_id' => 'required|exists:clients,id',
-                    'employee_id' => 'required|exists:employees,user_id',
+                    'employee_id' => 'required|exists:employees,id',
                     'notes' => 'string',
                     'has_discount' => 'boolean',
                     'discount_percentage' => 'required_with:has_discount|numeric',
@@ -76,7 +76,7 @@ class ClientProcessController extends Controller {
     public function store(Request $request) {
         $validator = $this->validator($request->all());
         $all = $request->all();
-        
+
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
@@ -195,6 +195,31 @@ class ClientProcessController extends Controller {
         ClientProcess::withTrashed()->find($id)->restore();
         ClientProcessItem::withTrashed()->where('process_id', $id)->restore();
         return redirect()->route('client.process.index')->with('success', 'تم استرجاع العملية.');
+    }
+
+    public function getClientProcesses(Request $request) {
+        $input = $request->input('option');
+        $clientProcesses = ClientProcess::where('client_id', $input)->get();
+        $clientProcesses_tmp = [];
+        foreach ($clientProcesses as $process) {
+            $clientProcesses_tmp[$process->id] = $process->name;
+        }
+        $clientProcesses = $clientProcesses_tmp;
+        return response()->json($clientProcesses);
+    }
+
+    public function getClientReportProcesses(Request $request) {
+        $input = $request->input('option');
+        $clientProcesses = ClientProcess::where('client_id', $input)->get();
+
+        $clientProcesses_tmp = [];
+        foreach ($clientProcesses as $process) {
+            $clientProcesses_tmp[$process->id]['name'] = $process->name;
+            $clientProcesses_tmp[$process->id]['totalPrice'] = $process->total_price;
+            $clientProcesses_tmp[$process->id]['status'] = $process->status;
+        }
+        $clientProcesses = $clientProcesses_tmp;
+        return response()->json($clientProcesses);
     }
 
 }
