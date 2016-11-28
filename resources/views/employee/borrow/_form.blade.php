@@ -133,5 +133,9 @@
 </div>
 
 <script>
-
+var employeeID, pay_percentage, pay_amount, after_pay, employeeSalary;
+    
+    $('#employee_id').on('change', function () {
+        employeeID = 
+    });
 </script>
