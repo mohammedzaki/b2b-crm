@@ -1,0 +1,30 @@
+2016-11-29T16:19:24.617Z - error: Error when processing render request Error during rendering report: Engine must be specified
+logs:
++0      Starting rendering request 7
++0      Rendering anonymous template { recipe:undefined,engine:undefined}
++1      Data item not defined for this template.
++3      Resources not defined for this template. Error: Engine must be specified
+    at invokeRender (/Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/lib/render/render.js:66:11)
+    at /Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/lib/render/render.js:144:12
+    at _fulfilled (/Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/node_modules/listener-collection/node_modules/q/q.js:794:54)
+    at self.promiseDispatch.done (/Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/node_modules/listener-collection/node_modules/q/q.js:823:30)
+    at Promise.promise.promiseDispatch (/Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/node_modules/listener-collection/node_modules/q/q.js:756:13)
+    at /Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/node_modules/listener-collection/node_modules/q/q.js:564:44
+    at flush (/Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/node_modules/listener-collection/node_modules/q/q.js:110:17)
+    at nextTickCallbackWith0Args (node.js:420:9)
+    at process._tickCallback (node.js:349:13) requestId=7
+2016-11-29T16:19:24.618Z - error: Error during processing request: http://localhost:5488/api/report details: Error during rendering report: Engine must be specified
+logs:
++0      Starting rendering request 7
++0      Rendering anonymous template { recipe:undefined,engine:undefined}
++1      Data item not defined for this template.
++3      Resources not defined for this template. Error: Engine must be specified
+    at invokeRender (/Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/lib/render/render.js:66:11)
+    at /Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/lib/render/render.js:144:12
+    at _fulfilled (/Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/node_modules/listener-collection/node_modules/q/q.js:794:54)
+    at self.promiseDispatch.done (/Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/node_modules/listener-collection/node_modules/q/q.js:823:30)
+    at Promise.promise.promiseDispatch (/Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/node_modules/listener-collection/node_modules/q/q.js:756:13)
+    at /Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/node_modules/listener-collection/node_modules/q/q.js:564:44
+    at flush (/Users/mohammedzaki/Documents/Mohamed_Zaki_Private/4_PHP/b2bpos/node_modules/jsreport/node_modules/jsreport-core/node_modules/listener-collection/node_modules/q/q.js:110:17)
+    at nextTickCallbackWith0Args (node.js:420:9)
+    at process._tickCallback (node.js:349:13)

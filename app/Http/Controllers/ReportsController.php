@@ -9,6 +9,10 @@ use App\User;
 use App\Role;
 use App\Permission;
 use App\Client;
+use App\ClientProcess;
+use App\DepositWithdraw;
+use App\Reports\Client\ClientTotal;
+use App\Reports\Client\ClientDetailed;
 
 class ReportsController extends Controller {
 
@@ -69,7 +73,7 @@ class ReportsController extends Controller {
     public function index() {
         return view('reports.index');
     }
-    
+
     public function client() {
         $clients = Client::all();
         $clients_tmp = [];
@@ -79,9 +83,87 @@ class ReportsController extends Controller {
         $clients = $clients_tmp;
         return view('reports.client.index', compact("clients"));
     }
-    
+
     public function viewClientReport(Request $request) {
-        return response()->json($request);
+        //{"ch_detialed":"0","client_id":"1","processes":["1","2"]}
+        $client = Client::findOrFail($request->client_id);
+        $clientName = $client->name;
+        $allProcessesTotalPrice = 0;
+        $allProcessTotalPaid = 0;
+        $allProcessTotalRemaining = 0;
+
+        $proceses = [];
+        foreach ($request->processes as $id) {
+            $clientProcess = ClientProcess::findOrFail($id);
+            $proceses[$id]['processName'] = $clientProcess->name;
+            $proceses[$id]['processTotalPrice'] = $clientProcess->total_price;
+            $proceses[$id]['processTotalPaid'] = $clientProcess->deposits()->sum('depositValue');
+            $proceses[$id]['processTotalRemaining'] = $clientProcess->total_price - $clientProcess->deposits()->sum('depositValue');
+            $proceses[$id]['processDate'] = $clientProcess->created_at;
+            $allProcessesTotalPrice += $proceses[$id]['processTotalPrice'];
+            $allProcessTotalPaid += $proceses[$id]['processTotalPaid'];
+            $allProcessTotalRemaining += $proceses[$id]['processTotalRemaining'];
+
+            if ($request->ch_detialed == "1") {
+                $index = 0;
+                $totalDepositValue = 0;
+                foreach ($clientProcess->items as $item) {
+                    $proceses[$id]['processDetails'][$index]['date'] = $item->updated_at;
+                    $proceses[$id]['processDetails'][$index]['remaining'] = "";
+                    $proceses[$id]['processDetails'][$index]['paid'] = "";
+                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $item->quantity * $item->unit_price;
+                    $proceses[$id]['processDetails'][$index]['unitPrice'] = $item->unit_price;
+                    $proceses[$id]['processDetails'][$index]['quantity'] = $item->quantity;
+                    $proceses[$id]['processDetails'][$index]['desc'] = $item->description;
+                    $index++;
+                }
+                foreach ($clientProcess->deposits as $deposit) {
+                    $totalDepositValue += $deposit->depositValue;
+                    $proceses[$id]['processDetails'][$index]['date'] = $deposit->updated_at;
+                    $proceses[$id]['processDetails'][$index]['remaining'] = $clientProcess->total_price - $totalDepositValue;
+                    $proceses[$id]['processDetails'][$index]['paid'] = $deposit->depositValue;
+                    $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
+                    $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
+                    $proceses[$id]['processDetails'][$index]['quantity'] = "";
+                    $proceses[$id]['processDetails'][$index]['desc'] = $deposit->recordDesc;
+                    $index++;
+                }
+            }
+        }
+        session([
+                'clientName' => $clientName,
+                'proceses' => $proceses, 
+                'allProcessesTotalPrice' => $allProcessesTotalPrice, 
+                'allProcessTotalPaid' => $allProcessTotalPaid, 
+                'allProcessTotalRemaining' => $allProcessTotalRemaining
+                ]);
+        if ($request->ch_detialed == "0") {
+            return view("reports.client.total", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
+        } else {
+            return view("reports.client.detialed", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
+        }
+    }
+
+    public function printTotalPDF() {
+        // Instanciation of inherited class
+        $pdfReport = new ClientTotal();
+        $pdfReport->clientName = session('clientName');
+        $pdfReport->proceses = session('proceses');
+        $pdfReport->allProcessesTotalPrice = session('allProcessesTotalPrice');
+        $pdfReport->allProcessTotalPaid = session('allProcessTotalPaid');
+        $pdfReport->allProcessTotalRemaining = session('allProcessTotalRemaining');
+        return $pdfReport->RenderReport();
+    }
+    
+    public function printDetailedPDF() {
+        // Instanciation of inherited class
+        $pdfReport = new ClientDetailed();
+        $pdfReport->clientName = session('clientName');
+        $pdfReport->proceses = session('proceses');
+        $pdfReport->allProcessesTotalPrice = session('allProcessesTotalPrice');
+        $pdfReport->allProcessTotalPaid = session('allProcessTotalPaid');
+        $pdfReport->allProcessTotalRemaining = session('allProcessTotalRemaining');
+        return $pdfReport->RenderReport();
     }
 
 }

@@ -662,7 +662,7 @@
 </div>
 
 <script>
-    var checkDelete, depositValue, withdrawValue, clientprocesses, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount;
+    var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount;
     var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
     SetIsNumberOnly();
     LockAll();
@@ -705,7 +705,7 @@
         depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(1)').children(0).children(0);
         withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(2)').children(0).children(0);
         recordDesc = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(3)').children(0).children(0);
-        clientprocesses = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
+        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
         client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(5)').children(0).children(0);
         supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(6)').children(0).children(0);
         employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(7)').children(0).children(0);
@@ -731,22 +731,22 @@
         } else {
             payMethod.parent().removeClass("has-error");
         }
-        if (supplier_id.val() === '' && employee_id.val() === '' && expenses_id.val() === '' && client_id.val() === '' && (clientprocesses.val() === '' || clientprocesses.val() === null)) {
-            clientprocesses.parent().addClass("has-error");
+        if (supplier_id.val() === '' && employee_id.val() === '' && expenses_id.val() === '' && client_id.val() === '' && (cbo_processes.val() === '' || cbo_processes.val() === null)) {
+            cbo_processes.parent().addClass("has-error");
             client_id.parent().addClass("has-error");
             supplier_id.parent().addClass("has-error");
             employee_id.parent().addClass("has-error");
             expenses_id.parent().addClass("has-error");
             flag = false;
         } else {
-            clientprocesses.parent().removeClass("has-error");
+            cbo_processes.parent().removeClass("has-error");
             client_id.parent().removeClass("has-error");
             supplier_id.parent().removeClass("has-error");
             employee_id.parent().removeClass("has-error");
             expenses_id.parent().removeClass("has-error");
         }
-        //console.log("depositValue.val(): " + depositValue.val() + ", : " + (supplier_id.val() === '' && employee_id.val() === '' && expenses_id.val() === '' && client_id.val() === '' && (clientprocesses.val() === '' || clientprocesses.val() === null)) + ", " + employee_id.val());
-        //console.log(" supplier_id: " + supplier_id.val() + ", employee_id: " + employee_id.val() + ", expenses_id: " + expenses_id.val() + ", client_id: " + client_id.val() + ", clientprocesses: " + clientprocesses.val() + ", rowIndex: " + rowIndex);
+        //console.log("depositValue.val(): " + depositValue.val() + ", : " + (supplier_id.val() === '' && employee_id.val() === '' && expenses_id.val() === '' && client_id.val() === '' && (cbo_processes.val() === '' || cbo_processes.val() === null)) + ", " + employee_id.val());
+        //console.log(" supplier_id: " + supplier_id.val() + ", employee_id: " + employee_id.val() + ", expenses_id: " + expenses_id.val() + ", client_id: " + client_id.val() + ", cbo_processes: " + cbo_processes.val() + ", rowIndex: " + rowIndex);
         if (depositValue.val() === '' && withdrawValue.val() === '') {
             depositValue.parent().addClass("has-error");
             withdrawValue.parent().addClass("has-error");
@@ -771,7 +771,7 @@
             depositValue: depositValue.val(),
             withdrawValue: withdrawValue.val(),
             recordDesc: recordDesc.val(),
-            clientprocesses: clientprocesses.val(),
+            cbo_processes: cbo_processes.val(),
             client_id: client_id.val(),
             supplier_id: supplier_id.val(),
             employee_id: employee_id.val(),
@@ -944,7 +944,7 @@
         checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(0)').children(0);
         depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(1)').children(0).children(0);
         withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(2)').children(0).children(0);
-        clientprocesses = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
+        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
         client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(5)').children(0).children(0);
         supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(6)').children(0).children(0);
         employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(7)').children(0).children(0);
@@ -973,10 +973,10 @@
                 withdrawValue.val('');
                 $.get("{{ url('api/getClientProcesses/') }}", {option: client_id.val()},
                         function (data) {
-                            clientprocesses.empty();
-                            clientprocesses.append($("<option></option>").attr("value", -1).text(''));
+                            cbo_processes.empty();
+                            cbo_processes.append($("<option></option>").attr("value", -1).text(''));
                             $.each(data, function (key, value) {
-                                clientprocesses.append($("<option></option>").attr("value", key).text(value));
+                                cbo_processes.append($("<option></option>").attr("value", key).text(value));
                             });
                         });
                 break;
@@ -987,10 +987,10 @@
                 depositValue.val('');
                 $.get("{{ url('api/getSupplierProcesses/') }}", {option: supplier_id.val()},
                         function (data) {
-                            clientprocesses.empty();
-                            clientprocesses.append($("<option></option>").attr("value", -1).text(''));
+                            cbo_processes.empty();
+                            cbo_processes.append($("<option></option>").attr("value", -1).text(''));
                             $.each(data, function (key, value) {
-                                clientprocesses.append($("<option></option>").attr("value", key).text(value));
+                                cbo_processes.append($("<option></option>").attr("value", key).text(value));
                             });
                         });
                 break;
@@ -999,13 +999,13 @@
                 supplier_id.val('');
                 expenses_id.val('');
                 depositValue.val('');
-                clientprocesses.empty();
+                cbo_processes.empty();
                 break;
             case "expenses_id":
                 client_id.val('');
                 supplier_id.val('');
                 depositValue.val('');
-                clientprocesses.empty();
+                cbo_processes.empty();
                 break;
             case "payMethod":
                 break;
@@ -1063,7 +1063,7 @@
         depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(1)').children(0).children(0);
         withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(2)').children(0).children(0);
         recordDesc = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(3)').children(0).children(0);
-        clientprocesses = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
+        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
         client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(5)').children(0).children(0);
         supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(6)').children(0).children(0);
         employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(7)').children(0).children(0);
@@ -1077,7 +1077,7 @@
         depositValue.attr("disabled", "disabled");
         withdrawValue.attr("disabled", "disabled");
         recordDesc.attr("disabled", "disabled");
-        clientprocesses.attr("disabled", "disabled");
+        cbo_processes.attr("disabled", "disabled");
         client_id.attr("disabled", "disabled");
         supplier_id.attr("disabled", "disabled");
         employee_id.attr("disabled", "disabled");

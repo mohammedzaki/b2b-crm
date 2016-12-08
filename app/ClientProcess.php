@@ -33,5 +33,8 @@ class ClientProcess extends Model {
     public function employee() {
         return $this->hasOne('App\Employee', 'user_id');
     }
-
+    
+    public function deposits() {
+        return $this->hasMany('App\DepositWithdraw', 'cbo_processes');
+    }
 }

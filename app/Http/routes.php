@@ -69,7 +69,9 @@ Route::group(['prefix' => 'api'], function() {
 Route::group(['prefix' => 'reports'], function() {
     Route::get('/', 'ReportsController@index');
     Route::get('client/', 'ReportsController@client');
-    Route::get('client/viewClientReport', 'ReportsController@viewClientReport');
+    Route::get('client/printTotalPDF', 'ReportsController@printTotalPDF');
+    Route::get('client/printDetailedPDF', 'ReportsController@printDetailedPDF');
+    Route::any('client/viewClientReport', 'ReportsController@viewClientReport')->name('reports.client.viewClientReport');
     Route::get('client/getClientProcesses', 'ClientProcessController@getClientReportProcesses');
 });
 

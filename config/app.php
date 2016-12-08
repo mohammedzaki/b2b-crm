@@ -155,12 +155,12 @@ return [
         App\Providers\AuthServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
-
+        
         /*
          * My Providers
          */
         Zizaco\Entrust\EntrustServiceProvider::class,
-        Collective\Html\HtmlServiceProvider::class,
+        Collective\Html\HtmlServiceProvider::class
     ],
 
     /*
