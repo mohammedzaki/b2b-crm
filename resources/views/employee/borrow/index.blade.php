@@ -47,16 +47,16 @@
 	                        	@forelse ($employeeBorrows as $item)
 	                        	<tr role="row">
 	                        	    <td class="text-center">{{ $item->id }}</td>
-	                        	    <td>{{ $item->name }}</td>
-	                        	    <td>{{ $item->employee->name }}</td>
+									<td>{{ $item->employee->name }}</td>
 	                        	    <td>{{ $item->borrow_reason }}</td>
+	                        	    <td>{{ $item->Amount }}</td>
 	                        	    <td>{{ $item->pay_amount }}</td>
 	                        	    <td>
-	                        	    	{{ Form::open(['method' => 'DELETE', 'route' => ['client.process.destroy', $item->id], 'onsubmit' => 'return ConfirmDelete()', 'style' => 'display: inline-block;']) }}
+	                        	    	{{ Form::open(['method' => 'DELETE', 'route' => ['employeeBorrow.destroy', $item->id], 'onsubmit' => 'return ConfirmDelete()', 'style' => 'display: inline-block;']) }}
 	                        	    	    {{ Form::button('حذف', array('type' => 'submit', 'class' => 'btn btn-danger')) }}
 	                        	    	{{ Form::close() }}
 
-	                        	    	{{ link_to_route('client.process.edit', 'تعديل', array('id' => $item->id), array('class' => 'btn btn-primary')) }}
+	                        	    	{{ link_to_route('employeeBorrow.edit', 'تعديل', array('id' => $item->id), array('class' => 'btn btn-primary')) }}
 	                        	    </td>
 	                        	</tr>
 	                        	@empty

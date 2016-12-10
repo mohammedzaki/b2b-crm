@@ -18,17 +18,17 @@ class EmployeeBorrowController extends Controller
     protected function validator(array $data, $id = null)
     {
         $validator = Validator::make($data, [
-            'employee_id' => 'required|exists:employees,user_id',
+            'user_id' => 'required|exists:employees,user_id',
             'borrow_reason' => 'required_with:has_discount|string',
-            'amount' => 'required|numeric',
+            'Amount' => 'required|numeric',
             'pay_percentage' => 'numeric',
             'pay_amount' => 'numeric'
         ]);
 
         $validator->setAttributeNames([
-            'employee_id' => 'أسم الموظف',
+            'user_id' => 'أسم الموظف',
             'borrow_reason' => 'سبب السلفية',
-            'amount' => 'القيمة',
+            'Amount' => 'القيمة',
             'pay_percentage' => 'نسبة الخصم',
             'pay_amount' => 'قيمة الخصم'
         ]);
@@ -43,6 +43,8 @@ class EmployeeBorrowController extends Controller
     public function index()
     {
         $employeeBorrows = EmployeeBorrow::all();
+
+
         return view('employee.borrow.index', compact('employeeBorrows'));
     }
 
@@ -63,7 +65,7 @@ class EmployeeBorrowController extends Controller
         }
         $employees = $employees_tmp;
         $employees_salary = $employees_salary_tmp;
-        return view('employee.borrow.create', compact(['employees', '$employees_salary']));
+        return view('employee.borrow.create', compact(['employees', 'employees_salary']));
     }
 
     /**
@@ -97,7 +99,7 @@ class EmployeeBorrowController extends Controller
                     $item['process_id'] = $clientProcess->id;
                     ClientProcessItem::create($item);
                 }*/
-                return redirect()->route('employee.borrow.index')->with('success', 'تم اضافة سلفية جديدة.');
+                return redirect()->route('employeeBorrow.index')->with('success', 'تم اضافة سلفية جديدة.');
             //}
         }
 
@@ -122,7 +124,18 @@ class EmployeeBorrowController extends Controller
      */
     public function edit($id)
     {
-        //
+        $process = EmployeeBorrow::findOrFail($id);
+        $employees = Employee::where('user_id', $process->user_id)->firstOrFail();
+        $employees_tmp[$employees->user_id] = $employees->name;
+        $employees_salary_tmp[$employees->user_id] = $employees->daily_salary;
+
+
+
+        $employees = $employees_tmp;
+        $employees_salary = $employees_salary_tmp;
+
+//        return $employees_salary;
+        return view('employee.borrow.edit', compact(['process', 'employees', 'employees_salary']));
     }
 
     /**
@@ -134,7 +147,22 @@ class EmployeeBorrowController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $employeeBorrow = EmployeeBorrow::findOrFail($id);
+        $validator = $this->validator($request->all());
+
+
+        if($validator->fails()){
+            return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
+        }else{
+            //$employeeBorrow->id = $request->id;
+            $employeeBorrow->user_id = $request->user_id;
+            $employeeBorrow->Amount = $request->Amount;
+            $employeeBorrow->borrow_reason = $request->borrow_reason;
+            $employeeBorrow->pay_amount = $request->pay_amount;
+            $employeeBorrow->save();
+
+            return redirect()->back()->with('success', 'تم تعديل بيانات العميل.');
+        }
     }
 
     /**
@@ -145,6 +173,12 @@ class EmployeeBorrowController extends Controller
      */
     public function destroy($id)
     {
-        //
+
+        $employee = EmployeeBorrow::where('id', $id)->firstOrFail();
+        // dd($employee);
+        $employee->delete();
+
+
+        return redirect()->back()->with('success', 'تم حذف موظف.');
     }
 }

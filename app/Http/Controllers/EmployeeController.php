@@ -141,19 +141,19 @@ class EmployeeController extends Controller
 
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
-        $roles = $user->roles;
-        foreach ($roles as $role) {
-            $role->detachPermissions($role->permissions);
-            $user->detachRole($role);
-            $role->delete();
-        }
-        $employee = Employee::where('user_id', $id)->firstOrFail();
-        // dd($employee);
-        $employee->delete();
-        $user->delete();
+            $user = User::findOrFail($id);
+            $roles = $user->roles;
+            foreach ($roles as $role) {
+                $role->detachPermissions($role->permissions);
+                $user->detachRole($role);
+                $role->delete();
+            }
+            $employee = Employee::where('user_id', $id)->firstOrFail();
+            // dd($employee);
+            $employee->delete();
+            $user->delete();
 
-        return redirect()->back()->with('success', 'تم حذف موظف.');
+            return redirect()->back()->with('success', 'تم حذف موظف.');
     }
 
     public function edit($id)
