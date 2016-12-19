@@ -638,7 +638,7 @@
                             <button type="button" class="btn btn-primary" onclick="LockSaveToAll()">حفظ</button>
                         </div>
                         <div class="col-md-6 text-left">
-                            @ability('admin', 'deposit-withdraw-edit')
+                            @if(Entrust::ability('admin', 'deposit-withdraw-edit'))
                             <!-- Date Picker-->
                             {{ Form::open(['route' => 'depositwithdraw.search', 'method' => 'get']) }}
                             <input type="text" style="width:100px"  id="targetdate" name="targetdate" readonly class="form-control">
@@ -649,7 +649,7 @@
                             </script>
                             <button type="submit" class="btn btn-danger">بحث</button>
                             {{ Form::close() }}
-                            @endability
+                            @endif
                         </div>
                     </div>
                 </div> 

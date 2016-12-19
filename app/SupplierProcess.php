@@ -13,6 +13,7 @@ class SupplierProcess extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
+        'name',
         'client_process_id',
         'supplier_id',
         'employee_id',
@@ -37,6 +38,15 @@ class SupplierProcess extends Model
     public function employee()
     {
         return $this->hasOne('App\Employee', 'user_id');
+    }
+    
+    public function withdrawals() {
+        /*return DepositWithdraw::where([
+                    ['cbo_processes', '=', $this->id],
+                    ['supplier_id', '=', $this->supplier->id]
+                ])->get();//
+                //*/
+        return $this->hasMany('App\DepositWithdraw', 'cbo_processes');
     }
 
 }

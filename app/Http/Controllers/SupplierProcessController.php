@@ -25,7 +25,7 @@ class SupplierProcessController extends Controller {
                     'client_id' => 'required|exists:clients,id',
                     'client_process_id' => 'required|exists:client_processes,id',
                     'supplier_id' => 'required|exists:suppliers,id',
-                    'employee_id' => 'required|exists:employees,user_id',
+                    'employee_id' => 'required|exists:employees,id',
                     'notes' => 'string',
                     'has_discount' => 'boolean',
                     'discount_percentage' => 'required_with:has_discount|numeric',
@@ -98,20 +98,6 @@ class SupplierProcessController extends Controller {
             $supplier_processes = $supplier->processes;
             $total_opened_processes_price = 0;
 
-//            foreach ($supplier_processes as $supplier_process) {
-//                /* count opened process only */
-//                if($supplier_process->status == "active"){
-//                    $total_opened_processes_price += $supplier_process->total_price;
-//                }
-//            }
-            /* Can't create new process if supplier has exceeded the credit limit */
-            // if($total_opened_processes_price >= $supplier->credit_limit){
-//            if($supplier->credit_limit < ($total_opened_processes_price + $request->total_price)){
-//                return redirect()->back()->withInput()->with('error',
-//                    "خطأ في انشاء عملية جديدة، العميل ".$supplier->name." قد تعدى الحد اﻻئتماني المسموح له."
-//                );
-//            }else{
-
             $all['status'] = 'active';
             $supplierProcess = SupplierProcess::create($all);
 
@@ -121,25 +107,30 @@ class SupplierProcessController extends Controller {
             }
 
             return redirect()->route('supplier.process.index')->with('success', 'تم اضافة عملية جديدة.');
-//            }
         }
     }
 
     public function edit($id) {
         $process = SupplierProcess::findOrFail($id);
         $suppliers = Supplier::select('id', 'name')->get();
+        $clients = Client::select('id', 'name')->get();
         $employees = Employee::select('id', 'name')->get();
         $suppliers_tmp = [];
         $employees_tmp = [];
+        $clients_tmp = [];
         foreach ($suppliers as $supplier) {
             $suppliers_tmp[$supplier->id] = $supplier->name;
         }
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
         }
+        foreach ($clients as $client) {
+            $clients_tmp[$client->id] = $client->name;
+        }
         $suppliers = $suppliers_tmp;
         $employees = $employees_tmp;
-        return view('supplier.process.edit', compact(['process', 'suppliers', 'employees']));
+        $clients = $clients_tmp;
+        return view('supplier.process.edit', compact(['process', 'suppliers', 'employees', 'clients']));
     }
 
     public function update(Request $request, $id) {
@@ -224,6 +215,20 @@ class SupplierProcessController extends Controller {
         }
         $clientProcesses = $clientProcesses_tmp;
         return response()->json($clientProcesses);
+    }
+
+    public function getSupplierReportProcesses(Request $request) {
+        $input = $request->input('option');
+        $supplierProcesses = SupplierProcess::where('supplier_id', $input)->get();
+
+        $supplierProcesses_tmp = [];
+        foreach ($supplierProcesses as $process) {
+            $supplierProcesses_tmp[$process->id]['name'] = $process->name;
+            $supplierProcesses_tmp[$process->id]['totalPrice'] = $process->total_price;
+            $supplierProcesses_tmp[$process->id]['status'] = $process->status;
+        }
+        $supplierProcesses = $supplierProcesses_tmp;
+        return response()->json($supplierProcesses);
     }
 
 }

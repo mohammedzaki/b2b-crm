@@ -30370,7 +30370,13 @@ $(document).ready(function() {
         if ($('input[name="require_bill"]').is(':checked')) {
             // $('.taxes_price').text("10%");
             // return parseFloat((price * 0.1) + price);
-            return parseFloat(price * 0.1);
+           
+            $.get("/api/getTaxesRate", {}, function (data) { 
+                
+                var taxes = parseInt(data.toString()) / 100;
+                //alert(price * taxes);
+                return price * taxes;
+            });
         } else {
             $('.taxes_price').text("0");
             return 0;
@@ -30391,19 +30397,28 @@ $(document).ready(function() {
         var final_price_html = $('.final_price');
 
         var price = calculate_process_price();
+        var priceAfterTaxes = price;
         var discount = calculate_discount(price);
-        var taxes = calculate_taxes(price);
+        //var taxes = calculate_taxes(price);
 
-        process_price_html.text(price);
-        discount_price_html.text(discount);
-        taxes_price_html.text(taxes);
+        $.get("/api/getTaxesRate", {}, function (data) { 
+            if ($('input[name="require_bill"]').is(':checked')) {
+                var taxes = (price - discount) * parseFloat(data.toString());
+            } else {
+                var taxes = 0;
+            }
+            process_price_html.text(price);
+            discount_price_html.text(discount);
+            taxes_price_html.text(taxes);
 
-        price -= discount;
-        price += taxes;
+            priceAfterTaxes -= discount;
+            priceAfterTaxes += taxes;
 
-        price = Math.ceil(price);
-        final_price_html.text(price);
-        $('input[name="total_price"]').val(price);
+            price = Math.ceil(price);
+            final_price_html.text(price);
+            $('input[name="total_price"]').val(price);
+            $('input[name="total_priceAfterTaxes"]').val(price);
+        });
     }
 
     if (processItemsCount == 0) {

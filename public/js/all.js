@@ -30370,7 +30370,9 @@ $(document).ready(function() {
         if ($('input[name="require_bill"]').is(':checked')) {
             // $('.taxes_price').text("10%");
             // return parseFloat((price * 0.1) + price);
-            return parseFloat(price * 0.1);
+            $.get("{{ url('api/getTaxesRate/') }}", {}, function (data) { 
+                return parseFloat(price * data);
+            });
         } else {
             $('.taxes_price').text("0");
             return 0;

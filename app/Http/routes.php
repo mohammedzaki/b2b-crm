@@ -59,10 +59,16 @@ Route::resource('expenses', 'ExpensesController');
 //salafeyat
 Route::resource('employeeBorrow', 'EmployeeBorrowController');
 
+//Route::group(['prefix' => 'attendance'], function() {
+   Route::resource('/attendance', 'AttendanceController');
+//});
+
 //api
 Route::group(['prefix' => 'api'], function() {
     Route::get('getClientProcesses', 'ClientProcessController@getClientProcesses');
     Route::get('getSupplierProcesses', 'SupplierProcessController@getSupplierProcesses');
+    Route::get('getTaxesRate', 'FacilityController@getTaxesRate');
+    
 });
 
 //reports
@@ -73,5 +79,13 @@ Route::group(['prefix' => 'reports'], function() {
     Route::get('client/printDetailedPDF', 'ReportsController@printDetailedPDF');
     Route::any('client/viewClientReport', 'ReportsController@viewClientReport')->name('reports.client.viewClientReport');
     Route::get('client/getClientProcesses', 'ClientProcessController@getClientReportProcesses');
+    
+    Route::group(['prefix' => 'supplier'], function() { 
+        Route::get('/', 'ReportsController@supplier');
+        Route::get('printTotalPDF', 'ReportsController@printSupplierTotalPDF');
+        Route::get('printDetailedPDF', 'ReportsController@printSupplierDetailedPDF');
+        Route::any('viewSupplierReport', 'ReportsController@viewSupplierReport')->name('reports.supplier.viewSupplierReport');
+        Route::get('getSupplierProcesses', 'SupplierProcessController@getSupplierReportProcesses');
+    });
 });
 

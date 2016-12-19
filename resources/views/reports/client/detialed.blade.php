@@ -9,18 +9,22 @@
                 <!-- /.panel-heading -->
                 <div class="panel-body">
                     <div class="col-lg-12 no-padding">
-                        <div class="col-lg-6 no-padding">
-                            <div class="form-group">
-                                <label>اسم العميل :</label> {{ $clientName }}
-                            </div>
-                        </div>
+                        <img src="/ReportsHtml/letr.png" class="letrHead" style="width: 100%; margin-bottom: 20px;" />
                     </div>
                     @forelse ($proceses as $process)
                     <div class="col-lg-12 no-padding">
                         <div class="col-lg-6 no-padding">
+                            <label>اسم العميل :</label> {{ $clientName }}
+                        </div>
+                        <div class="col-lg-6 no-padding">
                             <label>اسم العملية :</label> {{ $process['processName'] }}
                         </div>
-
+                        <div class="col-lg-6 no-padding">
+                            <label>مسلسل :</label> {{ $process['processNum'] }}
+                        </div>
+                        <div class="col-lg-6 no-padding">
+                            <label>تاريخ :</label> {{ $process['processDate'] }}
+                        </div>
                         <div class="col-lg-12 no-padding">
                             <div class="panel-body">
 
@@ -43,7 +47,7 @@
                                                 <tr class="odd">
                                                     <td> {{ $details['date'] }} </td>
                                                     <td> {{ $details['remaining'] }} </td>
-                                                    <td> {{ $details['paid'] }} </td>
+                                                    <td style="color: red;"> {{ $details['paid'] }} </td>
                                                     <td> {{ $details['totalPrice'] }} </td>
                                                     <td> {{ $details['unitPrice'] }} </td>
                                                     <td> {{ $details['quantity'] }} </td>
@@ -52,13 +56,11 @@
                                                 @empty
                                                 @endforelse
                                                 <tr class="info">
-                                                    <td>الاجمالى</td>
-                                                    <td> {{ $process['processTotalRemaining'] }} </td>
-                                                    <td> {{ $process['processTotalPaid'] }} </td>
-                                                    <td> {{ $process['processTotalPrice'] }} </td>
-                                                    <td>  </td>
-                                                    <td>  </td>
-                                                    <td>  </td>
+                                                    <td></td>
+                                                    <td style="color: red;">{{ $process['processTotalRemaining'] }}</td>
+                                                    <td style="color: red;">{{ $process['processTotalPaid'] }}</td>
+                                                    <td style="color: red;" colspan="3">{{ $process['processTotalPrice'] }}</td>
+                                                    <td style="color: red;"> الاجمالـــــــــــــــــــــــــــــــــــى</td>
                                                 </tr>
                                             </tbody>
                                         </table>  
@@ -70,7 +72,7 @@
                     </div>
                     @empty
                     @endforelse
-                    
+
                 </div>
                 <!-- /.panel-body -->
             </div>
@@ -79,6 +81,15 @@
 
         <row class="col-lg-12 clearboth"> 
             <p class="text-center">
+                {{ Form::hidden("ch_detialed", "1", null) }} 
+                {{ Form::checkbox("withLetterHead", "1", 1, 
+                        array(
+                            "id" => "withLetterHead",
+                            "class" => "checkbox_show_input"
+                        )
+                    ) }} 
+                {{ Form::label("withLetterHead", "طباعة الليتر هد") }}
+                <br>
                 <button class="btn btn-primary" type="submit">طباعة</button>
             </p>
 

@@ -1,9 +1,9 @@
 /vendor
 /node_modules
 /public/storage
+/public/mpdf60
 Homestead.yaml
 Homestead.json
 .env
 .idea/
 /nbproject/private/
-/public/mpdf60/nbproject/private/

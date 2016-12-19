@@ -119,4 +119,9 @@ class FacilityController extends Controller
         $photo->move($destinationPath, $fileName);
         return $fileName;
     }
+    
+    public function getTaxesRate() {
+        $facility = Facility::findOrFail(1);
+        return $facility->sales_tax / 100;
+    }
 }

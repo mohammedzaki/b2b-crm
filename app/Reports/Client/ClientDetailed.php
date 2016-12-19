@@ -11,26 +11,67 @@ class ClientDetailed {
             $allProcessTotalRemaining;
     private $mpdf;
     private $reportName = "ClientDetailedReport.pdf";
+    private $withLetterHead;
 
-    public function __construct() {
-        $this->mpdf = new \mPDF('', 'A4');
+    public function __construct($withLetterHead = true) {
+        if ($withLetterHead) {
+            $this->mpdf = new \mPDF('', 'A4', '', '', 8, 8, 28, 10, 10, 10);
+        } else {
+            $this->mpdf = new \mPDF('', 'A4', '', '', 8, 8, 8, 10, 10, 10);
+        }
+        $this->withLetterHead = $withLetterHead;
     }
 
     function SetHtmlBody() {
         return '<!DOCTYPE html>
                 <html>
                     <head>
-                        <link href="myReport_1.css" rel="stylesheet">
+                        
                     </head>
                     <body>
+                        ' . $this->SetPageHeader() . '
+                        ' . $this->SetPageFooter() . '
                         ' . $this->AddAllProcess() . '
                     </body>
                 </html>';
     }
 
     function SetCSS() {
-        $path = public_path('Reports/Client/ClientDetailed.css');
+        $path = public_path('ReportsHtml/Client/ClientDetailed.css');
         return file_get_contents($path);
+    }
+
+    function SetPageHeader() {
+        if ($this->withLetterHead) {
+            return '<!--mpdf
+                <htmlpageheader name="myheader">
+                <img src="http://eye-ltd.com/letr.png" class="letrHead">
+                </htmlpageheader>
+                
+
+                <sethtmlpageheader name="myheader" value="on" show-this-page="1" />
+                mpdf-->';
+        } else {
+            return '<!--mpdf
+                <htmlpageheader name="myheader">
+                </htmlpageheader>
+                
+                <sethtmlpageheader name="myheader" value="on" show-this-page="1" />
+                mpdf-->';
+        }
+    }
+
+    function SetPageFooter() {
+        return '<!--mpdf
+                <htmlpagefooter name="myfooter">
+                <div class="reportPageFooterLine" ></div>
+                <div class="reportPageFooterText">
+                صفحة {PAGENO} من {nb}
+                </div>
+                </htmlpagefooter>
+
+                <sethtmlpagefooter name="myfooter" value="on" />
+                mpdf-->';
     }
 
     function AddAllProcess() {
@@ -43,23 +84,32 @@ class ClientDetailed {
 
     function AddProcess($process) {
         $processHtml = '<div class="clientProcess">';
-        $processHtml .= $this->SetProcessHeader($this->clientName, $process['processName'], $process['processDate']);
-        $processHtml .= '       <table class="tg">';
+        $processHtml .= $this->SetProcessHeader($this->clientName, $process['processName'], $process['processDate'], $process['processNum']);
+        $processHtml .= '   <table class="tg">';
         $processHtml .= $this->AddProcessItems($process['processDetails']);
-        $processHtml .= $this->AddProcessItemsFooter($process['processTotalRemaining'], $process['processTotalPaid'], $process['processTotalPrice']);
-        $processHtml .= '       </table>
-                    <div class="lineBreak"></div>
-                </div>';
+        $processHtml .= $this->AddProcessItemsFooter($process['processTotalPrice'], $process['processTotalPaid'], $process['processTotalRemaining']);
+        $processHtml .= '   </table>
+                            <div class="lineBreak"></div>
+                        </div>';
         return $processHtml;
     }
 
-    function SetProcessHeader($clientName, $processName, $processDate) {
-        return '<br />
-                <span class="reportHeader">اسم العميل : <span>' . $clientName . '</span></span>
-                <span class="reportHeader">اسم العملية : <span>' . $processName . '</span></span>
-                <span class="reportHeader">تاريخ : <span>' . $processDate . '</span></span>
-                <br />
-                <br />';
+    function SetProcessHeader($clientName, $processName, $processDate, $processNum) {
+        return '
+                <div class="processHeader">
+                    <table class="headerTable">
+                        <tr>
+                            <td class="noLabel">مسلسل :</td>
+                            <td class="noValue" colspan="3">' . $processNum . '</td>
+                            <td class="clientLabel">اسم العميل :</td>
+                            <td class="clientName">' . $clientName . '</td>
+                            <td class="processLabel">اسم العملية :</td> 
+                            <td class="processName">' . $processName . '</td>
+                            <td class="dateLabel">تاريخ</td>
+                            <td class="dateValue">' . $processDate . '</td>
+                        </tr>
+                    </table>
+                </div>';
     }
 
     function AddProcessItems($processDetails) {
@@ -73,36 +123,35 @@ class ClientDetailed {
 
     function AddProcessItemsHeader() {
         return '<tr>
-                    <th class="tg-8fc1">تاريخ</th>
-                    <th class="tg-8fc1">المتبقى</th>
-                    <th class="tg-8fc1">المدفوع</th>
-                    <th class="tg-8fc1">الاجمالى</th>
-                    <th class="tg-8fc1">سعر الوحدة</th>
-                    <th class="tg-8fc1">القيمة</th>
-                    <th class="tg-8fc1">بيان</th>
-                </tr>
-                ';
+                    <th>تاريـــــــــــخ</th>
+                    <th>المتبقى</th>
+                    <th>المدفوع</th>
+                    <th>الاجمالى</th>
+                    <th>سعر الوحدة</th>
+                    <th>الكمية</th>
+                    <th>بيـــــــان</th>
+                </tr>';
     }
 
     function AddProcessItem($date, $remaining, $paid, $totalPrice, $unitPrice, $quantity, $desc) {
         return '<tr>
-                    <td class="tg-h31u"> ' . $date . ' </td>
-                    <td class="tg-h31u"> ' . $remaining . ' </td>
-                    <td class="tg-h31u"> ' . $paid . ' </td>
-                    <td class="tg-h31u"> ' . $totalPrice . ' </td>
-                    <td class="tg-h31u"> ' . $unitPrice . ' </td>
-                    <td class="tg-h31u"> ' . $quantity . ' </td>
-                    <td class="tg-h31u"> ' . $desc . ' </td>
+                    <td> ' . $date . ' </td>
+                    <td> ' . $remaining . ' </td>
+                    <td class="redColor" > ' . $paid . ' </td>
+                    <td> ' . $totalPrice . ' </td>
+                    <td> ' . $unitPrice . ' </td>
+                    <td> ' . $quantity . ' </td>
+                    <td> ' . $desc . ' </td>
                 </tr>
                 ';
     }
 
     function AddProcessItemsFooter($total, $paid, $remaining) {
-        return '<tr>
-                    <td class="tg-c2s1" colspan="2" style="text-align: left;">' . $remaining . '</td>
-                    <td class="tg-c2s1">' . $paid . '</td>
-                    <td class="tg-c2s1" colspan="3" style="text-align: right;">' . $total . '</td>
-                    <td class="tg-c2s1">الاجمالى</td>
+        return '<tr class="last">
+                    <td class="redColor textLeft" colspan="2">' . $remaining . '</td>
+                    <td class="redColor" >' . $paid . '</td>
+                    <td class="redColor textRight" colspan="3">' . $total . '</td>
+                    <td class="redColor" >الاجمالـــــــــــــــــــــــــــــــــــى</td>
                 </tr>
                 ';
     }
@@ -121,6 +170,7 @@ class ClientDetailed {
         $this->mpdf->WriteHTML($this->SetCSS(), 1); // The parameter 1 tells that this is css/style only and no body/html/text
 
         $this->mpdf->WriteHTML($this->SetHtmlBody(), 2);
+        $this->mpdf->SetMargins(.1, 11, 10);
 
         $this->mpdf->Output($this->reportName, 'I');
     }

@@ -126,8 +126,9 @@
                         {{ Form::label('require_bill', 'فاتورة') }}
                     </div>
                 </div>
-
+                
                 {{ Form::hidden('total_price') }}
+                {{ Form::hidden('total_priceAfterTaxes') }}
 
             </div>
             <!-- /.panel-body -->

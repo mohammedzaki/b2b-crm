@@ -140,6 +140,14 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
+                        {{ Form::checkbox("withLetterHead", "1", 1, 
+                            array(
+                                "id" => "withLetterHead",
+                                "class" => "checkbox_show_input"
+                            )
+                        ) }} 
+                        {{ Form::label("withLetterHead", "طباعة الليتر هد") }}
+                        <br>
                         <button type="submit" class="btn btn-primary center-block" style="padding: 6px 30px;">عرض</button>
                     </div>
                 </div>
