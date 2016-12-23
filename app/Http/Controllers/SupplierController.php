@@ -50,8 +50,9 @@ class SupplierController extends Controller {
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
-
-            Supplier::create($request->all());
+            $all = $request->all();
+            Supplier::create($all);
+            
             return redirect()->route('supplier.index')->with('success', 'تم اضافة مورد جديد.');
         }
     }
@@ -69,8 +70,8 @@ class SupplierController extends Controller {
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
-
-            $supplier->update($request->all());
+            $all = $request->all();
+            $supplier->update($all);
             return redirect()->back()->with('success', 'تم تعديل بيانات المورد.');
         }
     }

@@ -16,6 +16,7 @@ class ClientProcess extends Model {
         'employee_id',
         'notes',
         'has_discount',
+        'status',
         'discount_percentage',
         'discount_reason',
         'require_bill',
@@ -31,10 +32,40 @@ class ClientProcess extends Model {
     }
 
     public function employee() {
-        return $this->hasOne('App\Employee', 'user_id');
+        return $this->hasOne('App\Employee', 'id');
     }
-    
+
     public function deposits() {
         return $this->hasMany('App\DepositWithdraw', 'cbo_processes');
     }
+
+    public function processDeposit() {
+        return $this->deposits()->where('client_id', $this->client->id)->sum('depositValue');
+    }
+
+    public function totalPriceAfterTaxes() {
+        $discount = 0;
+        $taxesValue = 0;
+        if ($this->has_discount == "1") {
+            $discount = $this->total_price * ($this->discount_percentage / 100);
+        }
+        if ($this->require_bill == "1") {
+            $facility = Facility::findOrFail(1);
+            $taxesValue = ($this->total_price - $discount) * $facility->getTaxesRate();
+        }
+        return ($this->total_price - $discount) + $taxesValue;
+    }
+    
+    public function CheckProcessMustClosed() {
+        if ($this->totalPriceAfterTaxes() == $this->processDeposit()) {
+            $this->status = 'closed';
+            $this->save();
+            return TRUE;
+        } else {
+            $this->status = 'active';
+            $this->save();
+            return FALSE;
+        }
+    }
+
 }

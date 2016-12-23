@@ -6,21 +6,6 @@
             </div>
             <!-- /.panel-heading -->
             <div class="panel-body">
-                <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
-                    {{ Form::label('name', 'اسم العملية') }} 
-                    {{ Form::text('name', null, 
-                        array(
-                            'class' => 'form-control', 
-                            'placeholder' => 'ادخل اسم العملية')
-                        )
-                    }}
-                    @if ($errors->has('name'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('name') }}
-                    </label>
-                    @endif
-                </div>
-                
                 <div class="form-group{{ $errors->has('supplier_id') ? ' has-error' : '' }}">
                     {{ Form::label('supplier_id', 'اسم المورد') }}
                     {{ Form::select('supplier_id', $suppliers, null,

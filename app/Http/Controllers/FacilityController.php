@@ -3,40 +3,37 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use App\Http\Requests;
 use App\Facility;
 use App\User;
 use App\Employee;
 use Validator;
 
-class FacilityController extends Controller
-{
-    /**
-	 * Create a new controller instance.
-	 *
-	 * @return void
-	 */
-	public function __construct()
-	{
-	    $this->middleware('auth');
-        $this->middleware('ability:admin,facility-info');
-	}
+class FacilityController extends Controller {
 
-    protected function validator(array $data)
-    {
+    /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct() {
+        $this->middleware('auth');
+        $this->middleware('ability:admin,facility-info');
+    }
+
+    protected function validator(array $data) {
         $validator = Validator::make($data, [
-            'name' => 'required|max:255',
-            'manager' => 'max:255',
-            'type' => 'required|in:individual,joint,partnership,limited_partnership,stock',
-            'tax_file' => 'numeric',
-            'tax_card' => 'numeric',
-            'trade_record' => 'numeric',
-            'sales_tax' => 'numeric|max:60|min:0',
-            'opening_amount' => 'numeric',
-            //'country_sales_tax' => 'numeric',
-            'logo' => 'image',
-            'email' => 'email',
+                    'name' => 'required|max:255',
+                    'manager' => 'max:255',
+                    'type' => 'required|in:individual,joint,partnership,limited_partnership,stock',
+                    'tax_file' => 'numeric',
+                    'tax_card' => 'numeric',
+                    'trade_record' => 'numeric',
+                    'sales_tax' => 'numeric|max:60|min:0',
+                    'opening_amount' => 'numeric',
+                    //'country_sales_tax' => 'numeric',
+                    'logo' => 'image',
+                    'email' => 'email',
         ]);
 
         $validator->setAttributeNames([
@@ -56,32 +53,28 @@ class FacilityController extends Controller
         return $validator;
     }
 
-	/**
+    /**
      * Show the facility information.
      *
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
+    public function edit($id) {
         $facility = Facility::findOrFail($id);
         $facility->manager = Employee::find($facility->manager_id)->name; //User::find($facility->manager_id)->username;
         return view('facility.edit', compact('facility'));
     }
 
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         $facility = Facility::findOrFail($id);
-        $validator = $this->validator( $request->all() );
-        
-        if( $validator->fails() ){
-            
-            return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
+        $validator = $this->validator($request->all());
 
-        }else{
-            if( !User::where('name', $request->manager)->exists() ){
-                
+        if ($validator->fails()) {
+
+            return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
+        } else {
+            if (!User::where('name', $request->manager)->exists()) {
+
                 return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors(['manager' => 'خطأ في اسم مدير النمشأة.']);
-            
             }
 
             $facility->name = $request->name;
@@ -112,16 +105,16 @@ class FacilityController extends Controller
      * @param  UploadedFile $photo
      * @return string
      */
-    protected function savePhoto($photo)
-    {
+    protected function savePhoto($photo) {
         $fileName = str_random(40) . '.' . $photo->guessClientExtension();
         $destinationPath = public_path() . DIRECTORY_SEPARATOR . 'uploads';
         $photo->move($destinationPath, $fileName);
         return $fileName;
     }
-    
+
     public function getTaxesRate() {
         $facility = Facility::findOrFail(1);
-        return $facility->sales_tax / 100;
+        return $facility->getTaxesRate();
     }
+
 }

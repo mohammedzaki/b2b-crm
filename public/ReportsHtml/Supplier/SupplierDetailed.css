@@ -15,11 +15,11 @@ body {
     margin-bottom: 10px;
 }
 .headerTable {border-collapse: collapse;border-spacing: 0;border-color: #ccc;width: 100%;}
-.supplierLabel {text-align: right;width: 12%;}
-.supplierName {width: 32%;text-align: right;}
-.processLabel {text-align: right;width: 12%;}
-.processName {width: 32%;text-align: right;}
-.dateLabel {width: 11%;text-align: center;}
+.supplierLabel {text-align: right;/* width: 12%; */}
+.supplierName {/* width: 32%; */text-align: right;}
+.processLabel {text-align: right;/* width: 12%; */}
+.processName {/* width: 32%; */text-align: right;}
+.dateLabel {/* width: 11%; */text-align: center;}
 .noLabel {text-align: right;}
 .noValue {text-align: right;}
 .dateValue {text-align: center;}

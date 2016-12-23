@@ -58,15 +58,13 @@ class SupplierDetailed extends BaseReport {
             <div class="processHeader">
                     <table class="headerTable">
                         <tr>
+                            <td class="noLabel">مسلسل :</td>
+                            <td class="noValue" colspan="3">' . $processNum . '</td>
                             <td class="supplierLabel">اسم المورد :</td>
                             <td class="supplierName">' . $supplierName . '</td>
                             <td class="processLabel">اسم العملية :</td> 
                             <td class="processName">' . $processName . '</td>
                             <td class="dateLabel">تاريخ</td>
-                        </tr>
-                        <tr>
-                            <td class="noLabel">مسلسل :</td>
-                            <td class="noValue" colspan="3">' . $processNum . '</td>
                             <td class="dateValue">' . $processDate . '</td>
                         </tr>
                     </table>

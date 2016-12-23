@@ -84,7 +84,7 @@ class AttendanceController extends Controller {
                     'recordDesc' => 'required|string',
                     'cbo_processes' => 'numeric',
                     'client_id' => 'exists:clients,id',
-                    'employee_id' => 'exists:employees,user_id',
+                    'employee_id' => 'exists:employees,id',
                     'supplier_id' => 'exists:suppliers,id',
                     'expenses_id' => 'exists:expenses,id',
                     'payMethod' => 'required|numeric',

@@ -21,7 +21,7 @@ class SupplierProcessController extends Controller {
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-                    'name' => 'required|unique:client_processes,name,' . $id . '|min:5|max:255',
+                    //'name' => 'required|unique:client_processes,name,' . $id . '|min:5|max:255',
                     'client_id' => 'required|exists:clients,id',
                     'client_process_id' => 'required|exists:client_processes,id',
                     'supplier_id' => 'required|exists:suppliers,id',
@@ -39,7 +39,7 @@ class SupplierProcessController extends Controller {
         ]);
 
         $validator->setAttributeNames([
-            'name' => 'اسم العملية',
+            //'name' => 'اسم العملية',
             'client_id' => 'اسم العميل',
             'client_process_id' => 'اسم العملية',
             'supplier_id' => 'اسم المورد',
@@ -99,6 +99,18 @@ class SupplierProcessController extends Controller {
             $total_opened_processes_price = 0;
 
             $all['status'] = 'active';
+            if (isset($request->require_bill)) {
+                $all['require_bill'] = 1;
+            } else {
+                $all['require_bill'] = 0;
+            }
+
+            if (isset($request->has_discount)) {
+                $all['has_discount'] = 1;
+            } else {
+                $all['has_discount'] = 0;
+            }
+            $all['name'] = \App\ClientProcess::findOrFail($all['client_process_id'])->name;
             $supplierProcess = SupplierProcess::create($all);
 
             foreach ($all['items'] as $item) {
@@ -163,6 +175,18 @@ class SupplierProcessController extends Controller {
 //                    "خطأ في انشاء عملية جديدة، العميل ".$supplier->name." قد تعدى الحد اﻻئتماني المسموح له."
 //                );
 //            }else{
+            if (isset($request->require_bill)) {
+                $all['require_bill'] = 1;
+            } else {
+                $all['require_bill'] = 0;
+            }
+
+            if (isset($request->has_discount)) {
+                $all['has_discount'] = 1;
+            } else {
+                $all['has_discount'] = 0;
+            }
+            $all['name'] = \App\ClientProcess::findOrFail($all['client_process_id'])->name;
             $process->update($all);
             $items_ids = [];
 

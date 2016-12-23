@@ -120,7 +120,7 @@
                     <div class="legend">
                         {{ Form::checkbox('require_bill', '1', null, 
                             array(
-                                'id' => 'require_bill',
+                                'id' => 'require_bill'
                             )
                         ) }} 
                         {{ Form::label('require_bill', 'فاتورة') }}

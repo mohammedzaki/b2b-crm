@@ -18,7 +18,7 @@ class EmployeeBorrowController extends Controller
     protected function validator(array $data, $id = null)
     {
         $validator = Validator::make($data, [
-            'employee_id' => 'required|exists:employees,user_id',
+            'employee_id' => 'required|exists:employees,id',
             'borrow_reason' => 'required_with:has_discount|string',
             'amount' => 'required|numeric',
             'pay_percentage' => 'numeric',

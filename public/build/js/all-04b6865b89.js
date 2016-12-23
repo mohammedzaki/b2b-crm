@@ -30415,7 +30415,8 @@ $(document).ready(function() {
             priceAfterTaxes += taxes;
 
             price = Math.ceil(price);
-            final_price_html.text(price);
+            priceAfterTaxes = Math.ceil(priceAfterTaxes);
+            final_price_html.text(priceAfterTaxes);
             $('input[name="total_price"]').val(price);
             $('input[name="total_priceAfterTaxes"]').val(price);
         });

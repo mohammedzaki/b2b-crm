@@ -37,6 +37,6 @@ class Employee extends Model {
     }
 
     /* public function employeeBorrow() {
-      return $this->hasMany('App\EmployeeBorrow', 'user_id');
+      return $this->hasMany('App\EmployeeBorrow', 'id');
       } */
 }

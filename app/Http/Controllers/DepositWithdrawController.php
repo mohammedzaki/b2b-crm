@@ -84,7 +84,7 @@ class DepositWithdrawController extends Controller {
                     'recordDesc' => 'required|string',
                     'cbo_processes' => 'numeric',
                     'client_id' => 'exists:clients,id',
-                    'employee_id' => 'exists:employees,user_id',
+                    'employee_id' => 'exists:employees,id',
                     'supplier_id' => 'exists:suppliers,id',
                     'expenses_id' => 'exists:expenses,id',
                     'payMethod' => 'required|numeric',
@@ -132,11 +132,11 @@ class DepositWithdrawController extends Controller {
                         'errors' => $validator->getMessageBag()->toArray()
             ));
         } else {
-            $id = DepositWithdraw::create($request->all())->id;
-            //$current_amount = $this->CalculateCurrentAmount();
+            $depositWithdraw = DepositWithdraw::create($request->all());
+            $this->CheckProcessClosed($depositWithdraw);
             return response()->json(array(
                         'success' => true,
-                        'id' => $id,
+                        'id' => $depositWithdraw->id,
                         'current_amount' => $this->CalculateCurrentAmount(),
                         'message' => 'تم اضافة وارد جديد.',
                         'errors' => $validator->getMessageBag()->toArray()
@@ -289,9 +289,11 @@ class DepositWithdrawController extends Controller {
             ));
         } else {
             $depositWithdraw->update($all);
+            $this->CheckProcessClosed($depositWithdraw);
             return response()->json(array(
                         'success' => true,
-                        'id' => $id,
+                        'id' => $depositWithdraw->id,
+                        '$depositWithdraw->cbo_processe' => $depositWithdraw->cbo_processes,
                         'current_amount' => $this->CalculateCurrentAmount(),
                         'message' => 'تم تعديل وارد جديد.',
                         'errors' => $validator->getMessageBag()->toArray()
@@ -312,6 +314,18 @@ class DepositWithdrawController extends Controller {
     private function CalculateCurrentAmount() {
         // TODO: must re-program
         return ((DepositWithdraw::sum('depositValue') + Facility::sum('opening_amount')) - DepositWithdraw::sum('withdrawValue'));
+    }
+
+    private function CheckProcessClosed(DepositWithdraw $depositWithdraw) {
+        if (!empty($depositWithdraw->cbo_processes)) {
+            if (!empty($depositWithdraw->client_id)) {
+                $process = ClientProcess::findOrFail($depositWithdraw->cbo_processes);
+                $process->CheckProcessMustClosed();
+            } else if (!empty($depositWithdraw->supplier_id)) {
+                $process = SupplierProcess::findOrFail($depositWithdraw->cbo_processes);
+                $process->CheckProcessMustClosed();
+            }
+        }
     }
 
 }

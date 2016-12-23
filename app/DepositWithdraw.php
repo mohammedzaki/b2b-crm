@@ -28,7 +28,7 @@ class DepositWithdraw extends Model {
     }
 
     public function employee() {
-        return $this->hasOne('App\Employee', 'user_id');
+        return $this->hasOne('App\Employee', 'id');
     }
     
     public function client() {

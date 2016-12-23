@@ -99,6 +99,18 @@ class ClientProcessController extends Controller {
             } else {
 
                 $all['status'] = 'active';
+                if (isset($request->require_bill)) {
+                    $all['require_bill'] = 1;
+                } else {
+                    $all['require_bill'] = 0;
+                }
+
+                if (isset($request->has_discount)) {
+                    $all['has_discount'] = 1;
+                } else {
+                    $all['has_discount'] = 0;
+                }
+
                 $clientProcess = ClientProcess::create($all);
 
                 foreach ($all['items'] as $item) {
@@ -154,6 +166,18 @@ class ClientProcessController extends Controller {
                 return redirect()->back()->withInput($all)->with('error', "خطأ في انشاء عملية جديدة، العميل " . $client->name . " قد تعدى الحد اﻻئتماني المسموح له."
                 );
             } else {
+                if (isset($request->require_bill)) {
+                    $all['require_bill'] = 1;
+                } else {
+                    $all['require_bill'] = 0;
+                }
+
+                if (isset($request->has_discount)) {
+                    $all['has_discount'] = 1;
+                } else {
+                    $all['has_discount'] = 0;
+                }
+
                 $process->update($all);
                 $items_ids = [];
 

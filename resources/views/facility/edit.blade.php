@@ -158,7 +158,8 @@
                     {{ Form::text('opening_amount', null, 
                         array(
                             'class' => 'form-control', 
-                            'placeholder' => 'ادخل الرصيد الافتتاحي')
+                            'placeholder' => 'ادخل الرصيد الافتتاحي',
+                            'readonly' => 'readonly')
                         )
                     }}
                     @if ($errors->has('opening_amount'))

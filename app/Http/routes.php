@@ -1,15 +1,15 @@
 <?php
 
 /*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It's a breeze. Simply tell Laravel the URIs it should respond to
-| and give it the controller to call when that URI is requested.
-|
-*/
+  |--------------------------------------------------------------------------
+  | Application Routes
+  |--------------------------------------------------------------------------
+  |
+  | Here is where you can register all of the routes for an application.
+  | It's a breeze. Simply tell Laravel the URIs it should respond to
+  | and give it the controller to call when that URI is requested.
+  |
+ */
 
 Route::auth();
 
@@ -26,6 +26,7 @@ Route::get('/depositwithdraw/search', 'DepositWithdrawController@search')->name(
 Route::resource('/depositwithdraw', 'DepositWithdrawController');
 
 Route::resource('/facility', 'FacilityController');
+Route::resource('/facilityopeningamount', 'OpeningAmountController');
 
 //Employees
 Route::get('/employee/trash', 'EmployeeController@trash')->name('employee.trash');
@@ -60,15 +61,13 @@ Route::resource('expenses', 'ExpensesController');
 Route::resource('employeeBorrow', 'EmployeeBorrowController');
 
 //Route::group(['prefix' => 'attendance'], function() {
-   Route::resource('/attendance', 'AttendanceController');
+Route::resource('/attendance', 'AttendanceController');
 //});
-
 //api
 Route::group(['prefix' => 'api'], function() {
     Route::get('getClientProcesses', 'ClientProcessController@getClientProcesses');
     Route::get('getSupplierProcesses', 'SupplierProcessController@getSupplierProcesses');
     Route::get('getTaxesRate', 'FacilityController@getTaxesRate');
-    
 });
 
 //reports
@@ -79,8 +78,8 @@ Route::group(['prefix' => 'reports'], function() {
     Route::get('client/printDetailedPDF', 'ReportsController@printDetailedPDF');
     Route::any('client/viewClientReport', 'ReportsController@viewClientReport')->name('reports.client.viewClientReport');
     Route::get('client/getClientProcesses', 'ClientProcessController@getClientReportProcesses');
-    
-    Route::group(['prefix' => 'supplier'], function() { 
+
+    Route::group(['prefix' => 'supplier'], function() {
         Route::get('/', 'ReportsController@supplier');
         Route::get('printTotalPDF', 'ReportsController@printSupplierTotalPDF');
         Route::get('printDetailedPDF', 'ReportsController@printSupplierDetailedPDF');
