@@ -23,17 +23,17 @@
         </div>
     @endif
 
-    {{ Form::model($process, 
+    {{ Form::model($borrow, 
             array(
-                'route' => array('client.process.update', $process->id),
+                'route' => array('employeeBorrow.update', $borrow->id),
                 'method' => 'put'
             )
         ) 
     }}
         @if (session('error'))
-            @include('client.process._form', ['model' => 'edit', 'items' => old('items')])
+            @include('employee.borrow._form', ['model' => 'edit', 'items' => old('items')])
         @else
-            @include('client.process._form', ['model' => 'edit', 'items' => $process->items])
+            @include('employee.borrow._form', ['model' => 'edit', 'items' => $borrow->items])
         @endif
     {{ Form::close() }}
 
@@ -41,7 +41,7 @@
         @if (session('error'))
             var processItemsCount = {{ count(old('items')) }};
         @else
-            var processItemsCount = {{ count($process->items) }};
+            var processItemsCount = {{ count($borrow->items) }};
         @endif
     </script>
 

@@ -149,7 +149,7 @@ class EmployeeController extends Controller {
         $employee->delete();
         $user->delete();
 
-        return redirect()->back()->with('success', 'تم حذف موظف.');
+            return redirect()->back()->with('success', 'تم حذف موظف.');
     }
 
     public function trash() {

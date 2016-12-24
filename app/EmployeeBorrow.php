@@ -8,14 +8,14 @@ class EmployeeBorrow extends Model
 {
     protected $fillable = [
         'employee_id',
-        'Amount',
+        'amount',
         'borrow_reason',
         'pay_amount',
         'is_active'
     ];
 
     public function employee(){
-        return $this->belongsTo('App\Employee', 'id');
+        return $this->belongsTo('App\Employee');
     }
 
 }

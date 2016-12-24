@@ -13,8 +13,8 @@ class CreateEmployeesTable extends Migration
     public function up()
     {
         Schema::create('employees', function (Blueprint $table) {
-            $table->integer('user_id')->unsigned()->index();
-            // $table->foreign('user_id')->references('id')->on('users');
+            //$table->integer('id')->unsigned()->index();
+            //$table->foreign('user_id')->references('id')->on('users');
             $table->string('name');
             $table->string('ssn', 14);
             $table->enum('gender', ['m', 'f']);

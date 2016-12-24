@@ -7,13 +7,26 @@
             <!-- /.panel-heading -->
             <div class="panel-body">
                 <div class="form-group{{ $errors->has('employee_id') ? ' has-error' : '' }}">
+                    @if(count($employees) > 0)
                     {{ Form::label('employee_id', 'اسم الموظف') }}
                     {{ Form::select('employee_id', $employees, null,
-                        array(
-                            'class' => 'form-control',
-                            'placeholder' => 'ادخل اسم الموظف')
-                        )
+                            array(
+                                'class' => 'form-control',
+                                'id' => 'employee_id',
+                                'placeholder' => 'ادخل اسم الموظف')
+                            )
                     }}
+                    @else
+                    {{ Form::label('employee_id', 'اسم الموظف') }}
+                    {{ Form::select('employee_id', $employees, $employees[$borrow->employee_id],
+                            array(
+                                'class' => 'form-control',
+                                'id' => 'employee_id',
+                               )
+                            )
+                    }}
+                    @endif
+
                     @if ($errors->has('employee_id'))
                     <label for="inputError" class="control-label">
                         {{ $errors->first('employee_id') }}
@@ -41,13 +54,14 @@
                     {{ Form::text('amount', null,
                         array(
                             'class' => 'form-control',
+                            'id' => 'amount',
                             'placeholder' => 'ادخل قيمة السلفية')
                         )
                     }}
                     @if ($errors->has('amount'))
-                        <label for="inputError" class="control-label">
-                            {{ $errors->first('amount') }}
-                        </label>
+                    <label for="inputError" class="control-label">
+                        {{ $errors->first('amount') }}
+                    </label>
                     @endif
                 </div>
 
@@ -108,30 +122,108 @@
             <div class="panel-body">
                 <h4>
                     <span>المرتب </span>
-                    <span class="price process_price">0</span>
+                    <span class="price process_salary">0</span>
                 </h4>
 
                 <hr>
-                <h4>
+                <h4 class="hidden">
                     <span>بعد الخصم </span>
-                    <span class="price final_price">0</span>
+                    <span class="price final_amount" id="after_salary">0</span>
                 </h4>
             </div>
         </div>
 
         <div style="margin-bottom: 20px;">
             <button class="btn btn-lg btn-block btn-success" type="submit">
-            @if(isset($model))
+                @if(isset($model))
                 تعديل بيانات عملية
-            @else
+                @else
                 أضف عملية جديد
-            @endif
-        </button>
+                @endif
+            </button>
         </div>
     </div>
-
+    {{--<pre>
+    {{ var_dump($employees_salary) }}
+    </pre>--}}
 </div>
 
-<script>
+    <script>
+       var employeeID, pay_percentage, pay_amount, after_pay, employeeSalary, borrowamount, salary;
+        <?php
 
+        function js_str($s) {
+            return '"' . addcslashes($s, "\0..\37\"\\") . '"';
+        }
+
+        function js_array($array) {
+            $temp = array_map('js_str', $array);
+            return '[' . implode(',', $temp) . ']';
+        }
+
+        echo 'employeeSalary = ', js_array($employees_salary), ';';
+        ?>
+
+       if (employeeSalary.length == 1) {
+           salary = employeeSalary[0];
+           console.log(salary);
+           $('.process_salary').text(salary);
+       }
+
+
+       function calcAfterSalary() {
+           $("#after_salary").text(salary - pay_amount);
+       }
+
+       $('#has_discount').on('change', function () {
+           if (document.getElementById('has_discount').checked) {
+               console.log("something");
+               $('.final_amount').parent().removeClass('hidden');
+           } else {
+               $('.final_amount').parent().addClass('hidden');
+           }
+            });
+
+       $('#amount').on('keyup', function () {
+           if (document.getElementById('has_discount').checked) {
+
+               calcAfterSalary();
+           }
+      });
+
+       $('#pay_percentage').on('keyup', function () {
+           pay_percentage = $(this).val();
+           console.log(pay_percentage);
+           if (pay_percentage == 0 || isNaN(pay_percentage)) {
+               pay_percentage = pay_amount = 0;
+           } else {
+               borrowamount = $('#amount').val();
+               pay_amount = (pay_percentage * borrowamount) / 100;
+            }
+           $('#pay_amount').val(pay_amount);
+
+           calcAfterSalary();
+     });
+
+
+       $('#pay_amount').on('keyup', function () {
+           pay_amount = $(this).val();
+           if (pay_amount == 0 || isNaN(pay_amount)) {
+               pay_percentage = pay_amount = 0;
+           } else {
+               borrowamount = $('#amount').val();
+               pay_percentage = (pay_amount / borrowamount) * 100;
+                   }
+            $('#pay_percentage').val(pay_percentage);
+
+           calcAfterSalary();
+        });
+
+        console.log(employeeSalary);
+       $('#employee_id').on('change', function () {
+           employeeID = $(this).val();
+           console.log(employeeID);
+           salary = employeeSalary[employeeID];
+           $('.process_salary').text(employeeSalary[employeeID]);
+       });
 </script>
