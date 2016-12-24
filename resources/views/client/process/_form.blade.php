@@ -157,18 +157,18 @@
 
         <div style="margin-bottom: 20px;">
             <button class="btn btn-lg btn-block btn-success" type="submit">
-            @if(isset($model))
+                @if(isset($model))
                 تعديل بيانات عملية
-            @else
+                @else
                 أضف عملية جديد
-            @endif
-        </button>
+                @endif
+            </button>
         </div>
     </div>
     <div class="col-lg-8">
         <div class="panel panel-default">
             <div class="panel-heading">
-               مواصفات العملية
+                مواصفات العملية
             </div>
             <!-- /.panel-heading -->
             <div class="panel-body operationdes">
@@ -184,7 +184,7 @@
                             </tr>
                         </thead>
                         <tbody id="prcoess_items">
-                        @if($items)
+                            @if($items)
                             @for ($i = 0; $i < count($items); $i++)
                             <tr class="{{ ($i != count($items) - 1) ? 'skip' : '' }}" >
                                 {{ Form::hidden('items['.$i.'][id]') }}
@@ -252,7 +252,7 @@
                                 </td>
                             </tr>
                             @endfor
-                        @endif
+                            @endif
                         </tbody>
                     </table>
                 </div><!-- 

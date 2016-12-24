@@ -24,14 +24,17 @@
                     <li>
                         <a href="#"><i class="fa fa-money fa-fw"></i> السلفيات </a>
                         <ul>
-                            <li><a href="{{ UEL::to('/employeeBorrow') }}">الكل</a> </li>
-                            <li><a href="{{ UEL::to('/employeeBorrow/create') }}">أضف جديد</a> </li>
+                            <li><a href="{{ URL::to('/employeeBorrow') }}">الكل</a> </li>
+                            <li><a href="{{ URL::to('/employeeBorrow/create') }}">أضف جديد</a> </li>
                         </ul>
                     </li>
                 </ul>
             </li>
             <li>
-                <a href="index2.html"><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف</a>
+                <a href="{{ URL::to('/depositwithdraw') }}"><i class="fa fa-briefcase fa-fw"></i>وارد / منصرف</a>
+            </li>
+            <li>
+                <a href="#"><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف</a>
             </li>
             <li>
                 <a href="#"><i class="fa fa-edit fa-fw"></i> عملية جديدة عميل</a>
@@ -62,6 +65,7 @@
                 <ul>
                     <li><a href="{{ URL::to('/supplier') }}">الكل</a></li>
                     <li><a href="{{ URL::to('/supplier/create') }}">أضف جديد</a></li>
+                    <li><a href="{{ URL::to('/supplier/trash') }}">المحذوفات</a></li>
                 </ul>
             </li>
             <li>

@@ -32,7 +32,7 @@ class ExpensesController extends Controller
 
     public function index() {
         $expenses = Expenses::all();
-        return view('Expenses.index', compact('expenses'));
+        return view('expenses.index', compact('expenses'));
     }
 
     public function create() {

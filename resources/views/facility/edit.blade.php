@@ -152,6 +152,21 @@
                     </label>
                     @endif
                 </div>
+                
+                <div class="form-group{{ $errors->has('opening_amount') ? ' has-error' : '' }}">
+                    {{ Form::label('opening_amount', 'الرصيد الافتتاحى') }} 
+                    {{ Form::text('opening_amount', null, 
+                        array(
+                            'class' => 'form-control', 
+                            'placeholder' => 'ادخل الرصيد الافتتاحي')
+                        )
+                    }}
+                    @if ($errors->has('opening_amount'))
+                    <label for="inputError" class="control-label">
+                        {{ $errors->first('opening_amount') }}
+                    </label>
+                    @endif
+                </div>
 
                 <div class="form-group{{ $errors->has('logo') ? ' has-error' : '' }}">
                     {{ Form::label('logo', 'رفع شعار الشركة') }}

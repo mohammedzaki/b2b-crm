@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class EmployeeBorrow extends Model
 {
     protected $fillable = [
-        'employee_id',
+        'user_id',
         'Amount',
         'borrow_reason',
         'pay_amount',

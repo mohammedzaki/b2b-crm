@@ -13,7 +13,7 @@ class SupplierProcess extends Model
     protected $dates = ['deleted_at'];
 
     protected $fillable = [
-        'name',
+        'client_process_id',
         'supplier_id',
         'employee_id',
         'notes',

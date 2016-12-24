@@ -6,17 +6,30 @@
             </div>
             <!-- /.panel-heading -->
             <div class="panel-body">
-                <div class="form-group{{ $errors->has('employee_id') ? ' has-error' : '' }}">
-                    {{ Form::label('employee_id', 'اسم الموظف') }}
-                    {{ Form::select('employee_id', $employees, null,
-                        array(
-                            'class' => 'form-control',
-                            'placeholder' => 'ادخل اسم الموظف')
-                        )
-                    }}
-                    @if ($errors->has('employee_id'))
+                <div class="form-group{{ $errors->has('user_id') ? ' has-error' : '' }}">
+                    @if(count($employees) > 1)
+                        {{ Form::label('user_id', 'اسم الموظف') }}
+                        {{ Form::select('user_id', $employees, null,
+                            array(
+                                'class' => 'form-control',
+                                'id' => 'user_id',
+                                'placeholder' => 'ادخل اسم الموظف')
+                            )
+                        }}
+                        @else
+                        {{ Form::label('user_id', 'اسم الموظف') }}
+                        {{ Form::select('user_id', $employees, $employees[$process->user_id],
+                            array(
+                                'class' => 'form-control',
+                                'id' => 'user_id',
+                               )
+                            )
+                        }}
+                        @endif
+
+                    @if ($errors->has('user_id'))
                     <label for="inputError" class="control-label">
-                        {{ $errors->first('employee_id') }}
+                        {{ $errors->first('user_id') }}
                     </label>
                     @endif
                 </div>
@@ -36,17 +49,18 @@
                     @endif
                 </div>
 
-                <div class="form-group{{ $errors->has('amount') ? ' has-error' : '' }}">
-                    {{ Form::label('amount', 'القيمة') }}
-                    {{ Form::text('amount', null,
+                <div class="form-group{{ $errors->has('Amount') ? ' has-error' : '' }}">
+                    {{ Form::label('Amount', 'القيمة') }}
+                    {{ Form::text('Amount', null,
                         array(
                             'class' => 'form-control',
+                            'id' => 'Amount',
                             'placeholder' => 'ادخل قيمة السلفية')
                         )
                     }}
-                    @if ($errors->has('amount'))
+                    @if ($errors->has('Amount'))
                         <label for="inputError" class="control-label">
-                            {{ $errors->first('amount') }}
+                            {{ $errors->first('Amount') }}
                         </label>
                     @endif
                 </div>
@@ -108,13 +122,13 @@
             <div class="panel-body">
                 <h4>
                     <span>المرتب </span>
-                    <span class="price process_price">0</span>
+                    <span class="price process_salary">0</span>
                 </h4>
 
                 <hr>
-                <h4>
+                <h4 class="hidden">
                     <span>بعد الخصم </span>
-                    <span class="price final_price">0</span>
+                    <span class="price final_amount" id="after_salary">0</span>
                 </h4>
             </div>
         </div>
@@ -129,9 +143,87 @@
         </button>
         </div>
     </div>
-
+    {{--<pre>
+        {{ var_dump($employees_salary) }}
+    </pre>--}}
 </div>
 
 <script>
+var employeeID, pay_percentage, pay_amount, after_pay, employeeSalary, borrowAmount, salary;
+    <?php
+        function js_str($s)
+        {
+            return '"' . addcslashes($s, "\0..\37\"\\") . '"';
+        }
+        function js_array($array)
+        {
+            $temp = array_map('js_str', $array);
+            return '[' . implode(',', $temp) . ']';
+        }
 
+        echo 'employeeSalary = ', js_array($employees_salary), ';';
+    ?>
+
+    if(employeeSalary.length == 1){
+        salary = employeeSalary[0];
+        console.log(salary);
+        $('.process_salary').text(salary);
+    }
+
+
+    function calcAfterSalary() {
+        $("#after_salary").text(salary - pay_amount);
+    }
+
+    $('#has_discount').on('change', function () {
+        if(document.getElementById('has_discount').checked) {
+            console.log("something");
+            $('.final_amount').parent().removeClass('hidden');
+        }else {
+            $('.final_amount').parent().addClass('hidden');
+        }
+    });
+
+    $('#Amount').on('keyup', function () {
+       if(document.getElementById('has_discount').checked){
+
+            calcAfterSalary();
+       }
+    });
+
+    $('#pay_percentage').on('keyup', function () {
+        pay_percentage = $(this).val();
+        console.log(pay_percentage);
+        if(pay_percentage == 0 || isNaN(pay_percentage)){
+            pay_percentage = pay_amount = 0;
+        }else {
+            borrowAmount = $('#Amount').val();
+            pay_amount = (pay_percentage * borrowAmount) / 100;
+        }
+        $('#pay_amount').val(pay_amount);
+
+        calcAfterSalary();
+    });
+
+
+    $('#pay_amount').on('keyup', function () {
+        pay_amount = $(this).val();
+        if(pay_amount == 0 || isNaN(pay_amount)){
+            pay_percentage = pay_amount = 0;
+        }else {
+            borrowAmount = $('#Amount').val();
+            pay_percentage = (pay_amount/borrowAmount) * 100;
+        }
+        $('#pay_percentage').val(pay_percentage);
+
+        calcAfterSalary();
+    });
+
+console.log(employeeSalary);
+    $('#user_id').on('change', function () {
+        employeeID = $(this).val();
+        console.log(employeeID);
+        salary = employeeSalary[employeeID];
+        $('.process_salary').text(employeeSalary[employeeID]);
+    });
 </script>

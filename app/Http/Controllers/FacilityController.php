@@ -31,7 +31,9 @@ class FacilityController extends Controller
             'tax_file' => 'numeric',
             'tax_card' => 'numeric',
             'trade_record' => 'numeric',
-            'sales_tax' => 'numeric',
+            'sales_tax' => 'numeric|max:60|min:0',
+            'opening_amount' => 'numeric',
+            //'country_sales_tax' => 'numeric',
             'logo' => 'image',
             'email' => 'email',
         ]);
@@ -44,6 +46,8 @@ class FacilityController extends Controller
             'tax_card' => 'البطاقة الضريبية',
             'trade_record' => 'السجل التجاري',
             'sales_tax' => 'ضريبة المبيعات',
+            'opening_amount' => 'الرصيد الافتتاحى',
+            //'country_sales_tax' => 'ضريبة المبيعات',
             'logo' => 'الشعار',
             'email' => 'البريد اﻻلكتروني',
         ]);
@@ -95,6 +99,7 @@ class FacilityController extends Controller
             $facility->region = $request->region;
             $facility->address = $request->address;
             $facility->website = $request->website;
+            $facility->opening_amount = $request->opening_amount;
             $facility->save();
 
             return redirect()->back()->with('success', 'تم حفظ بيانات المنشأة.');

@@ -25,15 +25,15 @@
 
     {{ Form::model($process, 
             array(
-                'route' => array('client.process.update', $process->id),
+                'route' => array('employeeBorrow.update', $process->id),
                 'method' => 'put'
             )
         ) 
     }}
         @if (session('error'))
-            @include('client.process._form', ['model' => 'edit', 'items' => old('items')])
+            @include('employee.borrow._form', ['model' => 'edit', 'items' => old('items')])
         @else
-            @include('client.process._form', ['model' => 'edit', 'items' => $process->items])
+            @include('employee.borrow._form', ['model' => 'edit', 'items' => $process->items])
         @endif
     {{ Form::close() }}
 

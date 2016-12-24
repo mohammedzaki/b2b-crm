@@ -19,7 +19,7 @@ class ClientProcessController extends Controller {
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-                    'name' => 'required|unique:client_processes,name,' . $id . '|min:5|max:255',
+                    'name' => 'required|unique:supplier_processes,name,' . $id . '|min:5|max:255',
                     'client_id' => 'required|exists:clients,id',
                     'employee_id' => 'required|exists:employees,user_id',
                     'notes' => 'string',
@@ -76,7 +76,7 @@ class ClientProcessController extends Controller {
     public function store(Request $request) {
         $validator = $this->validator($request->all());
         $all = $request->all();
-
+        
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {

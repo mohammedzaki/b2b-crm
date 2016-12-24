@@ -1,10 +1,10 @@
 @extends('layouts.app') 
-@section('title', 'عرض الكل - عمليه جديدة عميل') 
+@section('title', 'المحذوفات - اضف عميل') 
 @section('content')
 
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">عمليه جديدة عميل <small>عرض الكل</small></h1>
+        <h1 class="page-header">اضافة عميل <small>المحذوفات</small></h1>
     </div>
 </div>
 <!-- /.row -->
@@ -26,7 +26,7 @@
     <div class="col-lg-12">
         <div class="panel panel-default">
             <div class="panel-heading">
-                العمليات
+                العملاء
             </div>
             <!-- /.panel-heading -->
             <div class="panel-body">
@@ -36,31 +36,29 @@
                             <thead>
                                 <tr>
                                     <th width="40">الرقم</th>
-                                    <th>اسم العميلة</th>
-                                    <th>اسم العميل</th>
-                                    <th>مﻻحظات</th>
-                                    <th>مبلغ العملية</th>
-                                    <th width="150">تحكم</th>
+                                    <th>اسم المورد</th>
+                                    <th>العنوان</th>
+                                    <th>حد المديونية</th>
+                                    <th width="60">التليفون</th>
+                                    <th width="60">المحمول</th>
+                                    <th width="100">تحكم</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($processes as $process)
+                                @forelse ($suppliers as $supplier)
                                 <tr role="row">
-                                    <td class="text-center">{{ $process->id }}</td>
-                                    <td>{{ $process->name }}</td>
-                                    <td>{{ $process->client->name }}</td>
-                                    <td>{{ $process->notes }}</td>
-                                    <td>{{ $process->total_price }}</td>
+                                    <td class="text-center">{{ $supplier->id }}</td>
+                                    <td>{{ $supplier->name }}</td>
+                                    <td>{{ $supplier->address }}</td>
+                                    <td>{{ $supplier->credit_limit }}</td>
+                                    <td>{{ $supplier->telephone }}</td>
+                                    <td>{{ $supplier->mobile }}</td>
                                     <td>
-                                        {{ Form::open(['method' => 'DELETE', 'route' => ['client.process.destroy', $process->id], 'onsubmit' => 'return ConfirmDelete()', 'style' => 'display: inline-block;']) }}
-                                        {{ Form::button('حذف', array('type' => 'submit', 'class' => 'btn btn-danger')) }}
-                                        {{ Form::close() }}
-
-                                        {{ link_to_route('client.process.edit', 'تعديل', array('id' => $process->id), array('class' => 'btn btn-primary')) }}
+                                        {{ link_to_route('supplier.restore', 'استرجاع', array('id' => $supplier->id), array('class' => 'btn btn-warning')) }}
                                     </td>
                                 </tr>
                                 @empty
-                                <tr>ﻻ يوجد عمليات.</tr>
+                                <tr>ﻻ يوجد موردين.</tr>
                                 @endforelse
                             </tbody>
                         </table>  
@@ -74,6 +72,7 @@
     </div>
     <!-- /.col-lg-12 -->
 </div>
+
 
 <script>
     function ConfirmDelete() {
