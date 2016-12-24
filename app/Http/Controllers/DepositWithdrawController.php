@@ -36,45 +36,9 @@ class DepositWithdrawController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $numbers['clients_number'] = Client::count();
-        $numbers['suppliers_number'] = Supplier::count();
-        $numbers['process_number'] = ClientProcess::count();
-        $numbers['Supplierprocess_number'] = SupplierProcess::count();
-        $numbers['current_amount'] = $this->CalculateCurrentAmount();
-
-        $clients = Client::select('id', 'name')->get();
-        $employees = Employee::select('id', 'name')->get();
-        $suppliers = Supplier::select('id', 'name')->get();
-        $expenses = Expenses::all();
-        //$depositWithdraws = DepositWithdraw::select()->whereRaw('Date(created_at) = CURDATE()')->get();
-        $depositWithdraws = DepositWithdraw::where('created_at', ">=", Carbon::today())->get();
-        $clients_tmp = [];
-        $employees_tmp = [];
-        $suppliers_tmp = [];
-        $expenses_tmp = [];
-        $payMethod = [];
-        //$depositWithdraws_tmp = [];
-        $payMethods = [];
-        $payMethods[0] = "كاش";
-        $payMethods[1] = "شيك";
-        foreach ($clients as $client) {
-            $clients_tmp[$client->id] = $client->name;
-        }
-        foreach ($employees as $employee) {
-            $employees_tmp[$employee->id] = $employee->name;
-        }
-        foreach ($suppliers as $supplier) {
-            $suppliers_tmp[$supplier->id] = $supplier->name;
-        }
-        foreach ($expenses as $expense) {
-            $expenses_tmp[$expense->id] = $expense->name;
-        }
-        $clients = $clients_tmp;
-        $employees = $employees_tmp;
-        $suppliers = $suppliers_tmp;
-        $expenses = $expenses_tmp;
-        $canEdit = 0;
-        return view('depositwithdraw', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit']));
+        $startDate = Carbon::today()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::today()->format('Y-m-d 23:59:59');
+        return $this->getDepositWithdrawsItems($startDate, $endDate, 0);
     }
 
     protected function validator(array $data, $id = null) {
@@ -205,19 +169,22 @@ class DepositWithdrawController extends Controller {
         if (!$user->ability('admin', 'deposit-withdraw-edit')) {
             return response()->view('errors.403', [], 403);
         }
+        $startDate = Carbon::parse($request['targetdate'])->format('Y-m-d 00:00:00');
+        $endDate = Carbon::parse($request['targetdate'])->format('Y-m-d 23:59:59');
+        return $this->getDepositWithdrawsItems($startDate, $endDate, 1);
+    }
+
+    private function getDepositWithdrawsItems($startDate, $endDate, $canEdit) {
         $numbers['clients_number'] = Client::count();
         $numbers['suppliers_number'] = Supplier::count();
         $numbers['process_number'] = ClientProcess::count();
         $numbers['Supplierprocess_number'] = SupplierProcess::count();
-        // TODO: must re-program
         $numbers['current_amount'] = $this->CalculateCurrentAmount();
 
         $clients = Client::select('id', 'name')->get();
         $employees = Employee::select('id', 'name')->get();
         $suppliers = Supplier::select('id', 'name')->get();
         $expenses = Expenses::all();
-        $startDate = Carbon::parse($request['targetdate'])->format('Y-m-d 00:00:00');
-        $endDate = Carbon::parse($request['targetdate'])->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::whereBetween('created_at', [$startDate, $endDate])->get();
 
         $clients_tmp = [];
@@ -245,7 +212,7 @@ class DepositWithdrawController extends Controller {
         $employees = $employees_tmp;
         $suppliers = $suppliers_tmp;
         $expenses = $expenses_tmp;
-        $canEdit = 1;
+        $canEdit = $canEdit;
         return view('depositwithdraw', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit']));
     }
 
@@ -312,8 +279,7 @@ class DepositWithdrawController extends Controller {
     }
 
     private function CalculateCurrentAmount() {
-        // TODO: must re-program
-        return ((DepositWithdraw::sum('depositValue') + Facility::sum('opening_amount')) - DepositWithdraw::sum('withdrawValue'));
+        return (DepositWithdraw::sum('depositValue') + Facility::sum('opening_amount')) - DepositWithdraw::sum('withdrawValue');
     }
 
     private function CheckProcessClosed(DepositWithdraw $depositWithdraw) {
