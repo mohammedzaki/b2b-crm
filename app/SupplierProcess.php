@@ -44,25 +44,16 @@ class SupplierProcess extends Model
         return $this->hasMany('App\DepositWithdraw', 'cbo_processes');
     }
     
-    public function processWithdrawals() {
+    public function totalWithdrawals() {
         return $this->withdrawals()->where('supplier_id', $this->supplier->id)->sum('withdrawValue');
     }
 
     public function totalPriceAfterTaxes() {
-        $discount = 0;
-        $taxesValue = 0;
-        if ($this->has_discount == "1") {
-            $discount = $this->total_price * ($this->discount_percentage / 100);
-        }
-        if ($this->require_bill == "1") {
-            $facility = Facility::findOrFail(1);
-            $taxesValue = ($this->total_price - $discount) * $facility->getTaxesRate();
-        }
-        return ($this->total_price - $discount) + $taxesValue;
+        return ($this->total_price - $this->discountValue()) + $this->taxesValue();
     }
     
     public function CheckProcessMustClosed() {
-        if ($this->totalPriceAfterTaxes() == $this->processWithdrawals()) {
+        if ($this->totalPriceAfterTaxes() == $this->totalWithdrawals()) {
             $this->status = 'closed';
             $this->save();
             return TRUE;
@@ -71,6 +62,21 @@ class SupplierProcess extends Model
             $this->save();
             return FALSE;
         }
+    }
+
+    public function discountValue() {
+        if ($this->has_discount == "1") {
+            return $this->total_price * ($this->discount_percentage / 100);
+        }
+        return 0;
+    }
+    
+    public function taxesValue() {
+        if ($this->require_bill == "1") {
+            $facility = Facility::findOrFail(1);
+            return ($this->total_price - $this->discountValue()) * $facility->getTaxesRate();
+        }
+        return 0;
     }
 
 }

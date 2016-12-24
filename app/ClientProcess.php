@@ -39,25 +39,16 @@ class ClientProcess extends Model {
         return $this->hasMany('App\DepositWithdraw', 'cbo_processes');
     }
 
-    public function processDeposit() {
+    public function totalDeposits() {
         return $this->deposits()->where('client_id', $this->client->id)->sum('depositValue');
     }
 
     public function totalPriceAfterTaxes() {
-        $discount = 0;
-        $taxesValue = 0;
-        if ($this->has_discount == "1") {
-            $discount = $this->total_price * ($this->discount_percentage / 100);
-        }
-        if ($this->require_bill == "1") {
-            $facility = Facility::findOrFail(1);
-            $taxesValue = ($this->total_price - $discount) * $facility->getTaxesRate();
-        }
-        return ($this->total_price - $discount) + $taxesValue;
+        return ($this->total_price - $this->discountValue()) + $this->taxesValue();
     }
     
     public function CheckProcessMustClosed() {
-        if ($this->totalPriceAfterTaxes() == $this->processDeposit()) {
+        if ($this->totalPriceAfterTaxes() == $this->totalDeposits()) {
             $this->status = 'closed';
             $this->save();
             return TRUE;
@@ -68,4 +59,18 @@ class ClientProcess extends Model {
         }
     }
 
+    public function discountValue() {
+        if ($this->has_discount == "1") {
+            return $this->total_price * ($this->discount_percentage / 100);
+        }
+        return 0;
+    }
+    
+    public function taxesValue() {
+        if ($this->require_bill == "1") {
+            $facility = Facility::findOrFail(1);
+            return ($this->total_price - $this->discountValue()) * $facility->getTaxesRate();
+        }
+        return 0;
+    }
 }

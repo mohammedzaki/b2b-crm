@@ -99,19 +99,11 @@ class ReportsController extends Controller {
         foreach ($request->processes as $id) {
             $clientProcess = ClientProcess::findOrFail($id);
             $proceses[$id]['processName'] = $clientProcess->name;
-            $discount = 0;
-            $taxesValue = 0;
-            if ($clientProcess->has_discount == "1") { 
-                $discount = $clientProcess->total_price * ($clientProcess->discount_percentage / 100);
-            } 
-            if ($clientProcess->require_bill == "1") {
-                $facility = new FacilityController();
-                $taxesValue = ($clientProcess->total_price - $discount) * $facility->getTaxesRate();
-            }
-            $proceses[$id]['processTotalPrice'] = ($clientProcess->total_price - $discount) + $taxesValue;
-            $proceses[$id]['processTotalPaid'] = $clientProcess->deposits()->where('client_id', $clientProcess->client->id)->sum('depositValue');
-            $proceses[$id]['processTotalRemaining'] = $proceses[$id]['processTotalPrice'] - $clientProcess->deposits()->where('client_id', $clientProcess->client->id)->sum('depositValue');
-            $proceses[$id]['processDate'] = Carbon::parse($clientProcess->created_at)->format('Y-m-d');
+            
+            $proceses[$id]['processTotalPrice'] = $clientProcess->totalPriceAfterTaxes();
+            $proceses[$id]['processTotalPaid'] = $clientProcess->totalDeposits();
+            $proceses[$id]['processTotalRemaining'] = $clientProcess->totalPriceAfterTaxes() - $clientProcess->totalDeposits();
+            $proceses[$id]['processDate'] = Carbon::today()->format('Y-m-d'); //Carbon::parse($clientProcess->created_at)->format('Y-m-d');
             $proceses[$id]['processNum'] = $id;
             $allProcessesTotalPrice += $proceses[$id]['processTotalPrice'];
             $allProcessTotalPaid += $proceses[$id]['processTotalPaid'];
@@ -133,7 +125,7 @@ class ReportsController extends Controller {
                 if ($clientProcess->has_discount == "1") {
                     $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($item->updated_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
-                    $proceses[$id]['processDetails'][$index]['paid'] = $discount;
+                    $proceses[$id]['processDetails'][$index]['paid'] = $clientProcess->discountValue();
                     $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
                     $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
                     $proceses[$id]['processDetails'][$index]['quantity'] = "";
@@ -145,7 +137,7 @@ class ReportsController extends Controller {
                     $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($item->updated_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
                     $proceses[$id]['processDetails'][$index]['paid'] = "";
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $taxesValue;
+                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $clientProcess->taxesValue();
                     $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
                     $proceses[$id]['processDetails'][$index]['quantity'] = "";
                     $proceses[$id]['processDetails'][$index]['desc'] = "قيمة الضريبة المضافة";
@@ -155,8 +147,8 @@ class ReportsController extends Controller {
                 
                 foreach ($clientProcess->deposits()->where('client_id', $clientProcess->client->id)->get() as $deposit) {
                     $totalDepositValue += $deposit->depositValue;
-                    $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($item->updated_at)->format('Y-m-d');
-                    $proceses[$id]['processDetails'][$index]['remaining'] = $clientProcess->total_price - $totalDepositValue;
+                    $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($deposit->updated_at)->format('Y-m-d');
+                    $proceses[$id]['processDetails'][$index]['remaining'] = $clientProcess->totalPriceAfterTaxes() - $totalDepositValue;
                     $proceses[$id]['processDetails'][$index]['paid'] = $deposit->depositValue;
                     $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
                     $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
@@ -226,19 +218,10 @@ class ReportsController extends Controller {
         foreach ($request->processes as $id) {
             $supplierProcess = SupplierProcess::findOrFail($id);
             $proceses[$id]['processName'] = $supplierProcess->name;
-            $discount = 0;
-            $taxesValue = 0;
-            if ($supplierProcess->has_discount == "1") { 
-                $discount = $supplierProcess->total_price * ($supplierProcess->discount_percentage / 100);
-            } 
-            if ($supplierProcess->require_bill == "1") {
-                $facility = new FacilityController();
-                    $taxesValue = ($supplierProcess->total_price - $discount) * $facility->getTaxesRate();
-            }
-            $proceses[$id]['processTotalPrice'] = ($supplierProcess->total_price - $discount) + $taxesValue;
-            $proceses[$id]['processTotalPaid'] = $supplierProcess->withdrawals()->where('supplier_id', $supplierProcess->supplier->id)->sum('withdrawValue');
-            $proceses[$id]['processTotalRemaining'] = $proceses[$id]['processTotalPrice'] - $supplierProcess->withdrawals()->where('supplier_id', $supplierProcess->supplier->id)->sum('withdrawValue');
-            $proceses[$id]['processDate'] = Carbon::parse($supplierProcess->created_at)->format('Y-m-d');
+            $proceses[$id]['processTotalPrice'] = $supplierProcess->totalPriceAfterTaxes();
+            $proceses[$id]['processTotalPaid'] = $supplierProcess->totalWithdrawals();
+            $proceses[$id]['processTotalRemaining'] = $supplierProcess->totalPriceAfterTaxes() - $supplierProcess->totalWithdrawals();
+            $proceses[$id]['processDate'] = Carbon::today()->format('Y-m-d'); //Carbon::parse($supplierProcess->created_at)->format('Y-m-d');
             $proceses[$id]['processNum'] = $id;
             $allProcessesTotalPrice += $proceses[$id]['processTotalPrice'];
             $allProcessTotalPaid += $proceses[$id]['processTotalPaid'];
@@ -260,7 +243,7 @@ class ReportsController extends Controller {
                 if ($supplierProcess->has_discount == "1") {
                     $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($item->updated_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
-                    $proceses[$id]['processDetails'][$index]['paid'] = $discount;
+                    $proceses[$id]['processDetails'][$index]['paid'] = $supplierProcess->discountValue();
                     $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
                     $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
                     $proceses[$id]['processDetails'][$index]['quantity'] = "";
@@ -271,16 +254,17 @@ class ReportsController extends Controller {
                     $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($item->updated_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
                     $proceses[$id]['processDetails'][$index]['paid'] = "";
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $taxesValue;
+                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $supplierProcess->taxesValue();
                     $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
                     $proceses[$id]['processDetails'][$index]['quantity'] = "";
                     $proceses[$id]['processDetails'][$index]['desc'] = "قيمة الضريبة المضافة";
                     $index++;
                 }
+                
                 foreach ($supplierProcess->withdrawals()->where('supplier_id', $supplierProcess->supplier->id)->get() as $withdrawal) {
                     $totalWithdrawalValue += $withdrawal->withdrawValue;
-                    $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($item->updated_at)->format('Y-m-d');
-                    $proceses[$id]['processDetails'][$index]['remaining'] = $supplierProcess->total_price - $totalWithdrawalValue;
+                    $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($withdrawal->updated_at)->format('Y-m-d');
+                    $proceses[$id]['processDetails'][$index]['remaining'] = $supplierProcess->totalPriceAfterTaxes() - $totalWithdrawalValue;
                     $proceses[$id]['processDetails'][$index]['paid'] = $withdrawal->withdrawValue;
                     $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
                     $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
