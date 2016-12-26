@@ -232,7 +232,7 @@ class SupplierProcessController extends Controller {
 
     public function getSupplierProcesses(Request $request) {
         $input = $request->input('option');
-        $clientProcesses = SupplierProcess::where('supplier_id', $input)->get();
+        $clientProcesses = SupplierProcess::allOpened()->where('supplier_id', $input)->get();
         $clientProcesses_tmp = [];
         foreach ($clientProcesses as $process) {
             $clientProcesses_tmp[$process->id] = $process->name;

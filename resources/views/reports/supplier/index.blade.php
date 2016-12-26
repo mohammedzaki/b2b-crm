@@ -162,16 +162,13 @@
 
 
 <script>
-    var supplierProcess = null;
-
+    var allProcesses  = [@foreach($supplierProcesses as $k => $info) {id: '{{ $k }}', name: '{{ $info["name"] }}', clientId: '{{ $info["supplierId"] }}', totalPrice: '{{ $info["totalPrice"] }}', status: '{{ $info["status"] }}'}, @endforeach];
+    //var supplierProcess = null;
+    var currentSupplierId = 0;
+    
     function GetSupplierProcess(supplier_id) {
-        supplier_id = $(supplier_id).val();
-        //console.log(supplier_id);
-        $.get('{{ url("reports/supplier/getSupplierProcesses/") }}', {option: supplier_id},
-                function (data) {
-                    supplierProcess = data;
-                    FillterProcess();
-                });
+        currentSupplierId = $(supplier_id).val();
+        FillterProcess();
     }
 
     function SelectAll(ch_all) {
@@ -192,16 +189,17 @@
     function FillterProcess() {
         $("#grid_SupplierProcess").empty();
         var index = 0;
-        if (supplierProcess != null) {
-            $.each(supplierProcess, function (key, value) {
-
-                if ($("#ch_openprocess").is(":checked") && value.status == "active") {
-                    $("#grid_SupplierProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled="disabled" name="processes[' + index + ']" type="hidden" value="' + key + '"></td></tr>');
+        if (allProcesses != null) {
+            $.each(allProcesses, function (key, value) {
+                if (value.clientId == currentSupplierId) {
+                    if ($("#ch_openprocess").is(":checked") && value.status == "active") {
+                        $("#grid_SupplierProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled="disabled" name="processes[' + index + ']" type="hidden" value="' + key + '"></td></tr>');
+                    }
+                    if ($("#ch_closedprocess").is(":checked") && value.status == "closed") {
+                        $("#grid_SupplierProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled="disabled" name="processes[' + index + ']" type="hidden" value="' + key + '"></td></tr>');
+                    }
+                    index++;
                 }
-                if ($("#ch_closedprocess").is(":checked") && value.status == "closed") {
-                    $("#grid_SupplierProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled="disabled" name="processes[' + index + ']" type="hidden" value="' + key + '"></td></tr>');
-                }
-                index++;
             });
         }
     }

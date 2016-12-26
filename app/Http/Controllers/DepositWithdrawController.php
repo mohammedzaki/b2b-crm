@@ -185,14 +185,17 @@ class DepositWithdrawController extends Controller {
         $employees = Employee::select('id', 'name')->get();
         $suppliers = Supplier::select('id', 'name')->get();
         $expenses = Expenses::all();
+        $clientProcesses = ClientProcess::allOpened()->get();
+        $supplierProcesses = SupplierProcess::allOpened()->get();
         $depositWithdraws = DepositWithdraw::whereBetween('created_at', [$startDate, $endDate])->get();
 
         $clients_tmp = [];
         $employees_tmp = [];
         $suppliers_tmp = [];
         $expenses_tmp = [];
+        $clientProcesses_tmp = [];
+        $supplierProcesses_tmp = [];
         $payMethod = [];
-        //$depositWithdraws_tmp = [];
         $payMethods = [];
         $payMethods[0] = "كاش";
         $payMethods[1] = "شيك";
@@ -208,12 +211,23 @@ class DepositWithdrawController extends Controller {
         foreach ($expenses as $expense) {
             $expenses_tmp[$expense->id] = $expense->name;
         }
+        foreach ($clientProcesses as $process) {
+            $clientProcesses_tmp[$process->id]['name'] = $process->name;
+            $clientProcesses_tmp[$process->id]['client_id'] = $process->client->id;
+        }
+        foreach ($supplierProcesses as $process) {
+            $supplierProcesses_tmp[$process->id]['name'] = $process->name;
+            $supplierProcesses_tmp[$process->id]['supplier_id'] = $process->supplier->id;
+        }
+        $clientProcesses = $clientProcesses_tmp;
+        $supplierProcesses = $supplierProcesses_tmp;
+        
         $clients = $clients_tmp;
         $employees = $employees_tmp;
         $suppliers = $suppliers_tmp;
         $expenses = $expenses_tmp;
         $canEdit = $canEdit;
-        return view('depositwithdraw', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit']));
+        return view('depositwithdraw', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit', 'clientProcesses', 'supplierProcesses']));
     }
 
     /**

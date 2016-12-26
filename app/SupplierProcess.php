@@ -78,5 +78,9 @@ class SupplierProcess extends Model
         }
         return 0;
     }
+    
+    public static function allOpened() {
+        return SupplierProcess::where('status', 'active');
+    }
 
 }

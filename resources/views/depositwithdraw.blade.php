@@ -664,6 +664,9 @@
 <script>
     var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount;
     var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
+    var supplierProcesses = [@foreach($supplierProcesses as $k => $info) {id: '{{ $k }}', name: '{{ $info["name"] }}', supplier_id: '{{ $info["supplier_id"] }}'}, @endforeach];
+    var clientProcesses = [@foreach($clientProcesses as $k => $info) {id: '{{ $k }}', name: '{{ $info["name"] }}', client_id: '{{ $info["client_id"] }}'}, @endforeach];
+    //console.log(clientProcesses, supplierProcesses);
     SetIsNumberOnly();
     LockAll();
     currentAmount = $("#currentAmount");
@@ -971,28 +974,28 @@
                 employee_id.val('');
                 expenses_id.val('');
                 withdrawValue.val('');
-                $.get("{{ url('api/getClientProcesses/') }}", {option: client_id.val()},
-                        function (data) {
-                            cbo_processes.empty();
-                            cbo_processes.append($("<option></option>").attr("value", -1).text(''));
-                            $.each(data, function (key, value) {
-                                cbo_processes.append($("<option></option>").attr("value", key).text(value));
-                            });
-                        });
+                
+                cbo_processes.empty();
+                cbo_processes.append($("<option></option>").attr("value", -1).text(''));
+                $.each(clientProcesses, function (key, process) {
+                    console.log(process);
+                    if (process.client_id == client_id.val()) {
+                        cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+                    }
+                });
+                
                 break;
             case "supplier_id":
                 client_id.val('');
                 employee_id.val('');
                 expenses_id.val('');
                 depositValue.val('');
-                $.get("{{ url('api/getSupplierProcesses/') }}", {option: supplier_id.val()},
-                        function (data) {
-                            cbo_processes.empty();
-                            cbo_processes.append($("<option></option>").attr("value", -1).text(''));
-                            $.each(data, function (key, value) {
-                                cbo_processes.append($("<option></option>").attr("value", key).text(value));
-                            });
-                        });
+                $.each(supplierProcesses, function (key, process) {
+                    console.log(process);
+                    if (process.supplier_id == supplier_id.val()) {
+                        cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+                    }
+                });
                 break;
             case "employee_id":
                 client_id.val('');

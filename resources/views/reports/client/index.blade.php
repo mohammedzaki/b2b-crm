@@ -162,16 +162,11 @@
 
 
 <script>
-    var clientProcess = null;
-
+    var allProcesses  = [@foreach($clientProcesses as $k => $info) {id: '{{ $k }}', name: '{{ $info["name"] }}', clientId: '{{ $info["clientId"] }}', totalPrice: '{{ $info["totalPrice"] }}', status: '{{ $info["status"] }}'}, @endforeach];
+    var currentClientId =0;
     function GetClientProcess(client_id) {
-        client_id = $(client_id).val();
-        //console.log(client_id);
-        $.get('{{ url("reports/client/getClientProcesses/") }}', {option: client_id},
-                function (data) {
-                    clientProcess = data;
-                    FillterProcess();
-                });
+        currentClientId = $(client_id).val();
+        FillterProcess();
     }
 
     function SelectAll(ch_all) {
@@ -192,16 +187,17 @@
     function FillterProcess() {
         $("#grid_ClientProcess").empty();
         var index = 0;
-        if (clientProcess != null) {
-            $.each(clientProcess, function (key, value) {
-
-                if ($("#ch_openprocess").is(":checked") && value.status == "active") {
-                    $("#grid_ClientProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled="disabled" name="processes[' + index + ']" type="hidden" value="' + key + '"></td></tr>');
+        if (allProcesses != null) {
+            $.each(allProcesses, function (key, value) {
+                if (value.clientId == currentClientId) {
+                    if ($("#ch_openprocess").is(":checked") && value.status == "active") {
+                        $("#grid_ClientProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled="disabled" name="processes[' + index + ']" type="hidden" value="' + value.id + '"></td></tr>');
+                    }
+                    if ($("#ch_closedprocess").is(":checked") && value.status == "closed") {
+                        $("#grid_ClientProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled="disabled" name="processes[' + index + ']" type="hidden" value="' + value.id + '"></td></tr>');
+                    }
+                    index++;
                 }
-                if ($("#ch_closedprocess").is(":checked") && value.status == "closed") {
-                    $("#grid_ClientProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled="disabled" name="processes[' + index + ']" type="hidden" value="' + key + '"></td></tr>');
-                }
-                index++;
             });
         }
     }

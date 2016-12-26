@@ -84,7 +84,19 @@ class ReportsController extends Controller {
             $clients_tmp[$client->id] = $client->name;
         }
         $clients = $clients_tmp;
-        return view('reports.client.index', compact("clients"));
+        
+        $clientProcesses = ClientProcess::all();
+
+        $clientProcesses_tmp = [];
+        foreach ($clientProcesses as $process) {
+            $clientProcesses_tmp[$process->id]['clientId'] = $process->client->id;
+            $clientProcesses_tmp[$process->id]['name'] = $process->name;
+            $clientProcesses_tmp[$process->id]['totalPrice'] = $process->total_price;
+            $clientProcesses_tmp[$process->id]['status'] = $process->status;
+        }
+        $clientProcesses = $clientProcesses_tmp;
+        
+        return view('reports.client.index', compact("clients", "clientProcesses"));
     }
 
     public function viewClientReport(Request $request) {
@@ -202,7 +214,18 @@ class ReportsController extends Controller {
             $suppliers_tmp[$supplier->id] = $supplier->name;
         }
         $suppliers = $suppliers_tmp;
-        return view('reports.supplier.index', compact("suppliers"));
+        
+        $supplierProcesses = SupplierProcess::all();
+
+        $supplierProcesses_tmp = [];
+        foreach ($supplierProcesses as $process) {
+            $supplierProcesses_tmp[$process->id]['supplierId'] = $process->supplier->id;
+            $supplierProcesses_tmp[$process->id]['name'] = $process->name;
+            $supplierProcesses_tmp[$process->id]['totalPrice'] = $process->total_price;
+            $supplierProcesses_tmp[$process->id]['status'] = $process->status;
+        }
+        $supplierProcesses = $supplierProcesses_tmp;
+        return view('reports.supplier.index', compact("suppliers", "supplierProcesses"));
     }
 
     public function viewSupplierReport(Request $request) {

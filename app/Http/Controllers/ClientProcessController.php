@@ -223,7 +223,7 @@ class ClientProcessController extends Controller {
 
     public function getClientProcesses(Request $request) {
         $input = $request->input('option');
-        $clientProcesses = ClientProcess::where('client_id', $input)->get();
+        $clientProcesses = ClientProcess::allOpened()->where('client_id', $input)->get();
         $clientProcesses_tmp = [];
         foreach ($clientProcesses as $process) {
             $clientProcesses_tmp[$process->id] = $process->name;
