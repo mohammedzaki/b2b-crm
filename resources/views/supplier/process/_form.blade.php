@@ -1,3 +1,8 @@
+@section('script_taxes')
+<script>
+var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
+</script>
+@endsection
 <div class="row">
     <div class="col-lg-4">
         <div class="panel panel-default">
@@ -38,9 +43,13 @@
 
                 <div class="form-group {{ $errors->has('client_process_id') ? ' has-error' : '' }}">
                     {{ Form::label('client_process_id', 'اسم العملية') }} 
-                    <select id="clientprocesses" name="client_process_id" class="form-control">
-                        <option value="">اختر اسم العملية</option>
-                    </select>
+                    {{ Form::select('client_process_id', [], null,
+                        array(
+                            'id' => 'client_process_id',
+                            'class' => 'form-control',
+                            'placeholder' => 'اختر اسم العملية')
+                        )
+                    }}
                     @if ($errors->has('client_process_id'))
                     <label for="inputError" class="control-label">
                         {{ $errors->first('client_process_id') }}
@@ -95,6 +104,7 @@
                                 {{ Form::label('discount_percentage', 'نسبة الخصم') }} 
                                 {{ Form::text('discount_percentage', null, 
                                     array(
+                                        'id' => 'discount_percentage',
                                         'class' => 'form-control', 
                                         'placeholder' => 'ادخل النسبة'
                                         )
@@ -120,6 +130,24 @@
                                 @if ($errors->has('discount_reason'))
                                 <label for="inputError" class="control-label">
                                     {{ $errors->first('discount_reason') }}
+                                </label>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5">
+                            <div class="form-group{{ $errors->has('discount_value') ? ' has-error' : '' }}">
+                                {{ Form::label('discount_value', 'القيمة') }} 
+                                {{ Form::text('discount_value', null, 
+                                    array(
+                                        'class' => 'form-control', 
+                                        'placeholder' => 'ادخل القيمة'
+                                        )
+                                    )
+                                }}
+                                @if ($errors->has('discount_value'))
+                                <label for="inputError" class="control-label">
+                                    {{ $errors->first('discount_value') }}
                                 </label>
                                 @endif
                             </div>
@@ -152,7 +180,7 @@
                     <span class="price process_price">0</span>
                 </h4>
                 <h4>
-                    <span>نسبة الخصم </span>
+                    <span>مبلغ الخصم </span>
                     <span class="price discount_price">0</span>
                 </h4>
                 <h4>
@@ -278,16 +306,39 @@
 </div>
 
 <script>
+    var clientProcesses = [@foreach($clientProcesses as $k => $info) { id: '{{ $k }}', name: '{{ $info["name"] }}', client_id: '{{ $info["client_id"] }}'}, @endforeach];
+    var cbo_processes = $('#client_process_id');
+    var client_id = $('#client_id');
     $(document).ready(function ($) {
         $('#client_id').change(function () {
-            $.get("{{ url('api/getClientProcesses/') }}", {option: $(this).val()},
-                function (data) {
-                    var clientprocesses = $('#clientprocesses');
-                    clientprocesses.empty();
-                    $.each(data, function (key, value) {
-                        clientprocesses.append($("<option></option>").attr("value", key).text(value));
-                    });
-                });
+            
+            cbo_processes.empty();
+            cbo_processes.append($("<option></option>"));
+            
+            $.each(clientProcesses, function (key, process) {
+                //console.log(process);
+                if (process.client_id == client_id.val()) {
+                    cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+                }
+            });  
         });
     });
+    LoadProcess();
+    function LoadProcess() {
+        var clientprocesses_val = "@if(isset($model)) {{ $process->client_process_id }} @else -1 @endif";//$("#client_process_id").val();
+        //alert(clientprocesses_val);
+        cbo_processes.empty();
+        cbo_processes.append($("<option></option>"));
+
+        $.each(clientProcesses, function (key, process) {
+            //console.log(process);
+            if (process.client_id == client_id.val()) {
+                if (process.id == clientprocesses_val) {
+                    cbo_processes.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
+                } else {
+                    cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+                }
+            }
+        }); 
+    }
 </script>

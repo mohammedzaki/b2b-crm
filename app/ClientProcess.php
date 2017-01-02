@@ -17,11 +17,13 @@ class ClientProcess extends Model {
         'notes',
         'has_discount',
         'status',
-        'discount_percentage',
+        //'discount_percentage',
+        'discount_value',
         'discount_reason',
         'require_bill',
         'total_price'
     ];
+    public $discount_percentage = 0;
 
     public function client() {
         return $this->belongsTo('App\Client');
@@ -61,7 +63,14 @@ class ClientProcess extends Model {
 
     public function discountValue() {
         if ($this->has_discount == "1") {
-            return $this->total_price * ($this->discount_percentage / 100);
+            return $this->discount_value; //* ($this->discount_percentage / 100);
+        }
+        return 0;
+    }
+
+    public function discountPercentage() {
+        if ($this->has_discount == "1") {
+            return ($this->discount_value / $this->total_price) * 100;
         }
         return 0;
     }

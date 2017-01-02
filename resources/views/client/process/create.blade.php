@@ -1,5 +1,6 @@
 @extends('layouts.app') 
 @section('title', 'اضف عملية جديدة - عمليه جديدة عميل') 
+
 @section('content')
 
 <div class="row">

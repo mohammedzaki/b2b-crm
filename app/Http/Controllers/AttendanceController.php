@@ -13,8 +13,9 @@ use App\ClientProcess;
 use App\Employee;
 use App\Expenses;
 use App\SupplierProcess;
-use App\DepositWithdraw;
+use App\Attendance;
 use App\Facility;
+use App\AbsentType;
 use App\User;
 use Validator;
 
@@ -36,72 +37,40 @@ class AttendanceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $numbers['clients_number'] = Client::count();
-        $numbers['suppliers_number'] = Supplier::count();
-        $numbers['process_number'] = ClientProcess::count();
-        $numbers['Supplierprocess_number'] = SupplierProcess::count();
-        $numbers['current_amount'] = $this->CalculateCurrentAmount();
+        $attendances = Attendance::all();
 
-        $clients = Client::select('id', 'name')->get();
-        $employees = Employee::select('id', 'name')->get();
-        $suppliers = Supplier::select('id', 'name')->get();
-        $expenses = Expenses::all();
-        //$depositWithdraws = DepositWithdraw::select()->whereRaw('Date(created_at) = CURDATE()')->get();
-        $depositWithdraws = DepositWithdraw::where('created_at', ">=", Carbon::today())->get();
-        $clients_tmp = [];
-        $employees_tmp = [];
-        $suppliers_tmp = [];
-        $expenses_tmp = [];
-        $payMethod = [];
-        //$depositWithdraws_tmp = [];
-        $payMethods = [];
-        $payMethods[0] = "غياب بدون اذن";
-        $payMethods[1] = "غياب بإذن";
-        foreach ($clients as $client) {
-            $clients_tmp[$client->id] = $client->name;
+        foreach ($attendances as $attendance) {
+            //$attendance->check_out - $attendance->check_in
+            $check_out = Carbon::parse($attendance->check_out);
+            $check_in = Carbon::parse($attendance->check_in);
+            //$attendance->check_out = $attendance->check_out
+            $attendance->workingHours = $check_out->diffInHours($check_in);
+            $attendance->employeeName = $attendance->employee->name;
+            if ($attendance->process) {
+                $attendance->processName = $attendance->process->name;
+            } else {
+                $attendance->processName = "عمليات ادارية";
+            }
+            if ($attendance->absentType) {
+                $attendance->absentTypeName = $attendance->absentType->name;
+            }
         }
-        foreach ($employees as $employee) {
-            $employees_tmp[$employee->id] = $employee->name;
-        }
-        foreach ($suppliers as $supplier) {
-            $suppliers_tmp[$supplier->id] = $supplier->name;
-        }
-        foreach ($expenses as $expense) {
-            $expenses_tmp[$expense->id] = $expense->name;
-        }
-        $clients = $clients_tmp;
-        $employees = $employees_tmp;
-        $suppliers = $suppliers_tmp;
-        $expenses = $expenses_tmp;
-        $canEdit = 0;
-        return view('attendance.index', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit']));
+        return view('attendance.index', compact(['attendances']));
     }
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-                    'depositValue' => 'numeric',
-                    'withdrawValue' => 'numeric',
-                    'recordDesc' => 'required|string',
-                    'cbo_processes' => 'numeric',
-                    'client_id' => 'exists:clients,id',
-                    'employee_id' => 'exists:employees,id',
-                    'supplier_id' => 'exists:suppliers,id',
-                    'expenses_id' => 'exists:expenses,id',
-                    'payMethod' => 'required|numeric',
+                    'process_id' => 'exists:client_processes,id|required_without:is_managment_process',
+                    'is_managment_process' => 'required_without:process_id',
+                    'employee_id' => 'exists:employees,id|required',
                     'notes' => 'string'
         ]);
 
         $validator->setAttributeNames([
-            'depositValue' => 'قيمة الوارد',
-            'withdrawValue' => 'قيمة المنصرف',
-            'recordDesc' => 'البيان',
-            'cbo_processes' => 'اسم العملية',
-            'client_id' => 'اسم العميل',
-            'employee_id' => 'مشرف العملية',
-            'expenses_id' => 'اسم المصروف',
-            'payMethod' => 'طريقة الدفع',
-            'supplier_id' => 'اسم المورد',
-            'notes' => 'مﻻحظات'
+            'process_id' => 'اسم العملية',
+            'employee_id' => 'اسم الموظف',
+            'is_managment_process' => 'عمليات ادارية',
+            'notes' => 'ملاحظات'
         ]);
 
         return $validator;
@@ -113,7 +82,30 @@ class AttendanceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function create() {
-        //
+        $employees = Employee::all();
+        $processes = ClientProcess::allOpened()->get();
+        $absentTypes = AbsentType::all();
+        $employees_tmp = [];
+        $employeesSalaries = [];
+        $processes_tmp = [];
+        $absentTypes_tmp = [];
+        $absentTypesInfo = [];
+        foreach ($employees as $employee) {
+            $employees_tmp[$employee->id] = $employee->name;
+            $employeesSalaries[$employee->id]['hourlySalary'] = $employee->daily_salary / $employee->working_hours;
+        }
+        foreach ($processes as $process) {
+            $processes_tmp[$process->id] = $process->name;
+        }
+        foreach ($absentTypes as $type) {
+            $absentTypes_tmp[$type->id] = $type->name;
+            $absentTypesInfo[$type->id]['salaryDeduction'] = $type->salary_deduction;
+            $absentTypesInfo[$type->id]['editable'] = $type->editable_deduction;
+        }
+        $processes = $processes_tmp;
+        $employees = $employees_tmp;
+        $absentTypes = $absentTypes_tmp;
+        return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo']));
     }
 
     /**
@@ -124,74 +116,20 @@ class AttendanceController extends Controller {
      */
     public function store(Request $request) {
         $validator = $this->validator($request->all());
-
+        $all = $request->all();
         if ($validator->fails()) {
-            return response()->json(array(
-                        'success' => false,
-                        'message' => 'حدث حطأ في حفظ البيانات.',
-                        'errors' => $validator->getMessageBag()->toArray()
-            ));
+            return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
-            $id = DepositWithdraw::create($request->all())->id;
-            //$current_amount = $this->CalculateCurrentAmount();
-            return response()->json(array(
-                        'success' => true,
-                        'id' => $id,
-                        'current_amount' => $this->CalculateCurrentAmount(),
-                        'message' => 'تم اضافة وارد جديد.',
-                        'errors' => $validator->getMessageBag()->toArray()
-            ));
+            $attendance = Attendance::firstOrCreate([
+                            ["date", "=", $all['date']],
+                            ["employee_id", "=", $all['employee_id']]
+            ]);
+            if (isset($request->is_managment_process)) {
+                $all['process_id'] = null;
+            }
+            $attendance->update($all);
+            return redirect()->route('attendance.edit', $attendance->id)->with(['success' => 'تم حفظ البيانات.']);
         }
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function LockSaveToAll(Request $request) {
-        $validator = $this->validator($request->all());
-        $all = $request->all();
-
-        $rowsIds = [];
-
-        foreach ($all['rowsIds'] as $id) {
-            DepositWithdraw::where('id', $id)->update(['saveStatus' => 2]);
-            $rowsIds[$id] = "Done";
-        }
-        return response()->json(array(
-                    'success' => true,
-                    'rowsIds' => $rowsIds,
-                    'current_amount' => $this->CalculateCurrentAmount(),
-                    'message' => 'تم حفظ الوارد.',
-                    'errors' => $validator->getMessageBag()->toArray()
-        ));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function RemoveSelected(Request $request) {
-        $validator = $this->validator($request->all());
-        $all = $request->all();
-
-        $rowsIds = [];
-
-        foreach ($all['rowsIds'] as $id) {
-            DepositWithdraw::where('id', $id)->delete(); //->update(['saveStatus' => 2]);
-            $rowsIds[$id] = "Done";
-        }
-        return response()->json(array(
-                    'success' => true,
-                    'rowsIds' => $rowsIds,
-                    'current_amount' => $this->CalculateCurrentAmount(),
-                    'message' => 'تم حذف الوارد.',
-                    'errors' => $validator->getMessageBag()->toArray()
-        ));
     }
 
     /**
@@ -200,63 +138,51 @@ class AttendanceController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function search(Request $request) {
-        $user = Auth::user();
-        if (!$user->ability('admin', 'deposit-withdraw-edit')) {
-            return response()->view('errors.403', [], 403);
+    public function show(Request $request, $id) {
+        $employees = Employee::all();
+        $dt = Carbon::parse($request->date);
+        $hourlyRate = 0;
+        if ($id == "all") {
+            $attendances = [];//Attendance::all();
+        } else {
+            $employee = Employee::findOrFail($id);
+            $hourlyRate = $employee->daily_salary / $employee->working_hours;
+            $attendances = Attendance::where([
+                ['employee_id', '=', $id]
+            ])->whereMonth('date', '=', $dt->month)->get();
         }
-        $numbers['clients_number'] = Client::count();
-        $numbers['suppliers_number'] = Supplier::count();
-        $numbers['process_number'] = ClientProcess::count();
-        $numbers['Supplierprocess_number'] = SupplierProcess::count();
-        // TODO: must re-program
-        $numbers['current_amount'] = $this->CalculateCurrentAmount();
-
-        $clients = Client::select('id', 'name')->get();
-        $employees = Employee::select('id', 'name')->get();
-        $suppliers = Supplier::select('id', 'name')->get();
-        $expenses = Expenses::all();
-        $startDate = Carbon::parse($request['targetdate'])->format('Y-m-d 00:00:00');
-        $endDate = Carbon::parse($request['targetdate'])->format('Y-m-d 23:59:59');
-        $depositWithdraws = DepositWithdraw::whereBetween('created_at', [$startDate, $endDate])->get();
-
-        $clients_tmp = [];
         $employees_tmp = [];
-        $suppliers_tmp = [];
-        $expenses_tmp = [];
-        $payMethod = [];
-        //$depositWithdraws_tmp = [];
-        $payMethods = [];
-        $payMethods[0] = "كاش";
-        $payMethods[1] = "شيك";
-        foreach ($clients as $client) {
-            $clients_tmp[$client->id] = $client->name;
+        $totalWorkingHours = 0;
+        $totalSalaryDeduction = 0;
+        $totalAbsentDeduction = 0;
+        $totalBonuses = 0;
+        $totalSalary = 0;
+        foreach ($attendances as $attendance) {
+            //$attendance->check_out - $attendance->check_in
+            $check_out = Carbon::parse($attendance->check_out);
+            $check_in = Carbon::parse($attendance->check_in);
+            //$attendance->check_out = $attendance->check_out
+            $attendance->workingHours = $check_out->diffInHours($check_in);
+            $attendance->employeeName = $attendance->employee->name;
+            if ($attendance->process) {
+                $attendance->processName = $attendance->process->name;
+            } else {
+                $attendance->processName = "عمليات ادارية";
+            }
+            if ($attendance->absentType) {
+                $attendance->absentTypeName = $attendance->absentType->name;
+            }
+            $totalWorkingHours += $attendance->workingHours;
+            $totalSalaryDeduction += $attendance->salary_deduction;
+            $totalAbsentDeduction += $attendance->absent_deduction;
+            $totalBonuses += $attendance->mokaf;
         }
+        $totalSalary = (($totalWorkingHours * $hourlyRate) + $totalBonuses) - ($totalSalaryDeduction + $totalAbsentDeduction);
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
         }
-        foreach ($suppliers as $supplier) {
-            $suppliers_tmp[$supplier->id] = $supplier->name;
-        }
-        foreach ($expenses as $expense) {
-            $expenses_tmp[$expense->id] = $expense->name;
-        }
-        $clients = $clients_tmp;
         $employees = $employees_tmp;
-        $suppliers = $suppliers_tmp;
-        $expenses = $expenses_tmp;
-        $canEdit = 1;
-        return view('depositwithdraw', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit']));
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id) {
-        //
+        return view('attendance.show', compact(['employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary"]));
     }
 
     /**
@@ -266,7 +192,45 @@ class AttendanceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function edit($id) {
-        //
+        $attendance = Attendance::findOrFail($id);
+        $check_out = Carbon::parse($attendance->check_out);
+        $check_in = Carbon::parse($attendance->check_in);
+        //$attendance->check_out = $attendance->check_out
+        $attendance->workingHours = $check_out->diffInHours($check_in);
+        $attendance->employeeName = $attendance->employee->name;
+        if ($attendance->process) {
+            $attendance->processName = $attendance->process->name;
+        } else {
+            $attendance->processName = "عمليات ادارية";
+            $attendance->is_managment_process = TRUE;
+        }
+        if ($attendance->absentType) {
+            $attendance->absentTypeName = $attendance->absentType->name;
+        }
+        $employees = Employee::all();
+        $processes = ClientProcess::allOpened()->get();
+        $absentTypes = AbsentType::all();
+        $employees_tmp = [];
+        $employeesSalaries = [];
+        $processes_tmp = [];
+        $absentTypes_tmp = [];
+        $absentTypesInfo = [];
+        foreach ($employees as $employee) {
+            $employees_tmp[$employee->id] = $employee->name;
+            $employeesSalaries[$employee->id]['hourlySalary'] = $employee->daily_salary / $employee->working_hours;
+        }
+        foreach ($processes as $process) {
+            $processes_tmp[$process->id] = $process->name;
+        }
+        foreach ($absentTypes as $type) {
+            $absentTypes_tmp[$type->id] = $type->name;
+            $absentTypesInfo[$type->id]['salaryDeduction'] = $type->salary_deduction;
+            $absentTypesInfo[$type->id]['editable'] = $type->editable_deduction;
+        }
+        $processes = $processes_tmp;
+        $employees = $employees_tmp;
+        $absentTypes = $absentTypes_tmp;
+        return view('attendance.edit', compact(['attendance', 'employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo']));
     }
 
     /**
@@ -277,25 +241,16 @@ class AttendanceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id) {
-        $depositWithdraw = DepositWithdraw::findOrFail($id);
+        $attendance = Attendance::findOrFail($id);
         $all = $request->all();
-        $validator = $this->validator($all, $depositWithdraw->id);
+        $validator = $this->validator($all, $attendance->id);
 
         if ($validator->fails()) {
-            return response()->json(array(
-                        'success' => false,
-                        'message' => 'حدث حطأ في حفظ البيانات.',
-                        'errors' => $validator->getMessageBag()->toArray()
-            ));
+            return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
-            $depositWithdraw->update($all);
-            return response()->json(array(
-                        'success' => true,
-                        'id' => $id,
-                        'current_amount' => $this->CalculateCurrentAmount(),
-                        'message' => 'تم تعديل وارد جديد.',
-                        'errors' => $validator->getMessageBag()->toArray()
-            ));
+            $attendance->update($all);
+            return redirect()->back()->withInput($all)->with(['success' => 'تم حفظ البيانات.']);
+            
         }
     }
 
@@ -309,9 +264,31 @@ class AttendanceController extends Controller {
         //
     }
 
-    private function CalculateCurrentAmount() {
-        // TODO: must re-program
-        return ((DepositWithdraw::sum('depositValue') + Facility::sum('opening_amount')) - DepositWithdraw::sum('withdrawValue'));
-    }
+    public function employee() {
+        $employees = Employee::all();
+        $attendances = Attendance::all();
+        $employees_tmp = [];
 
+        foreach ($attendances as $attendance) {
+            //$attendance->check_out - $attendance->check_in
+            $check_out = Carbon::parse($attendance->check_out);
+            $check_in = Carbon::parse($attendance->check_in);
+            //$attendance->check_out = $attendance->check_out
+            $attendance->workingHours = $check_out->diffInHours($check_in);
+            $attendance->employeeName = $attendance->employee->name;
+            if ($attendance->process) {
+                $attendance->processName = $attendance->process->name;
+            } else {
+                $attendance->processName = "عمليات ادارية";
+            }
+            if ($attendance->absentType) {
+                $attendance->absentTypeName = $attendance->absentType->name;
+            }
+        }
+        foreach ($employees as $employee) {
+            $employees_tmp[$employee->id] = $employee->name;
+        }
+        $employees = $employees_tmp;
+        return view('attendance.employee', compact(['employees', 'attendances']));
+    }
 }

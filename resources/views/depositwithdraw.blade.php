@@ -21,6 +21,13 @@
             margin-bottom: 10px;
         }
     }
+    tr.InSave {
+        
+    }
+    tr.InSave td {
+        background-color: red !important;
+    }
+    
 </style>
 <div class="row">
     <div class="col-lg-12">
@@ -161,11 +168,11 @@
                                                                     var year = d.getFullYear();
                                                                     var days = new Array("الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت");
                                                                     var months = new Array("يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "اكتوبر", "نوفمبر", "ديسمبر");
-                                                                    document.getElementById("clock").innerHTML = days[day] + " " + date + " " + months[month] + " " + year;
+                                                                    document.getElementById("clock").innerHTML = days['{{ $numbers["current_dayOfWeek"] }}'] + " " + '{{ $numbers["current_dayOfMonth"] }}' + " " + months['{{ $numbers["current_month"] }}'] + " " + '{{ $numbers["current_year"] }}';
                                                                     setTimeout("refrClock()", 1000);
                                                                 }
                                                                 refrClock();
-                                                            </script> 
+                                                            </script>
                                                         </div>
                                                     </div>
                                                 </td> 
@@ -206,7 +213,7 @@
                                     </thead>
                                     <tbody id="grid_GuardianshipDetails">
                                         @forelse ($depositWithdraws as $depositWithdraw)
-                                        <tr class="gradeA odd ItemRow" role="row">
+                                        <tr class="gradeA odd ItemRow Saved" role="row">
                                             <td>
                                                 <input type="checkbox" value="">
                                             </td>
@@ -269,7 +276,7 @@
                                             </td>
                                             <td>
                                                 <div class="form-group{{ $errors->has("cbo_processes") ? " has-error" : "" }}">
-                                                    {{ Form::select("cbo_processes", [], $depositWithdraw->cbo_processes, 
+                                                    {{ Form::select("cbo_processes", [$depositWithdraw->cbo_processes => $depositWithdraw->cbo_processes], $depositWithdraw->cbo_processes, 
                                                                 array(
                                                                     "class" => "form-control",
                                                                     "placeholder" => "",
@@ -662,14 +669,59 @@
 </div>
 
 <script>
+    var supplierProcesses = [@foreach($supplierProcesses as $k => $info) { id: '{{ $k }}', name: '{{ $info["name"] }}', supplier_id: '{{ $info["supplier_id"] }}'}, @endforeach];
+    var clientProcesses = [@foreach($clientProcesses as $k => $info) { id: '{{ $k }}', name: '{{ $info["name"] }}', client_id: '{{ $info["client_id"] }}'}, @endforeach];
+    
     var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount;
     var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
-    var supplierProcesses = [@foreach($supplierProcesses as $k => $info) {id: '{{ $k }}', name: '{{ $info["name"] }}', supplier_id: '{{ $info["supplier_id"] }}'}, @endforeach];
-    var clientProcesses = [@foreach($clientProcesses as $k => $info) {id: '{{ $k }}', name: '{{ $info["name"] }}', client_id: '{{ $info["client_id"] }}'}, @endforeach];
     //console.log(clientProcesses, supplierProcesses);
     SetIsNumberOnly();
     LockAll();
+    SetProcess();
     currentAmount = $("#currentAmount");
+
+    function LoadProcess(rowIndex) {
+        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(5)').children(0).children(0);
+        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(6)').children(0).children(0);
+        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
+        cbo_processesVal = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0).val();
+        //console.log(cbo_processesVal);
+        //console.log(supplier_id.val());
+        cbo_processes.empty();
+        cbo_processes.append($("<option></option>"));
+        if (client_id.val() > 0) {
+            $.each(clientProcesses, function (key, process) {
+                //console.log(process);
+                if (process.client_id == client_id.val()) {
+                    if (process.id == cbo_processesVal) {
+                        cbo_processes.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
+                    } else {
+                        cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+                    }
+                }
+            });
+        } else if (supplier_id.val() > 0) {
+            $.each(supplierProcesses, function (key, process) {
+                //console.log(process);
+                if (process.supplier_id == supplier_id.val()) {
+                    if (process.id == cbo_processesVal) {
+                        cbo_processes.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
+                    } else {
+                        cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+                    }
+                }
+            });
+        }
+    }
+
+    function SetProcess() {
+        var rowsCount = $('#grid_GuardianshipDetails').children().length;
+        for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
+            //if ($('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0).val() == 2) {
+            LoadProcess(rowIndex);
+            //}
+        }
+    }
 
     function OnRowFocus(CellChildInput) {
         SetCurrentRowIndex(CellChildInput);
@@ -790,7 +842,9 @@
             type = "PUT"; //for updating existing resource
             saveurl += '/' + id.val();
         }
+        checkDelete.parent().parent().addClass('InSave');
         //console.log(formData);
+
         $.ajax({
             type: type,
             url: saveurl,
@@ -801,6 +855,7 @@
                 //console.log("Success: " + data.message);
                 if (data.success) {
                     saveStatus.val(1);
+                    checkDelete.parent().parent().removeClass('InSave');
                     id.val(data.id);
                     currentAmount.html(data.current_amount);
                     console.log("message: " + data.message);
@@ -974,7 +1029,7 @@
                 employee_id.val('');
                 expenses_id.val('');
                 withdrawValue.val('');
-                
+
                 cbo_processes.empty();
                 cbo_processes.append($("<option></option>").attr("value", -1).text(''));
                 $.each(clientProcesses, function (key, process) {
@@ -983,7 +1038,7 @@
                         cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
                     }
                 });
-                
+
                 break;
             case "supplier_id":
                 client_id.val('');
@@ -1088,6 +1143,5 @@
         payMethod.attr("disabled", "disabled");
         notes.attr("disabled", "disabled");
     }
-
 </script>
 @endsection

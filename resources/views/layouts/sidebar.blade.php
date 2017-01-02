@@ -35,7 +35,12 @@
                 <a href="{{ URL::to('/depositwithdraw') }}"><i class="fa fa-briefcase fa-fw"></i>وارد / منصرف</a>
             </li>
             <li>
-                <a href="{{ URL::to('/attendance') }}"><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف</a>
+                <a href=""><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف</a>
+                <ul>
+                    <li><a href="{{ URL::to('/attendance') }}">الكل</a></li>
+                    <li><a href="{{ URL::to('/attendance/create') }}">أضف جديد</a></li>
+                    <li><a href="{{ URL::to('/attendance/all') }}">مرتبات</a>
+                </ul>
             </li>
             <li>
                 <a href="#"><i class="fa fa-edit fa-fw"></i> عملية جديدة عميل</a>

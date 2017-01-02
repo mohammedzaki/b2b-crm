@@ -1,3 +1,10 @@
+
+@section('script_taxes')
+<script>
+var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
+</script>
+@endsection
+
 <div class="row">
     <div class="col-lg-4">
         <div class="panel panel-default">
@@ -83,6 +90,7 @@
                                 {{ Form::label('discount_percentage', 'نسبة الخصم') }} 
                                 {{ Form::text('discount_percentage', null, 
                                     array(
+                                        'id' => 'discount_percentage',
                                         'class' => 'form-control', 
                                         'placeholder' => 'ادخل النسبة'
                                         )
@@ -108,6 +116,24 @@
                                 @if ($errors->has('discount_reason'))
                                 <label for="inputError" class="control-label">
                                     {{ $errors->first('discount_reason') }}
+                                </label>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="col-lg-5">
+                            <div class="form-group{{ $errors->has('discount_value') ? ' has-error' : '' }}">
+                                {{ Form::label('discount_value', 'القيمة') }} 
+                                {{ Form::text('discount_value', null, 
+                                    array(
+                                        'class' => 'form-control', 
+                                        'placeholder' => 'ادخل القيمة'
+                                        )
+                                    )
+                                }}
+                                @if ($errors->has('discount_value'))
+                                <label for="inputError" class="control-label">
+                                    {{ $errors->first('discount_value') }}
                                 </label>
                                 @endif
                             </div>
@@ -141,7 +167,7 @@
                     <span class="price process_price">0</span>
                 </h4>
                 <h4>
-                    <span>نسبة الخصم </span>
+                    <span>مبلغ الخصم </span>
                     <span class="price discount_price">0</span>
                 </h4>
                 <h4>

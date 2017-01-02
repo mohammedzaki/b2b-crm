@@ -180,7 +180,12 @@ class DepositWithdrawController extends Controller {
         $numbers['process_number'] = ClientProcess::count();
         $numbers['Supplierprocess_number'] = SupplierProcess::count();
         $numbers['current_amount'] = $this->CalculateCurrentAmount();
-
+        $dt = Carbon::parse($startDate);
+        $numbers['current_dayOfWeek'] = $dt->dayOfWeek;
+        $numbers['current_dayOfMonth'] = $dt->day;
+        $numbers['current_month'] = $dt->month - 1;
+        $numbers['current_year'] = $dt->year;
+                
         $clients = Client::select('id', 'name')->get();
         $employees = Employee::select('id', 'name')->get();
         $suppliers = Supplier::select('id', 'name')->get();

@@ -1,5 +1,6 @@
 @extends('layouts.app') 
-@section('title', 'اضف عملية جديدة - عمليه جديدة مورد')
+@section('title', 'اضف عملية جديدة - عمليه جديدة مورد') 
+
 @section('content')
 
 <div class="row">

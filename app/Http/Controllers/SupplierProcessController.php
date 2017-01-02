@@ -67,9 +67,11 @@ class SupplierProcessController extends Controller {
         $suppliers = Supplier::select('id', 'name')->get();
         $clients = Client::all();
         $employees = Employee::select('id', 'name')->get();
+        $clientProcesses = ClientProcess::allOpened()->get();
         $suppliers_tmp = [];
         $employees_tmp = [];
         $clients_tmp = [];
+        $clientProcesses_tmp = [];
         foreach ($suppliers as $supplier) {
             $suppliers_tmp[$supplier->id] = $supplier->name;
         }
@@ -79,10 +81,15 @@ class SupplierProcessController extends Controller {
         foreach ($clients as $client) {
             $clients_tmp[$client->id] = $client->name;
         }
+        foreach ($clientProcesses as $process) {
+            $clientProcesses_tmp[$process->id]['name'] = $process->name;
+            $clientProcesses_tmp[$process->id]['client_id'] = $process->client->id;
+        }
         $suppliers = $suppliers_tmp;
         $employees = $employees_tmp;
         $clients = $clients_tmp;
-        return view('supplier.process.create', compact(['suppliers', 'employees', 'clients']));
+        $clientProcesses = $clientProcesses_tmp;
+        return view('supplier.process.create', compact(['suppliers', 'employees', 'clients', 'clientProcesses']));
     }
 
     public function store(Request $request) {
@@ -127,9 +134,11 @@ class SupplierProcessController extends Controller {
         $suppliers = Supplier::select('id', 'name')->get();
         $clients = Client::select('id', 'name')->get();
         $employees = Employee::select('id', 'name')->get();
+        $clientProcesses = ClientProcess::all();
         $suppliers_tmp = [];
         $employees_tmp = [];
         $clients_tmp = [];
+        $clientProcesses_tmp = [];
         foreach ($suppliers as $supplier) {
             $suppliers_tmp[$supplier->id] = $supplier->name;
         }
@@ -139,10 +148,17 @@ class SupplierProcessController extends Controller {
         foreach ($clients as $client) {
             $clients_tmp[$client->id] = $client->name;
         }
+        foreach ($clientProcesses as $clientProcess) {
+            $clientProcesses_tmp[$clientProcess->id]['name'] = $clientProcess->name;
+            $clientProcesses_tmp[$clientProcess->id]['client_id'] = $clientProcess->client->id;
+        }
         $suppliers = $suppliers_tmp;
         $employees = $employees_tmp;
         $clients = $clients_tmp;
-        return view('supplier.process.edit', compact(['process', 'suppliers', 'employees', 'clients']));
+        $clientProcesses = $clientProcesses_tmp;
+        $process->discount_percentage = $process->discountPercentage();
+        $process->client_id = $process->clientProcess->client_id;
+        return view('supplier.process.edit', compact(['process', 'suppliers', 'employees', 'clients', 'clientProcesses']));
     }
 
     public function update(Request $request, $id) {
@@ -229,7 +245,8 @@ class SupplierProcessController extends Controller {
         SupplierProcessItem::withTrashed()->where('process_id', $id)->restore();
         return redirect()->route('supplier.process.index')->with('success', 'تم استرجاع العملية.');
     }
-
+    
+    /*
     public function getSupplierProcesses(Request $request) {
         $input = $request->input('option');
         $clientProcesses = SupplierProcess::allOpened()->where('supplier_id', $input)->get();
@@ -253,6 +270,6 @@ class SupplierProcessController extends Controller {
         }
         $supplierProcesses = $supplierProcesses_tmp;
         return response()->json($supplierProcesses);
-    }
+    }*/
 
 }

@@ -60,13 +60,16 @@ Route::resource('expenses', 'ExpensesController');
 //salafeyat
 Route::resource('employeeBorrow', 'EmployeeBorrowController');
 
-//Route::group(['prefix' => 'attendance'], function() {
-Route::resource('/attendance', 'AttendanceController');
-//});
+Route::resource('attendance', 'AttendanceController');
+
+//Route::get('/attendance/employee', 'AttendanceController@employee')->name('attendance.employee');;
+
+Route::resource('feasibilityStudy', 'FeasibilityStudyController');
+
 //api
 Route::group(['prefix' => 'api'], function() {
-    Route::get('getClientProcesses', 'ClientProcessController@getClientProcesses');
-    Route::get('getSupplierProcesses', 'SupplierProcessController@getSupplierProcesses');
+    //Route::get('getClientProcesses', 'ClientProcessController@getClientProcesses');
+    //Route::get('getSupplierProcesses', 'SupplierProcessController@getSupplierProcesses');
     Route::get('getTaxesRate', 'FacilityController@getTaxesRate');
 });
 

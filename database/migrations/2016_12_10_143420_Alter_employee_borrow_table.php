@@ -13,7 +13,7 @@ class AlterEmployeeBorrowTable extends Migration
     public function up()
     {
         Schema::table('employee_borrows', function (Blueprint $table) {
-            $table->renameColumn('employee_id', 'user_id');
+            //$table->renameColumn('employee_id', 'user_id');
         });
     }
 

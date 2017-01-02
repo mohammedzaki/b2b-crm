@@ -19,7 +19,7 @@ class ClientProcessController extends Controller {
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-                    'name' => 'required|unique:supplier_processes,name,' . $id . '|min:5|max:255',
+                    'name' => 'required|unique:client_processes,name,' . $id . '|min:5|max:255',
                     'client_id' => 'required|exists:clients,id',
                     'employee_id' => 'required|exists:employees,id',
                     'notes' => 'string',
@@ -136,6 +136,7 @@ class ClientProcessController extends Controller {
         }
         $clients = $clients_tmp;
         $employees = $employees_tmp;
+        $process->discount_percentage = $process->discountPercentage();
         return view('client.process.edit', compact(['process', 'clients', 'employees']));
     }
 
@@ -163,8 +164,7 @@ class ClientProcessController extends Controller {
             /* Can't create new process if client has exceeded the credit limit */
             // if($total_opened_processes_price >= $client->credit_limit){
             if ($client->credit_limit < ($total_opened_processes_price + $request->total_price)) {
-                return redirect()->back()->withInput($all)->with('error', "خطأ في انشاء عملية جديدة، العميل " . $client->name . " قد تعدى الحد اﻻئتماني المسموح له."
-                );
+                return redirect()->back()->withInput($all)->with('error', "خطأ في انشاء عملية جديدة، العميل " . $client->name . " قد تعدى الحد اﻻئتماني المسموح له.");
             } else {
                 if (isset($request->require_bill)) {
                     $all['require_bill'] = 1;
@@ -221,6 +221,7 @@ class ClientProcessController extends Controller {
         return redirect()->route('client.process.index')->with('success', 'تم استرجاع العملية.');
     }
 
+    /*
     public function getClientProcesses(Request $request) {
         $input = $request->input('option');
         $clientProcesses = ClientProcess::allOpened()->where('client_id', $input)->get();
@@ -244,6 +245,6 @@ class ClientProcessController extends Controller {
         }
         $clientProcesses = $clientProcesses_tmp;
         return response()->json($clientProcesses);
-    }
+    }*/
 
 }

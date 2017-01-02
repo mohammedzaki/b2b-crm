@@ -116,5 +116,10 @@ class FacilityController extends Controller {
         $facility = Facility::findOrFail(1);
         return $facility->getTaxesRate();
     }
+    
+    public static function TaxesRate() {
+        $facility = Facility::findOrFail(1);
+        return $facility->getTaxesRate();
+    }
 
 }
