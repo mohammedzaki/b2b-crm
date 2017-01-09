@@ -79,6 +79,7 @@
                                         <th>المكافأت</th>
                                         <th>الخصومات</th>
                                         <th>الملاحظات</th>
+                                        <th>السلف</th>
                                         <th>نوع الغياب</th>
                                         <th>خصم الغياب</th>
                                     </tr>
@@ -94,11 +95,12 @@
                                         <td>{{ $attendance->mokaf }}</td>
                                         <td>{{ $attendance->salary_deduction }}</td>
                                         <td>{{ $attendance->notes }}</td>
+                                        <td>??????</td>
                                         <td>{{ $attendance->absentTypeName }}</td>
                                         <td>{{ $attendance->absent_deduction }}</td>
                                     </tr>
                                     @empty
-                                    <tr>ﻻ يوجد عمليات.</tr>
+                                    <tr>ﻻ يوجد بيانات.</tr>
                                     @endforelse
                                     <tr>
                                         <th></th>
@@ -109,6 +111,7 @@
                                         <th>{{ $totalBonuses }}</th>
                                         <th>{{ $totalSalaryDeduction }}</th>
                                         <th></th>
+                                        <th>??????</th>
                                         <th></th>
                                         <th>{{ $totalAbsentDeduction }}</th>
                                     </tr>
@@ -135,6 +138,80 @@
             </div>
             <!-- /.panel-heading -->
             <div class="panel-body">
+                <div class="row">
+                    <div class="form-group col-lg-4">
+                        <label>عدد الساعات الفعلى</label>
+                        {{ Form::text('HourlyRate', $totalWorkingHours, array(
+                                        "id" => "HourlyRate",
+                                        'class' => 'form-control')) }}
+                    </div>
+                    <div class="form-group col-lg-4">
+                        <label>سعر الساعة</label>
+                        {{ Form::text('HourlyRate', $hourlyRate, array(
+                                        "id" => "HourlyRate",
+                                        'class' => 'form-control')) }}
+                    </div>
+                    <div class="form-group col-lg-4">
+                        <label>الاجمالى</label>
+                        {{ Form::text('HourlyRate', ($totalWorkingHours * $hourlyRate), array(
+                                        "id" => "HourlyRate",
+                                        'class' => 'form-control')) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-3">
+                        <label>خصومات الغياب</label>
+                        {{ Form::text('HourlyRate', $totalAbsentDeduction, array(
+                                        "id" => "HourlyRate",
+                                        'class' => 'form-control')) }}
+                    </div>
+                    <div class="form-group col-lg-3">
+                        <label>السلف المستديمة</label>
+                        {{ Form::text('HourlyRate', '??????', array(
+                                        "id" => "HourlyRate",
+                                        'class' => 'form-control')) }}
+                    </div>
+                    <div class="form-group col-lg-3">
+                        <label>سلف يومية</label>
+                        {{ Form::text('HourlyRate', '??????', array(
+                                        "id" => "HourlyRate",
+                                        'class' => 'form-control')) }}
+                    </div>
+                    <div class="form-group col-lg-3">
+                        <label>خصم مسبب</label>
+                        {{ Form::text('HourlyRate', $totalSalaryDeduction, array(
+                                        "id" => "HourlyRate",
+                                        'class' => 'form-control')) }}
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="form-group col-lg-3">
+                        <label>اجمالى السلف</label>
+                        {{ Form::text('HourlyRate', '??????', array(
+                                        "id" => "HourlyRate",
+                                        'class' => 'form-control')) }}
+                    </div>
+                    
+                    <div class="form-group col-lg-3">
+                        <label>المكافأت</label>
+                        {{ Form::text('HourlyRate', $totalBonuses, array(
+                                        "id" => "HourlyRate",
+                                        'class' => 'form-control')) }}
+                    </div>
+                    <div class="form-group col-lg-3">
+                        <label>المرتب</label>
+                        {{ Form::text('TotalSalary', $totalSalary, array(
+                                        "id" => "TotalSalary",
+                                        'class' => 'form-control')) }}
+                    </div>
+                    <div class="form-group col-lg-3">
+                        <label>الصافى المستحق</label>
+                        {{ Form::text('HourlyRate', '??????', array(
+                                        "id" => "HourlyRate",
+                                        'class' => 'form-control')) }}
+                    </div>
+                </div>
+                <!--
                 <div class="col-lg-6 ">
                     <div class="form-group">
                         <label>سعر الساعة</label>
@@ -150,7 +227,7 @@
                                         "id" => "TotalSalary",
                                         'class' => 'form-control')) }}
                     </div>
-                </div>
+                </div>-->
             </div>
             <!-- /.panel-body -->
         </div>

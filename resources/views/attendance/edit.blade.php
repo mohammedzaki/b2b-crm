@@ -28,7 +28,7 @@
                 'route' => array('attendance.update', $attendance->id),
                 'method' => 'put')) }}
         
-        @include('attendance._form', ['model' => 'edit'])
+        @include('attendance._form', ['model' => 'edit', 'checkinbtn' => session('checkin')])
        
     {{ Form::close() }}
 </div>

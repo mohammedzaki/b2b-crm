@@ -60,16 +60,16 @@ class AttendanceController extends Controller {
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-                    'process_id' => 'exists:client_processes,id|required_without:is_managment_process',
-                    'is_managment_process' => 'required_without:process_id',
+                    //'process_id' => 'exists:client_processes,id|required_without:is_managment_process',
+                    //'is_managment_process' => 'required_without:process_id',
                     'employee_id' => 'exists:employees,id|required',
                     'notes' => 'string'
         ]);
 
         $validator->setAttributeNames([
-            'process_id' => 'اسم العملية',
+            //'process_id' => 'اسم العملية',
             'employee_id' => 'اسم الموظف',
-            'is_managment_process' => 'عمليات ادارية',
+            //'is_managment_process' => 'عمليات ادارية',
             'notes' => 'ملاحظات'
         ]);
 
@@ -105,7 +105,66 @@ class AttendanceController extends Controller {
         $processes = $processes_tmp;
         $employees = $employees_tmp;
         $absentTypes = $absentTypes_tmp;
-        return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo']));
+        $checkin = TRUE;
+        return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin']));
+    }
+    
+    public function checkin() {
+        $employees = Employee::all();
+        $processes = ClientProcess::allOpened()->get();
+        $absentTypes = AbsentType::all();
+        $employees_tmp = [];
+        $employeesSalaries = [];
+        $processes_tmp = [];
+        $absentTypes_tmp = [];
+        $absentTypesInfo = [];
+        foreach ($employees as $employee) {
+            $employees_tmp[$employee->id] = $employee->name;
+            $employeesSalaries[$employee->id]['hourlySalary'] = $employee->daily_salary / $employee->working_hours;
+        }
+        foreach ($processes as $process) {
+            $processes_tmp[$process->id] = $process->name;
+        }
+        foreach ($absentTypes as $type) {
+            $absentTypes_tmp[$type->id] = $type->name;
+            $absentTypesInfo[$type->id]['salaryDeduction'] = $type->salary_deduction;
+            $absentTypesInfo[$type->id]['editable'] = $type->editable_deduction;
+        }
+        $processes = $processes_tmp;
+        $employees = $employees_tmp;
+        $absentTypes = $absentTypes_tmp;
+        $checkin = TRUE;
+        $checkinbtn = FALSE;
+        return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn']));
+    }
+    
+    public function checkout() {
+        $employees = Employee::all();
+        $processes = ClientProcess::allOpened()->get();
+        $absentTypes = AbsentType::all();
+        $employees_tmp = [];
+        $employeesSalaries = [];
+        $processes_tmp = [];
+        $absentTypes_tmp = [];
+        $absentTypesInfo = [];
+        foreach ($employees as $employee) {
+            $employees_tmp[$employee->id] = $employee->name;
+            $employeesSalaries[$employee->id]['hourlySalary'] = $employee->daily_salary / $employee->working_hours;
+        }
+        foreach ($processes as $process) {
+            $processes_tmp[$process->id] = $process->name;
+        }
+        foreach ($absentTypes as $type) {
+            $absentTypes_tmp[$type->id] = $type->name;
+            $absentTypesInfo[$type->id]['salaryDeduction'] = $type->salary_deduction;
+            $absentTypesInfo[$type->id]['editable'] = $type->editable_deduction;
+        }
+        $processes = $processes_tmp;
+        $employees = $employees_tmp;
+        $absentTypes = $absentTypes_tmp;
+        $checkin = FALSE;
+        $checkinbtn = FALSE;
+        return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn']));
     }
 
     /**
@@ -128,7 +187,7 @@ class AttendanceController extends Controller {
                 $all['process_id'] = null;
             }
             $attendance->update($all);
-            return redirect()->route('attendance.edit', $attendance->id)->with(['success' => 'تم حفظ البيانات.']);
+            return redirect()->route('attendance.edit', $attendance->id)->with(['success' => 'تم حفظ البيانات.', 'checkin' => $request->checkin]);
         }
     }
 
@@ -230,7 +289,8 @@ class AttendanceController extends Controller {
         $processes = $processes_tmp;
         $employees = $employees_tmp;
         $absentTypes = $absentTypes_tmp;
-        return view('attendance.edit', compact(['attendance', 'employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo']));
+        $checkin = TRUE;
+        return view('attendance.edit', compact(['attendance', 'employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin']));
     }
 
     /**

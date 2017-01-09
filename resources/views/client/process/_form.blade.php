@@ -92,7 +92,8 @@ var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
                                     array(
                                         'id' => 'discount_percentage',
                                         'class' => 'form-control', 
-                                        'placeholder' => 'ادخل النسبة'
+                                        'placeholder' => 'ادخل النسبة',
+                                        'disabled' => 'disabled'
                                         )
                                     )
                                 }}

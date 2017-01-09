@@ -23,6 +23,7 @@
                     </label>
                     @endif
                 </div>
+                @if ($checkin)
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="form-group{{ $errors->has('process_id') ? ' has-error' : '' }}">
@@ -45,6 +46,7 @@
                         </div>
                     </div><!-- /.col-lg-6 -->
                 </div>
+                @endif
                 <div class="form-group">
                     <label>المكافأت</label>
                     {{ Form::text('mokaf', null, array(
@@ -159,11 +161,22 @@
     <div class="col-lg-6">
         <div class="form-group buttonsdiv">
             @if(isset($model))
-            <a class="btn btn-primary" href="{{ URL::route('attendance.create') }}">جديد</a>
+           
+            @if ($checkinbtn)
+            <input type="hidden" name="checkin" value="1" />
+            <a class="btn btn-primary" href="{{ URL::route('attendance.checkin') }}">جديد</a>
+            @else
+            <input type="hidden" name="checkin" value="0" />
+            <a class="btn btn-primary" href="{{ URL::route('attendance.checkout') }}">جديد</a>
+            @endif
+            
             <button class="btn btn-success" type="submit">حفظ التعديلات</button>
             @else
-            <button class="btn btn-success" type="button" onclick="SubmitCheck(1)">تسجيل حضور</button>
-            <button class="btn btn-primary" type="button" onclick="SubmitCheck(0)">تسجيل انصراف</button>
+                @if ($checkin)
+                <button class="btn btn-success" type="button" onclick="SubmitCheck(1)">تسجيل حضور</button>
+                @else
+                <button class="btn btn-primary" type="button" onclick="SubmitCheck(0)">تسجيل انصراف</button>
+                @endif
             @endif
         </div>
     </div>

@@ -17,6 +17,7 @@
     <![endif]-->
     @yield('script_taxes')
     <script src="{{ asset( elixir('js/all.js') ) }}"></script>
+    <script src="{{ url('js/common.js') }}"></script>
 </head>
 
 <body>

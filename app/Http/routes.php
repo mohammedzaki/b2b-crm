@@ -60,6 +60,8 @@ Route::resource('expenses', 'ExpensesController');
 //salafeyat
 Route::resource('employeeBorrow', 'EmployeeBorrowController');
 
+Route::get('/attendance/checkin', 'AttendanceController@checkin')->name('attendance.checkin');
+Route::get('/attendance/checkout', 'AttendanceController@checkout')->name('attendance.checkout');
 Route::resource('attendance', 'AttendanceController');
 
 //Route::get('/attendance/employee', 'AttendanceController@employee')->name('attendance.employee');;

@@ -38,7 +38,8 @@
                 <a href=""><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف</a>
                 <ul>
                     <li><a href="{{ URL::to('/attendance') }}">الكل</a></li>
-                    <li><a href="{{ URL::to('/attendance/create') }}">أضف جديد</a></li>
+                    <li><a href="{{ URL::to('/attendance/checkin') }}">تسجيل حضور</a></li>
+                    <li><a href="{{ URL::to('/attendance/checkout') }}">تسجيل انصراف</a></li>
                     <li><a href="{{ URL::to('/attendance/all') }}">مرتبات</a>
                 </ul>
             </li>
