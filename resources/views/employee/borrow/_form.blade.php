@@ -121,7 +121,7 @@
         <div class="panel panel-default">
             <div class="panel-body">
                 <h4>
-                    <span>المرتب </span>
+                    <span>مرتب اليوم</span>
                     <span class="price process_salary">0</span>
                 </h4>
 
@@ -163,7 +163,10 @@
 
         echo 'employeeSalary = ', js_array($employees_salary), ';';
         ?>
-
+       var roundDecimals = function (value, decimals) {
+        decimals = decimals || 0;
+        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+    };         
        if (employeeSalary.length == 1) {
            salary = employeeSalary[0];
            console.log(salary);
@@ -172,7 +175,8 @@
 
 
        function calcAfterSalary() {
-           $("#after_salary").text(salary - pay_amount);
+       
+           $("#after_salary").text(roundDecimals((salary - pay_amount), 3));
        }
 
        $('#has_discount').on('change', function () {
@@ -200,6 +204,7 @@
                borrowamount = $('#amount').val();
                pay_amount = (pay_percentage * borrowamount) / 100;
             }
+           pay_amount = roundDecimals(pay_amount, 3);
            $('#pay_amount').val(pay_amount);
 
            calcAfterSalary();
@@ -213,7 +218,8 @@
            } else {
                borrowamount = $('#amount').val();
                pay_percentage = (pay_amount / borrowamount) * 100;
-                   }
+            }
+           pay_percentage = roundDecimals(pay_percentage, 3);
             $('#pay_percentage').val(pay_percentage);
 
            calcAfterSalary();

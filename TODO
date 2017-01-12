@@ -1,8 +1,0 @@
-- facility logo image at login and header
-- opening balance for facility
-- facility phone, mobile, fax, hotline
-- don't use program checkbox disable login
-- add employee number at edit view
-- remove redundant javascript code
-- change confirm delete message to bootstrap modal
-- track employee salary

@@ -80,6 +80,8 @@
                                         <th>الخصومات</th>
                                         <th>الملاحظات</th>
                                         <th>السلف</th>
+                                        <th>العهد</th>
+                                        <th>العهد المردودة</th>
                                         <th>نوع الغياب</th>
                                         <th>خصم الغياب</th>
                                     </tr>
@@ -95,7 +97,9 @@
                                         <td>{{ $attendance->mokaf }}</td>
                                         <td>{{ $attendance->salary_deduction }}</td>
                                         <td>{{ $attendance->notes }}</td>
-                                        <td>??????</td>
+                                        <td>{{ $attendance->borrowValue }}</td>
+                                        <td>{{ $attendance->GuardianshipValue }}</td>
+                                        <td>{{ $attendance->GuardianshipReturnValue }}</td>
                                         <td>{{ $attendance->absentTypeName }}</td>
                                         <td>{{ $attendance->absent_deduction }}</td>
                                     </tr>
@@ -111,7 +115,9 @@
                                         <th>{{ $totalBonuses }}</th>
                                         <th>{{ $totalSalaryDeduction }}</th>
                                         <th></th>
-                                        <th>??????</th>
+                                        <th>{{ $totalBorrowValue }}</th>
+                                        <th>{{ $totalGuardianshipValue }}</th>
+                                        <th>{{ $totalGuardianshipReturnValue }}</th>
                                         <th></th>
                                         <th>{{ $totalAbsentDeduction }}</th>
                                     </tr>
@@ -153,7 +159,7 @@
                     </div>
                     <div class="form-group col-lg-4">
                         <label>الاجمالى</label>
-                        {{ Form::text('HourlyRate', ($totalWorkingHours * $hourlyRate), array(
+                        {{ Form::text('HourlyRate', $totalHoursSalary, array(
                                         "id" => "HourlyRate",
                                         'class' => 'form-control')) }}
                     </div>
@@ -167,13 +173,13 @@
                     </div>
                     <div class="form-group col-lg-3">
                         <label>السلف المستديمة</label>
-                        {{ Form::text('HourlyRate', '??????', array(
+                        {{ Form::text('HourlyRate', $totalLongBorrowValue, array(
                                         "id" => "HourlyRate",
                                         'class' => 'form-control')) }}
                     </div>
                     <div class="form-group col-lg-3">
                         <label>سلف يومية</label>
-                        {{ Form::text('HourlyRate', '??????', array(
+                        {{ Form::text('HourlyRate', $totalSmallBorrowValue, array(
                                         "id" => "HourlyRate",
                                         'class' => 'form-control')) }}
                     </div>
@@ -187,7 +193,7 @@
                 <div class="row">
                     <div class="form-group col-lg-3">
                         <label>اجمالى السلف</label>
-                        {{ Form::text('HourlyRate', '??????', array(
+                        {{ Form::text('HourlyRate', $totalBorrowValue, array(
                                         "id" => "HourlyRate",
                                         'class' => 'form-control')) }}
                     </div>
@@ -206,7 +212,7 @@
                     </div>
                     <div class="form-group col-lg-3">
                         <label>الصافى المستحق</label>
-                        {{ Form::text('HourlyRate', '??????', array(
+                        {{ Form::text('HourlyRate', $totalNetSalary, array(
                                         "id" => "HourlyRate",
                                         'class' => 'form-control')) }}
                     </div>

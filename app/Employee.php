@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\DepositWithdraw;
 
 class Employee extends Model {
 
@@ -39,4 +40,11 @@ class Employee extends Model {
     /* public function employeeBorrow() {
       return $this->hasMany('App\EmployeeBorrow', 'id');
       } */
+    
+    public function employeeSmallBorrows() {
+        DepositWithdraw::where([
+            ['employee_id', '=', $this->id],
+            ['expenses_id', '=', 3],
+        ]); //->get();
+    }
 }

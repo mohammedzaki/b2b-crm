@@ -46,6 +46,7 @@ class AttendanceController extends Controller {
             //$attendance->check_out = $attendance->check_out
             $attendance->workingHours = $check_out->diffInHours($check_in);
             $attendance->employeeName = $attendance->employee->name;
+
             if ($attendance->process) {
                 $attendance->processName = $attendance->process->name;
             } else {
@@ -108,7 +109,7 @@ class AttendanceController extends Controller {
         $checkin = TRUE;
         return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin']));
     }
-    
+
     public function checkin() {
         $employees = Employee::all();
         $processes = ClientProcess::allOpened()->get();
@@ -137,7 +138,7 @@ class AttendanceController extends Controller {
         $checkinbtn = FALSE;
         return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn']));
     }
-    
+
     public function checkout() {
         $employees = Employee::all();
         $processes = ClientProcess::allOpened()->get();
@@ -202,20 +203,27 @@ class AttendanceController extends Controller {
         $dt = Carbon::parse($request->date);
         $hourlyRate = 0;
         if ($id == "all") {
-            $attendances = [];//Attendance::all();
+            $attendances = []; //Attendance::all();
         } else {
             $employee = Employee::findOrFail($id);
             $hourlyRate = $employee->daily_salary / $employee->working_hours;
             $attendances = Attendance::where([
-                ['employee_id', '=', $id]
-            ])->whereMonth('date', '=', $dt->month)->get();
+                            ['employee_id', '=', $id]
+                    ])->whereMonth('date', '=', $dt->month)->get();
         }
         $employees_tmp = [];
         $totalWorkingHours = 0;
         $totalSalaryDeduction = 0;
         $totalAbsentDeduction = 0;
         $totalBonuses = 0;
+        $totalHoursSalary = 0;
         $totalSalary = 0;
+        $totalNetSalary = 0;
+        $totalGuardianshipValue = 0;
+        $totalGuardianshipReturnValue = 0;
+        $totalBorrowValue = 0;
+        $totalSmallBorrowValue = 0;
+        $totalLongBorrowValue = 0;
         foreach ($attendances as $attendance) {
             //$attendance->check_out - $attendance->check_in
             $check_out = Carbon::parse($attendance->check_out);
@@ -223,6 +231,11 @@ class AttendanceController extends Controller {
             //$attendance->check_out = $attendance->check_out
             $attendance->workingHours = $check_out->diffInHours($check_in);
             $attendance->employeeName = $attendance->employee->name;
+
+            $attendance->GuardianshipValue = $attendance->employeeGuardianship();
+            $attendance->GuardianshipReturnValue = $attendance->employeeGuardianshipReturn();
+            $attendance->borrowValue = $attendance->employeeSmallBorrow();
+
             if ($attendance->process) {
                 $attendance->processName = $attendance->process->name;
             } else {
@@ -235,13 +248,27 @@ class AttendanceController extends Controller {
             $totalSalaryDeduction += $attendance->salary_deduction;
             $totalAbsentDeduction += $attendance->absent_deduction;
             $totalBonuses += $attendance->mokaf;
+            $totalGuardianshipValue += $attendance->GuardianshipValue;
+            $totalGuardianshipReturnValue += $attendance->GuardianshipReturnValue;
+            $totalBorrowValue += $attendance->borrowValue;
         }
-        $totalSalary = (($totalWorkingHours * $hourlyRate) + $totalBonuses) - ($totalSalaryDeduction + $totalAbsentDeduction);
+        try {
+            $attendances[0]->borrowValue = $attendances[0]->employeeLongBorrow();
+            $totalLongBorrowValue = $attendances[0]->employeeLongBorrow();
+        } catch (\Exception $exc) {
+            
+        }
+        $totalSmallBorrowValue = $totalBorrowValue;
+        $totalBorrowValue += $totalLongBorrowValue;
+        $totalHoursSalary = $totalWorkingHours * $hourlyRate;
+        $totalSalary = ($totalHoursSalary + $totalBonuses);
+        $totalNetSalary = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
+
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
         }
         $employees = $employees_tmp;
-        return view('attendance.show', compact(['employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary"]));
+        return view('attendance.show', compact(['employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue']));
     }
 
     /**
@@ -310,7 +337,6 @@ class AttendanceController extends Controller {
         } else {
             $attendance->update($all);
             return redirect()->back()->withInput($all)->with(['success' => 'تم حفظ البيانات.']);
-            
         }
     }
 
@@ -351,4 +377,5 @@ class AttendanceController extends Controller {
         $employees = $employees_tmp;
         return view('attendance.employee', compact(['employees', 'attendances']));
     }
+
 }

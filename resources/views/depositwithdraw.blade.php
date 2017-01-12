@@ -357,7 +357,7 @@
                                             </td>
                                             <td>
                                                 <div class="form-group{{ $errors->has("expenses_id") ? " has-error" : "" }}">
-                                                    {{ Form::select("expenses_id", $expenses, $depositWithdraw->expenses_id,
+                                                    {{ Form::select("expenses_id", [$depositWithdraw->expenses_id => $depositWithdraw->expenses_id], [$depositWithdraw->expenses_id => $depositWithdraw->expenses_id],
                                                         array(
                                                             "class" => "form-control",
                                                             "placeholder" => "",
@@ -568,7 +568,7 @@
                                             </td>
                                             <td>
                                                 <div class="form-group{{ $errors->has("expenses_id") ? " has-error" : "" }}">
-                                                    {{ Form::select("expenses_id", $expenses, null,
+                                                    {{ Form::select("expenses_id", [], null,
                                                         array(
                                                             "class" => "form-control",
                                                             "placeholder" => "",
@@ -671,7 +671,8 @@
 <script>
     var supplierProcesses = [@foreach($supplierProcesses as $k => $info) { id: '{{ $k }}', name: '{{ $info["name"] }}', supplier_id: '{{ $info["supplier_id"] }}'}, @endforeach];
     var clientProcesses = [@foreach($clientProcesses as $k => $info) { id: '{{ $k }}', name: '{{ $info["name"] }}', client_id: '{{ $info["client_id"] }}'}, @endforeach];
-    
+    var expenses = [@foreach($expenses as $k => $info) { id: '{{ $k }}', name: '{{ $info }}'}, @endforeach];
+    var employeeActions = [@foreach($employeeActions as $k => $info) { id: '{{ $k }}', name: '{{ $info }}'}, @endforeach];
     var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount;
     var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
     //console.log(clientProcesses, supplierProcesses);
@@ -679,16 +680,20 @@
     LockAll();
     SetProcess();
     currentAmount = $("#currentAmount");
-
+    
+                    
     function LoadProcess(rowIndex) {
         client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(5)').children(0).children(0);
         supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(6)').children(0).children(0);
         cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
         cbo_processesVal = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0).val();
-        //console.log(cbo_processesVal);
-        //console.log(supplier_id.val());
+        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(7)').children(0).children(0);
+        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(8)').children(0).children(0);
+        expenses_idVal = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(8)').children(0).children(0).val();
         cbo_processes.empty();
         cbo_processes.append($("<option></option>"));
+        expenses_id.empty();
+        expenses_id.append($("<option></option>"));
         if (client_id.val() > 0) {
             $.each(clientProcesses, function (key, process) {
                 //console.log(process);
@@ -709,6 +714,24 @@
                     } else {
                         cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
                     }
+                }
+            });
+        }
+        if (employee_id.val() > 0) {
+            $.each(employeeActions, function (key, process) {
+                if (process.id == expenses_idVal) {
+                    expenses_id.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
+                } else {
+                    expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
+                }
+            });
+
+        } else {
+            $.each(expenses, function (key, process) {
+                if (process.id == expenses_idVal) {
+                    expenses_id.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
+                } else {
+                    expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
                 }
             });
         }
@@ -1018,7 +1041,11 @@
                 depositValue.val('');
                 client_id.val('');
                 employee_id.val('');
-                expenses_id.val('');
+                expenses_id.empty();
+                expenses_id.append($("<option></option>"));
+                $.each(expenses, function (key, process) {
+                    expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
+                });
                 break;
             case "recordDesc":
                 break;
@@ -1033,7 +1060,7 @@
                 cbo_processes.empty();
                 cbo_processes.append($("<option></option>").attr("value", -1).text(''));
                 $.each(clientProcesses, function (key, process) {
-                    console.log(process);
+                    //console.log(process);
                     if (process.client_id == client_id.val()) {
                         cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
                     }
@@ -1046,7 +1073,7 @@
                 expenses_id.val('');
                 depositValue.val('');
                 $.each(supplierProcesses, function (key, process) {
-                    console.log(process);
+                    //console.log(process);
                     if (process.supplier_id == supplier_id.val()) {
                         cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
                     }
@@ -1058,12 +1085,27 @@
                 expenses_id.val('');
                 depositValue.val('');
                 cbo_processes.empty();
+                expenses_id.empty();
+                expenses_id.append($("<option></option>"));
+                //alert(employee_id.val());
+                if (employee_id.val() > 0) {
+                    $.each(employeeActions, function (key, process) {
+                        //console.log(process);
+                        expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
+                    });
+                    
+                } else {
+                    $.each(expenses, function (key, process) {
+                        expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
+                    });
+                }
                 break;
             case "expenses_id":
                 client_id.val('');
                 supplier_id.val('');
                 depositValue.val('');
                 cbo_processes.empty();
+                
                 break;
             case "payMethod":
                 break;

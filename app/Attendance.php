@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Carbon\Carbon;
 
 class Attendance extends Model {
 
@@ -22,18 +23,85 @@ class Attendance extends Model {
     public $employeeName;
     public $processName;
     public $absentTypeName;
+    public $GuardianshipValue;
+    public $GuardianshipReturnValue;
+    public $borrowValue;
     public $is_managment_process;
 
-    public function employee(){
+    public function employee() {
         return $this->belongsTo('App\Employee');
     }
-    
-    public function absentType(){
+
+    public function absentType() {
         return $this->belongsTo('App\AbsentType');
     }
-    
-    public function process(){
+
+    public function process() {
         return $this->belongsTo('App\ClientProcess');
+    }
+
+    public function employeeGuardianship() {
+        $startDate = Carbon::parse($this->date)->format('Y-m-d 00:00:00');
+        $endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
+        $depositWithdraws = DepositWithdraw::where([
+                        ['employee_id', '=', $this->employee_id],
+                        ['expenses_id', '=', 1],
+                        ['created_at', '>=', $startDate],
+                        ['created_at', '<=', $endDate]
+                ])->get();
+        try {
+            return $depositWithdraws[0]->withdrawValue;
+        } catch (\Exception $exc) {
+            return 0;
+        }
+    }
+
+    public function employeeGuardianshipReturn() {
+        $startDate = Carbon::parse($this->date)->format('Y-m-d 00:00:00');
+        $endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
+        $depositWithdraws = DepositWithdraw::where([
+                        ['employee_id', '=', $this->employee_id],
+                        ['expenses_id', '=', 2],
+                        ['created_at', '>=', $startDate],
+                        ['created_at', '<=', $endDate]
+                ])->get();
+        try {
+            return $depositWithdraws[0]->withdrawValue;
+        } catch (\Exception $exc) {
+            return 0;
+        }
+    }
+
+    public function employeeSmallBorrow() {
+        $startDate = Carbon::parse($this->date)->format('Y-m-d 00:00:00');
+        $endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
+        $depositWithdraws = DepositWithdraw::where([
+                        ['employee_id', '=', $this->employee_id],
+                        ['expenses_id', '=', 3],
+                        ['created_at', '>=', $startDate],
+                        ['created_at', '<=', $endDate]
+                ])->get();
+        try {
+            return $depositWithdraws[0]->withdrawValue;
+        } catch (\Exception $exc) {
+            return 0;
+        }
+    }
+
+    public function employeeLongBorrow() {
+        $startDate = Carbon::parse($this->date)->format('Y-m-d 00:00:00');
+        $endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
+        $depositWithdraws = DepositWithdraw::where([
+                        ['employee_id', '=', $this->employee_id],
+                        ['expenses_id', '=', 4],
+                        ['created_at', '>=', $startDate],
+                        ['created_at', '<=', $endDate]
+                ])->get();
+        try {
+            return $depositWithdraws[0]->withdrawValue;
+        } catch (\Exception $exc) {
+            return 0;
+        }
     }
 
 }

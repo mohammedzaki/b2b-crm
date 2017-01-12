@@ -35,7 +35,7 @@
                 <a href="{{ URL::to('/depositwithdraw') }}"><i class="fa fa-briefcase fa-fw"></i>وارد / منصرف</a>
             </li>
             <li>
-                <a href=""><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف</a>
+                <a href="#"><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف</a>
                 <ul>
                     <li><a href="{{ URL::to('/attendance') }}">الكل</a></li>
                     <li><a href="{{ URL::to('/attendance/checkin') }}">تسجيل حضور</a></li>

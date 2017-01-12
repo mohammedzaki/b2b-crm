@@ -50,7 +50,7 @@ class DepositWithdrawController extends Controller {
                     'client_id' => 'exists:clients,id',
                     'employee_id' => 'exists:employees,id',
                     'supplier_id' => 'exists:suppliers,id',
-                    'expenses_id' => 'exists:expenses,id',
+                    //'expenses_id' => 'exists:expenses,id',
                     'payMethod' => 'required|numeric',
                     'notes' => 'string'
         ]);
@@ -204,6 +204,13 @@ class DepositWithdrawController extends Controller {
         $payMethods = [];
         $payMethods[0] = "كاش";
         $payMethods[1] = "شيك";
+        
+        $employeeActions = [];
+        $employeeActions[1] = "عهدة";
+        $employeeActions[2] = "رد عهدة";
+        $employeeActions[3] = "سلفة";
+        $employeeActions[4] = "سلفة مستديمة";
+        
         foreach ($clients as $client) {
             $clients_tmp[$client->id] = $client->name;
         }
@@ -232,7 +239,7 @@ class DepositWithdrawController extends Controller {
         $suppliers = $suppliers_tmp;
         $expenses = $expenses_tmp;
         $canEdit = $canEdit;
-        return view('depositwithdraw', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit', 'clientProcesses', 'supplierProcesses']));
+        return view('depositwithdraw', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit', 'clientProcesses', 'supplierProcesses', 'employeeActions']));
     }
 
     /**
