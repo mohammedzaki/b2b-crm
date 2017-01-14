@@ -1035,7 +1035,9 @@
                 withdrawValue.val('');
                 supplier_id.val('');
                 employee_id.val('');
-                expenses_id.val('');
+                expenses_id.empty();
+                expenses_id.append($("<option></option>"));
+                
                 break;
             case "withdrawValue":
                 depositValue.val('');
@@ -1056,7 +1058,6 @@
                 employee_id.val('');
                 expenses_id.val('');
                 withdrawValue.val('');
-
                 cbo_processes.empty();
                 cbo_processes.append($("<option></option>").attr("value", -1).text(''));
                 $.each(clientProcesses, function (key, process) {
@@ -1083,18 +1084,29 @@
                 client_id.val('');
                 supplier_id.val('');
                 expenses_id.val('');
-                depositValue.val('');
+                //
                 cbo_processes.empty();
                 expenses_id.empty();
                 expenses_id.append($("<option></option>"));
                 //alert(employee_id.val());
                 if (employee_id.val() > 0) {
-                    $.each(employeeActions, function (key, process) {
-                        //console.log(process);
-                        expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
-                    });
+                    if (depositValue.val() > 0) {
+                        $.each(employeeActions, function (key, process) {
+                            if (process.id == 2) {
+                                expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
+                            }
+                        });
+                    } else {
+                        $.each(employeeActions, function (key, process) {
+                            if (process.id != 2 && process.id != 4) {
+                                expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
+                            }
+                        });
+                    }
+                    
                     
                 } else {
+                    depositValue.val('');
                     $.each(expenses, function (key, process) {
                         expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
                     });
@@ -1103,7 +1115,9 @@
             case "expenses_id":
                 client_id.val('');
                 supplier_id.val('');
-                depositValue.val('');
+                if (employee_id.val() == 0 && expenses_id.val() != 2) {
+                    depositValue.val('');
+                }
                 cbo_processes.empty();
                 
                 break;

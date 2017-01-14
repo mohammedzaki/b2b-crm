@@ -62,6 +62,8 @@ Route::resource('employeeBorrow', 'EmployeeBorrowController');
 
 Route::get('/attendance/checkin', 'AttendanceController@checkin')->name('attendance.checkin');
 Route::get('/attendance/checkout', 'AttendanceController@checkout')->name('attendance.checkout');
+Route::get('/attendance/guardianship/{employee_id}', 'AttendanceController@guardianship')->name('attendance.guardianship');
+Route::get('/attendance/guardianshipaway/{id}', 'AttendanceController@guardianshipaway')->name('attendance.guardianshipaway');
 Route::resource('attendance', 'AttendanceController');
 
 //Route::get('/attendance/employee', 'AttendanceController@employee')->name('attendance.employee');;

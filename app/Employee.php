@@ -47,4 +47,16 @@ class Employee extends Model {
             ['expenses_id', '=', 3],
         ]); //->get();
     }
+    
+    public function employeeGuardianships($month) {
+        //$startDate = Carbon::parse($this->date)->format('Y-m-d 00:00:00');
+        //$endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
+        $depositWithdraws = DepositWithdraw::where([
+                        ['employee_id', '=', $this->id]
+                ])
+                ->whereIn('expenses_id', ['1', '2'])
+                ->whereMonth('created_at', '=', $month)->get();
+                        
+        return $depositWithdraws;
+    }
 }

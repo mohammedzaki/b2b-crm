@@ -24,8 +24,8 @@ class Kernel extends ConsoleKernel {
      * @return void
      */
     protected function schedule(Schedule $schedule) {
-        $schedule->command('employee:LongBorrow')
-                 ->everyMinute();
+        //$schedule->command('employee:LongBorrow')
+        //         ->everyMinute();
     }
 
 }

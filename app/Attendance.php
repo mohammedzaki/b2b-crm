@@ -66,7 +66,7 @@ class Attendance extends Model {
                         ['created_at', '<=', $endDate]
                 ])->get();
         try {
-            return $depositWithdraws[0]->withdrawValue;
+            return $depositWithdraws[0]->depositValue;
         } catch (\Exception $exc) {
             return 0;
         }

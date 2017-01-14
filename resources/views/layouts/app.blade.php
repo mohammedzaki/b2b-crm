@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>@yield('title') - برنامج حسابات</title>
     
-    <link href="{{ asset( elixir('css/all.css') ) }}" rel="stylesheet">
+    <link href="{{ url('css/all.css') }}" rel="stylesheet">
     @yield('css_scripts')
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -16,7 +16,7 @@
     <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
     @yield('script_taxes')
-    <script src="{{ asset( elixir('js/all.js') ) }}"></script>
+    <script src="{{ url('js/all.js') }}"></script>
     <script src="{{ url('js/common.js') }}"></script>
 </head>
 

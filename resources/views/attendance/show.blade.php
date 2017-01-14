@@ -23,8 +23,8 @@
                 <div class="panel-body">
                     <div class="col-lg-6 ">
                         <div class="form-group{{ $errors->has('id') ? ' has-error' : '' }}">
-                            {{ Form::label('id', 'اسم الموظف') }} 
-                            {{ Form::select('id', $employees, null, 
+                            {{ Form::label('id', 'اسم الموظف') }}
+                            {{ Form::select('id', $employees, $employee_id, 
                                         array(
                                         'name' => '',
                                         'class' => 'form-control',
@@ -39,15 +39,15 @@
                     <div class="col-lg-4 ">
                         <div class="form-group">
                             <label>اليوم</label>
-                            {{ Form::text('date', null, array(
+                            {{ Form::text('date', $date, array(
                                         "id" => "datepicker",
                                         'class' => 'form-control',
                                         'placeholder' => 'ادخل اليوم')) }}
                         </div>
                     </div>
                     <div class="col-lg-2 ">
-                        <label></label>
-                        <button class="btn btn-success" type="button" onclick="SubmitSearch()">بحث</button>
+                        <label>></label>
+                        <button class="btn btn-success form-control" type="button" onclick="SubmitSearch()">بحث</button>
                     </div>
                 </div>
                 <!-- /.panel-body -->
@@ -217,23 +217,36 @@
                                         'class' => 'form-control')) }}
                     </div>
                 </div>
-                <!--
-                <div class="col-lg-6 ">
-                    <div class="form-group">
-                        <label>سعر الساعة</label>
-                        {{ Form::text('HourlyRate', $hourlyRate, array(
-                                        "id" => "HourlyRate",
+                <div class="row">
+                    <div class="col-lg-4 ">
+                        <div class="form-group">
+                            <label>اجمالى العهدة</label>
+                            {{ Form::text('TotalSalary', $totalGuardianshipValue, array(
+                                        "id" => "totalGuardianshipValue",
                                         'class' => 'form-control')) }}
+                        </div>
+                    </div>
+                    <div class="col-lg-4 ">
+                        <div class="form-group">
+                            <label>اجمالى رد العهدة</label>
+                            {{ Form::text('TotalSalary', $totalGuardianshipReturnValue, array(
+                                        "id" => "totalGuardianshipReturnValue",
+                                        'class' => 'form-control')) }}
+                        </div>
+                    </div>
+                    <div class="col-lg-2 ">
+                        <div class="form-group">
+                            <label>></label>
+                            <button class="btn btn-primary form-control" type="button" onclick="SubmitSearchGuardianship()">كشف حساب العهد</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 ">
+                        <div class="form-group">
+                            <label>></label>
+                            {{ link_to_route('attendance.guardianship', 'ترحيل العهدة', array('id' => 1), array('class' => 'btn btn-primary form-control')) }}
+                        </div>
                     </div>
                 </div>
-                <div class="col-lg-6 ">
-                    <div class="form-group">
-                        <label>اجمالى المرتب</label>
-                        {{ Form::text('TotalSalary', $totalSalary, array(
-                                        "id" => "TotalSalary",
-                                        'class' => 'form-control')) }}
-                    </div>
-                </div>-->
             </div>
             <!-- /.panel-body -->
         </div>
@@ -260,6 +273,10 @@ var datepicker = $("#datepicker").flatpickr({
 function SubmitSearch() {
     var empId = $("#id").val();
     $('#SearchForm').prop('action', empId).submit();
+}
+function SubmitSearchGuardianship() {
+    var empId = $("#id").val();
+    $('#SearchForm').prop('action', 'guardianship/' + empId).submit();
 }
 </script>
 @endsection

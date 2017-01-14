@@ -204,6 +204,8 @@ class AttendanceController extends Controller {
         $hourlyRate = 0;
         if ($id == "all") {
             $attendances = []; //Attendance::all();
+            $employee_id = 0;
+            $date = null;
         } else {
             $employee = Employee::findOrFail($id);
             $hourlyRate = $employee->daily_salary / $employee->working_hours;
@@ -211,6 +213,8 @@ class AttendanceController extends Controller {
                             ['employee_id', '=', $id]
                     ])->whereMonth('date', '=', $dt->month)->get();
         }
+        $date = $request->date;
+        $employee_id = $id;
         $employees_tmp = [];
         $totalWorkingHours = 0;
         $totalSalaryDeduction = 0;
@@ -268,7 +272,7 @@ class AttendanceController extends Controller {
             $employees_tmp[$employee->id] = $employee->name;
         }
         $employees = $employees_tmp;
-        return view('attendance.show', compact(['employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue']));
+        return view('attendance.show', compact(['employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date']));
     }
 
     /**
@@ -377,5 +381,38 @@ class AttendanceController extends Controller {
         $employees = $employees_tmp;
         return view('attendance.employee', compact(['employees', 'attendances']));
     }
+
+    public function guardianship(Request $request, $employee_id) {
+        $employees = Employee::all();
+        $dt = Carbon::parse($request->date);
+        foreach ($employees as $employee) {
+            $employees_tmp[$employee->id] = $employee->name;
+        }
+        if ($employee_id == "all") {
+            $employeeGuardianships = []; //Attendance::all();
+            $employee_id = 0;
+            $date = null;
+        } else {
+            $employee = Employee::findOrFail($employee_id);
+            $employeeGuardianships = $employee->employeeGuardianships($dt->month);
+        }
+        $date = $request->date;
+        $employee_id = $employee_id;
+        $totalGuardianshipValue = 0;
+        $totalGuardianshipReturnValue = 0;
+
+        foreach ($employeeGuardianships as $guardianship) {
+            $totalGuardianshipValue += $guardianship->withdrawValue;
+            $totalGuardianshipReturnValue += $guardianship->depositValue;
+        }
+        $employees = $employees_tmp;
+        return view("attendance.guardianship", compact(['employees', 'employeeGuardianships', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'employee_id', 'date']));
+    }
+    
+    public function guardianshipaway(Request $request, $id) {
+        
+        return "تم الترحيل";
+    }
+    
 
 }
