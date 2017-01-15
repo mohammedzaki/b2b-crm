@@ -68,7 +68,7 @@
                     <div class="dataTable_wrapper">
 
                         <div class="table-responsive">
-                            <table width="2000" class="table table-striped table-bordered table-hover" id="dataTables-example">
+                            <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                                 <thead>
                                     <tr>
                                         <th>اسم الموظف</th>
@@ -133,8 +133,6 @@
         </div>
         <!-- /.col-lg-12 -->
     </div>
-
-
 </row>
 <row>
     <div class="col-lg-12">
@@ -197,7 +195,7 @@
                                         "id" => "HourlyRate",
                                         'class' => 'form-control')) }}
                     </div>
-                    
+
                     <div class="form-group col-lg-3">
                         <label>المكافأت</label>
                         {{ Form::text('HourlyRate', $totalBonuses, array(
@@ -210,6 +208,38 @@
                                         "id" => "TotalSalary",
                                         'class' => 'form-control')) }}
                     </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 ">
+                        <div class="form-group">
+                            <label>اجمالى العهدة</label>
+                            {{ Form::text('TotalSalary', $totalGuardianshipValue, array(
+                                        "id" => "totalGuardianshipValue",
+                                        'class' => 'form-control')) }}
+                        </div>
+                    </div>
+                    <div class="col-lg-3 ">
+                        <div class="form-group">
+                            <label>اجمالى رد العهدة</label>
+                            {{ Form::text('TotalSalary', $totalGuardianshipReturnValue, array(
+                                        "id" => "totalGuardianshipReturnValue",
+                                        'class' => 'form-control')) }}
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-3">
+                        <div class="col-lg-6 ">
+                            <div class="form-group">
+                                <label>></label>
+                                <button class="btn btn-primary form-control" type="button" onclick="SubmitSearchGuardianship()">كشف حساب العهد</button>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 ">
+                            <div class="form-group">
+                                <label>></label>
+                                {{ link_to_route('attendance.guardianship', 'ترحيل العهدة', array('id' => 1), array('class' => 'btn btn-primary form-control')) }}
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group col-lg-3">
                         <label>الصافى المستحق</label>
                         {{ Form::text('HourlyRate', $totalNetSalary, array(
@@ -218,32 +248,9 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-4 ">
+                    <div class="col-lg-6 ">
                         <div class="form-group">
-                            <label>اجمالى العهدة</label>
-                            {{ Form::text('TotalSalary', $totalGuardianshipValue, array(
-                                        "id" => "totalGuardianshipValue",
-                                        'class' => 'form-control')) }}
-                        </div>
-                    </div>
-                    <div class="col-lg-4 ">
-                        <div class="form-group">
-                            <label>اجمالى رد العهدة</label>
-                            {{ Form::text('TotalSalary', $totalGuardianshipReturnValue, array(
-                                        "id" => "totalGuardianshipReturnValue",
-                                        'class' => 'form-control')) }}
-                        </div>
-                    </div>
-                    <div class="col-lg-2 ">
-                        <div class="form-group">
-                            <label>></label>
-                            <button class="btn btn-primary form-control" type="button" onclick="SubmitSearchGuardianship()">كشف حساب العهد</button>
-                        </div>
-                    </div>
-                    <div class="col-lg-2 ">
-                        <div class="form-group">
-                            <label>></label>
-                            {{ link_to_route('attendance.guardianship', 'ترحيل العهدة', array('id' => 1), array('class' => 'btn btn-primary form-control')) }}
+                            <button class="btn btn-success form-control" type="button" onclick="SubmitSearchPrintReport()">طباعة كشف حساب الموظف</button>
                         </div>
                     </div>
                 </div>
@@ -258,25 +265,29 @@
 <script src="{{ url('/vendors/flatpickr/dist/flatpickr.min.js') }}"></script>
 <script src="{{ url('/vendors/flatpickr/dist/l10n/ar.js') }}"></script>
 <script>
-var datepicker = $("#datepicker").flatpickr({
-    enableTime: false,
-    altInput: true,
-    altFormat: "l, j F, Y",
-    locale: "ar",
-    onChange: function (selectedDates, dateStr, instance) {
-        //startDate = selectedDates[0];
-        timepicker.setDate(selectedDates[0]);
-        timepicker.open();
-        //console.log(selectedDates, dateStr, instance);
+    var datepicker = $("#datepicker").flatpickr({
+        enableTime: false,
+        altInput: true,
+        altFormat: "l, j F, Y",
+        locale: "ar",
+        onChange: function (selectedDates, dateStr, instance) {
+            //startDate = selectedDates[0];
+            timepicker.setDate(selectedDates[0]);
+            timepicker.open();
+            //console.log(selectedDates, dateStr, instance);
+        }
+    });
+    function SubmitSearch() {
+        var empId = $("#id").val();
+        $('#SearchForm').prop('action', empId).submit();
     }
-});
-function SubmitSearch() {
-    var empId = $("#id").val();
-    $('#SearchForm').prop('action', empId).submit();
-}
-function SubmitSearchGuardianship() {
-    var empId = $("#id").val();
-    $('#SearchForm').prop('action', 'guardianship/' + empId).submit();
-}
+    function SubmitSearchGuardianship() {
+        var empId = $("#id").val();
+        $('#SearchForm').prop('action', 'guardianship/' + empId).submit();
+    }
+    function SubmitSearchPrintReport() {
+        var empId = $("#id").val();
+        $('#SearchForm').prop('action', 'printSalaryReport/' + empId).submit();
+    }
 </script>
 @endsection

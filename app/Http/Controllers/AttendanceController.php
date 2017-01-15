@@ -414,5 +414,89 @@ class AttendanceController extends Controller {
         return "تم الترحيل";
     }
     
+    public function printSalaryReport(Request $request, $id) {
+        
+        $employees = Employee::all();
+        $dt = Carbon::parse($request->date);
+        $hourlyRate = 0;
+        if ($id == "all") {
+            $attendances = []; //Attendance::all();
+            $employee_id = 0;
+            $date = null;
+        } else {
+            $employee = Employee::findOrFail($id);
+            $hourlyRate = $employee->daily_salary / $employee->working_hours;
+            $attendances = Attendance::where([
+                            ['employee_id', '=', $id]
+                    ])->whereMonth('date', '=', $dt->month)->get();
+        }
+        $date = $request->date;
+        $employee_id = $id;
+        $employees_tmp = [];
+        $totalWorkingHours = 0;
+        $totalSalaryDeduction = 0;
+        $totalAbsentDeduction = 0;
+        $totalBonuses = 0;
+        $totalHoursSalary = 0;
+        $totalSalary = 0;
+        $totalNetSalary = 0;
+        $totalGuardianshipValue = 0;
+        $totalGuardianshipReturnValue = 0;
+        $totalBorrowValue = 0;
+        $totalSmallBorrowValue = 0;
+        $totalLongBorrowValue = 0;
+        foreach ($attendances as $attendance) {
+            //$attendance->check_out - $attendance->check_in
+            $check_out = Carbon::parse($attendance->check_out);
+            $check_in = Carbon::parse($attendance->check_in);
+            //$attendance->check_out = $attendance->check_out
+            $attendance->workingHours = $check_out->diffInHours($check_in);
+            $attendance->employeeName = $attendance->employee->name;
+
+            $attendance->GuardianshipValue = $attendance->employeeGuardianship();
+            $attendance->GuardianshipReturnValue = $attendance->employeeGuardianshipReturn();
+            $attendance->borrowValue = $attendance->employeeSmallBorrow();
+
+            if ($attendance->process) {
+                $attendance->processName = $attendance->process->name;
+            } else {
+                $attendance->processName = "عمليات ادارية";
+            }
+            if ($attendance->absentType) {
+                $attendance->absentTypeName = $attendance->absentType->name;
+            }
+            $totalWorkingHours += $attendance->workingHours;
+            $totalSalaryDeduction += $attendance->salary_deduction;
+            $totalAbsentDeduction += $attendance->absent_deduction;
+            $totalBonuses += $attendance->mokaf;
+            $totalGuardianshipValue += $attendance->GuardianshipValue;
+            $totalGuardianshipReturnValue += $attendance->GuardianshipReturnValue;
+            $totalBorrowValue += $attendance->borrowValue;
+        }
+        try {
+            $attendances[0]->borrowValue = $attendances[0]->employeeLongBorrow();
+            $totalLongBorrowValue = $attendances[0]->employeeLongBorrow();
+        } catch (\Exception $exc) {
+            
+        }
+        $totalSmallBorrowValue = $totalBorrowValue;
+        $totalBorrowValue += $totalLongBorrowValue;
+        $totalHoursSalary = $totalWorkingHours * $hourlyRate;
+        $totalSalary = ($totalHoursSalary + $totalBonuses);
+        $totalNetSalary = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
+
+        foreach ($employees as $employee) {
+            $employees_tmp[$employee->id] = $employee->name;
+        }
+        $employees = $employees_tmp;
+        $employeeName = $employee->name;
+        $pdfReport = new \App\Reports\Employee\Salary(TRUE);
+        
+        $pdfReport->htmlContent = view('reports.employee.salary', compact(['employeeName','employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date']))->render();
+        
+        
+        //$pdfReport->employeeName = "Mai Gado";
+        return $pdfReport->RenderReport();
+    }
 
 }

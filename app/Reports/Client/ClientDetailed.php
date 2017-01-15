@@ -2,7 +2,9 @@
 
 namespace App\Reports\Client;
 
-class ClientDetailed {
+use App\Reports\BaseReport;
+
+class ClientDetailed extends BaseReport {
 
     public $clientName,
             $proceses,
@@ -39,39 +41,6 @@ class ClientDetailed {
     function SetCSS() {
         $path = public_path('ReportsHtml/Client/ClientDetailed.css');
         return file_get_contents($path);
-    }
-
-    function SetPageHeader() {
-        if ($this->withLetterHead) {
-            return '<!--mpdf
-                <htmlpageheader name="myheader">
-                <img src="http://eye-ltd.com/letr.png" class="letrHead">
-                </htmlpageheader>
-                
-
-                <sethtmlpageheader name="myheader" value="on" show-this-page="1" />
-                mpdf-->';
-        } else {
-            return '<!--mpdf
-                <htmlpageheader name="myheader">
-                </htmlpageheader>
-                
-                <sethtmlpageheader name="myheader" value="on" show-this-page="1" />
-                mpdf-->';
-        }
-    }
-
-    function SetPageFooter() {
-        return '<!--mpdf
-                <htmlpagefooter name="myfooter">
-                <div class="reportPageFooterLine" ></div>
-                <div class="reportPageFooterText">
-                صفحة {PAGENO} من {nb}
-                </div>
-                </htmlpagefooter>
-
-                <sethtmlpagefooter name="myfooter" value="on" />
-                mpdf-->';
     }
 
     function AddAllProcess() {

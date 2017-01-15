@@ -2,7 +2,9 @@
 
 namespace App\Reports\Client;
 
-class ClientTotal {
+use App\Reports\BaseReport;
+
+class ClientTotal extends BaseReport {
 
     public $clientName,
             $proceses,
@@ -44,40 +46,6 @@ class ClientTotal {
         $path = public_path('ReportsHtml/Client/ClientTotal.css');
         return file_get_contents($path);
     }
-
-    function SetPageHeader() {
-        if ($this->withLetterHead) {
-            return '<!--mpdf
-                <htmlpageheader name="myheader">
-                <img src="http://eye-ltd.com/letr.png" class="letrHead">
-                </htmlpageheader>
-
-                <sethtmlpageheader name="myheader" value="on" show-this-page="1" />
-                mpdf-->';
-        } else {
-            return '<!--mpdf
-                <htmlpageheader name="myheader">
-                </htmlpageheader>
-                
-                <sethtmlpageheader name="myheader" value="on" show-this-page="1" />
-                mpdf-->';
-        }
-        
-    }
-
-    function SetPageFooter() {
-        return '<!--mpdf
-                <htmlpagefooter name="myfooter">
-                <div class="reportPageFooterLine" ></div>
-                <div class="reportPageFooterText">
-                صفحة {PAGENO} من {nb}
-                </div>
-                </htmlpagefooter>
-
-                <sethtmlpagefooter name="myfooter" value="on" />
-                mpdf-->';
-    }
-    
     
     function SetReportHeader($clientName) {
         return '<div class="processHeader">
