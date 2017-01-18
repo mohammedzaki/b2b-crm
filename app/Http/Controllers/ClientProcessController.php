@@ -136,7 +136,6 @@ class ClientProcessController extends Controller {
         }
         $clients = $clients_tmp;
         $employees = $employees_tmp;
-        $process->discount_percentage = $process->discountPercentage();
         return view('client.process.edit', compact(['process', 'clients', 'employees']));
     }
 

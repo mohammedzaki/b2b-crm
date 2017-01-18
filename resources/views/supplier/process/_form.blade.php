@@ -102,7 +102,7 @@ var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
                         <div class="col-lg-5">
                             <div class="form-group{{ $errors->has('discount_percentage') ? ' has-error' : '' }}">
                                 {{ Form::label('discount_percentage', 'نسبة الخصم') }} 
-                                {{ Form::text('discount_percentage', null, 
+                                {{ Form::text('dis', null, 
                                     array(
                                         'id' => 'discount_percentage',
                                         'class' => 'form-control', 

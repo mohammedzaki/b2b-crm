@@ -14,6 +14,17 @@
 </div>
 <form method="get" id="SearchForm" action="" >
     <row>
+        @if (session('success'))
+            <div class="alert alert-success">
+                {{ session('success') }}
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="alert alert-danger">
+                {{ session('error') }}
+            </div>
+        @endif
         <div class="col-lg-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -236,7 +247,7 @@
                         <div class="col-lg-6 ">
                             <div class="form-group">
                                 <label>></label>
-                                {{ link_to_route('attendance.guardianship', 'ترحيل العهدة', array('id' => 1), array('class' => 'btn btn-primary form-control')) }}
+                                {{ link_to_route('attendance.guardianshipaway', 'ترحيل العهدة', array('id' => 1), array('class' => 'btn btn-primary form-control')) }}
                             </div>
                         </div>
                     </div>
@@ -248,9 +259,14 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-6 ">
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <button class="btn btn-success form-control" type="button" onclick="SubmitSearchPrintReport()">طباعة كشف حساب الموظف</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <button class="btn btn-danger form-control" type="button" onclick="SubmitSearchPrintReport()">دفع المرتب</button>
                         </div>
                     </div>
                 </div>

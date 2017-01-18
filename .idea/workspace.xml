@@ -234,7 +234,6 @@
         <option value="$PROJECT_DIR$/database/migrations/2016_11_04_173141_create_employee_borrow_table.php" />
         <option value="$PROJECT_DIR$/database/migrations/2016_11_04_173731_create_employee_borrow_table.php" />
         <option value="$PROJECT_DIR$/resources/views/client/process/create.blade.php" />
-        <option value="$PROJECT_DIR$/resources/assets/js/custom.js" />
         <option value="$PROJECT_DIR$/app/Http/Controllers/ClientController.php" />
         <option value="$PROJECT_DIR$/app/Facility.php" />
         <option value="$PROJECT_DIR$/resources/views/layouts/sidebar.blade.php" />
@@ -1036,14 +1035,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1309">
           <caret line="77" column="10" lean-forward="false" selection-start-line="77" selection-start-column="10" selection-end-line="77" selection-end-column="10" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/resources/assets/js/custom.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="178" column="49" lean-forward="true" selection-start-line="178" selection-start-column="49" selection-end-line="178" selection-end-column="49" />
           <folding />
         </state>
       </provider>

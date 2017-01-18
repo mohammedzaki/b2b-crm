@@ -156,7 +156,6 @@ class SupplierProcessController extends Controller {
         $employees = $employees_tmp;
         $clients = $clients_tmp;
         $clientProcesses = $clientProcesses_tmp;
-        $process->discount_percentage = $process->discountPercentage();
         $process->client_id = $process->clientProcess->client_id;
         return view('supplier.process.edit', compact(['process', 'suppliers', 'employees', 'clients', 'clientProcesses']));
     }

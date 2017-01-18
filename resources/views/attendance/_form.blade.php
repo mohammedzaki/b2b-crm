@@ -15,6 +15,7 @@
                     {{ Form::label('employee_id', 'اسم الموظف') }} 
                     {{ Form::select('employee_id', $employees, null, 
                                         array(
+                                        'id' => 'employee_id',
                                         'class' => 'form-control',
                                         'placeholder' => '')) }}
                     @if ($errors->has('employee_id'))
@@ -114,12 +115,23 @@
             <div class="col-lg-12"> 
 
                 <div class="legend">
+                    @if(isset($model) && $attendance->absent_type_id > 0)
+                    {{ Form::checkbox('absent_check', '1', true, 
+                            array(
+                                'id' => 'absent_check',
+                                'class' => 'checkbox_show_input',
+                                'onchange' => 'RemoveAbsent()'
+                            )) }} 
+                    {{ Form::label('absent_check', 'غياب') }}
+                    @else
                     {{ Form::checkbox('absent_check', '1', null, 
                             array(
                                 'id' => 'absent_check',
-                                'class' => 'checkbox_show_input'
+                                'class' => 'checkbox_show_input',
+                                'onchange' => 'RemoveAbsent()'
                             )) }} 
                     {{ Form::label('absent_check', 'غياب') }}
+                    @endif
                 </div>
                 <div class="hidden_input">
                     <div class="row"> 
@@ -127,8 +139,11 @@
                             <div class="form-group">
                                 {{ Form::label('absent_type_id', 'نوع الغياب') }}
                                 {{ Form::select('absent_type_id', $absentTypes, null, array(
+                                        'id' => 'absent_type_id',
                                         'class' => 'form-control',
-                                        'placeholder' => '')) }}
+                                        'placeholder' => '',
+                                        'onchange' => 'SetAbsentDeduction()')) }}
+                                
                             </div>
                         </div>
                         <div class="col-lg-6 ">
@@ -137,16 +152,20 @@
                                     المبلغ
                                 </label>
                                 {{ Form::text('absent_deduction', null, array(
+                                        'id' => 'absent_deduction',
                                         'class' => 'form-control',
                                         'placeholder' => '')) }}
                             </div>
                         </div>
                     </div>
+                    @if(isset($model))
+                    @else
                     <div class="row">
                         <div class="col-lg-6 ">
-                            <button class="btn btn-danger" type="button">حفظ</button>
+                            <button class="btn btn-danger" type="button" onclick="SubmitCheck(3)">حفظ</button>
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
 
@@ -175,7 +194,7 @@
                 @if ($checkin)
                 <button class="btn btn-success" type="button" onclick="SubmitCheck(1)">تسجيل حضور</button>
                 @else
-                <button class="btn btn-primary" type="button" onclick="SubmitCheck(0)">تسجيل انصراف</button>
+                <button class="btn btn-primary" type="button" onclick="SubmitCheck(2)">تسجيل انصراف</button>
                 @endif
             @endif
         </div>
@@ -187,14 +206,14 @@
 <script src="{{ url('/vendors/flatpickr/dist/flatpickr.min.js') }}"></script>
 <script src="{{ url('/vendors/flatpickr/dist/l10n/ar.js') }}"></script>
 <script>
-var employeesSalaries = [
+var employeesSalaries = {
     @foreach($employeesSalaries as $k => $info) 
-    { id: '{{ $k }}', hourlySalary: '{{ $info["hourlySalary"] }}'}, 
-    @endforeach];
-var absentTypesInfo = [
+    {{ $k }}: { dailySalary: '{{ $info["dailySalary"] }}'},
+    @endforeach};
+var absentTypesInfo = {
     @foreach($absentTypesInfo as $k => $info) 
-    { id: '{{ $k }}', salaryDeduction: '{{ $info["salaryDeduction"] }}', editable: '{{ $info["editable"] }}'}, 
-    @endforeach];
+    {{ $k }}: {salaryDeduction: '{{ $info["salaryDeduction"] }}', editable: '{{ $info["editable"] }}'}, 
+    @endforeach};
 
 $(function () {
     //var startDate = new Date();
@@ -228,11 +247,12 @@ $(function () {
     });
 });
 function SubmitCheck(checkType) {
-    // 
     if (checkType == 1) {
         $('#attendanceForm').append('<input type="hidden" id="check_in" name="check_in" value="' + $('#timepicker').val() + '"/>')
-    } else {
+    } else if (checkType == 2) {
         $('#attendanceForm').append('<input type="hidden" id="check_out" name="check_out" value="' + $('#timepicker').val() + '"/>')
+    } else if (checkType == 3) {
+        
     }
     $('#attendanceForm').submit();
 }
@@ -244,6 +264,25 @@ function ResetProcess() {
 function ResetManagmentProcess() {
     if ($('#process_id').val() > 0) {
         $('#is_managment_process').prop('checked', false);
+    }
+}
+function SetAbsentDeduction() {
+    if ($("#absent_type_id").val() != 0 && $("#employee_id").val() != 0) {
+        var s_d = employeesSalaries[$("#employee_id").val()].dailySalary * (absentTypesInfo[$("#absent_type_id").val()].salaryDeduction / 100);
+        $("#absent_deduction").val(s_d);
+        if (absentTypesInfo[$("#absent_type_id").val()].editable == '0') {
+            $("#absent_deduction").prop('disabled', true);
+        } else {
+            $("#absent_deduction").prop('disabled', false);
+        }
+    } else {
+        $("#absent_deduction").val('');
+    }
+}
+function RemoveAbsent() {
+    if ($('#absent_check').is(":checked")) {
+        $("#absent_type_id").val('');
+        $("#absent_deduction").val('');
     }
 }
 </script>

@@ -42,8 +42,7 @@ elixir(function(mix) {
         'bootstrap-select.min.js',
         'bootstrap-select-defaults-ar_AR.js',
         'jquery.dataTables.min.js',
-        'dataTables.bootstrap.min.js',
-        'custom.js'
+        'dataTables.bootstrap.min.js'
     ]);
 
     mix.version(['css/all.css', 'js/all.js']);

@@ -93,7 +93,7 @@ class AttendanceController extends Controller {
         $absentTypesInfo = [];
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
-            $employeesSalaries[$employee->id]['hourlySalary'] = $employee->daily_salary / $employee->working_hours;
+            $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
         }
         foreach ($processes as $process) {
             $processes_tmp[$process->id] = $process->name;
@@ -121,7 +121,7 @@ class AttendanceController extends Controller {
         $absentTypesInfo = [];
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
-            $employeesSalaries[$employee->id]['hourlySalary'] = $employee->daily_salary / $employee->working_hours;
+            $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
         }
         foreach ($processes as $process) {
             $processes_tmp[$process->id] = $process->name;
@@ -150,7 +150,7 @@ class AttendanceController extends Controller {
         $absentTypesInfo = [];
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
-            $employeesSalaries[$employee->id]['hourlySalary'] = $employee->daily_salary / $employee->working_hours;
+            $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
         }
         foreach ($processes as $process) {
             $processes_tmp[$process->id] = $process->name;
@@ -307,7 +307,7 @@ class AttendanceController extends Controller {
         $absentTypesInfo = [];
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
-            $employeesSalaries[$employee->id]['hourlySalary'] = $employee->daily_salary / $employee->working_hours;
+            $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
         }
         foreach ($processes as $process) {
             $processes_tmp[$process->id] = $process->name;
@@ -339,6 +339,13 @@ class AttendanceController extends Controller {
         if ($validator->fails()) {
             return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
+            if (isset($request->is_managment_process)) {
+                $all['process_id'] = null;
+            }
+            if (!isset($request->absent_check)) {
+                $all['absent_type_id'] = 0;
+                $all['absent_deduction'] = 0;
+            }
             $attendance->update($all);
             return redirect()->back()->withInput($all)->with(['success' => 'تم حفظ البيانات.']);
         }
@@ -410,12 +417,11 @@ class AttendanceController extends Controller {
     }
     
     public function guardianshipaway(Request $request, $id) {
-        
-        return "تم الترحيل";
+        //return "";
+        return redirect()->back()->with('success', 'تم الترحيل');
     }
     
     public function printSalaryReport(Request $request, $id) {
-        
         $employees = Employee::all();
         $dt = Carbon::parse($request->date);
         $hourlyRate = 0;
