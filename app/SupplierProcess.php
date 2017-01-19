@@ -17,7 +17,7 @@ class SupplierProcess extends Model {
         'employee_id',
         'notes',
         'has_discount',
-        //'discount_percentage',
+        'discount_percentage',
         'discount_value',
         'discount_reason',
         'require_bill',
@@ -25,7 +25,6 @@ class SupplierProcess extends Model {
         'total_price_taxes',
         'taxes_value'
     ];
-    public $discount_percentage = 0;
     public $client_id = 0;
 
     public function supplier() {

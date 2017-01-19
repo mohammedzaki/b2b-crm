@@ -17,7 +17,7 @@ class ClientProcess extends Model {
         'notes',
         'has_discount',
         'status',
-        //'discount_percentage',
+        'discount_percentage',
         'discount_value',
         'discount_reason',
         'require_bill',
@@ -25,7 +25,6 @@ class ClientProcess extends Model {
         'total_price_taxes',
         'taxes_value'
     ];
-    public $discount_percentage = 0;
 
     public function client() {
         return $this->belongsTo('App\Client');

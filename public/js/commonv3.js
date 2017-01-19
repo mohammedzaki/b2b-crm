@@ -43,6 +43,16 @@ $(document).ready(function () {
         return discount_percentage;
     }
 
+    function calculate_discount_from_percentage() {
+        discount_value = 0;
+        if ($('input[name="has_discount"]').is(':checked')) {
+            discount_percentage = $("#discount_percentage").val();
+            discount_value = (calculate_process_price() / 100) * discount_percentage;
+            discount_value = roundDecimals(discount_value, 3);
+        }
+        return discount_value;
+    }
+    
     function calculate_discount() {
         discount_value = 0;
         if ($('input[name="has_discount"]').is(':checked')) {
@@ -214,10 +224,8 @@ $(document).ready(function () {
     });
 
     $("#discount_percentage").change(function () {
-        /*var price = calculate_process_price();
-         discount_value = (price / 100) * $("#discount_percentage").val();
-         $("#discount_value").val(discount_value);
-         update_prices();*/
+         $("#discount_value").val(calculate_discount_from_percentage());
+         update_prices();
     });
 
     if (processItemsCount == 0) {
