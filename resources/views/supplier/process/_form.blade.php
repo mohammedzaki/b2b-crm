@@ -169,7 +169,9 @@ var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
                 </div>
 
                 {{ Form::hidden('total_price') }}
-
+                {{ Form::hidden('total_price_taxes') }}
+                {{ Form::hidden('taxes_value') }}
+                
             </div>
             <!-- /.panel-body -->
         </div>

@@ -180,6 +180,10 @@ class AttendanceController extends Controller {
         if ($validator->fails()) {
             return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
+            $attendance = Attendance::last([
+                            ["date", "=", $all['date']],
+                            ["employee_id", "=", $all['employee_id']]
+            ]);
             $attendance = Attendance::firstOrCreate([
                             ["date", "=", $all['date']],
                             ["employee_id", "=", $all['employee_id']]

@@ -21,7 +21,9 @@ class SupplierProcess extends Model {
         'discount_value',
         'discount_reason',
         'require_bill',
-        'total_price'
+        'total_price',
+        'total_price_taxes',
+        'taxes_value'
     ];
     public $discount_percentage = 0;
     public $client_id = 0;
@@ -82,8 +84,9 @@ class SupplierProcess extends Model {
 
     public function taxesValue() {
         if ($this->require_bill == "1") {
-            $facility = Facility::findOrFail(1);
-            return ($this->total_price - $this->discountValue()) * $facility->getTaxesRate();
+            //$facility = Facility::findOrFail(1);
+            //($this->total_price - $this->discountValue()) * $facility->getTaxesRate();
+            return $this->taxes_value;
         }
         return 0;
     }

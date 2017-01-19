@@ -21,7 +21,9 @@ class ClientProcess extends Model {
         'discount_value',
         'discount_reason',
         'require_bill',
-        'total_price'
+        'total_price',
+        'total_price_taxes',
+        'taxes_value'
     ];
     public $discount_percentage = 0;
 
@@ -77,8 +79,9 @@ class ClientProcess extends Model {
     
     public function taxesValue() {
         if ($this->require_bill == "1") {
-            $facility = Facility::findOrFail(1);
-            return ($this->total_price - $this->discountValue()) * $facility->getTaxesRate();
+            //$facility = Facility::findOrFail(1);
+            //return ($this->total_price - $this->discountValue()) * $facility->getTaxesRate();
+            return $this->taxes_value;
         }
         return 0;
     }
