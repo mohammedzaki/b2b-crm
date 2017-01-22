@@ -37,6 +37,7 @@
                                         <th width="150">الملاحظات</th>
                                         <th width="55">نوع الغياب</th>
                                         <th width="40">خصم الغياب</th>
+                                        <th width="40">#</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -52,6 +53,7 @@
                                         <td>{{ $attendance->notes }}</td>
                                         <td>{{ $attendance->absentTypeName }}</td>
                                         <td>{{ $attendance->absent_deduction }}</td>
+                                        <td>{{ link_to_route('attendance.edit', 'تعديل', array('id' => $attendance->id), array('class' => 'btn btn-primary')) }}</td>
                                     </tr>
                                     @empty
                                     <tr>ﻻ يوجد عمليات.</tr>

@@ -40,11 +40,7 @@ class AttendanceController extends Controller {
         $attendances = Attendance::all();
 
         foreach ($attendances as $attendance) {
-            //$attendance->check_out - $attendance->check_in
-            $check_out = Carbon::parse($attendance->check_out);
-            $check_in = Carbon::parse($attendance->check_in);
-            //$attendance->check_out = $attendance->check_out
-            $attendance->workingHours = $check_out->diffInHours($check_in);
+            $attendance->workingHours = $attendance->workingHoursToString(); 
             $attendance->employeeName = $attendance->employee->name;
 
             if ($attendance->process) {
@@ -61,16 +57,48 @@ class AttendanceController extends Controller {
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-                    //'process_id' => 'exists:client_processes,id|required_without:is_managment_process',
-                    //'is_managment_process' => 'required_without:process_id',
+                    'process_id' => 'exists:client_processes,id|required_without:is_managment_process',
+                    'is_managment_process' => 'required_without:process_id',
                     'employee_id' => 'exists:employees,id|required',
                     'notes' => 'string'
         ]);
 
         $validator->setAttributeNames([
-            //'process_id' => 'اسم العملية',
+            'process_id' => 'اسم العملية',
             'employee_id' => 'اسم الموظف',
-            //'is_managment_process' => 'عمليات ادارية',
+            'is_managment_process' => 'عمليات ادارية',
+            'notes' => 'ملاحظات'
+        ]);
+
+        return $validator;
+    }
+
+    protected function validatorCheckin(array $data, $id = null) {
+        $validator = Validator::make($data, [
+                    'process_id' => 'exists:client_processes,id|required_without:is_managment_process',
+                    'is_managment_process' => 'required_without:process_id',
+                    'employee_id' => 'exists:employees,id|required',
+                    'notes' => 'string'
+        ]);
+
+        $validator->setAttributeNames([
+            'process_id' => 'اسم العملية',
+            'employee_id' => 'اسم الموظف',
+            'is_managment_process' => 'عمليات ادارية',
+            'notes' => 'ملاحظات'
+        ]);
+
+        return $validator;
+    }
+
+    protected function validatorCheckout(array $data, $id = null) {
+        $validator = Validator::make($data, [
+                    'employee_id' => 'exists:employees,id|required',
+                    'notes' => 'string'
+        ]);
+
+        $validator->setAttributeNames([
+            'employee_id' => 'اسم الموظف',
             'notes' => 'ملاحظات'
         ]);
 
@@ -119,6 +147,7 @@ class AttendanceController extends Controller {
         $processes_tmp = [];
         $absentTypes_tmp = [];
         $absentTypesInfo = [];
+        $employeesCheckinDates = [];
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
             $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
@@ -134,9 +163,10 @@ class AttendanceController extends Controller {
         $processes = $processes_tmp;
         $employees = $employees_tmp;
         $absentTypes = $absentTypes_tmp;
+
         $checkin = TRUE;
         $checkinbtn = FALSE;
-        return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn']));
+        return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn', 'employeesCheckinDates']));
     }
 
     public function checkout() {
@@ -148,9 +178,11 @@ class AttendanceController extends Controller {
         $processes_tmp = [];
         $absentTypes_tmp = [];
         $absentTypesInfo = [];
+        $employeesCheckinDates = [];
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
             $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
+            
         }
         foreach ($processes as $process) {
             $processes_tmp[$process->id] = $process->name;
@@ -165,7 +197,7 @@ class AttendanceController extends Controller {
         $absentTypes = $absentTypes_tmp;
         $checkin = FALSE;
         $checkinbtn = FALSE;
-        return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn']));
+        return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn', 'employeesCheckinDates']));
     }
 
     /**
@@ -175,24 +207,72 @@ class AttendanceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request) {
-        $validator = $this->validator($request->all());
+        if (!empty($request->check_in)) {
+            $validator = $this->validatorCheckin($request->all());
+        } else {
+            $validator = $this->validatorCheckout($request->all());
+        }
         $all = $request->all();
         if ($validator->fails()) {
             return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
-            $attendance = Attendance::last([
+            $attendance = Attendance::where("employee_id", $all['employee_id'])
+                    ->orderBy('date', 'desc')
+                    ->first();
+            $attendanceToday = Attendance::where([
                             ["date", "=", $all['date']],
                             ["employee_id", "=", $all['employee_id']]
-            ]);
-            $attendance = Attendance::firstOrCreate([
-                            ["date", "=", $all['date']],
-                            ["employee_id", "=", $all['employee_id']]
-            ]);
+                    ])->first();
+            if (empty($attendance)) {
+                if (empty($request->check_in)) {
+                    return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل حضور اولا')->withErrors($validator);
+                }
+                $attendance = Attendance::firstOrCreate([
+                                ["date", "=", $all['date']],
+                                ["employee_id", "=", $all['employee_id']]
+                ]);
+            } else if (empty($attendanceToday)) {
+                if (isset($request->check_in)) {
+                    if (empty($attendance->check_out)) {
+                        return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل انصراف اولا');
+                    }
+                } else if (isset($request->check_out)) {
+                    if (empty($attendance->check_in)) {
+                        return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل حضور اولا');
+                    }
+                }
+                $attendance = Attendance::firstOrCreate([
+                                ["date", "=", $all['date']],
+                                ["employee_id", "=", $all['employee_id']]
+                ]);
+            } else {
+                if (isset($attendanceToday->absent_check)) {
+                    return redirect()->back()->withInput($all)->with('error', 'لقد تم تسجيل غياب لهذا العامل يرجى التعديل من شاشة التعديل');
+                } else if (isset($attendanceToday->check_in) && isset($attendanceToday->check_out)) {
+                    return redirect()->back()->withInput($all)->with('error', 'لقد تم تسجيل حضور و انصراف هذا العامل يرجى التعديل من شاشة التعديل');
+                } else if (isset($request->check_in)) {
+                    if (empty($attendanceToday->check_out)) {
+                        return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل انصراف اولا');
+                    }
+                } else if (isset($request->check_out)) {
+                    if (empty($attendanceToday->check_in)) {
+                        return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل حضور اولا');
+                    }
+                }
+                $attendance = Attendance::firstOrCreate([
+                                ["date", "=", $all['date']],
+                                ["employee_id", "=", $all['employee_id']]
+                ]);
+            }
             if (isset($request->is_managment_process)) {
                 $all['process_id'] = null;
             }
             $attendance->update($all);
-            return redirect()->route('attendance.edit', $attendance->id)->with(['success' => 'تم حفظ البيانات.', 'checkin' => $request->checkin]);
+            if ($request->checkin) {
+                return redirect()->route('attendance.checkin')->with(['success' => 'تم حفظ البيانات.']);
+            } else {
+                return redirect()->route('attendance.checkout')->with(['success' => 'تم حفظ البيانات.']);
+            }
         }
     }
 
@@ -233,11 +313,7 @@ class AttendanceController extends Controller {
         $totalSmallBorrowValue = 0;
         $totalLongBorrowValue = 0;
         foreach ($attendances as $attendance) {
-            //$attendance->check_out - $attendance->check_in
-            $check_out = Carbon::parse($attendance->check_out);
-            $check_in = Carbon::parse($attendance->check_in);
-            //$attendance->check_out = $attendance->check_out
-            $attendance->workingHours = $check_out->diffInHours($check_in);
+            $attendance->workingHours = $attendance->workingHoursToString();
             $attendance->employeeName = $attendance->employee->name;
 
             $attendance->GuardianshipValue = $attendance->employeeGuardianship();
@@ -252,7 +328,7 @@ class AttendanceController extends Controller {
             if ($attendance->absentType) {
                 $attendance->absentTypeName = $attendance->absentType->name;
             }
-            $totalWorkingHours += $attendance->workingHours;
+            $totalWorkingHours += $attendance->workingHoursToSeconds();
             $totalSalaryDeduction += $attendance->salary_deduction;
             $totalAbsentDeduction += $attendance->absent_deduction;
             $totalBonuses += $attendance->mokaf;
@@ -268,7 +344,9 @@ class AttendanceController extends Controller {
         }
         $totalSmallBorrowValue = $totalBorrowValue;
         $totalBorrowValue += $totalLongBorrowValue;
-        $totalHoursSalary = $totalWorkingHours * $hourlyRate;
+        $totalHoursSalary = $totalWorkingHours * (($hourlyRate / 60) / 60);
+        $totalHoursSalary = round($totalHoursSalary, 2); 
+        $totalWorkingHours = $this->diffInHoursMinutsToString($totalWorkingHours);
         $totalSalary = ($totalHoursSalary + $totalBonuses);
         $totalNetSalary = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
 
@@ -347,6 +425,7 @@ class AttendanceController extends Controller {
                 $all['process_id'] = null;
             }
             if (!isset($request->absent_check)) {
+                $all['absent_check'] = null;
                 $all['absent_type_id'] = 0;
                 $all['absent_deduction'] = 0;
             }
@@ -375,6 +454,7 @@ class AttendanceController extends Controller {
             $check_out = Carbon::parse($attendance->check_out);
             $check_in = Carbon::parse($attendance->check_in);
             //$attendance->check_out = $attendance->check_out
+            
             $attendance->workingHours = $check_out->diffInHours($check_in);
             $attendance->employeeName = $attendance->employee->name;
             if ($attendance->process) {
@@ -392,6 +472,17 @@ class AttendanceController extends Controller {
         $employees = $employees_tmp;
         return view('attendance.employee', compact(['employees', 'attendances']));
     }
+
+    function diffInHoursMinutsToString($totalDuration) {
+        return gmdate('H:i:s', $totalDuration);
+    }
+    
+    function diffInHoursMinutsToSeconds($startDate, $endDate) {
+        $totalDuration = $endDate->diffInSeconds($startDate);
+
+        return $totalDuration;
+    }
+
 
     public function guardianship(Request $request, $employee_id) {
         $employees = Employee::all();
@@ -419,12 +510,12 @@ class AttendanceController extends Controller {
         $employees = $employees_tmp;
         return view("attendance.guardianship", compact(['employees', 'employeeGuardianships', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'employee_id', 'date']));
     }
-    
+
     public function guardianshipaway(Request $request, $id) {
         //return "";
         return redirect()->back()->with('success', 'تم الترحيل');
     }
-    
+
     public function printSalaryReport(Request $request, $id) {
         $employees = Employee::all();
         $dt = Carbon::parse($request->date);
@@ -456,13 +547,8 @@ class AttendanceController extends Controller {
         $totalSmallBorrowValue = 0;
         $totalLongBorrowValue = 0;
         foreach ($attendances as $attendance) {
-            //$attendance->check_out - $attendance->check_in
-            $check_out = Carbon::parse($attendance->check_out);
-            $check_in = Carbon::parse($attendance->check_in);
-            //$attendance->check_out = $attendance->check_out
-            $attendance->workingHours = $check_out->diffInHours($check_in);
+            $attendance->workingHours = $attendance->workingHoursToString();
             $attendance->employeeName = $attendance->employee->name;
-
             $attendance->GuardianshipValue = $attendance->employeeGuardianship();
             $attendance->GuardianshipReturnValue = $attendance->employeeGuardianshipReturn();
             $attendance->borrowValue = $attendance->employeeSmallBorrow();
@@ -475,7 +561,7 @@ class AttendanceController extends Controller {
             if ($attendance->absentType) {
                 $attendance->absentTypeName = $attendance->absentType->name;
             }
-            $totalWorkingHours += $attendance->workingHours;
+            $totalWorkingHours += $attendance->workingHoursToSeconds();
             $totalSalaryDeduction += $attendance->salary_deduction;
             $totalAbsentDeduction += $attendance->absent_deduction;
             $totalBonuses += $attendance->mokaf;
@@ -491,22 +577,32 @@ class AttendanceController extends Controller {
         }
         $totalSmallBorrowValue = $totalBorrowValue;
         $totalBorrowValue += $totalLongBorrowValue;
-        $totalHoursSalary = $totalWorkingHours * $hourlyRate;
+        $totalHoursSalary = $totalWorkingHours * (($hourlyRate / 60) / 60);
+        $totalHoursSalary = round($totalHoursSalary, 2); 
         $totalSalary = ($totalHoursSalary + $totalBonuses);
         $totalNetSalary = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
-
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
         }
         $employees = $employees_tmp;
         $employeeName = $employee->name;
         $pdfReport = new \App\Reports\Employee\Salary(TRUE);
-        
-        $pdfReport->htmlContent = view('reports.employee.salary', compact(['employeeName','employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date']))->render();
-        
-        
+
+        $pdfReport->htmlContent = view('reports.employee.salary', compact(['employeeName', 'employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date']))->render();
+
         //$pdfReport->employeeName = "Mai Gado";
         return $pdfReport->RenderReport();
+    }
+
+    public function getEmployeesCheckinDate(Request $request) {
+        $attendance = Attendance::where([
+                        ["date", "=", $request->date],
+                        ["employee_id", "=", $request->employee_id]
+                ])->first();
+        if (empty($attendance))
+            return "";
+        else
+            return $attendance->check_in;
     }
 
 }

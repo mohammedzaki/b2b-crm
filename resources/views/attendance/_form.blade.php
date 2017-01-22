@@ -17,7 +17,8 @@
                                         array(
                                         'id' => 'employee_id',
                                         'class' => 'form-control',
-                                        'placeholder' => '')) }}
+                                        'placeholder' => '',
+                                        'onchange' => ($checkin == 0 ? 'SetCheckIndatetime()' : '') )) }}
                     @if ($errors->has('employee_id'))
                     <label for="inputError" class="control-label">
                         {{ $errors->first('employee_id') }}
@@ -66,24 +67,32 @@
                     <label>اليوم</label>
                     {{ Form::text('date', null, array(
                                         "id" => "datepicker",
-                                        'class' => 'form-control',
+                                        'class' => 'form-control datepicker',
                                         'placeholder' => 'ادخل اليوم')) }}
                 </div>
                 <div class="row">
-                    @if(isset($model))
+                    @if(!$checkin || isset($model))
+                    
                     <div class="form-group col-lg-6">
                         <label>ساعة الدخول</label>
+                        @if (!$checkin)
+                        {{ Form::text('check_in_display', null, array(
+                                        "id" => "check_in",
+                                        'class' => 'form-control datepicker',
+                                        'placeholder' => 'ساعة الدخول')) }}
+                        @else
                         {{ Form::text('check_in', null, array(
                                         "id" => "check_in",
-                                        'class' => 'form-control',
+                                        'class' => 'form-control datepicker',
                                         'placeholder' => 'ساعة الدخول')) }}
+                        @endif
                     </div>
 
                     <div class="form-group col-lg-6">
                         <label>ساعة الخروج</label>
                         {{ Form::text('check_out', null, array(
                                         "id" => "check_out",
-                                        'class' => 'form-control',
+                                        'class' => 'form-control datepicker',
                                         'placeholder' => 'ساعة الخروج')) }}
                     </div>
                     @else
@@ -91,20 +100,22 @@
                         <label>الساعة</label>
                         {{ Form::text('check_time', null, array(
                                         "id" => "timepicker",
-                                        'class' => 'form-control',
+                                        'class' => 'form-control datepicker',
                                         'placeholder' => 'ادخل الساعة')) }}
                     </div>
                     @endif
 
                 </div>
+                @if(!$checkin || isset($model))
                 <div class="form-group">
                     <label> ساعات العمل</label>
-                    {{ Form::text('workingHours', null, array(
-                                        "id" => "workingHours",
+                    {{ Form::text('working_hours', null, array(
+                                        "id" => "working_hours",
                                         'class' => 'form-control',
                                         'disabled' => 'disabled',
                                         'placeholder' => '')) }}
                 </div>
+                @endif
                 <div class="form-group">
                     <label>ملاحظات</label>
                     {{ Form::text('notes', null, array(
@@ -168,9 +179,6 @@
                     @endif
                 </div>
             </div>
-
-
-
         </div>
         <!-- /.panel-body -->
     </div>
@@ -180,15 +188,6 @@
     <div class="col-lg-6">
         <div class="form-group buttonsdiv">
             @if(isset($model))
-           
-            @if ($checkinbtn)
-            <input type="hidden" name="checkin" value="1" />
-            <a class="btn btn-primary" href="{{ URL::route('attendance.checkin') }}">جديد</a>
-            @else
-            <input type="hidden" name="checkin" value="0" />
-            <a class="btn btn-primary" href="{{ URL::route('attendance.checkout') }}">جديد</a>
-            @endif
-            
             <button class="btn btn-success" type="submit">حفظ التعديلات</button>
             @else
                 @if ($checkin)
@@ -199,7 +198,6 @@
             @endif
         </div>
     </div>
-
 </div>
 
 @section('scripts')
@@ -214,15 +212,60 @@ var absentTypesInfo = {
     @foreach($absentTypesInfo as $k => $info) 
     {{ $k }}: {salaryDeduction: '{{ $info["salaryDeduction"] }}', editable: '{{ $info["editable"] }}'}, 
     @endforeach};
-
+var startDate = new Date();
+var endDate = new Date();
+var check_inPickr;
+var check_outPickr;
+var datepicker;
+var timepicker;
+var selecteddatepicker;
 $(function () {
-    //var startDate = new Date();
-    //var endDate = new Date();
-    var timepicker = $("#timepicker").flatpickr({
+    @if(!$checkin || isset($model))
+    check_inPickr = $('#check_in').flatpickr({
+        enableTime: true,
+        altInput: true,
+        @if(!$checkin) clickOpens: false, @endif
+        maxDate: new Date(),
+        altFormat: "l, j F, Y - h:i K",
+        locale: "ar",
+        onChange: function (selectedDates, dateStr, instance) {
+            startDate = selectedDates[0];
+            caluclateHours();
+            //check_outPickr.setDate(selectedDates[0]);
+            //check_outPickr.open();
+        }
+    });
+    check_outPickr = $('#check_out').flatpickr({
         enableTime: true,
         altInput: true,
         maxDate: new Date(),
-        defaultDate: new Date(),
+        altFormat: "l, j F, Y - h:i K",
+        locale: "ar",
+        onChange: function (selectedDates, dateStr, instance) {
+            endDate = selectedDates[0];
+            caluclateHours();
+        }
+    });
+    datepicker = $("#datepicker").flatpickr({
+        enableTime: false,
+        maxDate: new Date(),
+        @if(!$checkin) defaultDate: new Date(), @endif
+        altInput: true,
+        altFormat: "l, j F, Y",
+        locale: "ar",
+        onChange: function (selectedDates, dateStr, instance) {
+            selecteddatepicker = selectedDates[0];
+            check_inPickr.setDate(selectedDates[0]);
+            check_inPickr.open();
+        }
+    });
+    caluclateHours();
+    @else
+    timepicker = $("#timepicker").flatpickr({
+        enableTime: true,
+        altInput: true,
+        maxDate: new Date(),
+        //defaultDate: new Date(),
         altFormat: "l, j F, Y - h:i K",
         locale: "ar",
         onChange: function (selectedDates, dateStr, instance) {
@@ -231,7 +274,7 @@ $(function () {
             //$('#workinghours').val(hours);
         }
     });
-    var datepicker = $("#datepicker").flatpickr({
+    datepicker = $("#datepicker").flatpickr({
         enableTime: false,
         maxDate: new Date(),
         defaultDate: new Date(),
@@ -239,18 +282,34 @@ $(function () {
         altFormat: "l, j F, Y",
         locale: "ar",
         onChange: function (selectedDates, dateStr, instance) {
-            //startDate = selectedDates[0];
+            selecteddatepicker = selectedDates[0];
             timepicker.setDate(selectedDates[0]);
             timepicker.open();
-            //console.log(selectedDates, dateStr, instance);
         }
-    });
+    }); 
+    @endif
 });
+
+function caluclateHours() {
+    _startDate = check_inPickr.parseDate($('#check_in').val());
+    _endDate = check_inPickr.parseDate($('#check_out').val());
+    var seconds = Math.floor((_endDate - (_startDate))/1000);
+    var minutes = Math.floor(seconds/60);
+    var hours = Math.floor(minutes/60);
+    var days = Math.floor(hours/24);
+
+    hours = hours-(days*24);
+    minutes = minutes-(days*24*60)-(hours*60);
+    seconds = seconds-(days*24*60*60)-(hours*60*60)-(minutes*60);
+    console.log('test: ' + hours + ":" + minutes, _startDate , _endDate);
+    $('#working_hours').val(hours + ":" + minutes);
+}
+
 function SubmitCheck(checkType) {
     if (checkType == 1) {
-        $('#attendanceForm').append('<input type="hidden" id="check_in" name="check_in" value="' + $('#timepicker').val() + '"/>')
+        $('#attendanceForm').append('<input type="hidden" name="checkin" value="1" /> <input type="hidden" id="check_in" name="check_in" value="' + $('#timepicker').val() + '"/>');
     } else if (checkType == 2) {
-        $('#attendanceForm').append('<input type="hidden" id="check_out" name="check_out" value="' + $('#timepicker').val() + '"/>')
+        $('#attendanceForm').append('<input type="hidden" name="checkin" value="0" /> <input type="hidden" id="check_out" name="check_out" value="' + $('#check_out').val() + '"/>');
     } else if (checkType == 3) {
         
     }
@@ -284,6 +343,17 @@ function RemoveAbsent() {
         $("#absent_type_id").val('');
         $("#absent_deduction").val('');
     }
+}
+function SetCheckIndatetime() {
+    //check_inPickr.setDate(employeesCheckinDates[$("#employee_id").val()].checkinDate);
+    selecteddatepicker = $("#datepicker").val();
+    //console.log(selecteddatepicker);
+    $.get("{{ url('api/getEmployeesCheckinDate/') }}", 
+        {employee_id: $("#employee_id").val(), date: selecteddatepicker},
+        function (data) {
+            console.log(data);
+            check_inPickr.setDate(data, true);
+        });
 }
 </script>
 @endsection

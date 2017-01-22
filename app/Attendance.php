@@ -11,6 +11,8 @@ class Attendance extends Model {
         'date',
         'check_in',
         'check_out',
+        'working_hours',
+        'absent_check',
         'absent_type_id',
         'salary_deduction',
         'absent_deduction',
@@ -102,6 +104,26 @@ class Attendance extends Model {
         } catch (\Exception $exc) {
             return 0;
         }
+    }
+    
+    public function diffInHoursMinutsToString($startDate, $endDate) {
+        $totalDuration = $endDate->diffInSeconds($startDate);
+
+        return gmdate('H:i:s', $totalDuration);
+    }
+    
+    public function workingHoursToString() {
+        $check_out = Carbon::parse($this->check_out);
+        $check_in = Carbon::parse($this->check_in);
+        $totalDuration = $check_out->diffInSeconds($check_in);
+        return gmdate('H:i:s', $totalDuration);
+    }
+    
+    public function workingHoursToSeconds() {
+        $check_out = Carbon::parse($this->check_out);
+        $check_in = Carbon::parse($this->check_in);
+        $totalDuration = $check_out->diffInSeconds($check_in);
+        return $totalDuration;
     }
 
 }

@@ -76,6 +76,7 @@ Route::resource('feasibilityStudy', 'FeasibilityStudyController');
 Route::group(['prefix' => 'api'], function() {
     //Route::get('getClientProcesses', 'ClientProcessController@getClientProcesses');
     //Route::get('getSupplierProcesses', 'SupplierProcessController@getSupplierProcesses');
+    Route::get('getEmployeesCheckinDate', 'AttendanceController@getEmployeesCheckinDate');
     Route::get('getTaxesRate', 'FacilityController@getTaxesRate');
 });
 
@@ -96,4 +97,3 @@ Route::group(['prefix' => 'reports'], function() {
         Route::get('getSupplierProcesses', 'SupplierProcessController@getSupplierReportProcesses');
     });
 });
-
