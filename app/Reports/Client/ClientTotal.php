@@ -11,9 +11,6 @@ class ClientTotal extends BaseReport {
             $allProcessesTotalPrice,
             $allProcessTotalPaid,
             $allProcessTotalRemaining;
-    private $mpdf;
-    private $reportName = "ClientTotalReport.pdf";
-    private $withLetterHead;
 
     public function __construct($withLetterHead = true) {
         if ($withLetterHead) {
@@ -21,6 +18,7 @@ class ClientTotal extends BaseReport {
         } else {
             $this->mpdf = new \mPDF('', 'A4', '', '', 8, 8, 8, 10, 10, 10);
         }
+        $this->reportName = "ClientTotalReport.pdf";
         $this->withLetterHead = $withLetterHead;
     }
 

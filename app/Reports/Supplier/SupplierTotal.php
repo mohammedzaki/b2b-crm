@@ -12,8 +12,16 @@ class SupplierTotal extends BaseReport {
             $allProcessTotalPaid,
             $allProcessTotalRemaining;
     
-    private $reportName = "SupplierTotalReport.pdf";
-
+    public function __construct($withLetterHead = true) {
+        if ($withLetterHead) {
+            $this->mpdf = new \mPDF('', 'A4', '', '', 8, 8, 28, 10, 10, 10);
+        } else {
+            $this->mpdf = new \mPDF('', 'A4', '', '', 8, 8, 8, 10, 10, 10);
+        }
+        $this->reportName = "SupplierTotalReport.pdf";
+        $this->withLetterHead = $withLetterHead;
+    }
+    
     function SetHtmlBody() {
         return '<!DOCTYPE html>
                 <html>

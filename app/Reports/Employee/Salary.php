@@ -7,8 +7,6 @@ use App\Reports\BaseReport;
 class Salary extends BaseReport {
 
     public $employeeName;
-
-    protected $reportName = "EmployeeSalaryReport.pdf";
     
     public $vars = array();
     public $htmlContent = "";
@@ -19,6 +17,7 @@ class Salary extends BaseReport {
         } else {
             $this->mpdf = new \mPDF('', 'A4', '', '', 8, 8, 8, 10, 10, 10);
         }
+        $this->reportName = "EmployeeSalaryReport.pdf";
         $this->withLetterHead = $withLetterHead;
     }
 

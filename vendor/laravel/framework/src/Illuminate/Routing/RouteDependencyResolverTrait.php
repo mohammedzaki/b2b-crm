@@ -10,20 +10,6 @@ use ReflectionFunctionAbstract;
 trait RouteDependencyResolverTrait
 {
     /**
-     * Call a class method with the resolved dependencies.
-     *
-     * @param  object  $instance
-     * @param  string  $method
-     * @return mixed
-     */
-    protected function callWithDependencies($instance, $method)
-    {
-        return call_user_func_array(
-            [$instance, $method], $this->resolveClassMethodDependencies([], $instance, $method)
-        );
-    }
-
-    /**
      * Resolve the object method's type-hinted dependencies.
      *
      * @param  array  $parameters
@@ -95,7 +81,7 @@ trait RouteDependencyResolverTrait
      */
     protected function alreadyInParameters($class, array $parameters)
     {
-        return ! is_null(Arr::first($parameters, function ($key, $value) use ($class) {
+        return ! is_null(Arr::first($parameters, function ($value) use ($class) {
             return $value instanceof $class;
         }));
     }
