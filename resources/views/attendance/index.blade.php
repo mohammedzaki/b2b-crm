@@ -27,8 +27,9 @@
                             <table width="2000" class="table table-striped table-bordered table-hover" id="dataTables-example">
                                 <thead>
                                     <tr>
-                                        <th width="145">اسم الموظف</th>
-                                        <th width="145">اسم العملية</th>
+                                        <th width="120">اسم الموظف</th>
+                                        <th width="120">اسم العملية</th>
+                                        <th width="45">اليوم</th>
                                         <th width="45">من</th>
                                         <th width="55">الى</th>
                                         <th width="50">ساعات العمل</th>
@@ -45,6 +46,7 @@
                                     <tr class="odd">
                                         <td>{{ $attendance->employeeName }}</td>
                                         <td>{{ $attendance->processName }}</td>
+                                        <td>{{ $attendance->date }}</td>
                                         <td>{{ $attendance->check_in }}</td>
                                         <td>{{ $attendance->check_out }}</td>
                                         <td>{{ $attendance->workingHours }}</td>

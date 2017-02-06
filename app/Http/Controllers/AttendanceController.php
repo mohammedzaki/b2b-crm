@@ -17,6 +17,7 @@ use App\Attendance;
 use App\Facility;
 use App\AbsentType;
 use App\User;
+use App\DepositWithdraw;
 use Validator;
 
 class AttendanceController extends Controller {
@@ -37,10 +38,12 @@ class AttendanceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $attendances = Attendance::all();
+        $startDate = Carbon::today()->format('Y-m-d 00:00:00');
+        $endDate = Carbon::today()->format('Y-m-d 23:59:59');
+        $attendances = Attendance::whereBetween('date', [$startDate, $endDate])->orderBy('date', 'asc')->get();
 
         foreach ($attendances as $attendance) {
-            $attendance->workingHours = $attendance->workingHoursToString(); 
+            $attendance->workingHours = $attendance->workingHoursToString();
             $attendance->employeeName = $attendance->employee->name;
 
             if ($attendance->process) {
@@ -55,37 +58,19 @@ class AttendanceController extends Controller {
         return view('attendance.index', compact(['attendances']));
     }
 
-    protected function validator(array $data, $id = null) {
-        $validator = Validator::make($data, [
-                    'process_id' => 'exists:client_processes,id|required_without:is_managment_process',
-                    'is_managment_process' => 'required_without:process_id',
-                    'employee_id' => 'exists:employees,id|required',
-                    'notes' => 'string'
-        ]);
-
-        $validator->setAttributeNames([
-            'process_id' => 'اسم العملية',
-            'employee_id' => 'اسم الموظف',
-            'is_managment_process' => 'عمليات ادارية',
-            'notes' => 'ملاحظات'
-        ]);
-
-        return $validator;
-    }
-
     protected function validatorCheckin(array $data, $id = null) {
         $validator = Validator::make($data, [
-                    'process_id' => 'exists:client_processes,id|required_without:is_managment_process',
-                    'is_managment_process' => 'required_without:process_id',
+                    'process_id' => 'required_without:is_managment_process',
+                    'is_managment_process' => 'required_if:process_id,-1',
                     'employee_id' => 'exists:employees,id|required',
-                    'notes' => 'string'
+                        //'notes' => 'string'
         ]);
 
         $validator->setAttributeNames([
             'process_id' => 'اسم العملية',
             'employee_id' => 'اسم الموظف',
             'is_managment_process' => 'عمليات ادارية',
-            'notes' => 'ملاحظات'
+                //'notes' => 'ملاحظات'
         ]);
 
         return $validator;
@@ -94,12 +79,12 @@ class AttendanceController extends Controller {
     protected function validatorCheckout(array $data, $id = null) {
         $validator = Validator::make($data, [
                     'employee_id' => 'exists:employees,id|required',
-                    'notes' => 'string'
+                        //'notes' => 'string'
         ]);
 
         $validator->setAttributeNames([
             'employee_id' => 'اسم الموظف',
-            'notes' => 'ملاحظات'
+                //'notes' => 'ملاحظات'
         ]);
 
         return $validator;
@@ -139,37 +124,14 @@ class AttendanceController extends Controller {
     }
 
     public function checkin() {
-        $employees = Employee::all();
-        $processes = ClientProcess::allOpened()->get();
-        $absentTypes = AbsentType::all();
-        $employees_tmp = [];
-        $employeesSalaries = [];
-        $processes_tmp = [];
-        $absentTypes_tmp = [];
-        $absentTypesInfo = [];
-        $employeesCheckinDates = [];
-        foreach ($employees as $employee) {
-            $employees_tmp[$employee->id] = $employee->name;
-            $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
-        }
-        foreach ($processes as $process) {
-            $processes_tmp[$process->id] = $process->name;
-        }
-        foreach ($absentTypes as $type) {
-            $absentTypes_tmp[$type->id] = $type->name;
-            $absentTypesInfo[$type->id]['salaryDeduction'] = $type->salary_deduction;
-            $absentTypesInfo[$type->id]['editable'] = $type->editable_deduction;
-        }
-        $processes = $processes_tmp;
-        $employees = $employees_tmp;
-        $absentTypes = $absentTypes_tmp;
-
-        $checkin = TRUE;
-        $checkinbtn = FALSE;
-        return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn', 'employeesCheckinDates']));
+        return $this->createAttendance(TRUE);
     }
 
     public function checkout() {
+        return $this->createAttendance(FALSE);
+    }
+
+    function createAttendance($checkType) {
         $employees = Employee::all();
         $processes = ClientProcess::allOpened()->get();
         $absentTypes = AbsentType::all();
@@ -182,8 +144,8 @@ class AttendanceController extends Controller {
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
             $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
-            
         }
+        $processes_tmp[-1] = '';
         foreach ($processes as $process) {
             $processes_tmp[$process->id] = $process->name;
         }
@@ -195,7 +157,7 @@ class AttendanceController extends Controller {
         $processes = $processes_tmp;
         $employees = $employees_tmp;
         $absentTypes = $absentTypes_tmp;
-        $checkin = FALSE;
+        $checkin = $checkType;
         $checkinbtn = FALSE;
         return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn', 'employeesCheckinDates']));
     }
@@ -207,32 +169,64 @@ class AttendanceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request) {
-        if (!empty($request->check_in)) {
-            $validator = $this->validatorCheckin($request->all());
-        } else {
-            $validator = $this->validatorCheckout($request->all());
-        }
         $all = $request->all();
+        if (!empty($request->check_in)) {
+            $validator = $this->validatorCheckin($all);
+        } else {
+            $validator = $this->validatorCheckout($all);
+        }
         if ($validator->fails()) {
             return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
             $attendance = Attendance::where("employee_id", $all['employee_id'])
-                    ->orderBy('date', 'desc')
+                    ->orderBy('id', 'desc')
                     ->first();
             $attendanceToday = Attendance::where([
                             ["date", "=", $all['date']],
                             ["employee_id", "=", $all['employee_id']]
-                    ])->first();
+                    ])
+                    ->orderBy('id', 'desc')
+                    ->first();
             if (empty($attendance)) {
-                if (empty($request->check_in)) {
+                if (isset($request->is_second_shift)) {
+                    $errors['is_second_shift'] = "يجب تسجيل الوردية الاولى اولا";
+                    return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($errors);
+                } else if (empty($request->check_in)) {
                     return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل حضور اولا')->withErrors($validator);
                 }
-                $attendance = Attendance::firstOrCreate([
-                                ["date", "=", $all['date']],
-                                ["employee_id", "=", $all['employee_id']]
-                ]);
-            } else if (empty($attendanceToday)) {
-                if (isset($request->check_in)) {
+            } else if (!empty($attendanceToday)) { // There 
+                if (isset($attendanceToday->absent_check)) {
+                    return redirect()->back()->withInput($all)->with('error', 'لقد تم تسجيل غياب لهذا العامل يرجى التعديل من شاشة التعديل');
+                } else if (isset($attendanceToday->check_in) && isset($attendanceToday->check_out)) {
+                    if (isset($request->is_second_shift)) {
+                        $attendance = Attendance::firstOrCreate([
+                                        ["date", "=", $all['date']],
+                                        ["employee_id", "=", $all['employee_id']],
+                                        ["shift", "=", 2]
+                        ]);
+                        $all['shift'] = 2;
+                        goto skip;
+                    }
+                    return redirect()->back()->withInput($all)->with('error', 'لقد تم تسجيل حضور و انصراف هذا العامل يرجى التعديل من شاشة التعديل');
+                } else if (isset($request->check_in)) {
+                    if (empty($attendanceToday->check_out)) {
+                        return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل انصراف اولا');
+                    }
+                } else if (isset($request->check_out)) {
+                    if (isset($request->is_second_shift)) {
+                        //|| $attendanceToday->shift == 2
+                        if ($attendanceToday->shift == 1) {
+                            return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل حضور الوردية الاولى اولا');
+                        }
+                    } else if (empty($attendanceToday->check_in)) {
+                        return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل حضور اولا');
+                    }
+                }
+            } else { // There are no checkin at this day
+                if (isset($request->is_second_shift)) {
+                    $errors['is_second_shift'] = "يجب تسجيل الوردية الاولى اولا";
+                    return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($errors);
+                } else if (isset($request->check_in)) {
                     if (empty($attendance->check_out)) {
                         return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل انصراف اولا');
                     }
@@ -241,29 +235,14 @@ class AttendanceController extends Controller {
                         return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل حضور اولا');
                     }
                 }
-                $attendance = Attendance::firstOrCreate([
-                                ["date", "=", $all['date']],
-                                ["employee_id", "=", $all['employee_id']]
-                ]);
-            } else {
-                if (isset($attendanceToday->absent_check)) {
-                    return redirect()->back()->withInput($all)->with('error', 'لقد تم تسجيل غياب لهذا العامل يرجى التعديل من شاشة التعديل');
-                } else if (isset($attendanceToday->check_in) && isset($attendanceToday->check_out)) {
-                    return redirect()->back()->withInput($all)->with('error', 'لقد تم تسجيل حضور و انصراف هذا العامل يرجى التعديل من شاشة التعديل');
-                } else if (isset($request->check_in)) {
-                    if (empty($attendanceToday->check_out)) {
-                        return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل انصراف اولا');
-                    }
-                } else if (isset($request->check_out)) {
-                    if (empty($attendanceToday->check_in)) {
-                        return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل حضور اولا');
-                    }
-                }
-                $attendance = Attendance::firstOrCreate([
-                                ["date", "=", $all['date']],
-                                ["employee_id", "=", $all['employee_id']]
-                ]);
             }
+            $attendance = Attendance::firstOrCreate([
+                            ["date", "=", $all['date']],
+                            ["employee_id", "=", $all['employee_id']],
+                            ["shift", "=", 1]
+            ]);
+            $all['shift'] = 1;
+            skip:
             if (isset($request->is_managment_process)) {
                 $all['process_id'] = null;
             }
@@ -345,7 +324,7 @@ class AttendanceController extends Controller {
         $totalSmallBorrowValue = $totalBorrowValue;
         $totalBorrowValue += $totalLongBorrowValue;
         $totalHoursSalary = $totalWorkingHours * (($hourlyRate / 60) / 60);
-        $totalHoursSalary = round($totalHoursSalary, 2); 
+        $totalHoursSalary = round($totalHoursSalary, 2);
         $totalWorkingHours = $this->diffInHoursMinutsToString($totalWorkingHours);
         $totalSalary = ($totalHoursSalary + $totalBonuses);
         $totalNetSalary = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
@@ -416,7 +395,7 @@ class AttendanceController extends Controller {
     public function update(Request $request, $id) {
         $attendance = Attendance::findOrFail($id);
         $all = $request->all();
-        $validator = $this->validator($all, $attendance->id);
+        $validator = $this->validatorCheckin($all, $attendance->id);
 
         if ($validator->fails()) {
             return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
@@ -454,7 +433,7 @@ class AttendanceController extends Controller {
             $check_out = Carbon::parse($attendance->check_out);
             $check_in = Carbon::parse($attendance->check_in);
             //$attendance->check_out = $attendance->check_out
-            
+
             $attendance->workingHours = $check_out->diffInHours($check_in);
             $attendance->employeeName = $attendance->employee->name;
             if ($attendance->process) {
@@ -476,13 +455,12 @@ class AttendanceController extends Controller {
     function diffInHoursMinutsToString($totalDuration) {
         return gmdate('H:i:s', $totalDuration);
     }
-    
+
     function diffInHoursMinutsToSeconds($startDate, $endDate) {
         $totalDuration = $endDate->diffInSeconds($startDate);
 
         return $totalDuration;
     }
-
 
     public function guardianship(Request $request, $employee_id) {
         $employees = Employee::all();
@@ -511,8 +489,13 @@ class AttendanceController extends Controller {
         return view("attendance.guardianship", compact(['employees', 'employeeGuardianships', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'employee_id', 'date']));
     }
 
-    public function guardianshipaway(Request $request, $id) {
-        //return "";
+    public function guardianshipaway(Request $request, $employee_id) {
+        $employee = Employee::findOrFail($employee_id);
+        $newDate = Carbon::parse($request->date);
+        $newDate->addMonth(1);
+        $depositWithdraw = DepositWithdraw::findOrFail($employee->lastGuardianshipId());
+        $depositWithdraw->due_date = $newDate;
+        $depositWithdraw->save();
         return redirect()->back()->with('success', 'تم الترحيل');
     }
 
@@ -578,7 +561,7 @@ class AttendanceController extends Controller {
         $totalSmallBorrowValue = $totalBorrowValue;
         $totalBorrowValue += $totalLongBorrowValue;
         $totalHoursSalary = $totalWorkingHours * (($hourlyRate / 60) / 60);
-        $totalHoursSalary = round($totalHoursSalary, 2); 
+        $totalHoursSalary = round($totalHoursSalary, 2);
         $totalSalary = ($totalHoursSalary + $totalBonuses);
         $totalNetSalary = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
         foreach ($employees as $employee) {
@@ -595,9 +578,11 @@ class AttendanceController extends Controller {
     }
 
     public function getEmployeesCheckinDate(Request $request) {
+        $shift = ($request->is_second_shift == "true" ? 2 : 1);
         $attendance = Attendance::where([
                         ["date", "=", $request->date],
-                        ["employee_id", "=", $request->employee_id]
+                        ["employee_id", "=", $request->employee_id],
+                        ["shift", "=", $shift]
                 ])->first();
         if (empty($attendance))
             return "";

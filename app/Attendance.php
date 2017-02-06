@@ -9,6 +9,7 @@ class Attendance extends Model {
 
     protected $fillable = [
         'date',
+        'shift',
         'check_in',
         'check_out',
         'working_hours',
@@ -47,12 +48,16 @@ class Attendance extends Model {
         $endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
                         ['employee_id', '=', $this->employee_id],
-                        ['expenses_id', '=', 1],
-                        ['created_at', '>=', $startDate],
-                        ['created_at', '<=', $endDate]
-                ])->get();
+                        ['expenses_id', '=', EmployeeActions::Guardianship],
+                        ['due_date', '>=', $startDate],
+                        ['due_date', '<=', $endDate]
+        ]);
         try {
-            return $depositWithdraws[0]->withdrawValue;
+            if ($this->shift == 1) {
+                return $depositWithdraws->sum('withdrawValue');
+            } else {
+                return 0;
+            }
         } catch (\Exception $exc) {
             return 0;
         }
@@ -63,12 +68,16 @@ class Attendance extends Model {
         $endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
                         ['employee_id', '=', $this->employee_id],
-                        ['expenses_id', '=', 2],
-                        ['created_at', '>=', $startDate],
-                        ['created_at', '<=', $endDate]
-                ])->get();
+                        ['expenses_id', '=', EmployeeActions::GuardianshipReturn],
+                        ['due_date', '>=', $startDate],
+                        ['due_date', '<=', $endDate]
+        ]);
         try {
-            return $depositWithdraws[0]->depositValue;
+            if ($this->shift == 1) {
+                return $depositWithdraws->sum('depositValue');
+            } else {
+                return 0;
+            }
         } catch (\Exception $exc) {
             return 0;
         }
@@ -79,9 +88,9 @@ class Attendance extends Model {
         $endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
                         ['employee_id', '=', $this->employee_id],
-                        ['expenses_id', '=', 3],
-                        ['created_at', '>=', $startDate],
-                        ['created_at', '<=', $endDate]
+                        ['expenses_id', '=', EmployeeActions::SmallBorrow],
+                        ['due_date', '>=', $startDate],
+                        ['due_date', '<=', $endDate]
                 ])->get();
         try {
             return $depositWithdraws[0]->withdrawValue;
@@ -95,9 +104,9 @@ class Attendance extends Model {
         $endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
                         ['employee_id', '=', $this->employee_id],
-                        ['expenses_id', '=', 4],
-                        ['created_at', '>=', $startDate],
-                        ['created_at', '<=', $endDate]
+                        ['expenses_id', '=', EmployeeActions::LongBorrow],
+                        ['due_date', '>=', $startDate],
+                        ['due_date', '<=', $endDate]
                 ])->get();
         try {
             return $depositWithdraws[0]->withdrawValue;
@@ -105,20 +114,20 @@ class Attendance extends Model {
             return 0;
         }
     }
-    
+
     public function diffInHoursMinutsToString($startDate, $endDate) {
         $totalDuration = $endDate->diffInSeconds($startDate);
 
         return gmdate('H:i:s', $totalDuration);
     }
-    
+
     public function workingHoursToString() {
         $check_out = Carbon::parse($this->check_out);
         $check_in = Carbon::parse($this->check_in);
         $totalDuration = $check_out->diffInSeconds($check_in);
         return gmdate('H:i:s', $totalDuration);
     }
-    
+
     public function workingHoursToSeconds() {
         $check_out = Carbon::parse($this->check_out);
         $check_in = Carbon::parse($this->check_in);

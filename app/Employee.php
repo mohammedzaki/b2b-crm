@@ -40,23 +40,76 @@ class Employee extends Model {
     /* public function employeeBorrow() {
       return $this->hasMany('App\EmployeeBorrow', 'id');
       } */
-    
+
     public function employeeSmallBorrows() {
         DepositWithdraw::where([
-            ['employee_id', '=', $this->id],
-            ['expenses_id', '=', 3],
+                ['employee_id', '=', $this->id],
+                ['expenses_id', '=', 3],
         ]); //->get();
     }
-    
+
     public function employeeGuardianships($month) {
         //$startDate = Carbon::parse($this->date)->format('Y-m-d 00:00:00');
         //$endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
-                        ['employee_id', '=', $this->id]
-                ])
-                ->whereIn('expenses_id', ['1', '2'])
-                ->whereMonth('created_at', '=', $month)->get();
-                        
+                                ['employee_id', '=', $this->id]
+                        ])
+                        ->whereIn('expenses_id', ['1', '2'])
+                        ->whereMonth('created_at', '=', $month)->get();
+
         return $depositWithdraws;
     }
+
+    public function lastGuardianship() {
+        try {
+            $depositWithdraws = DepositWithdraw::where([
+                            ['employee_id', '=', $this->id],
+                            ['expenses_id', '=', EmployeeActions::Guardianship]
+                    ])->orderBy('id', 'desc')
+                    ->first();
+            return $depositWithdraws->withdrawValue;
+        } catch (\Exception $exc) {
+            return 0;
+        }
+    }
+
+    public function lastGuardianshipReturn() {
+        try {
+            $depositWithdraws = DepositWithdraw::where([
+                            ['employee_id', '=', $this->id],
+                            ['expenses_id', '=', EmployeeActions::GuardianshipReturn]
+                    ])->orderBy('id', 'desc')
+                    ->first();
+            return $depositWithdraws->depositValue;
+        } catch (\Exception $exc) {
+            return 0;
+        }
+    }
+
+    public function lastGuardianshipId() {
+        try {
+            $depositWithdraws = DepositWithdraw::where([
+                            ['employee_id', '=', $this->id],
+                            ['expenses_id', '=', EmployeeActions::Guardianship]
+                    ])->orderBy('id', 'desc')
+                    ->first();
+            return $depositWithdraws->id;
+        } catch (\Exception $exc) {
+            return 0;
+        }
+    }
+
+    public function lastGuardianshipReturnId() {
+        try {
+            $depositWithdraws = DepositWithdraw::where([
+                            ['employee_id', '=', $this->id],
+                            ['expenses_id', '=', EmployeeActions::GuardianshipReturn]
+                    ])->orderBy('id', 'desc')
+                    ->first();
+            return $depositWithdraws->id;
+        } catch (\Exception $exc) {
+            return 0;
+        }
+    }
+
 }

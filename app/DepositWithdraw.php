@@ -19,7 +19,8 @@ class DepositWithdraw extends Model {
         'supplier_id',
         'expenses_id',
         'payMethod',
-        'notes'
+        'notes',
+        'due_date'
     ];
 
 

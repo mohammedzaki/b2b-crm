@@ -247,7 +247,7 @@
                         <div class="col-lg-6 ">
                             <div class="form-group">
                                 <label>></label>
-                                {{ link_to_route('attendance.guardianshipaway', 'ترحيل العهدة', array('id' => 1), array('class' => 'btn btn-primary form-control')) }}
+                                {{ link_to_route('attendance.guardianshipaway', 'ترحيل العهدة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
                             </div>
                         </div>
                     </div>

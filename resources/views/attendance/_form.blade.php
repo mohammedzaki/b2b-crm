@@ -33,8 +33,7 @@
                             <div class="input-group">
                                 {{ Form::select('process_id', $processes, null, array(
                                         'class' => 'form-control',
-                                        'onchange' => 'ResetManagmentProcess()',
-                                        'placeholder' => '')) }}
+                                        'onchange' => 'ResetManagmentProcess()')) }}
                                 <span class="input-group-addon">
                                     {{ Form::checkbox('is_managment_process', '1', null, array('id' => 'is_managment_process', 'onchange' => 'ResetProcess()')) }} 
                                     {{ Form::label('is_managment_process', 'عمليات ادارية') }}
@@ -63,12 +62,23 @@
                 </div>
             </div>
             <div class="col-lg-6 ">
-                <div class="form-group">
+                <div class="form-group{{ $errors->has('is_second_shift') ? ' has-error' : '' }}">
                     <label>اليوم</label>
-                    {{ Form::text('date', null, array(
+                    <div class="input-group">
+                        {{ Form::text('date', null, array(
                                         "id" => "datepicker",
                                         'class' => 'form-control datepicker',
                                         'placeholder' => 'ادخل اليوم')) }}
+                        <span class="input-group-addon">
+                            {{ Form::checkbox('is_second_shift', '1', null, array('id' => 'is_second_shift')) }} 
+                            {{ Form::label('is_second_shift', 'وردية ثانية') }}
+                        </span>    
+                    </div><!-- /input-group -->
+                    @if ($errors->has('is_second_shift'))
+                    <label for="inputError" class="control-label">
+                        {{ $errors->first('is_second_shift') }}
+                    </label>
+                    @endif
                 </div>
                 <div class="row">
                     @if(!$checkin || isset($model))
@@ -301,7 +311,7 @@ function caluclateHours() {
     hours = hours-(days*24);
     minutes = minutes-(days*24*60)-(hours*60);
     seconds = seconds-(days*24*60*60)-(hours*60*60)-(minutes*60);
-    console.log('test: ' + hours + ":" + minutes, _startDate , _endDate);
+    //console.log('test: ' + hours + ":" + minutes, _startDate , _endDate);
     $('#working_hours').val(hours + ":" + minutes);
 }
 
@@ -349,7 +359,7 @@ function SetCheckIndatetime() {
     selecteddatepicker = $("#datepicker").val();
     //console.log(selecteddatepicker);
     $.get("{{ url('api/getEmployeesCheckinDate/') }}", 
-        {employee_id: $("#employee_id").val(), date: selecteddatepicker},
+        {employee_id: $("#employee_id").val(), date: selecteddatepicker, is_second_shift: $("#is_second_shift").is(":checked")},
         function (data) {
             console.log(data);
             check_inPickr.setDate(data, true);

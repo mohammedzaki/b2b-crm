@@ -844,10 +844,12 @@
             }
         });
         canEdit = $("#canEdit").val();
+        var due_date = '{{ $numbers["current_dayOfMonth"] }}-{{ $numbers["current_month"] + 1 }}-{{ $numbers["current_year"] }}';
         var formData = {
             checkDelete: checkDelete.val(),
             depositValue: depositValue.val(),
             withdrawValue: withdrawValue.val(),
+            due_date: due_date,
             recordDesc: recordDesc.val(),
             cbo_processes: cbo_processes.val(),
             client_id: client_id.val(),
