@@ -37,19 +37,23 @@ class ClientProcess extends Model {
     public function employee() {
         return $this->hasOne('App\Employee', 'id');
     }
-
-    public function deposits() {
+    
+    private function clientProcessDeposits() {
         return $this->hasMany('App\DepositWithdraw', 'cbo_processes');
     }
 
+    public function deposits() {
+        return $this->clientProcessDeposits()->where('client_id', $this->client->id)->get();
+    }
+
     public function totalDeposits() {
-        return $this->deposits()->where('client_id', $this->client->id)->sum('depositValue');
+        return $this->clientProcessDeposits()->where('client_id', $this->client->id)->sum('depositValue');
     }
 
     public function totalPriceAfterTaxes() {
         return ($this->total_price - $this->discountValue()) + $this->taxesValue();
     }
-    
+
     public function CheckProcessMustClosed() {
         if ($this->totalPriceAfterTaxes() == $this->totalDeposits()) {
             $this->status = 'closed';
@@ -64,7 +68,7 @@ class ClientProcess extends Model {
 
     public function discountValue() {
         if ($this->has_discount == "1") {
-            return $this->discount_value; //* ($this->discount_percentage / 100);
+            return $this->discount_value;
         }
         return 0;
     }
@@ -75,17 +79,16 @@ class ClientProcess extends Model {
         }
         return 0;
     }
-    
+
     public function taxesValue() {
         if ($this->require_bill == "1") {
-            //$facility = Facility::findOrFail(1);
-            //return ($this->total_price - $this->discountValue()) * $facility->getTaxesRate();
             return $this->taxes_value;
         }
         return 0;
     }
-    
+
     public static function allOpened() {
         return ClientProcess::where('status', 'active');
     }
+
 }

@@ -90,51 +90,53 @@ class DepositWithdrawController extends Controller {
     public function store(Request $request) {
         //$validator = $this->validator($request->all());
 
-        /*if ($validator->fails()) {
-            return response()->json(array(
-                        'success' => false,
-                        'message' => 'حدث حطأ في حفظ البيانات.',
-                        'errors' => $validator->getMessageBag()->toArray()
-            ));
-        } else {*/
-            if (isset($request->employee_id) && $request->expenses_id == EmployeeActions::Guardianship) {
-                
-                $employee = Employee::findOrFail($request->employee_id);
-                
-                $lG = $employee->lastGuardianship();
-                $lGR = $employee->lastGuardianshipReturn();
-                $lGId = $employee->lastGuardianshipId();
-                $lGRId = $employee->lastGuardianshipReturnId();
-                
-                if (($lG != $lGR) || ($lGId > $lGRId) ) {
-                    return response()->json(array(
-                                'success' => false,
-                                'message' => 'error $employee->lastGuardianship() != $employee->lastGuardianshipReturn()',
+        /* if ($validator->fails()) {
+          return response()->json(array(
+          'success' => false,
+          'message' => 'حدث حطأ في حفظ البيانات.',
+          'errors' => $validator->getMessageBag()->toArray()
+          ));
+          } else { */
+
+        // FIXME: رد عهدة مرتين
+        // FIXME: save with expense_id = null and value of deposit = 0
+        if (isset($request->employee_id) && $request->expenses_id == EmployeeActions::Guardianship) {
+
+            $employee = Employee::findOrFail($request->employee_id);
+
+            $lG = $employee->lastGuardianship();
+            $lGR = $employee->lastGuardianshipReturn();
+            $lGId = $employee->lastGuardianshipId();
+            $lGRId = $employee->lastGuardianshipReturnId();
+
+            if (($lG != $lGR) || ($lGId > $lGRId)) {
+                return response()->json(array(
+                            'success' => false,
+                            'message' => 'error $employee->lastGuardianship() != $employee->lastGuardianshipReturn()',
                                 //'errors' => $validator->getMessageBag()->toArray()
-                    ));
-                }
-                
-            } else if (isset($request->employee_id) && $request->expenses_id == EmployeeActions::GuardianshipReturn) {
-                $employee = Employee::findOrFail($request->employee_id);
-                if ($employee->lastGuardianship() != $request->depositValue) {
-                    return response()->json(array(
-                                'success' => false,
-                                'message' => 'error $employee->lastGuardianship() != $request->depositValue',
-                                //'errors' => $validator->getMessageBag()->toArray()
-                    ));
-                }
+                ));
             }
-            $all = $request->all();
-            $all['due_date'] = Carbon::parse($request->due_date);
-            $depositWithdraw = DepositWithdraw::create($all);
-            $this->CheckProcessClosed($depositWithdraw);
-            return response()->json(array(
-                        'success' => true,
-                        'id' => $depositWithdraw->id,
-                        'current_amount' => $this->CalculateCurrentAmount(),
-                        'message' => 'تم اضافة وارد جديد.',
+        } else if (isset($request->employee_id) && $request->expenses_id == EmployeeActions::GuardianshipReturn) {
+            $employee = Employee::findOrFail($request->employee_id);
+            if ($employee->lastGuardianship() != $request->depositValue) {
+                return response()->json(array(
+                            'success' => false,
+                            'message' => 'error $employee->lastGuardianship() != $request->depositValue',
+                                //'errors' => $validator->getMessageBag()->toArray()
+                ));
+            }
+        }
+        $all = $request->all();
+        $all['due_date'] = Carbon::parse($request->due_date);
+        $depositWithdraw = DepositWithdraw::create($all);
+        $this->CheckProcessClosed($depositWithdraw);
+        return response()->json(array(
+                    'success' => true,
+                    'id' => $depositWithdraw->id,
+                    'current_amount' => $this->CalculateCurrentAmount(),
+                    'message' => 'تم اضافة وارد جديد.',
                         //'errors' => $validator->getMessageBag()->toArray()
-            ));
+        ));
         //}
     }
 
@@ -159,7 +161,7 @@ class DepositWithdrawController extends Controller {
                     'rowsIds' => $rowsIds,
                     'current_amount' => $this->CalculateCurrentAmount(),
                     'message' => 'تم حفظ الوارد.',
-                    //'errors' => $validator->getMessageBag()->toArray()
+                        //'errors' => $validator->getMessageBag()->toArray()
         ));
     }
 
@@ -184,7 +186,7 @@ class DepositWithdrawController extends Controller {
                     'rowsIds' => $rowsIds,
                     'current_amount' => $this->CalculateCurrentAmount(),
                     'message' => 'تم حذف الوارد.',
-                    //'errors' => $validator->getMessageBag()->toArray()
+                        //'errors' => $validator->getMessageBag()->toArray()
         ));
     }
 
@@ -201,10 +203,10 @@ class DepositWithdrawController extends Controller {
         }
         $startDate = Carbon::parse($request['targetdate'])->format('Y-m-d 00:00:00');
         $endDate = Carbon::parse($request['targetdate'])->format('Y-m-d 23:59:59');
-        return $this->getDepositWithdrawsItems($startDate, $endDate, 1);
+        return $this->getDepositWithdrawsItems($startDate, $endDate, 1, TRUE);
     }
 
-    private function getDepositWithdrawsItems($startDate, $endDate, $canEdit) {
+    private function getDepositWithdrawsItems($startDate, $endDate, $canEdit, $isSearch = FALSE) {
         $numbers['clients_number'] = Client::count();
         $numbers['suppliers_number'] = Supplier::count();
         $numbers['process_number'] = ClientProcess::count();
@@ -215,13 +217,19 @@ class DepositWithdrawController extends Controller {
         $numbers['current_dayOfMonth'] = $dt->day;
         $numbers['current_month'] = $dt->month - 1;
         $numbers['current_year'] = $dt->year;
-
-        $clients = Client::select('id', 'name')->get();
+        if ($isSearch) {
+            $clients = Client::all();
+            $suppliers = Supplier::all();
+            $clientProcesses = ClientProcess::all();
+            $supplierProcesses = SupplierProcess::all();
+        } else {
+            $clients = Client::allHasOpenProcess();
+            $suppliers = Supplier::allHasOpenProcess();
+            $clientProcesses = ClientProcess::allOpened()->get();
+            $supplierProcesses = SupplierProcess::allOpened()->get();
+        }
         $employees = Employee::select('id', 'name')->get();
-        $suppliers = Supplier::select('id', 'name')->get();
         $expenses = Expenses::all();
-        $clientProcesses = ClientProcess::allOpened()->get();
-        $supplierProcesses = SupplierProcess::allOpened()->get();
         $depositWithdraws = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->get();
 
         $clients_tmp = [];
@@ -235,11 +243,7 @@ class DepositWithdrawController extends Controller {
         $payMethods[0] = "كاش";
         $payMethods[1] = "شيك";
 
-        $employeeActions = [];
-        $employeeActions[EmployeeActions::Guardianship] = "عهدة";
-        $employeeActions[EmployeeActions::GuardianshipReturn] = "رد عهدة";
-        $employeeActions[EmployeeActions::SmallBorrow] = "سلفة";
-        $employeeActions[EmployeeActions::LongBorrow] = "سلفة مستديمة";
+        $employeeActions = EmployeeActions::all();
 
         foreach ($clients as $client) {
             $clients_tmp[$client->id] = $client->name;
@@ -304,25 +308,25 @@ class DepositWithdrawController extends Controller {
         $all = $request->all();
         $validator = $this->validator($all, $depositWithdraw->id);
 
-        /*if ($validator->fails()) {
-            return response()->json(array(
-                        'success' => false,
-                        'message' => 'حدث حطأ في حفظ البيانات.',
-                        'errors' => $validator->getMessageBag()->toArray()
-            ));
-        } else {*/
-            
-            $all['due_date'] = Carbon::parse($request->due_date);
-            $depositWithdraw->update($all);
-            $this->CheckProcessClosed($depositWithdraw);
-            return response()->json(array(
-                        'success' => true,
-                        'id' => $depositWithdraw->id,
-                        '$depositWithdraw->cbo_processe' => $depositWithdraw->cbo_processes,
-                        'current_amount' => $this->CalculateCurrentAmount(),
-                        'message' => 'تم تعديل وارد جديد.',
+        /* if ($validator->fails()) {
+          return response()->json(array(
+          'success' => false,
+          'message' => 'حدث حطأ في حفظ البيانات.',
+          'errors' => $validator->getMessageBag()->toArray()
+          ));
+          } else { */
+
+        $all['due_date'] = Carbon::parse($request->due_date);
+        $depositWithdraw->update($all);
+        $this->CheckProcessClosed($depositWithdraw);
+        return response()->json(array(
+                    'success' => true,
+                    'id' => $depositWithdraw->id,
+                    '$depositWithdraw->cbo_processe' => $depositWithdraw->cbo_processes,
+                    'current_amount' => $this->CalculateCurrentAmount(),
+                    'message' => 'تم تعديل وارد جديد.',
                         //'errors' => $validator->getMessageBag()->toArray()
-            ));
+        ));
         //}
     }
 

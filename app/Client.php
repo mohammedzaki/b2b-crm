@@ -26,7 +26,14 @@ class Client extends Model {
     }
 
     public function closedProcess() {
-        return $this->hasManyThrough($related, $through);
+        //return $this->hasM //hasManyThrough($related, $through);
+    }
+    
+    public static function allHasOpenProcess() {
+        $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
+            ->select('clients.*')->where('client_processes.status', 'active')
+            ->get();
+        return $clients;
     }
 
 }

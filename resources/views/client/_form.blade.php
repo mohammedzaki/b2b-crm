@@ -5,80 +5,80 @@
         </div>
         <!-- /.panel-heading -->
         <div class="panel-body">
-        	<div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
-        	    {{ Form::label('name', 'اسم العميل') }} 
-        	    {{ Form::text('name', null, 
+            <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
+                {{ Form::label('name', 'اسم العميل') }} 
+                {{ Form::text('name', null, 
         	        array(
         	            'class' => 'form-control', 
         	            'placeholder' => 'ادخل اسم العميل')
         	        )
-        	    }}
-        	    @if ($errors->has('name'))
-        	    <label for="inputError" class="control-label">
-        	        {{ $errors->first('name') }}
-        	    </label>
-        	    @endif
-        	</div>
+                }}
+                @if ($errors->has('name'))
+                <label for="inputError" class="control-label">
+                    {{ $errors->first('name') }}
+                </label>
+                @endif
+            </div>
 
-        	<div class="form-group{{ $errors->has('address') ? ' has-error' : '' }}">
-        	    {{ Form::label('address', 'العنوان') }} 
-        	    {{ Form::text('address', null, 
+            <div class="form-group{{ $errors->has('address') ? ' has-error' : '' }}">
+                {{ Form::label('address', 'العنوان') }} 
+                {{ Form::text('address', null, 
         	        array(
         	            'class' => 'form-control', 
         	            'placeholder' => 'ادخل العنوان')
         	        )
-        	    }}
-        	    @if ($errors->has('address'))
-        	    <label for="inputError" class="control-label">
-        	        {{ $errors->first('address') }}
-        	    </label>
-        	    @endif
-        	</div>
-            
-        	<div class="form-group{{ $errors->has('telephone') ? ' has-error' : '' }}">
-        	    {{ Form::label('telephone', 'التليفون') }} 
-        	    {{ Form::text('telephone', null, 
+                }}
+                @if ($errors->has('address'))
+                <label for="inputError" class="control-label">
+                    {{ $errors->first('address') }}
+                </label>
+                @endif
+            </div>
+
+            <div class="form-group{{ $errors->has('telephone') ? ' has-error' : '' }}">
+                {{ Form::label('telephone', 'التليفون') }} 
+                {{ Form::text('telephone', null, 
         	        array(
         	            'class' => 'form-control', 
         	            'placeholder' => 'ادخل التليفون')
         	        )
-        	    }}
-        	    @if ($errors->has('telephone'))
-        	    <label for="inputError" class="control-label">
-        	        {{ $errors->first('telephone') }}
-        	    </label>
-        	    @endif
-        	</div>
+                }}
+                @if ($errors->has('telephone'))
+                <label for="inputError" class="control-label">
+                    {{ $errors->first('telephone') }}
+                </label>
+                @endif
+            </div>
 
-        	<div class="form-group{{ $errors->has('mobile') ? ' has-error' : '' }}">
-        	    {{ Form::label('mobile', 'المحمول') }} 
-        	    {{ Form::text('mobile', null, 
+            <div class="form-group{{ $errors->has('mobile') ? ' has-error' : '' }}">
+                {{ Form::label('mobile', 'المحمول') }} 
+                {{ Form::text('mobile', null, 
         	        array(
         	            'class' => 'form-control', 
         	            'placeholder' => 'ادخل المحمول')
         	        )
-        	    }}
-        	    @if ($errors->has('mobile'))
-        	    <label for="inputError" class="control-label">
-        	        {{ $errors->first('mobile') }}
-        	    </label>
-        	    @endif
-        	</div>
+                }}
+                @if ($errors->has('mobile'))
+                <label for="inputError" class="control-label">
+                    {{ $errors->first('mobile') }}
+                </label>
+                @endif
+            </div>
 
-        	<div class="form-group{{ $errors->has('credit_limit') ? ' has-error' : '' }}">
-        	    {{ Form::label('credit_limit', 'الحد اﻻئتماني') }} 
-        	    {{ Form::text('credit_limit', null, 
+            <div class="form-group{{ $errors->has('credit_limit') ? ' has-error' : '' }}">
+                {{ Form::label('credit_limit', 'الحد اﻻئتماني') }} 
+                {{ Form::text('credit_limit', null, 
         	        array(
         	            'class' => 'form-control', 
         	            'placeholder' => 'ادخل الحد اﻻئتماني')
         	        )
-        	    }}
-        	    @if ($errors->has('credit_limit'))
-        	    <label for="inputError" class="control-label">
-        	        {{ $errors->first('credit_limit') }}
-        	    </label>
-        	    @endif
-        	</div>
+                }}
+                @if ($errors->has('credit_limit'))
+                <label for="inputError" class="control-label">
+                    {{ $errors->first('credit_limit') }}
+                </label>
+                @endif
+            </div>
 
             <div class="legend">
                 {{ Form::checkbox('is_client_company', '1', null, 
@@ -97,41 +97,45 @@
             </div>
 
             <div class="hidden_input">
-            	<div class="col-lg-8">
-            		<div class="form-group{{ $errors->has('referral') ? ' has-error' : '' }}">
-            		    {{ Form::label('referral', 'اسم المندوب') }} 
-            		    {{ Form::text('referral', null, 
+                <div class="col-lg-8">
+                    <div class="form-group{{ $errors->has('referral') ? ' has-error' : '' }}">
+                        {{ Form::label('referral', 'اسم المندوب') }} 
+                        {{ Form::select('referral', $employees, null,
             		        array(
-            		            'class' => 'form-control', 
-            		            'placeholder' => 'ادخل اسم المندوب')
+            		            'class' => 'form-control')
             		        )
-            		    }}
-            		    @if ($errors->has('referral'))
-            		    <label for="inputError" class="control-label">
-            		        {{ $errors->first('referral') }}
-            		    </label>
-            		    @endif
-            		</div>
-            	</div>
+                        }}
+                        @if ($errors->has('referral'))
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('referral') }}
+                        </label>
+                        @endif
+                    </div>
+                </div>
 
-            	<div class="col-lg-4">
-                	<div class="form-group{{ $errors->has('referral_percentage') ? ' has-error' : '' }}">
-                	    {{ Form::label('referral_percentage', 'نسبة العمولة') }} 
-                	    {{ Form::text('referral_percentage', null, 
+                <div class="col-lg-4">
+                    <div class="form-group{{ $errors->has('referral_percentage') ? ' has-error' : '' }}">
+                        {{ Form::label('referral_percentage', 'نسبة العمولة') }} 
+
+                        <div class="input-group">
+                            {{ Form::text('referral_percentage', null, 
                 	        array(
                 	            'class' => 'form-control', 
-                	            'placeholder' => 'ادخل النسبة',
-                	            'style' => 'width: 100px;display: inline-block;'
+                	            'placeholder' => 'ادخل النسبة'
                 	            )
                 	        )
-                	    }} %
-                	    @if ($errors->has('referral_percentage'))
-                	    <label for="inputError" class="control-label">
-                	        {{ $errors->first('referral_percentage') }}
-                	    </label>
-                	    @endif
-                	</div>
-            	</div>
+                            }} 
+                            <span class="input-group-addon">
+                                %
+                            </span>    
+                        </div><!-- /input-group -->
+                        @if ($errors->has('referral_percentage'))
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('referral_percentage') }}
+                        </label>
+                        @endif
+                    </div>
+                </div>
             </div>
         </div>
         <!-- /.panel-body -->
@@ -147,13 +151,13 @@
         <div class="panel-body">
             <!-- authorized pepole -->
             <div class="authorized_people">
-            @if($authorized)
+                @if($authorized)
                 @for ($i = 0; $i < count($authorized); $i++)
                 <div class="authorized_person">
                     <div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div>
 
                     @if(isset($model))
-                        {{ Form::hidden('authorized['.$i.'][id]', $authorized[$i]['id']) }}
+                    {{ Form::hidden('authorized['.$i.'][id]', $authorized[$i]['id']) }}
                     @endif
 
                     <div class="form-group{{ $errors->has('authorized.'.$i.'.name') ? ' has-error' : '' }}">
@@ -185,7 +189,7 @@
                         </label>
                         @endif
                     </div>
-                       
+
                     <div class="form-group{{ $errors->has('authorized.'.$i.'.telephone') ? ' has-error' : '' }}">
                         {{ Form::label(null, 'التليفون') }} 
                         {{ Form::text('authorized['.$i.'][telephone]', $authorized[$i]['telephone'], 
@@ -217,7 +221,7 @@
                     </div>
                 </div>
                 @endfor
-            @endif
+                @endif
             </div>
             <!-- authorized pepole -->
             <button id="add_authorized_people" class="btn btn-success"><i class="fa fa-plus-square"></i> أضف</button>
@@ -230,9 +234,9 @@
     <div class="col-lg-6">
         <button class="btn btn-lg btn-block btn-success" type="submit">
             @if(isset($model))
-                تعديل بيانات عميل
+            تعديل بيانات عميل
             @else
-                أضف عميل جديد
+            أضف عميل جديد
             @endif
         </button>
     </div>

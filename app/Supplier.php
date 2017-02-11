@@ -23,5 +23,12 @@ class Supplier extends Model
     {
         return $this->hasMany('App\SupplierProcess');
     }
+    
+    public static function allHasOpenProcess() {
+        $clients = Supplier::join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
+            ->select('suppliers.*')->where('supplier_processes.status', 'active')
+            ->get();
+        return $clients;
+    }
 
 }

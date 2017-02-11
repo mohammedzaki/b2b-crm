@@ -27,10 +27,11 @@ class SupplierProcessController extends Controller {
                     'supplier_id' => 'required|exists:suppliers,id',
                     'employee_id' => 'required|exists:employees,id',
                     'notes' => 'string',
-                    'has_discount' => 'boolean',
-                    'discount_value' => 'required_with:has_discount|numeric',
-                    'discount_reason' => 'required_with:has_discount|string',
-                    'require_bill' => 'boolean',
+                    // FIXME: Solve validation 
+                    //'has_discount' => 'boolean',
+                    //'discount_value' => 'required_with:has_discount|numeric',
+                    //'discount_reason' => 'required_with:has_discount|string',
+                    //'require_bill' => 'boolean',
                     'total_price' => 'required|numeric',
                     'items.*.description' => 'required|string',
                     'items.*.quantity' => 'required|numeric',
@@ -65,7 +66,7 @@ class SupplierProcessController extends Controller {
 
     public function create() {
         $suppliers = Supplier::select('id', 'name')->get();
-        $clients = Client::all();
+        $clients = Client::allHasOpenProcess();
         $employees = Employee::select('id', 'name')->get();
         $clientProcesses = ClientProcess::allOpened()->get();
         $suppliers_tmp = [];
@@ -244,31 +245,30 @@ class SupplierProcessController extends Controller {
         SupplierProcessItem::withTrashed()->where('process_id', $id)->restore();
         return redirect()->route('supplier.process.index')->with('success', 'تم استرجاع العملية.');
     }
-    
+
     /*
-    public function getSupplierProcesses(Request $request) {
-        $input = $request->input('option');
-        $clientProcesses = SupplierProcess::allOpened()->where('supplier_id', $input)->get();
-        $clientProcesses_tmp = [];
-        foreach ($clientProcesses as $process) {
-            $clientProcesses_tmp[$process->id] = $process->name;
-        }
-        $clientProcesses = $clientProcesses_tmp;
-        return response()->json($clientProcesses);
-    }
+      public function getSupplierProcesses(Request $request) {
+      $input = $request->input('option');
+      $clientProcesses = SupplierProcess::allOpened()->where('supplier_id', $input)->get();
+      $clientProcesses_tmp = [];
+      foreach ($clientProcesses as $process) {
+      $clientProcesses_tmp[$process->id] = $process->name;
+      }
+      $clientProcesses = $clientProcesses_tmp;
+      return response()->json($clientProcesses);
+      }
 
-    public function getSupplierReportProcesses(Request $request) {
-        $input = $request->input('option');
-        $supplierProcesses = SupplierProcess::where('supplier_id', $input)->get();
+      public function getSupplierReportProcesses(Request $request) {
+      $input = $request->input('option');
+      $supplierProcesses = SupplierProcess::where('supplier_id', $input)->get();
 
-        $supplierProcesses_tmp = [];
-        foreach ($supplierProcesses as $process) {
-            $supplierProcesses_tmp[$process->id]['name'] = $process->name;
-            $supplierProcesses_tmp[$process->id]['totalPrice'] = $process->total_price;
-            $supplierProcesses_tmp[$process->id]['status'] = $process->status;
-        }
-        $supplierProcesses = $supplierProcesses_tmp;
-        return response()->json($supplierProcesses);
-    }*/
-
+      $supplierProcesses_tmp = [];
+      foreach ($supplierProcesses as $process) {
+      $supplierProcesses_tmp[$process->id]['name'] = $process->name;
+      $supplierProcesses_tmp[$process->id]['totalPrice'] = $process->total_price;
+      $supplierProcesses_tmp[$process->id]['status'] = $process->status;
+      }
+      $supplierProcesses = $supplierProcesses_tmp;
+      return response()->json($supplierProcesses);
+      } */
 }

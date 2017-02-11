@@ -10,6 +10,7 @@ class SupplierProcess extends Model {
     use SoftDeletes;
 
     protected $dates = ['deleted_at'];
+    
     protected $fillable = [
         'name',
         'client_process_id',
@@ -38,17 +39,17 @@ class SupplierProcess extends Model {
     public function employee() {
         return $this->hasOne('App\Employee', 'id');
     }
-
-    public function clientProcess() {
-        return $this->belongsTo('App\ClientProcess');
+    
+    private function supplierProcessWithdrawals() {
+        return $this->hasMany('App\DepositWithdraw', 'cbo_processes');
     }
     
     public function withdrawals() {
-        return $this->hasMany('App\DepositWithdraw', 'cbo_processes');
+        return $this->supplierProcessWithdrawals()->where('supplier_id', $supplierProcess->supplier->id)->get();
     }
 
     public function totalWithdrawals() {
-        return $this->withdrawals()->where('supplier_id', $this->supplier->id)->sum('withdrawValue');
+        return $this->supplierProcessWithdrawals()->where('supplier_id', $this->supplier->id)->sum('withdrawValue');
     }
 
     public function totalPriceAfterTaxes() {

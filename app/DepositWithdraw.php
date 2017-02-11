@@ -13,11 +13,13 @@ class DepositWithdraw extends Model {
         'depositValue',
         'withdrawValue',
         'recordDesc',
+        
         'cbo_processes',
         'client_id',
         'employee_id',
         'supplier_id',
         'expenses_id',
+        
         'payMethod',
         'notes',
         'due_date'
@@ -41,6 +43,6 @@ class DepositWithdraw extends Model {
     }
 
     public function expenses() {
-        return $this->hasOne('App\expenses', 'id');
+        return $this->hasOne('App\Expenses', 'id');
     }
 }

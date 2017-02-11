@@ -1,7 +1,6 @@
 @section('script_taxes')
 <script>
-var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
-</script>
+    var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};</script>
 @endsection
 <div class="row">
     <div class="col-lg-4">
@@ -101,15 +100,20 @@ var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
 
                         <div class="col-lg-5">
                             <div class="form-group{{ $errors->has('discount_percentage') ? ' has-error' : '' }}">
-                                {{ Form::label('discount_percentage', 'نسبة الخصم') }} 
-                                {{ Form::text('discount_percentage', null, 
-                                    array(
-                                        'id' => 'discount_percentage',
-                                        'class' => 'form-control', 
-                                        'placeholder' => 'ادخل النسبة'
+                                {{ Form::label('discount_percentage', 'نسبة الخصم') }}
+                                <div class="input-group">
+                                    {{ Form::text('discount_percentage', null, 
+                                        array(
+                                            'id' => 'discount_percentage',
+                                            'class' => 'form-control', 
+                                            'placeholder' => 'ادخل النسبة'
+                                            )
                                         )
-                                    )
-                                }}
+                                    }}
+                                    <span class="input-group-addon">
+                                        %
+                                    </span>    
+                                </div><!-- /input-group -->
                                 @if ($errors->has('discount_percentage'))
                                 <label for="inputError" class="control-label">
                                     {{ $errors->first('discount_percentage') }}
@@ -170,7 +174,7 @@ var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
                 {{ Form::hidden('total_price') }}
                 {{ Form::hidden('total_price_taxes') }}
                 {{ Form::hidden('taxes_value') }}
-                
+
             </div>
             <!-- /.panel-body -->
         </div>
@@ -312,35 +316,33 @@ var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
     var cbo_processes = $('#client_process_id');
     var client_id = $('#client_id');
     $(document).ready(function ($) {
-        $('#client_id').change(function () {
-            
-            cbo_processes.empty();
-            cbo_processes.append($("<option></option>"));
-            
-            $.each(clientProcesses, function (key, process) {
-                //console.log(process);
-                if (process.client_id == client_id.val()) {
-                    cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
-                }
-            });  
-        });
+    $('#client_id').change(function () {
+
+    cbo_processes.empty();
+    cbo_processes.append($("<option></option>"));
+    $.each(clientProcesses, function (key, process) {
+    //console.log(process);
+    if (process.client_id == client_id.val()) {
+    cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+    }
+    });
+    });
     });
     LoadProcess();
     function LoadProcess() {
-        var clientprocesses_val = "@if(isset($model)) {{ $process->client_process_id }} @else -1 @endif";//$("#client_process_id").val();
-        //alert(clientprocesses_val);
-        cbo_processes.empty();
-        cbo_processes.append($("<option></option>"));
-
-        $.each(clientProcesses, function (key, process) {
-            //console.log(process);
-            if (process.client_id == client_id.val()) {
-                if (process.id == clientprocesses_val) {
-                    cbo_processes.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
-                } else {
-                    cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
-                }
-            }
-        }); 
+    var clientprocesses_val = "@if(isset($model)) {{ $process->client_process_id }} @else -1 @endif"; //$("#client_process_id").val();
+    //alert(clientprocesses_val);
+    cbo_processes.empty();
+    cbo_processes.append($("<option></option>"));
+    $.each(clientProcesses, function (key, process) {
+    //console.log(process);
+    if (process.client_id == client_id.val()) {
+    if (process.id == clientprocesses_val) {
+    cbo_processes.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
+    } else {
+    cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+    }
+    }
+    });
     }
 </script>

@@ -1,22 +1,20 @@
 <?php
 
 /*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
+  |--------------------------------------------------------------------------
+  | Web Routes
+  |--------------------------------------------------------------------------
+  |
+  | Here is where you can register web routes for your application. These
+  | routes are loaded by the RouteServiceProvider within a group which
+  | contains the "web" middleware group. Now create something great!
+  |
+ */
 
 Route::auth();
 
 Route::get('/', 'DashboardController@index');
 Route::get('/home', 'DashboardController@index');
-//Route::get('/dashboard/store', 'DashboardController@store');
-
 
 Route::resource('dashboard', 'DashboardController');
 
@@ -68,33 +66,29 @@ Route::get('/attendance/printSalaryReport/{id}', 'AttendanceController@printSala
 
 Route::resource('attendance', 'AttendanceController');
 
-//Route::get('/attendance/employee', 'AttendanceController@employee')->name('attendance.employee');;
-
 Route::resource('feasibilityStudy', 'FeasibilityStudyController');
 
 //api
 Route::group(['prefix' => 'api'], function() {
-    //Route::get('getClientProcesses', 'ClientProcessController@getClientProcesses');
-    //Route::get('getSupplierProcesses', 'SupplierProcessController@getSupplierProcesses');
     Route::get('getEmployeesCheckinDate', 'AttendanceController@getEmployeesCheckinDate');
     Route::get('getTaxesRate', 'FacilityController@getTaxesRate');
-    
 });
 
 //reports
 Route::group(['prefix' => 'reports'], function() {
-    Route::get('/', 'ReportsController@index');
-    Route::get('client/', 'ReportsController@client');
-    Route::get('client/printTotalPDF', 'ReportsController@printTotalPDF');
-    Route::get('client/printDetailedPDF', 'ReportsController@printDetailedPDF');
-    Route::any('client/viewClientReport', 'ReportsController@viewClientReport')->name('reports.client.viewClientReport');
-    Route::get('client/getClientProcesses', 'ClientProcessController@getClientReportProcesses');
+
+    Route::group(['prefix' => 'client'], function() {
+        Route::get('/', 'Reports\ClientReportsController@index');
+        Route::get('printTotalPDF', 'Reports\ClientReportsController@printTotalPDF');
+        Route::get('printDetailedPDF', 'Reports\ClientReportsController@printDetailedPDF');
+        Route::any('viewClientReport', 'Reports\ClientReportsController@viewReport')->name('reports.client.viewClientReport');
+    });
 
     Route::group(['prefix' => 'supplier'], function() {
-        Route::get('/', 'ReportsController@supplier');
-        Route::get('printTotalPDF', 'ReportsController@printSupplierTotalPDF');
-        Route::get('printDetailedPDF', 'ReportsController@printSupplierDetailedPDF');
-        Route::any('viewSupplierReport', 'ReportsController@viewSupplierReport')->name('reports.supplier.viewSupplierReport');
-        Route::get('getSupplierProcesses', 'SupplierProcessController@getSupplierReportProcesses');
+        Route::get('/', 'Reports\SupplierReportsController@index');
+        Route::get('printTotalPDF', 'Reports\SupplierReportsController@printTotalPDF');
+        Route::get('printDetailedPDF', 'Reports\SupplierReportsController@printDetailedPDF');
+        Route::any('viewSupplierReport', 'Reports\SupplierReportsController@viewReport')->name('reports.supplier.viewSupplierReport');
     });
+    
 });

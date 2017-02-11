@@ -1,7 +1,7 @@
 
 @section('script_taxes')
 <script>
-var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
+    var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
 </script>
 @endsection
 
@@ -88,15 +88,19 @@ var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
                         <div class="col-lg-5">
                             <div class="form-group{{ $errors->has('discount_percentage') ? ' has-error' : '' }}">
                                 {{ Form::label('discount_percentage', 'نسبة الخصم') }} 
-                                {{ Form::text('discount_percentage', null, 
-                                    array(
-                                        'id' => 'discount_percentage',
-                                        'class' => 'form-control', 
-                                        'placeholder' => 'ادخل النسبة'
+                                <div class="input-group">
+                                    {{ Form::text('discount_percentage', null, 
+                                        array(
+                                            'id' => 'discount_percentage',
+                                            'class' => 'form-control', 
+                                            'placeholder' => 'ادخل النسبة'
+                                            )
                                         )
-                                    )
-                                }}
-                                
+                                    }}
+                                    <span class="input-group-addon">
+                                        %
+                                    </span>    
+                                </div><!-- /input-group -->
                                 @if ($errors->has('discount_percentage'))
                                 <label for="inputError" class="control-label">
                                     {{ $errors->first('discount_percentage') }}
@@ -153,7 +157,7 @@ var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
                         {{ Form::label('require_bill', 'فاتورة') }}
                     </div>
                 </div>
-                
+
                 {{ Form::hidden('total_price') }}
                 {{ Form::hidden('total_price_taxes') }}
                 {{ Form::hidden('taxes_value') }}

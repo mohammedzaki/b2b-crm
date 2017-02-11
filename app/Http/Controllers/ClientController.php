@@ -7,6 +7,7 @@ use App\Http\Requests;
 use App\Client;
 use App\AuthorizedPerson;
 use App\User;
+use App\Employee;
 use Validator;
 
 class ClientController extends Controller {
@@ -22,8 +23,8 @@ class ClientController extends Controller {
                     'address' => 'required|string',
                     'telephone' => 'digits_between:8,14',
                     'mobile' => 'required|numeric',
-                    'referral' => 'required_without:is_client_company|exists:users,username',
-                    'referral_percentage' => 'required_without:is_client_company|required_with:referral|numeric',
+                    //'referral' => 'required_without:is_client_company|exists:users,username',
+                    //'referral_percentage' => 'required_without:is_client_company|required_with:referral|numeric',
                     'credit_limit' => 'required|numeric',
                     'is_client_company' => 'boolean',
                     'authorized.*.name' => 'required|string',
@@ -37,8 +38,8 @@ class ClientController extends Controller {
             'address' => 'العنوان',
             'telephone' => 'التليفون',
             'mobile' => 'المحمول',
-            'referral' => 'اسم المندوب',
-            'referral_percentage' => 'نسبة العمولة',
+            //'referral' => 'اسم المندوب',
+            //'referral_percentage' => 'نسبة العمولة',
             'credit_limit' => 'الحد اﻻئتماني',
             'is_client_company' => 'عميل شركة',
             'authorized.*.name' => 'اسم الشخص المفوض',
@@ -56,7 +57,13 @@ class ClientController extends Controller {
     }
 
     public function create() {
-        return view('client.create');
+        $employees = Employee::select('id', 'name')->get();
+        $employees_tmp[-1] = "اختر اسم المندوب";
+        foreach ($employees as $employee) {
+            $employees_tmp[$employee->id] = $employee->name;
+        }
+        $employees = $employees_tmp;
+        return view('client.create', compact('employees'));
     }
 
     public function store(Request $request) {
@@ -72,7 +79,7 @@ class ClientController extends Controller {
                 $all['referral_id'] = null;
                 $all['referral_percentage'] = null;
             } else {
-                $all['referral_id'] = User::where('username', $all['referral'])->first()->id;
+                //$all['referral_id'] = //User::where('username', $all['referral'])->first()->id;
                 $all['is_client_company'] = false;
             }
 
