@@ -62,7 +62,8 @@ Route::get('/attendance/checkin', 'AttendanceController@checkin')->name('attenda
 Route::get('/attendance/checkout', 'AttendanceController@checkout')->name('attendance.checkout');
 Route::get('/attendance/guardianship/{employee_id}', 'AttendanceController@guardianship')->name('attendance.guardianship');
 Route::get('/attendance/guardianshipaway/{employee_id}', 'AttendanceController@guardianshipaway')->name('attendance.guardianshipaway');
-Route::get('/attendance/printSalaryReport/{id}', 'AttendanceController@printSalaryReport')->name('attendance.printSalaryReport');
+Route::get('/attendance/printSalaryReport/{employee_id}', 'AttendanceController@printSalaryReport')->name('attendance.printSalaryReport');
+Route::post('/attendance/paySalary/{employee_id}', 'AttendanceController@payEmpolyeeSalary')->name('attendance.payEmpolyeeSalary');
 
 Route::resource('attendance', 'AttendanceController');
 

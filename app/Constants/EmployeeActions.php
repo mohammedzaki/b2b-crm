@@ -1,10 +1,6 @@
 <?php
 
-namespace App;
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
-use App\DepositWithdraw;
+namespace App\Constants;
 
 class EmployeeActions {
 
@@ -12,6 +8,7 @@ class EmployeeActions {
     const GuardianshipReturn = 2;
     const SmallBorrow = 3;
     const LongBorrow = 4;
+    const TakeSalary = 5;
 
     public static function all() {
         $employeeActions = [];
@@ -19,6 +16,8 @@ class EmployeeActions {
         $employeeActions[EmployeeActions::GuardianshipReturn] = "رد عهدة";
         $employeeActions[EmployeeActions::SmallBorrow] = "سلفة";
         $employeeActions[EmployeeActions::LongBorrow] = "سلفة مستديمة";
+        //$employeeActions[EmployeeActions::TakeSalary] = "مرتبات";
         return $employeeActions;
     }
+
 }

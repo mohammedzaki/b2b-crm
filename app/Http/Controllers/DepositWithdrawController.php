@@ -16,7 +16,8 @@ use App\SupplierProcess;
 use App\DepositWithdraw;
 use App\Facility;
 use App\User;
-use App\EmployeeActions;
+use App\Constants\EmployeeActions;
+use App\Constants\PaymentMethods;
 use Validator;
 
 class DepositWithdrawController extends Controller {
@@ -238,11 +239,7 @@ class DepositWithdrawController extends Controller {
         $expenses_tmp = [];
         $clientProcesses_tmp = [];
         $supplierProcesses_tmp = [];
-        $payMethod = [];
-        $payMethods = [];
-        $payMethods[0] = "كاش";
-        $payMethods[1] = "شيك";
-
+        $payMethods = PaymentMethods::all();
         $employeeActions = EmployeeActions::all();
 
         foreach ($clients as $client) {

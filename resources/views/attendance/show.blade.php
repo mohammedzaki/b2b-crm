@@ -13,6 +13,7 @@
     </div>
 </div>
 <form method="get" id="SearchForm" action="" >
+    {{ csrf_field() }}
     <row>
         @if (session('success'))
             <div class="alert alert-success">
@@ -35,6 +36,7 @@
                     <div class="col-lg-6 ">
                         <div class="form-group{{ $errors->has('id') ? ' has-error' : '' }}">
                             {{ Form::label('id', 'اسم الموظف') }}
+                            {{ Form::hidden('employee_id', $employee_id, array('id' => 'employee_id', 'name' => '')) }}
                             {{ Form::select('id', $employees, $employee_id, 
                                         array(
                                         'name' => '',
@@ -67,6 +69,7 @@
         </div>
     </row>
 </form>
+@if ($hasData)
 <row class="col-lg-12 clearboth">
     <div class="row">
         <div class="col-lg-12">
@@ -253,8 +256,8 @@
                     </div>
                     <div class="form-group col-lg-3">
                         <label>الصافى المستحق</label>
-                        {{ Form::text('HourlyRate', $totalNetSalary, array(
-                                        "id" => "HourlyRate",
+                        {{ Form::text('TotalNetSalary', $totalNetSalary, array(
+                                        "id" => "TotalNetSalary",
                                         'class' => 'form-control')) }}
                     </div>
                 </div>
@@ -266,7 +269,7 @@
                     </div>
                     <div class="col-lg-6">
                         <div class="form-group">
-                            <button class="btn btn-danger form-control" type="button" onclick="SubmitSearchPrintReport()">دفع المرتب</button>
+                            <button class="btn btn-danger form-control" type="button" onclick="SubmitPaySalary()">دفع المرتب</button>
                         </div>
                     </div>
                 </div>
@@ -276,6 +279,7 @@
         <!-- /.panel -->
     </div>
 </row>
+@endif
 @endsection
 @section('scripts')
 <script src="{{ url('/vendors/flatpickr/dist/flatpickr.min.js') }}"></script>
@@ -298,12 +302,26 @@
         $('#SearchForm').prop('action', empId).submit();
     }
     function SubmitSearchGuardianship() {
-        var empId = $("#id").val();
+        var empId = $("#employee_id").val();
         $('#SearchForm').prop('action', 'guardianship/' + empId).submit();
     }
     function SubmitSearchPrintReport() {
-        var empId = $("#id").val();
+        var empId = $("#employee_id").val();
         $('#SearchForm').prop('action', 'printSalaryReport/' + empId).submit();
+    }
+    function SubmitPaySalary() {
+        var empId = $("#employee_id").val();
+        /*if (empId == '') {
+            return alert('يجب اختيار موظف اولا.');
+        }*/
+        if (ConfirmPay()) {
+            
+            $('#SearchForm').append('<input type="hidden" name="totalNetSalary" value="' + $('#TotalNetSalary').val() + '" />');
+            $('#SearchForm').prop('method', 'post').prop('action', 'paySalary/' + empId).submit();
+        }
+    }
+    function ConfirmPay() {
+        return confirm("هل انت متأكد من دفع المرتب ؟");
     }
 </script>
 @endsection

@@ -321,7 +321,7 @@ function SubmitCheck(checkType) {
     } else if (checkType == 2) {
         $('#attendanceForm').append('<input type="hidden" name="checkin" value="0" /> <input type="hidden" id="check_out" name="check_out" value="' + $('#check_out').val() + '"/>');
     } else if (checkType == 3) {
-        
+        $('#attendanceForm').append('<input type="hidden" name="checkin" value="-1" />');
     }
     $('#attendanceForm').submit();
 }

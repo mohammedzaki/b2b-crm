@@ -18,6 +18,8 @@ use App\Facility;
 use App\AbsentType;
 use App\User;
 use App\DepositWithdraw;
+use App\Constants\EmployeeActions;
+use App\Constants\PaymentMethods;
 use Validator;
 
 class AttendanceController extends Controller {
@@ -31,7 +33,7 @@ class AttendanceController extends Controller {
         $this->middleware('auth');
         //$this->middleware('ability:admin,deposit-withdraw');
     }
-
+    
     /**
      * Display a listing of the resource.
      *
@@ -187,7 +189,14 @@ class AttendanceController extends Controller {
                     ])
                     ->orderBy('id', 'desc')
                     ->first();
-            if (empty($attendance)) {
+            if ($request->checkin == -1) {
+                $attendance = Attendance::firstOrCreate([
+                                ["date", "=", $all['date']],
+                                ["employee_id", "=", $all['employee_id']]
+                ]);
+                $all['absent_check'] = TRUE;
+                goto skip;
+            } else if (empty($attendance)) {
                 if (isset($request->is_second_shift)) {
                     $errors['is_second_shift'] = "يجب تسجيل الوردية الاولى اولا";
                     return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($errors);
@@ -265,6 +274,7 @@ class AttendanceController extends Controller {
         $employees = Employee::all();
         $dt = Carbon::parse($request->date);
         $hourlyRate = 0;
+        $hasData = FALSE;
         if ($id == "all") {
             $attendances = []; //Attendance::all();
             $employee_id = 0;
@@ -275,6 +285,7 @@ class AttendanceController extends Controller {
             $attendances = Attendance::where([
                             ['employee_id', '=', $id]
                     ])->whereMonth('date', '=', $dt->month)->get();
+            $hasData = TRUE;
         }
         $date = $request->date;
         $employee_id = $id;
@@ -333,7 +344,7 @@ class AttendanceController extends Controller {
             $employees_tmp[$employee->id] = $employee->name;
         }
         $employees = $employees_tmp;
-        return view('attendance.show', compact(['employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date']));
+        return view('attendance.show', compact(['employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date', 'hasData']));
     }
 
     /**
@@ -499,23 +510,22 @@ class AttendanceController extends Controller {
         return redirect()->back()->with('success', 'تم الترحيل');
     }
 
-    public function printSalaryReport(Request $request, $id) {
+    public function printSalaryReport(Request $request, $employee_id) {
         $employees = Employee::all();
         $dt = Carbon::parse($request->date);
         $hourlyRate = 0;
-        if ($id == "all") {
+        if ($employee_id == "all") {
             $attendances = []; //Attendance::all();
             $employee_id = 0;
             $date = null;
         } else {
-            $employee = Employee::findOrFail($id);
+            $employee = Employee::findOrFail($employee_id);
             $hourlyRate = $employee->daily_salary / $employee->working_hours;
             $attendances = Attendance::where([
-                            ['employee_id', '=', $id]
+                            ['employee_id', '=', $employee_id]
                     ])->whereMonth('date', '=', $dt->month)->get();
         }
         $date = $request->date;
-        $employee_id = $id;
         $employees_tmp = [];
         $totalWorkingHours = 0;
         $totalSalaryDeduction = 0;
@@ -577,6 +587,34 @@ class AttendanceController extends Controller {
         return $pdfReport->RenderReport();
     }
 
+    public function payEmpolyeeSalary(Request $request, $employee_id) {
+        try {
+            $employee = Employee::findOrFail($employee_id);
+            $dt = Carbon::parse($request->date);
+            $all['due_date'] = Carbon::today();
+            $all['withdrawValue'] = $request->totalNetSalary;
+            $all['recordDesc'] = "دفع مرتب {$employee->name}";
+            $all['employee_id'] = $employee_id;
+            $all['payMethod'] = PaymentMethods::CASH;
+            $all['expenses_id'] = EmployeeActions::TakeSalary;
+            $all['notes'] = $dt;
+
+            $depositWithdraw = DepositWithdraw::where([
+                            ['employee_id', '=', $employee_id],
+                            ['expenses_id', '=', EmployeeActions::TakeSalary]
+                    ])->whereMonth('notes', '=', $dt->month)->first();
+            
+            if (empty($depositWithdraw)) {
+                DepositWithdraw::create($all);
+                return redirect()->back()->with('success', 'تم دفع المرتب');
+            } else {
+                return redirect()->back()->withInput($request->all())->with('error', 'لقد تم دفع المرتب من قبل');
+            }
+        } catch (\Exception $exc) {
+            return redirect()->back()->withInput($request->all())->with('error', 'حدث حطأ في حفظ البيانات.');
+        }
+    }
+
     public function getEmployeesCheckinDate(Request $request) {
         $shift = ($request->is_second_shift == "true" ? 2 : 1);
         $attendance = Attendance::where([
@@ -589,5 +627,4 @@ class AttendanceController extends Controller {
         else
             return $attendance->check_in;
     }
-
 }
