@@ -260,43 +260,44 @@
                     @endif
                 </div>
             </div>
-
-            <div class="col-lg-6"> 
-                <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
-                    {{ Form::label('username', 'اسم المستخدم') }}
-                    {{ Form::text('username', null, 
+            <div class="hidden_input02">
+                <div class="col-lg-6"> 
+                    <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
+                        {{ Form::label('username', 'اسم المستخدم') }}
+                        {{ Form::text('username', null, 
                         array(
                             'class' => 'form-control', 
                             'placeholder' => 'ادخل اسم المستخدم')
                         )
-                    }}
-                    @if ($errors->has('username'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('username') }}
-                    </label>
-                    @endif
+                        }}
+                        @if ($errors->has('username'))
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('username') }}
+                        </label>
+                        @endif
+                    </div>
                 </div>
-            </div>
 
-            <div class="clearboth"></div>
+                <div class="clearboth"></div>
 
-            <div class="col-lg-6"> 
-                <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                    {{ Form::label('password', 'كلمة المرور') }}
-                    {{ Form::password('password', 
+                <div class="col-lg-6"> 
+                    <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
+                        {{ Form::label('password', 'كلمة المرور') }}
+                        {{ Form::password('password', 
                         array(
                             'class' => 'form-control', 
                             'placeholder' => 'ادخل كلمة المرور')
                         )
-                    }}
-                    @if ($errors->has('password'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('password') }}
-                    </label>
-                    @endif
+                        }}
+                        @if ($errors->has('password'))
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('password') }}
+                        </label>
+                        @endif
+                    </div>
                 </div>
             </div>
-
+            
             <div class="col-lg-12 no-padding">
                 <div class="legend">
                     {{ Form::checkbox('borrow_system', '1', null, 
@@ -345,7 +346,7 @@
         </div>
         <!-- /.panel-heading -->
         <div class="panel-body">
-            <div class="table-responsive">
+            <div class="table-responsive hidden_input02">
                 <table class="table table-striped table-bordered table-hover">
                     <thead>
                         <tr>
@@ -375,7 +376,11 @@
             </div>
             <div class="form-group text-danger">
                 <label class="checkbox-inline">
-                    {{ Form::checkbox('can_not_use_program') }}عدم استخدام البرنامج
+                    {{ Form::checkbox('can_not_use_program', 1, null,
+                        array(
+                            'id' => 'can_not_use_program',
+                            'class' => 'can_not_use_program'
+                        )) }}عدم استخدام البرنامج
                 </label>
             </div>
         </div>

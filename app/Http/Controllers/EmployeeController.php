@@ -39,8 +39,8 @@ class EmployeeController extends Controller {
                     'can_not_use_program' => 'boolean',
                     'is_active' => 'boolean',
                     'borrow_system' => 'boolean',
-                    'username' => 'unique:users,username',
-                    'password' => 'min:4'
+                    'username' => 'required_without:can_not_use_program|unique:users,username',
+                    'password' => 'required_without:can_not_use_program'
         ]);
 
         $validator->setAttributeNames([
@@ -103,32 +103,26 @@ class EmployeeController extends Controller {
             $employee->borrow_system = ($request->borrow_system) ? $request->borrow_system : false;
             $employee->save();
 
-            $user = new User();
-            if ($request->username) {
+            if ($employee->can_not_use_program) {
+                $user = new User();
                 $user->username = $request->username;
-            } else {
-                $user->username = "user_" . str_random(5);
-            }
-            if ($request->password) {
                 $user->password = bcrypt($request->password);
-            } else {
-                $user->password = bcrypt(str_random(40));
-            }
-            $user->employee_id = $employee->id;
-            $user->save();
-            
-            /* create new user role */
-            $role = new Role();
-            $role->name = 'role_' . $employee->id;
-            $role->save();
-            /* attatch role to user */
-            $user->attachRole($role);
-            /* attatch permissions to role */
-            if ($request->permissions) {
-                foreach ($request->permissions as $permission) {
-                    $role->attachPermission(Permission::find($permission));
+                $user->employee_id = $employee->id;
+                $user->save();
+                /* create new user role */
+                $role = new Role();
+                $role->name = 'role_' . $employee->id;
+                $role->save();
+                /* attatch role to user */
+                $user->attachRole($role);
+                /* attatch permissions to role */
+                if ($request->permissions) {
+                    foreach ($request->permissions as $permission) {
+                        $role->attachPermission(Permission::find($permission));
+                    }
                 }
             }
+
             return redirect()->route('employee.index')
                             ->with('success', 'تم اضافة موظف جديد.');
         }
@@ -149,7 +143,7 @@ class EmployeeController extends Controller {
         $employee->delete();
         $user->delete();
 
-            return redirect()->back()->with('success', 'تم حذف موظف.');
+        return redirect()->back()->with('success', 'تم حذف موظف.');
     }
 
     public function trash() {
@@ -224,16 +218,19 @@ class EmployeeController extends Controller {
             $employee->borrow_system = $request->borrow_system;
             $employee->save();
 
-            $role = $user->roles->first();
-            $role->detachPermissions($role->permissions);
+            if ($employee->can_not_use_program) {
+                $user->delete();
+            } else {
+                $role = $user->roles->first();
+                $role->detachPermissions($role->permissions);
 
-            /* attatch permissions to role */
-            if ($request->permissions) {
-                foreach ($request->permissions as $permission) {
-                    $role->attachPermission(Permission::find($permission));
+                /* attatch permissions to role */
+                if ($request->permissions) {
+                    foreach ($request->permissions as $permission) {
+                        $role->attachPermission(Permission::find($permission));
+                    }
                 }
             }
-
             return redirect()->back()
                             ->with('success', 'تم تعديل بيانات الموظف.');
         }

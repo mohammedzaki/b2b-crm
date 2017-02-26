@@ -1,5 +1,5 @@
 @extends('layouts.app') 
-@section('title', 'أضف موظف جديد - صﻻحيات الموظفين') 
+@section('title', 'أضف موظف جديد - صلاحيات الموظفين') 
 @section('content')
 
 <div class="row">

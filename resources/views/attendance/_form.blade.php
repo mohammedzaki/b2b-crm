@@ -2,10 +2,20 @@
 <link href="{{ url('vendors/flatpickr/dist/flatpickr.min.css') }}" rel="stylesheet">
 @endsection
 
+@if ($checkin)
+@section('title', 'حضور الموظفين')
+@else 
+@section('title', 'انصراف الموظفين')
+@endif 
+
 <div class="col-lg-12">
     <div class="panel panel-default">
         <div class="panel-heading">
-            بيانات الحضور والانصراف
+            @if ($checkin)
+            بيانات الحضور
+            @else 
+            بيانات الانصراف
+            @endif 
         </div>
         <!-- /.panel-heading -->
         <div class="panel-body">
@@ -134,7 +144,8 @@
                 </div>
             </div>
             <div class="col-lg-12"> 
-
+                
+                @if ($checkin || isset($model))
                 <div class="legend">
                     @if(isset($model) && $attendance->absent_type_id > 0)
                     {{ Form::checkbox('absent_check', '1', true, 
@@ -187,6 +198,7 @@
                         </div>
                     </div>
                     @endif
+                    @endif
                 </div>
             </div>
         </div>
@@ -201,7 +213,7 @@
             <button class="btn btn-success" type="submit">حفظ التعديلات</button>
             @else
                 @if ($checkin)
-                <button class="btn btn-success" type="button" onclick="SubmitCheck(1)">تسجيل حضور</button>
+                <button class="btn btn-success visible_input" type="button" onclick="SubmitCheck(1)">تسجيل حضور</button>
                 @else
                 <button class="btn btn-primary" type="button" onclick="SubmitCheck(2)">تسجيل انصراف</button>
                 @endif
@@ -265,8 +277,9 @@ $(function () {
         locale: "ar",
         onChange: function (selectedDates, dateStr, instance) {
             selecteddatepicker = selectedDates[0];
-            check_inPickr.setDate(selectedDates[0]);
-            check_inPickr.open();
+            SetCheckIndatetime();
+            //check_inPickr.setDate(selectedDates[0]);
+            //check_inPickr.open();
         }
     });
     caluclateHours();
@@ -293,8 +306,9 @@ $(function () {
         locale: "ar",
         onChange: function (selectedDates, dateStr, instance) {
             selecteddatepicker = selectedDates[0];
-            timepicker.setDate(selectedDates[0]);
-            timepicker.open();
+            SetCheckIndatetime();
+            //timepicker.setDate(selectedDates[0]);
+            //timepicker.open();
         }
     }); 
     @endif
@@ -311,6 +325,7 @@ function caluclateHours() {
     hours = hours-(days*24);
     minutes = minutes-(days*24*60)-(hours*60);
     seconds = seconds-(days*24*60*60)-(hours*60*60)-(minutes*60);
+    hours = hours + (days*24);
     //console.log('test: ' + hours + ":" + minutes, _startDate , _endDate);
     $('#working_hours').val(hours + ":" + minutes);
 }

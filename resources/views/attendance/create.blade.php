@@ -1,12 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'حضور وانصراف الموظفين')
-
-
 @section('content')
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">حضور وانصراف الموظفين</h1>
+        @if ($checkin)
+        <h1 class="page-header">شاشة حضور الموظفين</h1>
+        @else 
+        <h1 class="page-header">شاشة انصراف الموظفين</h1>
+        @endif
     </div>
 </div>
 <!-- /.row -->

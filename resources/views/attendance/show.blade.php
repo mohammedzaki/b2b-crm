@@ -87,6 +87,7 @@
                                     <tr>
                                         <th>اسم الموظف</th>
                                         <th>اسم العملية</th>
+                                        <th>اليوم</th>
                                         <th>من</th>
                                         <th>الى</th>
                                         <th>ساعات العمل</th>
@@ -105,6 +106,7 @@
                                     <tr class="odd">
                                         <td>{{ $attendance->employeeName }}</td>
                                         <td>{{ $attendance->processName }}</td>
+                                        <td>{{ $attendance->date }}</td>
                                         <td>{{ $attendance->check_in }}</td>
                                         <td>{{ $attendance->check_out }}</td>
                                         <td>{{ $attendance->workingHours }}</td>
@@ -121,6 +123,7 @@
                                     <tr>ﻻ يوجد بيانات.</tr>
                                     @endforelse
                                     <tr>
+                                        <th></th>
                                         <th></th>
                                         <th></th>
                                         <th></th>

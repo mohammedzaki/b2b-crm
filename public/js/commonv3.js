@@ -98,19 +98,28 @@ $(document).ready(function () {
      ****************************************************************/
     $('.checkbox_show_input, .checkbox_hide_input').click(function () {
         $(".hidden_input").slideToggle(this.checked);
+        $(".visible_input").slideToggle(this.checked);
     });
 
+    $('#can_not_use_program').click(function () {
+        $(".hidden_input02").slideToggle(this.checked);
+        //$(".visible_input02").slideToggle(this.checked);
+    });
     if ($('.checkbox_show_input').length) {
         if ($('.checkbox_show_input').is(':checked')) {
             $(".hidden_input").show();
+            $(".visible_input").hide();
         } else {
             $(".hidden_input").hide();
+            $(".visible_input").show();
         }
     } else if ($('.checkbox_hide_input').length) {
         if ($('.checkbox_hide_input').is(':checked')) {
             $(".hidden_input").hide();
+            $(".visible_input").show();
         } else {
             $(".hidden_input").show();
+            $(".visible_input").hide();
         }
     }
     /******************
