@@ -8,21 +8,20 @@ use App\Employee;
 use App\EmployeeBorrow;
 use Validator;
 
-class EmployeeBorrowController extends Controller
-{
+class EmployeeBorrowController extends Controller {
+
     public function __construct() {
         $this->middleware('auth');
         $this->middleware('ability:admin,employees-permissions');
     }
 
-    protected function validator(array $data, $id = null)
-    {
+    protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-            'employee_id' => 'required|exists:employees,id',
-            'borrow_reason' => 'required_with:has_discount|string',
-            'amount' => 'required|numeric',
-            'pay_percentage' => 'numeric',
-            'pay_amount' => 'numeric'
+                    'employee_id' => 'required|exists:employees,id',
+                    'borrow_reason' => 'required_with:has_discount|string',
+                    'amount' => 'required|numeric',
+                    'pay_percentage' => 'numeric',
+                    'pay_amount' => 'numeric'
         ]);
 
         $validator->setAttributeNames([
@@ -35,13 +34,13 @@ class EmployeeBorrowController extends Controller
 
         return $validator;
     }
+
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
+    public function index() {
         $employeeBorrows = EmployeeBorrow::all();
 
 
@@ -53,8 +52,7 @@ class EmployeeBorrowController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    public function create() {
         $employees = Employee::select('id', 'name', 'daily_salary')->get();
         $employees_tmp = [];
         $employees_salary_tmp = [];
@@ -74,8 +72,7 @@ class EmployeeBorrowController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
-    {
+    public function store(Request $request) {
         $validator = $this->validator($request->all());
         $all = $request->all();
 
@@ -86,23 +83,12 @@ class EmployeeBorrowController extends Controller
             $employee = Employee::find($request->employee_id);
 
             /* Can't create new borrow if employee has payment lower than the borrow */
-            // if($total_opened_processes_price >= $client->credit_limit){
-            /*if ($client->credit_limit < ($total_opened_processes_price + $request->total_price)) {
-                return redirect()->back()->withInput()->with('error', "خطأ في انشاء عملية جديدة، العميل " . $client->name . " قد تعدى الحد اﻻئتماني المسموح له."
-                );
-            } else {*/
 
-                $all['status'] = 'active';
-                $employeeBorrow = EmployeeBorrow::create($all);
+            $all['is_active'] = 1;
+            $employeeBorrow = EmployeeBorrow::create($all);
 
-                /*foreach ($all['items'] as $item) {
-                    $item['process_id'] = $clientProcess->id;
-                    ClientProcessItem::create($item);
-                }*/
-                return redirect()->route('employeeBorrow.index')->with('success', 'تم اضافة سلفية جديدة.');
-            //}
+            return redirect()->route('employeeBorrow.index')->with('success', 'تم اضافة سلفية جديدة.');
         }
-
     }
 
     /**
@@ -111,8 +97,7 @@ class EmployeeBorrowController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
-    {
+    public function show($id) {
         //
     }
 
@@ -122,8 +107,7 @@ class EmployeeBorrowController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
+    public function edit($id) {
         $borrow = EmployeeBorrow::findOrFail($id);
         $employees = Employee::where('id', $borrow->employee_id)->firstOrFail();
         $employees_tmp[$employees->id] = $employees->name;
@@ -145,15 +129,14 @@ class EmployeeBorrowController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
-    {
+    public function update(Request $request, $id) {
         $employeeBorrow = EmployeeBorrow::findOrFail($id);
         $validator = $this->validator($request->all());
 
 
-        if($validator->fails()){
+        if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
-        }else{
+        } else {
             //$employeeBorrow->id = $request->id;
             $employeeBorrow->employee_id = $request->employee_id;
             $employeeBorrow->amount = $request->amount;
@@ -171,8 +154,7 @@ class EmployeeBorrowController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
+    public function destroy($id) {
 
         $employee = EmployeeBorrow::where('id', $id)->firstOrFail();
         // dd($employee);
@@ -181,4 +163,5 @@ class EmployeeBorrowController extends Controller
 
         return redirect()->back()->with('success', 'تم حذف موظف.');
     }
+
 }

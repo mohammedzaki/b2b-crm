@@ -42,12 +42,58 @@ class AttendanceController extends Controller {
     public function index() {
         $startDate = Carbon::today()->format('Y-m-d 00:00:00');
         $endDate = Carbon::today()->format('Y-m-d 23:59:59');
-        $attendances = Attendance::whereBetween('date', [$startDate, $endDate])->orderBy('date', 'asc')->get();
+        
+        return $this->getAttendanceItems('all', $startDate, $endDate, 1, TRUE);
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function search($employee_id, Request $request) {
+        $user = Auth::user();
+        if (!$user->ability('admin', 'attendance-edit')) {
+            return response()->view('errors.403', [], 403);
+        }
+        $date = Carbon::parse($request['targetdate']);
+        return $this->getAttendanceItems($employee_id, $date, null, 1);
+    }
+
+    private function getAttendanceItems($id, $startDate, $endDate, $canEdit, $isToday = FALSE) {
+        $employees = Employee::all();
+        $dt = Carbon::parse($startDate);
+        $hasData = FALSE;
+        if ($id == "all") {
+            $attendances = []; //Attendance::all();
+            $attendances = Attendance::whereBetween('date', [$startDate, $endDate])->orderBy('date', 'asc')->get();
+            $employee_id = 0;
+            $startDate = null;
+            $id = 0;
+        } else {
+            $employee = Employee::findOrFail($id);
+            if ($isToday) {
+                $attendances = Attendance::whereBetween('date', [$startDate, $endDate])->orderBy('date', 'asc')->get();
+            } else {
+                $attendances = Attendance::where([
+                            ['employee_id', '=', $id]
+                        ])->whereMonth('date', '=', $dt->month)->get();
+            }
+            $hasData = TRUE;
+        }
+        $date = $startDate;
+        $employee_id = $id;
+
+        foreach ($employees as $employee) {
+            $employees_tmp[$employee->id] = $employee->name;
+        }
+        $employees = $employees_tmp;
 
         foreach ($attendances as $attendance) {
             $attendance->workingHours = $attendance->workingHoursToString();
             $attendance->employeeName = $attendance->employee->name;
-
+            $attendance->date = Carbon::parse($attendance->date)->format('l, d-m-Y');
             if ($attendance->process) {
                 $attendance->processName = $attendance->process->name;
             } else {
@@ -57,7 +103,7 @@ class AttendanceController extends Controller {
                 $attendance->absentTypeName = $attendance->absentType->name;
             }
         }
-        return view('attendance.index', compact(['attendances']));
+        return view('attendance.index', compact(['employees', 'attendances', 'date', 'employee_id', 'hasData']));
     }
 
     protected function validatorCheckin(array $data, $id = null) {
@@ -133,7 +179,11 @@ class AttendanceController extends Controller {
         return $this->createAttendance(FALSE);
     }
 
-    function createAttendance($checkType) {
+    public function manualadding() {
+        return $this->createAttendance();
+    }
+
+    function createAttendance($checkType = -1) {
         $employees = Employee::all();
         $processes = ClientProcess::allOpened()->get();
         $absentTypes = AbsentType::all();
@@ -196,6 +246,8 @@ class AttendanceController extends Controller {
                 ]);
                 $all['absent_check'] = TRUE;
                 goto skip;
+            } else if ($request->checkin == 0) {
+                
             } else if (empty($attendance)) {
                 if (isset($request->is_second_shift)) {
                     $errors['is_second_shift'] = "يجب تسجيل الوردية الاولى اولا";
@@ -299,7 +351,7 @@ class AttendanceController extends Controller {
             $hourlyRate = $employee->daily_salary / $employee->working_hours;
             $attendances = Attendance::where([
                         ['employee_id', '=', $id]
-                    ])->whereMonth('date', '=', $dt->month)->get();
+                    ])->whereMonth('date', '=', $dt->month)->orderBy('date', 'asc')->get();
             $hasData = TRUE;
         }
         $date = $request->date;
@@ -320,6 +372,7 @@ class AttendanceController extends Controller {
         foreach ($attendances as $attendance) {
             $attendance->workingHours = $attendance->workingHoursToString();
             $attendance->employeeName = $attendance->employee->name;
+            $attendance->date = Carbon::parse($attendance->date)->format('l, d-m-Y');
 
             $attendance->GuardianshipValue = $attendance->employeeGuardianship();
             $attendance->GuardianshipReturnValue = $attendance->employeeGuardianshipReturn();
@@ -446,7 +499,10 @@ class AttendanceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function destroy($id) {
-        //
+        $attendance = Attendance::findOrFail($id);
+        $attendance->delete();
+
+        return redirect()->back()->with('success', 'تم الحذف .');
     }
 
     public function employee() {

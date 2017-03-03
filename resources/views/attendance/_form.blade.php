@@ -1,8 +1,9 @@
 @section('css_scripts')
 <link href="{{ url('vendors/flatpickr/dist/flatpickr.min.css') }}" rel="stylesheet">
 @endsection
-
-@if ($checkin)
+@if($checkin === -1)
+@section('title', 'بيانات الحضور و الانصراف')   
+@elseif ($checkin)
 @section('title', 'حضور الموظفين')
 @else 
 @section('title', 'انصراف الموظفين')
@@ -11,7 +12,9 @@
 <div class="col-lg-12">
     <div class="panel panel-default">
         <div class="panel-heading">
-            @if ($checkin)
+            @if($checkin === -1)
+            بيانات الحضور و الانصراف
+            @elseif ($checkin)
             بيانات الحضور
             @else 
             بيانات الانصراف
@@ -35,7 +38,7 @@
                     </label>
                     @endif
                 </div>
-                @if ($checkin)
+                @if ($checkin || $checkin === -1)
                 <div class="row">
                     <div class="col-lg-12">
                         <div class="form-group{{ $errors->has('process_id') ? ' has-error' : '' }}">
@@ -91,8 +94,7 @@
                     @endif
                 </div>
                 <div class="row">
-                    @if(!$checkin || isset($model))
-                    
+                    @if(!$checkin || isset($model) || $checkin === -1)
                     <div class="form-group col-lg-6">
                         <label>ساعة الدخول</label>
                         @if (!$checkin)
@@ -126,7 +128,7 @@
                     @endif
 
                 </div>
-                @if(!$checkin || isset($model))
+                @if(!$checkin || isset($model) || $checkin === -1)
                 <div class="form-group">
                     <label> ساعات العمل</label>
                     {{ Form::text('working_hours', null, array(
@@ -145,7 +147,7 @@
             </div>
             <div class="col-lg-12"> 
                 
-                @if ($checkin || isset($model))
+                @if ($checkin || isset($model) || $checkin === -1)
                 <div class="legend">
                     @if(isset($model) && $attendance->absent_type_id > 0)
                     {{ Form::checkbox('absent_check', '1', true, 
@@ -190,7 +192,7 @@
                             </div>
                         </div>
                     </div>
-                    @if(isset($model))
+                    @if(isset($model) || $checkin === -1)
                     @else
                     <div class="row">
                         <div class="col-lg-6 ">
@@ -211,6 +213,8 @@
         <div class="form-group buttonsdiv">
             @if(isset($model))
             <button class="btn btn-success" type="submit">حفظ التعديلات</button>
+            @elseif($checkin === -1)
+            <button class="btn btn-success" onclick="SubmitCheck(4)">حفظ التعديلات</button>
             @else
                 @if ($checkin)
                 <button class="btn btn-success visible_input" type="button" onclick="SubmitCheck(1)">تسجيل حضور</button>
@@ -242,7 +246,7 @@ var datepicker;
 var timepicker;
 var selecteddatepicker;
 $(function () {
-    @if(!$checkin || isset($model))
+    @if(!$checkin || isset($model) || $checkin === -1)
     check_inPickr = $('#check_in').flatpickr({
         enableTime: true,
         altInput: true,
@@ -253,7 +257,7 @@ $(function () {
         onChange: function (selectedDates, dateStr, instance) {
             startDate = selectedDates[0];
             caluclateHours();
-            //check_outPickr.setDate(selectedDates[0]);
+            check_outPickr.setDate(selectedDates[0]);
             //check_outPickr.open();
         }
     });
@@ -278,7 +282,7 @@ $(function () {
         onChange: function (selectedDates, dateStr, instance) {
             selecteddatepicker = selectedDates[0];
             SetCheckIndatetime();
-            //check_inPickr.setDate(selectedDates[0]);
+            check_inPickr.setDate(selectedDates[0]);
             //check_inPickr.open();
         }
     });
@@ -307,7 +311,7 @@ $(function () {
         onChange: function (selectedDates, dateStr, instance) {
             selecteddatepicker = selectedDates[0];
             SetCheckIndatetime();
-            //timepicker.setDate(selectedDates[0]);
+            timepicker.setDate(selectedDates[0]);
             //timepicker.open();
         }
     }); 
@@ -337,6 +341,8 @@ function SubmitCheck(checkType) {
         $('#attendanceForm').append('<input type="hidden" name="checkin" value="0" /> <input type="hidden" id="check_out" name="check_out" value="' + $('#check_out').val() + '"/>');
     } else if (checkType == 3) {
         $('#attendanceForm').append('<input type="hidden" name="checkin" value="-1" />');
+    } else if (checkType == 4) {
+        $('#attendanceForm').append('<input type="hidden" name="checkin" value="0" />');
     }
     $('#attendanceForm').submit();
 }

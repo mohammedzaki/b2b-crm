@@ -19,7 +19,20 @@
                 <li><a href="{{ URL::to('/facility/1/edit') }}"><i class="fa fa-gear fa-fw"></i> بيانات المنشاه</a></li>
                 <li><a href="{{ URL::to('/facilityopeningamount') }}"><i class="fa fa-gear fa-fw"></i> الرصيد الافتتاحى</a></li>
                 <li class="divider"></li>
-                <li><a href="{{ URL::to('/logout') }}"><i class="fa fa-sign-out fa-fw"></i> خروج</a></li>
+                <li>
+                <li>
+                    <a href="{{ url('/logout') }}" 
+                       onclick="event.preventDefault();
+                               document.getElementById('logout-form').submit();">
+                        <i class="fa fa-sign-out fa-fw"></i> خروج
+                    </a>
+                    <form id="logout-form" 
+                          action="{{ url('/logout') }}" 
+                          method="POST" 
+                          style="display: none;">
+                        {{ csrf_field() }}
+                    </form>
+                </li>
             </ul>
         </li>
     </ul>

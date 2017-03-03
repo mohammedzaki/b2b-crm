@@ -31,6 +31,9 @@ class Employee extends Model {
         'borrow_system',
         'deleted_at_id'
     ];
+    
+    public $username = "";
+    public $password = "";
 
     public function users() {
         //return $this->belongsTo('App\User', 'employee_id');

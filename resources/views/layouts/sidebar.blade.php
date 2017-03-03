@@ -40,6 +40,7 @@
                     <li><a href="{{ URL::to('/attendance') }}">الكل</a></li>
                     <li><a href="{{ URL::to('/attendance/checkin') }}">تسجيل حضور</a></li>
                     <li><a href="{{ URL::to('/attendance/checkout') }}">تسجيل انصراف</a></li>
+                    <li><a href="{{ route('attendance.manualadding') }}">تسجيل جديد</a></li>
                     <li><a href="{{ URL::to('/attendance/guardianship/all') }}">سجل العهد</a>
                     <li><a href="{{ URL::to('/attendance/all') }}">مرتبات</a>
                 </ul>

@@ -59,7 +59,9 @@ Route::resource('expenses', 'ExpensesController');
 Route::resource('employeeBorrow', 'EmployeeBorrowController');
 
 Route::get('/attendance/checkin', 'AttendanceController@checkin')->name('attendance.checkin');
+Route::get('/attendanceSearch/{employee_id}', 'AttendanceController@search')->name('attendance.search');
 Route::get('/attendance/checkout', 'AttendanceController@checkout')->name('attendance.checkout');
+Route::get('/attendance/manualadding', 'AttendanceController@manualadding')->name('attendance.manualadding');
 Route::get('/attendance/guardianship/{employee_id}', 'AttendanceController@guardianship')->name('attendance.guardianship');
 Route::get('/attendance/guardianshipaway/{employee_id}', 'AttendanceController@guardianshipaway')->name('attendance.guardianshipaway');
 Route::get('/attendance/printSalaryReport/{employee_id}', 'AttendanceController@printSalaryReport')->name('attendance.printSalaryReport');

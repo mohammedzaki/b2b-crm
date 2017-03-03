@@ -3,7 +3,9 @@
 @section('content')
 <div class="row">
     <div class="col-lg-12">
-        @if ($checkin)
+        @if($checkin == -1)
+        <h1 class="page-header">شاشة ادخال جديد</h1>
+        @elseif ($checkin)
         <h1 class="page-header">شاشة حضور الموظفين</h1>
         @else 
         <h1 class="page-header">شاشة انصراف الموظفين</h1>

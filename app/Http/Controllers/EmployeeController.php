@@ -9,6 +9,7 @@ use App\User;
 use App\Role;
 use App\Permission;
 use App\Employee;
+use Crypt;
 
 class EmployeeController extends Controller {
 
@@ -103,26 +104,32 @@ class EmployeeController extends Controller {
             $employee->borrow_system = ($request->borrow_system) ? $request->borrow_system : false;
             $employee->save();
 
-            if ($employee->can_not_use_program) {
-                $user = new User();
+            $user = new User();
+            if ($request->username) {
                 $user->username = $request->username;
+            } else {
+                $user->username = "user_" . str_random(5);
+            }
+            if ($request->password) {
                 $user->password = bcrypt($request->password);
-                $user->employee_id = $employee->id;
-                $user->save();
-                /* create new user role */
-                $role = new Role();
-                $role->name = 'role_' . $employee->id;
-                $role->save();
-                /* attatch role to user */
-                $user->attachRole($role);
-                /* attatch permissions to role */
-                if ($request->permissions) {
-                    foreach ($request->permissions as $permission) {
-                        $role->attachPermission(Permission::find($permission));
-                    }
+            } else {
+                $user->password = bcrypt(str_random(40));
+            }
+            $user->employee_id = $employee->id;
+            $user->save();
+
+            /* create new user role */
+            $role = new Role();
+            $role->name = 'role_' . $employee->id;
+            $role->save();
+            /* attatch role to user */
+            $user->attachRole($role);
+            /* attatch permissions to role */
+            if ($request->permissions) {
+                foreach ($request->permissions as $permission) {
+                    $role->attachPermission(Permission::find($permission));
                 }
             }
-
             return redirect()->route('employee.index')
                             ->with('success', 'تم اضافة موظف جديد.');
         }
@@ -161,14 +168,16 @@ class EmployeeController extends Controller {
 
     public function edit($id) {
         $employee = Employee::findOrFail($id);
-        //$employee->username = $employee->user[0]->username;
+        $employee->username = $employee->users()->first()->username;
+        //$employee->password = Crypt::decrypt($employee->users()->first()->password);//bcrypt();
+
         $employeePermissions = $employee->users[0]->roles->first()->perms;
         $selectedPermissions = [];
         foreach ($employeePermissions as $p) {
             array_push($selectedPermissions, $p->id);
         }
         $permissions = Permission::all();
-        return view('employee.edit', compact('employee', 'permissions', 'selectedPermissions'));
+        return view('employee.edit', compact('employee', 'permissions', 'selectedPermissions', 'username'));
     }
 
     public function update(Request $request, $id) {
@@ -185,17 +194,19 @@ class EmployeeController extends Controller {
         if ($request->username) {
             $user->username = $request->username;
             if (!$user->isDirty('username')) {
-                $all = array_except($all, 'username');
+                $all['username'] = "isDirtyAndUpdated";
             }
         }
-
+        if (empty($request->password)) {
+            $all['password'] = "noChange";
+        }
         $validator = $this->validator($all);
 
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
 
-            if ($request->password) {
+            if ($all['password'] != "noChange") {
                 $user->password = bcrypt($request->password);
             }
 
@@ -213,26 +224,21 @@ class EmployeeController extends Controller {
             $employee->job_title = $request->job_title;
             $employee->telephone = $request->telephone;
             $employee->mobile = $request->mobile;
-            $employee->can_not_use_program = $request->can_not_use_program;
-            $employee->is_active = $request->is_active;
-            $employee->borrow_system = $request->borrow_system;
+            $employee->can_not_use_program = ($request->can_not_use_program) ? $request->can_not_use_program : false;
+            $employee->is_active = ($request->is_active) ? $request->is_active : false;
+            $employee->borrow_system = ($request->borrow_system) ? $request->borrow_system : false;
             $employee->save();
 
-            if ($employee->can_not_use_program) {
-                $user->delete();
-            } else {
-                $role = $user->roles->first();
-                $role->detachPermissions($role->permissions);
+            $role = $user->roles->first();
+            $role->detachPermissions($role->perms);
 
-                /* attatch permissions to role */
-                if ($request->permissions) {
-                    foreach ($request->permissions as $permission) {
-                        $role->attachPermission(Permission::find($permission));
-                    }
+            /* attatch permissions to role */
+            if ($request->permissions) {
+                foreach ($request->permissions as $permission) {
+                    $role->attachPermission(Permission::find($permission));
                 }
             }
-            return redirect()->back()
-                            ->with('success', 'تم تعديل بيانات الموظف.');
+            return redirect()->route('employee.index')->with('success', 'تم تعديل بيانات الموظف.');
         }
     }
 
