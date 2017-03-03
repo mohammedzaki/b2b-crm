@@ -38,7 +38,6 @@ class EmployeeController extends Controller {
                     'telephone' => 'digits:8',
                     'mobile' => 'required|digits:11',
                     'can_not_use_program' => 'boolean',
-                    'is_active' => 'boolean',
                     'borrow_system' => 'boolean',
                     'username' => 'required_without:can_not_use_program|unique:users,username',
                     'password' => 'required_without:can_not_use_program'
@@ -58,7 +57,6 @@ class EmployeeController extends Controller {
             'telephone' => 'التليفون',
             'mobile' => 'المحمول',
             'can_not_use_program' => 'عدم استخدام البرنامج',
-            'is_active' => 'نشط',
             'borrow_system' => 'نظام السلف',
             'username' => 'اسم المستخدم',
             'password' => 'كلمة المرور'
@@ -100,7 +98,6 @@ class EmployeeController extends Controller {
             $employee->mobile = $request->mobile;
             $employee->facility_id = 1;
             $employee->can_not_use_program = ($request->can_not_use_program) ? $request->can_not_use_program : false;
-            $employee->is_active = ($request->is_active) ? $request->is_active : false;
             $employee->borrow_system = ($request->borrow_system) ? $request->borrow_system : false;
             $employee->save();
 
@@ -225,7 +222,6 @@ class EmployeeController extends Controller {
             $employee->telephone = $request->telephone;
             $employee->mobile = $request->mobile;
             $employee->can_not_use_program = ($request->can_not_use_program) ? $request->can_not_use_program : false;
-            $employee->is_active = ($request->is_active) ? $request->is_active : false;
             $employee->borrow_system = ($request->borrow_system) ? $request->borrow_system : false;
             $employee->save();
 

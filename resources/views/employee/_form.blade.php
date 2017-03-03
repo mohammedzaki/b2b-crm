@@ -2,11 +2,6 @@
     <div class="panel panel-default">
         <div class="panel-heading">
             بيانات الموظف
-            <div class="pull-left">
-                <label class="checkbox-inline text-danger">
-                    {{ Form::checkbox('is_active') }}نشط
-                </label>
-            </div>
         </div>
         <!-- /.panel-heading -->
         <div class="panel-body">

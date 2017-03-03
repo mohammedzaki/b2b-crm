@@ -27,7 +27,6 @@ class Employee extends Model {
         'mobile',
         'facility_id',
         'can_not_use_program',
-        'is_active',
         'borrow_system',
         'deleted_at_id'
     ];
