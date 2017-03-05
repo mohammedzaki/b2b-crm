@@ -76,7 +76,7 @@
                                         <th>رد عهدة</th>
                                         <th>بيان</th>
                                         <th>التاريخ</th>
-                                        <th>#</th>
+                                        {{--<th>#</th>--}}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -95,11 +95,13 @@
                                         </td>
                                         <td>{{ $guardianship->recordDesc }}</td>
                                         <td>{{ $guardianship->created_at }}</td>
-                                        <td>
+                                        {{--<td>
+                                            
                                             @if($guardianship->withdrawValue > 0)
                                             {{ link_to_route('attendance.guardianshipaway', 'ترحيل العهدة', array('id' => 1), array('class' => 'btn btn-primary')) }}
                                             @endif
-                                        </td>
+                                            
+                                        </td>--}}
                                     </tr>
                                     @empty
                                     <tr>ﻻ يوجد بيانات.</tr>
@@ -110,7 +112,7 @@
                                         <th>{{ $totalGuardianshipReturnValue }}</th>
                                         <th></th>
                                         <th></th>
-                                        <th></th>
+                                        {{--<th></th>--}}
                                     </tr>
                                 </tbody>
                             </table>  

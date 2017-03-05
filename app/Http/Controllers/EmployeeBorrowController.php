@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use App\Http\Requests;
 use App\Employee;
 use App\EmployeeBorrow;
+use App\DepositWithdraw;
+use App\Constants\EmployeeActions;
+use App\Constants\PaymentMethods;
+use Carbon\Carbon;
 use Validator;
 
 class EmployeeBorrowController extends Controller {
@@ -14,7 +18,7 @@ class EmployeeBorrowController extends Controller {
         $this->middleware('auth');
         $this->middleware('ability:admin,employees-permissions');
     }
-
+    
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
                     'employee_id' => 'required|exists:employees,id',
@@ -42,8 +46,7 @@ class EmployeeBorrowController extends Controller {
      */
     public function index() {
         $employeeBorrows = EmployeeBorrow::all();
-
-
+    
         return view('employee.borrow.index', compact('employeeBorrows'));
     }
 
@@ -53,17 +56,16 @@ class EmployeeBorrowController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function create() {
-        $employees = Employee::select('id', 'name', 'daily_salary')->get();
+        $employees = Employee::select('id', 'name', 'daily_salary')->where("borrow_system", 1)->get();
         $employees_tmp = [];
-        $employees_salary_tmp = [];
+        $employeesSalaries = [];
 
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
-            $employees_salary_tmp[$employee->id] = $employee->daily_salary;
+            $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
         }
         $employees = $employees_tmp;
-        $employees_salary = $employees_salary_tmp;
-        return view('employee.borrow.create', compact(['employees', 'employees_salary']));
+        return view('employee.borrow.create', compact(['employees', 'employeesSalaries']));
     }
 
     /**
@@ -79,14 +81,26 @@ class EmployeeBorrowController extends Controller {
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
-            /* get employee info */
+            /* get employee info  */
             $employee = Employee::find($request->employee_id);
 
-            /* Can't create new borrow if employee has payment lower than the borrow */
+            /* Can't create new borrow if employee has payment lower than the borrow  */
 
             $all['is_active'] = 1;
             $employeeBorrow = EmployeeBorrow::create($all);
-
+            
+            if ($request->start_discount) {
+                $depositWithdraw = new DepositWithdraw();
+                $depositWithdraw->withdrawValue = $employeeBorrow->pay_amount;
+                $depositWithdraw->due_date = Carbon::now();
+                $depositWithdraw->recordDesc = "سلفة مستديمة دفعة شهر {$depositWithdraw->due_date->month} سنة {$depositWithdraw->due_date->year}";
+                $depositWithdraw->employee_id = $employee->id;
+                $depositWithdraw->expenses_id = EmployeeActions::LongBorrow;
+                $depositWithdraw->payMethod = PaymentMethods::CASH;
+                $depositWithdraw->notes = Carbon::now();
+                $depositWithdraw->save();
+            }
+            
             return redirect()->route('employeeBorrow.index')->with('success', 'تم اضافة سلفية جديدة.');
         }
     }
@@ -98,7 +112,7 @@ class EmployeeBorrowController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function show($id) {
-        //
+        
     }
 
     /**
@@ -109,17 +123,14 @@ class EmployeeBorrowController extends Controller {
      */
     public function edit($id) {
         $borrow = EmployeeBorrow::findOrFail($id);
-        $employees = Employee::where('id', $borrow->employee_id)->firstOrFail();
-        $employees_tmp[$employees->id] = $employees->name;
-        $employees_salary_tmp[$employees->id] = $employees->daily_salary;
-
-
-
+        $employee = Employee::where('id', $borrow->employee_id)->firstOrFail();
+        $employees_tmp[$employee->id] = $employee->name;
+        $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
+        
         $employees = $employees_tmp;
-        $employees_salary = $employees_salary_tmp;
 
-//        return $employees_salary;
-        return view('employee.borrow.edit', compact(['borrow', 'employees', 'employees_salary']));
+        //return $employees_salary;
+        return view('employee.borrow.edit', compact(['borrow', 'employees', 'employeesSalaries']));
     }
 
     /**
@@ -157,11 +168,8 @@ class EmployeeBorrowController extends Controller {
     public function destroy($id) {
 
         $employee = EmployeeBorrow::where('id', $id)->firstOrFail();
-        // dd($employee);
         $employee->delete();
-
 
         return redirect()->back()->with('success', 'تم حذف موظف.');
     }
-
 }

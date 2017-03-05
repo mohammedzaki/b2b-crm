@@ -5,14 +5,13 @@ var discount_percentage = 0;
 var total_price = 0;
 var taxes = 0;
 var priceAfterTaxes = 0;
+var roundDecimals = function (value, decimals) {
+    decimals = decimals || 0;
+    return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
+};
 
 $(document).ready(function () {
 
-    var roundDecimals = function (value, decimals) {
-        decimals = decimals || 0;
-        return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
-    };
-    
     function add_new_process_item() {
         var html = '<tr>';
         html += '<td><div class="form-group"><input class="form-control" name="items[' + processItemsCount + '][description]" placeholder="ادخل تفاصيل البيان" /></div></td>';
@@ -52,7 +51,7 @@ $(document).ready(function () {
         }
         return discount_value;
     }
-    
+
     function calculate_discount() {
         discount_value = 0;
         if ($('input[name="has_discount"]').is(':checked')) {
@@ -92,7 +91,7 @@ $(document).ready(function () {
         $('input[name="taxes_value"]').val(calculate_taxes());
 
     }
-    
+
     /******************
      General
      ****************************************************************/
@@ -233,8 +232,8 @@ $(document).ready(function () {
     });
 
     $("#discount_percentage").change(function () {
-         $("#discount_value").val(calculate_discount_from_percentage());
-         update_prices();
+        $("#discount_value").val(calculate_discount_from_percentage());
+        update_prices();
     });
 
     if (processItemsCount == 0) {

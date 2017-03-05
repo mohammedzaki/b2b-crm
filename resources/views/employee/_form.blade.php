@@ -303,30 +303,6 @@
                     ) }} 
                     {{ Form::label('borrow_system', 'نظام السلف') }}
                 </div>
-                <div class="hidden_input">
-                    <div class="col-lg-6">
-                        <div class="form-group">
-                            {{ Form::radio('value') }}
-                            قيمة
-                            {{ Form::text('number', null, array(
-                                    'class' => 'form-control',
-                                    'style' => 'width:160px; display:inline;',
-                                    'placeholder' => 'ادخل القيمة'
-                                )) }} $
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
-                        <div class="form-group">
-                            {{ Form::radio('value') }}
-                            نسبة
-                            {{ Form::text('percentage', null, array(
-                                    'class' => 'form-control',
-                                    'style' => 'width:160px; display:inline;',
-                                    'placeholder' => 'ادخل النسبة'
-                                )) }} %
-                        </div>    
-                    </div>
-                </div>
             </div>
 
         </div>

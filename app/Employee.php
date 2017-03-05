@@ -5,6 +5,7 @@ namespace App;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use App\DepositWithdraw;
+use App\Constants\EmployeeActions;
 
 class Employee extends Model {
 
@@ -46,7 +47,7 @@ class Employee extends Model {
     public function employeeSmallBorrows() {
         DepositWithdraw::where([
                 ['employee_id', '=', $this->id],
-                ['expenses_id', '=', 3],
+                ['expenses_id', '=', EmployeeActions::SmallBorrow],
         ]); //->get();
     }
 
@@ -56,8 +57,8 @@ class Employee extends Model {
         $depositWithdraws = DepositWithdraw::where([
                                 ['employee_id', '=', $this->id]
                         ])
-                        ->whereIn('expenses_id', ['1', '2'])
-                        ->whereMonth('created_at', '=', $month)->get();
+                        ->whereIn('expenses_id', [EmployeeActions::Guardianship, EmployeeActions::GuardianshipReturn])
+                        ->whereMonth('due_date', '=', $month)->get();
 
         return $depositWithdraws;
     }
