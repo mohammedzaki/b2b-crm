@@ -24,6 +24,10 @@ class Client extends Model {
     public function processes() {
         return $this->hasMany('App\ClientProcess');
     }
+    
+    public function unBilledProcesses() {
+        return $this->hasMany('App\ClientProcess')->where('is_billed', ClientProcess::unBilled);
+    }
 
     public function closedProcess() {
         //return $this->hasM //hasManyThrough($related, $through);

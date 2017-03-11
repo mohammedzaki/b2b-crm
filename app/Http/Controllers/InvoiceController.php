@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Client;
+use App\ClientProcess;
 
 class InvoiceController extends Controller {
 
@@ -12,7 +14,8 @@ class InvoiceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        //
+        $processes = [];
+        return view('invoice.index', compact('processes'));
     }
 
     /**
@@ -21,7 +24,24 @@ class InvoiceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function create() {
-        //
+        $clients = Client::all();
+        $clients_tmp = [];
+        $clientProcesses = [];
+        foreach ($clients as $client) {
+            $clients_tmp[$client->id] = $client->name;
+
+            foreach ($client->unBilledProcesses as $process) {
+                $clientProcesses[$client->id][$process->id]['name'] = $process->name;
+                $clientProcesses[$client->id][$process->id]['totalPrice'] = $process->total_price;
+                $clientProcesses[$client->id][$process->id]['status'] = $process->status;
+                $clientProcesses[$client->id][$process->id]['items'] = $process->items;
+            }
+        }
+        $clients = $clients_tmp;
+
+        $clientProcesses = json_encode($clientProcesses);
+
+        return view('invoice.create', compact("clients", "clientProcesses"));
     }
 
     /**

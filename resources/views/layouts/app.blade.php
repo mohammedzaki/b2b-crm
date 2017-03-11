@@ -18,6 +18,7 @@
     @yield('script_taxes')
     <script src="{{ url('js/all.js') }}"></script>
     <script src="{{ url('js/commonv3.js') }}"></script>
+<script src="{{ url('/vendors/he/he.js') }}"></script>
 </head>
 
 <body>

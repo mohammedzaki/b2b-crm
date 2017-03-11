@@ -13,9 +13,9 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
         'e7223560d890eab89cda23685e711e2c' => __DIR__ . '/..' . '/psy/psysh/src/Psy/functions.php',
+        'f18cc91337d49233e5754e93f3ed9ec3' => __DIR__ . '/..' . '/laravelcollective/html/src/helpers.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
-        'f18cc91337d49233e5754e93f3ed9ec3' => __DIR__ . '/..' . '/laravelcollective/html/src/helpers.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -34,6 +34,10 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'W' => 
         array (
             'Webmozart\\Assert\\' => 17,
+        ),
+        'U' => 
+        array (
+            'User11001\\EloquentModelGenerator\\' => 33,
         ),
         'T' => 
         array (
@@ -124,6 +128,10 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'Webmozart\\Assert\\' => 
         array (
             0 => __DIR__ . '/..' . '/webmozart/assert/src',
+        ),
+        'User11001\\EloquentModelGenerator\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/user11001/eloquent-model-generator/src',
         ),
         'TijsVerkoyen\\CssToInlineStyles\\' => 
         array (
@@ -272,6 +280,20 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
     );
 
     public static $prefixesPsr0 = array (
+        'X' => 
+        array (
+            'Xethron\\MigrationsGenerator' => 
+            array (
+                0 => __DIR__ . '/..' . '/xethron/migrations-generator/src',
+            ),
+        ),
+        'W' => 
+        array (
+            'Way\\Generators' => 
+            array (
+                0 => __DIR__ . '/..' . '/xethron/laravel-4-generators/src',
+            ),
+        ),
         'P' => 
         array (
             'Prophecy\\' => 
@@ -330,6 +352,8 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'App\\ClientProcess' => __DIR__ . '/../..' . '/app/ClientProcess.php',
         'App\\ClientProcessItem' => __DIR__ . '/../..' . '/app/ClientProcessItem.php',
         'App\\Console\\Kernel' => __DIR__ . '/../..' . '/app/Console/Kernel.php',
+        'App\\Constants\\EmployeeActions' => __DIR__ . '/../..' . '/app/Constants/EmployeeActions.php',
+        'App\\Constants\\PaymentMethods' => __DIR__ . '/../..' . '/app/Constants/PaymentMethods.php',
         'App\\DepositWithdraw' => __DIR__ . '/../..' . '/app/DepositWithdraw.php',
         'App\\Employee' => __DIR__ . '/../..' . '/app/Employee.php',
         'App\\EmployeeBorrow' => __DIR__ . '/../..' . '/app/EmployeeBorrow.php',
@@ -337,6 +361,7 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'App\\Expenses' => __DIR__ . '/../..' . '/app/Expenses.php',
         'App\\Facility' => __DIR__ . '/../..' . '/app/Facility.php',
         'App\\FeasibilityStudy' => __DIR__ . '/../..' . '/app/FeasibilityStudy.php',
+        'App\\Helpers\\Helpers' => __DIR__ . '/../..' . '/app/Helpers/Helpers.php',
         'App\\Http\\Controllers\\AttendanceController' => __DIR__ . '/../..' . '/app/Http/Controllers/AttendanceController.php',
         'App\\Http\\Controllers\\Auth\\ForgotPasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ForgotPasswordController.php',
         'App\\Http\\Controllers\\Auth\\LoginController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/LoginController.php',
@@ -353,8 +378,10 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'App\\Http\\Controllers\\FacilityController' => __DIR__ . '/../..' . '/app/Http/Controllers/FacilityController.php',
         'App\\Http\\Controllers\\FeasibilityStudyController' => __DIR__ . '/../..' . '/app/Http/Controllers/FeasibilityStudyController.php',
         'App\\Http\\Controllers\\HomeController' => __DIR__ . '/../..' . '/app/Http/Controllers/HomeController.php',
+        'App\\Http\\Controllers\\InvoiceController' => __DIR__ . '/../..' . '/app/Http/Controllers/InvoiceController.php',
         'App\\Http\\Controllers\\OpeningAmountController' => __DIR__ . '/../..' . '/app/Http/Controllers/OpeningAmountController.php',
-        'App\\Http\\Controllers\\ReportsController' => __DIR__ . '/../..' . '/app/Http/Controllers/ReportsController.php',
+        'App\\Http\\Controllers\\Reports\\ClientReportsController' => __DIR__ . '/../..' . '/app/Http/Controllers/Reports/ClientReportsController.php',
+        'App\\Http\\Controllers\\Reports\\SupplierReportsController' => __DIR__ . '/../..' . '/app/Http/Controllers/Reports/SupplierReportsController.php',
         'App\\Http\\Controllers\\SupplierController' => __DIR__ . '/../..' . '/app/Http/Controllers/SupplierController.php',
         'App\\Http\\Controllers\\SupplierProcessController' => __DIR__ . '/../..' . '/app/Http/Controllers/SupplierProcessController.php',
         'App\\Http\\Kernel' => __DIR__ . '/../..' . '/app/Http/Kernel.php',
@@ -374,6 +401,7 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'App\\Reports\\Client\\ClientDetailed' => __DIR__ . '/../..' . '/app/Reports/Client/ClientDetailed.php',
         'App\\Reports\\Client\\ClientTotal' => __DIR__ . '/../..' . '/app/Reports/Client/ClientTotal.php',
         'App\\Reports\\Employee\\Salary' => __DIR__ . '/../..' . '/app/Reports/Employee/Salary.php',
+        'App\\Reports\\Invoice\\Invoice' => __DIR__ . '/../..' . '/app/Reports/Invoice/Invoice.php',
         'App\\Reports\\Supplier\\SupplierDetailed' => __DIR__ . '/../..' . '/app/Reports/Supplier/SupplierDetailed.php',
         'App\\Reports\\Supplier\\SupplierTotal' => __DIR__ . '/../..' . '/app/Reports/Supplier/SupplierTotal.php',
         'App\\Role' => __DIR__ . '/../..' . '/app/Role.php',
@@ -598,6 +626,7 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'Doctrine\\DBAL\\Driver\\PDOSqlite\\Driver' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOSqlite/Driver.php',
         'Doctrine\\DBAL\\Driver\\PDOSqlsrv\\Connection' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOSqlsrv/Connection.php',
         'Doctrine\\DBAL\\Driver\\PDOSqlsrv\\Driver' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOSqlsrv/Driver.php',
+        'Doctrine\\DBAL\\Driver\\PDOSqlsrv\\Statement' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOSqlsrv/Statement.php',
         'Doctrine\\DBAL\\Driver\\PDOStatement' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOStatement.php',
         'Doctrine\\DBAL\\Driver\\PingableConnection' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/PingableConnection.php',
         'Doctrine\\DBAL\\Driver\\ResultStatement' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/ResultStatement.php',
@@ -1555,6 +1584,7 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'Illuminate\\Encryption\\Encrypter' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Encryption/Encrypter.php',
         'Illuminate\\Encryption\\EncryptionServiceProvider' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Encryption/EncryptionServiceProvider.php',
         'Illuminate\\Events\\CallQueuedHandler' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Events/CallQueuedHandler.php',
+        'Illuminate\\Events\\CallQueuedListener' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Events/CallQueuedListener.php',
         'Illuminate\\Events\\Dispatcher' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Events/Dispatcher.php',
         'Illuminate\\Events\\EventServiceProvider' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Events/EventServiceProvider.php',
         'Illuminate\\Filesystem\\Filesystem' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Filesystem/Filesystem.php',
@@ -1603,7 +1633,7 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'Illuminate\\Foundation\\Console\\OptimizeCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/OptimizeCommand.php',
         'Illuminate\\Foundation\\Console\\PolicyMakeCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/PolicyMakeCommand.php',
         'Illuminate\\Foundation\\Console\\ProviderMakeCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/ProviderMakeCommand.php',
-        'Illuminate\\Foundation\\Console\\QueuedJob' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/QueuedJob.php',
+        'Illuminate\\Foundation\\Console\\QueuedCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/QueuedCommand.php',
         'Illuminate\\Foundation\\Console\\RequestMakeCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/RequestMakeCommand.php',
         'Illuminate\\Foundation\\Console\\RouteCacheCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/RouteCacheCommand.php',
         'Illuminate\\Foundation\\Console\\RouteClearCommand' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/Console/RouteClearCommand.php',
@@ -1670,6 +1700,9 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'Illuminate\\Http\\Request' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Request.php',
         'Illuminate\\Http\\Response' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Response.php',
         'Illuminate\\Http\\ResponseTrait' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/ResponseTrait.php',
+        'Illuminate\\Http\\Testing\\File' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Testing/File.php',
+        'Illuminate\\Http\\Testing\\FileFactory' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Testing/FileFactory.php',
+        'Illuminate\\Http\\Testing\\MimeType' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/Testing/MimeType.php',
         'Illuminate\\Http\\UploadedFile' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Http/UploadedFile.php',
         'Illuminate\\Log\\Events\\MessageLogged' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Log/Events/MessageLogged.php',
         'Illuminate\\Log\\LogServiceProvider' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Log/LogServiceProvider.php',
@@ -2473,6 +2506,7 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'PHP_Token_NEW' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
         'PHP_Token_NS_C' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
         'PHP_Token_NS_SEPARATOR' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
+        'PHP_Token_NULLSAFE_OBJECT_OPERATOR' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
         'PHP_Token_NUM_STRING' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
         'PHP_Token_OBJECT_CAST' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
         'PHP_Token_OBJECT_OPERATOR' => __DIR__ . '/..' . '/phpunit/php-token-stream/src/Token.php',
@@ -2853,6 +2887,7 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'Psy\\CodeCleaner\\CalledClassPass' => __DIR__ . '/..' . '/psy/psysh/src/Psy/CodeCleaner/CalledClassPass.php',
         'Psy\\CodeCleaner\\CodeCleanerPass' => __DIR__ . '/..' . '/psy/psysh/src/Psy/CodeCleaner/CodeCleanerPass.php',
         'Psy\\CodeCleaner\\ExitPass' => __DIR__ . '/..' . '/psy/psysh/src/Psy/CodeCleaner/ExitPass.php',
+        'Psy\\CodeCleaner\\FinalClassPass' => __DIR__ . '/..' . '/psy/psysh/src/Psy/CodeCleaner/FinalClassPass.php',
         'Psy\\CodeCleaner\\FunctionReturnInWriteContextPass' => __DIR__ . '/..' . '/psy/psysh/src/Psy/CodeCleaner/FunctionReturnInWriteContextPass.php',
         'Psy\\CodeCleaner\\ImplicitReturnPass' => __DIR__ . '/..' . '/psy/psysh/src/Psy/CodeCleaner/ImplicitReturnPass.php',
         'Psy\\CodeCleaner\\InstanceOfPass' => __DIR__ . '/..' . '/psy/psysh/src/Psy/CodeCleaner/InstanceOfPass.php',
@@ -3623,8 +3658,50 @@ class ComposerStaticInitdb15cc0a10d319af92d67c96e68fd5f6
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Rule\\Processor' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Rule/Processor.php',
         'TijsVerkoyen\\CssToInlineStyles\\Css\\Rule\\Rule' => __DIR__ . '/..' . '/tijsverkoyen/css-to-inline-styles/src/Css/Rule/Rule.php',
         'UCDN' => __DIR__ . '/..' . '/mpdf/mpdf/classes/ucdn.php',
+        'User11001\\EloquentModelGenerator\\Console\\GenerateModelsCommand' => __DIR__ . '/..' . '/user11001/eloquent-model-generator/src/Console/GenerateModelsCommand.php',
+        'User11001\\EloquentModelGenerator\\Console\\SchemaGenerator' => __DIR__ . '/..' . '/user11001/eloquent-model-generator/src/Console/SchemaGenerator.php',
+        'User11001\\EloquentModelGenerator\\EloquentModelGeneratorProvider' => __DIR__ . '/..' . '/user11001/eloquent-model-generator/src/EloquentModelGeneratorProvider.php',
+        'Way\\Generators\\Commands\\ControllerGeneratorCommand' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Commands/ControllerGeneratorCommand.php',
+        'Way\\Generators\\Commands\\GeneratorCommand' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Commands/GeneratorCommand.php',
+        'Way\\Generators\\Commands\\MigrationGeneratorCommand' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Commands/MigrationGeneratorCommand.php',
+        'Way\\Generators\\Commands\\ModelGeneratorCommand' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Commands/ModelGeneratorCommand.php',
+        'Way\\Generators\\Commands\\PivotGeneratorCommand' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Commands/PivotGeneratorCommand.php',
+        'Way\\Generators\\Commands\\PublishTemplatesCommand' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Commands/PublishTemplatesCommand.php',
+        'Way\\Generators\\Commands\\ResourceGeneratorCommand' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Commands/ResourceGeneratorCommand.php',
+        'Way\\Generators\\Commands\\ScaffoldGeneratorCommand' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Commands/ScaffoldGeneratorCommand.php',
+        'Way\\Generators\\Commands\\SeederGeneratorCommand' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Commands/SeederGeneratorCommand.php',
+        'Way\\Generators\\Commands\\ViewGeneratorCommand' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Commands/ViewGeneratorCommand.php',
+        'Way\\Generators\\Compilers\\Compiler' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Compilers/Compiler.php',
+        'Way\\Generators\\Compilers\\TemplateCompiler' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Compilers/TemplateCompiler.php',
+        'Way\\Generators\\Filesystem\\FileAlreadyExists' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Filesystem/FileAlreadyExists.php',
+        'Way\\Generators\\Filesystem\\FileNotFound' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Filesystem/FileNotFound.php',
+        'Way\\Generators\\Filesystem\\Filesystem' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Filesystem/Filesystem.php',
+        'Way\\Generators\\Generator' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Generator.php',
+        'Way\\Generators\\GeneratorsServiceProvider' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/GeneratorsServiceProvider.php',
+        'Way\\Generators\\InvalidMigrationName' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/InvalidMigrationName.php',
+        'Way\\Generators\\Parsers\\MigrationFieldsParser' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Parsers/MigrationFieldsParser.php',
+        'Way\\Generators\\Parsers\\MigrationNameParser' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Parsers/MigrationNameParser.php',
+        'Way\\Generators\\SchemaCreator' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/SchemaCreator.php',
+        'Way\\Generators\\Syntax\\AddToTable' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Syntax/AddToTable.php',
+        'Way\\Generators\\Syntax\\CreateTable' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Syntax/CreateTable.php',
+        'Way\\Generators\\Syntax\\DroppedTable' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Syntax/DroppedTable.php',
+        'Way\\Generators\\Syntax\\RemoveFromTable' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Syntax/RemoveFromTable.php',
+        'Way\\Generators\\Syntax\\Table' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/Syntax/Table.php',
+        'Way\\Generators\\Templates\\Data\\Controller' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/templates/Data/Controller.php',
+        'Way\\Generators\\Templates\\Data\\Migration' => __DIR__ . '/..' . '/xethron/laravel-4-generators/src/Way/Generators/templates/Data/Migration.php',
         'Webmozart\\Assert\\Assert' => __DIR__ . '/..' . '/webmozart/assert/src/Assert.php',
         'XdgBaseDir\\Xdg' => __DIR__ . '/..' . '/dnoegel/php-xdg-base-dir/src/Xdg.php',
+        'Xethron\\MigrationsGenerator\\Generators\\FieldGenerator' => __DIR__ . '/..' . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/Generators/FieldGenerator.php',
+        'Xethron\\MigrationsGenerator\\Generators\\ForeignKeyGenerator' => __DIR__ . '/..' . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/Generators/ForeignKeyGenerator.php',
+        'Xethron\\MigrationsGenerator\\Generators\\IndexGenerator' => __DIR__ . '/..' . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/Generators/IndexGenerator.php',
+        'Xethron\\MigrationsGenerator\\Generators\\SchemaGenerator' => __DIR__ . '/..' . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/Generators/SchemaGenerator.php',
+        'Xethron\\MigrationsGenerator\\MigrateGenerateCommand' => __DIR__ . '/..' . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/MigrateGenerateCommand.php',
+        'Xethron\\MigrationsGenerator\\MigrationsGeneratorServiceProvider' => __DIR__ . '/..' . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/MigrationsGeneratorServiceProvider.php',
+        'Xethron\\MigrationsGenerator\\Syntax\\AddForeignKeysToTable' => __DIR__ . '/..' . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/Syntax/AddForeignKeysToTable.php',
+        'Xethron\\MigrationsGenerator\\Syntax\\AddToTable' => __DIR__ . '/..' . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/Syntax/AddToTable.php',
+        'Xethron\\MigrationsGenerator\\Syntax\\DroppedTable' => __DIR__ . '/..' . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/Syntax/DroppedTable.php',
+        'Xethron\\MigrationsGenerator\\Syntax\\RemoveForeignKeysFromTable' => __DIR__ . '/..' . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/Syntax/RemoveForeignKeysFromTable.php',
+        'Xethron\\MigrationsGenerator\\Syntax\\Table' => __DIR__ . '/..' . '/xethron/migrations-generator/src/Xethron/MigrationsGenerator/Syntax/Table.php',
         'Zizaco\\Entrust\\Contracts\\EntrustPermissionInterface' => __DIR__ . '/..' . '/zizaco/entrust/src/Entrust/Contracts/EntrustPermissionInterface.php',
         'Zizaco\\Entrust\\Contracts\\EntrustRoleInterface' => __DIR__ . '/..' . '/zizaco/entrust/src/Entrust/Contracts/EntrustRoleInterface.php',
         'Zizaco\\Entrust\\Contracts\\EntrustUserInterface' => __DIR__ . '/..' . '/zizaco/entrust/src/Entrust/Contracts/EntrustUserInterface.php',

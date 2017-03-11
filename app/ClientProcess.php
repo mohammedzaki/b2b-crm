@@ -23,8 +23,12 @@ class ClientProcess extends Model {
         'require_bill',
         'total_price',
         'total_price_taxes',
-        'taxes_value'
+        'taxes_value',
+        'is_billed'
     ];
+
+    const isBilled = 1;
+    const unBilled = 0;
 
     public function client() {
         return $this->belongsTo('App\Client');
@@ -37,7 +41,7 @@ class ClientProcess extends Model {
     public function employee() {
         return $this->hasOne('App\Employee', 'id');
     }
-    
+
     private function clientProcessDeposits() {
         return $this->hasMany('App\DepositWithdraw', 'cbo_processes');
     }

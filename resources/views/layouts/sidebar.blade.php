@@ -78,21 +78,27 @@
                 </ul>
             </li>
             <li>
+                <a href="#"><i class="fa fa-share-square-o  fa-fw"></i>إصدار فاتورة</a>
+                <ul>
+                    <li><a href="{{ URL::to('/invoice') }}">الكل</a></li>
+                    <li><a href="{{ URL::to('/invoice/create') }}">أضف جديد</a></li>
+                </ul>
+            </li>
+            <li>
                 <a href="{{ URL::to('/expenses') }}"><i class="fa fa-files-o fa-fw"></i> مصروف جديد</a>
                 <ul>
                     <li><a href="{{ URL::to('/expenses') }}">الكل</a></li>
                     <li><a href="{{ URL::to('/expenses/create') }}">أضف جديد</a></li>
                 </ul>
-
             </li>
             <li>
-                <a href="index2.html"><i class="fa fa-bank fa-fw"></i> بنك جديد</a>
+                <a href="#"><i class="fa fa-bank fa-fw"></i> بنك جديد</a>
             </li>
             <li>
-                <a href="index2.html"><i class="fa fa-briefcase fa-fw"></i> وارد منصرف بنك</a>
+                <a href="#"><i class="fa fa-briefcase fa-fw"></i> وارد منصرف بنك</a>
             </li>
             <li>
-                <a href="index2.html"><i class="fa fa-list-alt fa-fw"></i> دراسة جدوى العملية</a>
+                <a href="#"><i class="fa fa-list-alt fa-fw"></i> دراسة جدوى العملية</a>
             </li>
             <li style="font-size: 20px;">
                 <a href="{{ URL::to('/reports') }}"><i class="fa fa-bar-chart-o"></i>  التقارير</a>
