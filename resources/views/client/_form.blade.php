@@ -99,15 +99,15 @@
             <div class="hidden_input">
                 <div class="col-lg-8">
                     <div class="form-group{{ $errors->has('referral') ? ' has-error' : '' }}">
-                        {{ Form::label('referral', 'اسم المندوب') }} 
-                        {{ Form::select('referral', $employees, null,
+                        {{ Form::label('referral_id', 'اسم المندوب') }} 
+                        {{ Form::select('referral_id', $employees, null,
             		        array(
             		            'class' => 'form-control')
             		        )
                         }}
-                        @if ($errors->has('referral'))
+                        @if ($errors->has('referral_id'))
                         <label for="inputError" class="control-label">
-                            {{ $errors->first('referral') }}
+                            {{ $errors->first('referral_id') }}
                         </label>
                         @endif
                     </div>

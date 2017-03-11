@@ -23,6 +23,7 @@ class ClientController extends Controller {
                     'address' => 'required|string',
                     'telephone' => 'digits_between:8,14',
                     'mobile' => 'required|numeric',
+                    //FIXME: this valdiation
                     //'referral' => 'required_without:is_client_company|exists:users,username',
                     //'referral_percentage' => 'required_without:is_client_company|required_with:referral|numeric',
                     'credit_limit' => 'required|numeric',
@@ -79,7 +80,6 @@ class ClientController extends Controller {
                 $all['referral_id'] = null;
                 $all['referral_percentage'] = null;
             } else {
-                //$all['referral_id'] = //User::where('username', $all['referral'])->first()->id;
                 $all['is_client_company'] = false;
             }
 
@@ -98,11 +98,13 @@ class ClientController extends Controller {
     public function edit($id) {
         $client = Client::findOrFail($id);
         $authorized = AuthorizedPerson::where('client_id', $client->id)->get()->toArray();
-
-        if ($client->referral_id) {
-            $client->referral = User::find($client->referral_id)->username;
+        $employees = Employee::select('id', 'name')->get();
+        $employees_tmp[-1] = "اختر اسم المندوب";
+        foreach ($employees as $employee) {
+            $employees_tmp[$employee->id] = $employee->name;
         }
-        return view('client.edit', compact('client', 'authorized'));
+        $employees = $employees_tmp;
+        return view('client.edit', compact('client', 'authorized', 'employees'));
     }
 
     public function update(Request $request, $id) {
@@ -119,7 +121,6 @@ class ClientController extends Controller {
                 $all['referral_id'] = null;
                 $all['referral_percentage'] = null;
             } else {
-                $all['referral_id'] = User::where('username', $all['referral'])->first()->id;
                 $all['is_client_company'] = false;
             }
             /*             * ****************************************** */
