@@ -45,7 +45,7 @@ class SupplierProcess extends Model {
     }
     
     public function withdrawals() {
-        return $this->supplierProcessWithdrawals()->where('supplier_id', $supplierProcess->supplier->id)->get();
+        return $this->supplierProcessWithdrawals()->where('supplier_id', $this->supplier->id)->get();
     }
 
     public function totalWithdrawals() {

@@ -809,7 +809,16 @@
         } else {
             payMethod.parent().removeClass("has-error");
         }
-        if (supplier_id.val() === '' && employee_id.val() === '' && expenses_id.val() === '' && client_id.val() === '' && (cbo_processes.val() === '' || cbo_processes.val() === null)) {
+        console.log("supplier_id.val() === '%s' \n employee_id.val() === '%s' \n expenses_id.val() === '%s' \n client_id.val() === '%s' \n cbo_processes.val() === '%s'", supplier_id.val(), employee_id.val(), expenses_id.val(), client_id.val(), cbo_processes.val());
+        if (depositValue.val() === '' && withdrawValue.val() === '') {
+            depositValue.parent().addClass("has-error");
+            withdrawValue.parent().addClass("has-error");
+            flag = false;
+        } else {
+            depositValue.parent().removeClass("has-error");
+            withdrawValue.parent().removeClass("has-error");
+        }
+        if (supplier_id.val() === '' && client_id.val() === '' && employee_id.val() === '') {
             cbo_processes.parent().addClass("has-error");
             client_id.parent().addClass("has-error");
             supplier_id.parent().addClass("has-error");
@@ -823,15 +832,13 @@
             employee_id.parent().removeClass("has-error");
             expenses_id.parent().removeClass("has-error");
         }
-        //console.log("depositValue.val(): " + depositValue.val() + ", : " + (supplier_id.val() === '' && employee_id.val() === '' && expenses_id.val() === '' && client_id.val() === '' && (cbo_processes.val() === '' || cbo_processes.val() === null)) + ", " + employee_id.val());
-        //console.log(" supplier_id: " + supplier_id.val() + ", employee_id: " + employee_id.val() + ", expenses_id: " + expenses_id.val() + ", client_id: " + client_id.val() + ", cbo_processes: " + cbo_processes.val() + ", rowIndex: " + rowIndex);
-        if (depositValue.val() === '' && withdrawValue.val() === '') {
-            depositValue.parent().addClass("has-error");
-            withdrawValue.parent().addClass("has-error");
+        if (expenses_id.val() === ''  && cbo_processes.val() === '') {
+            cbo_processes.parent().addClass("has-error");
+            expenses_id.parent().addClass("has-error");
             flag = false;
         } else {
-            depositValue.parent().removeClass("has-error");
-            withdrawValue.parent().removeClass("has-error");
+            cbo_processes.parent().removeClass("has-error");
+            expenses_id.parent().removeClass("has-error");
         }
         return flag;
     }
@@ -1043,7 +1050,7 @@
                 break;
             case "withdrawValue":
                 depositValue.val('');
-                client_id.val('');
+                //client_id.val('');
                 employee_id.val('');
                 expenses_id.empty();
                 expenses_id.append($("<option></option>"));
@@ -1059,7 +1066,7 @@
                 supplier_id.val('');
                 employee_id.val('');
                 expenses_id.val('');
-                withdrawValue.val('');
+                //withdrawValue.val('');
                 cbo_processes.empty();
                 cbo_processes.append($("<option></option>").attr("value", -1).text(''));
                 $.each(clientProcesses, function (key, process) {

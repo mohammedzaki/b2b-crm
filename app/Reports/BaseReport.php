@@ -2,13 +2,17 @@
 
 namespace App\Reports;
 
-abstract class BaseReport {
+use App\Http\Controllers\Controller;
 
+abstract class BaseReport {
+    
     protected $mpdf;
     protected $reportName = "BaseReport.pdf";
     protected $withLetterHead;
+    protected $controller;
 
     public function __construct($withLetterHead = true) {
+        $this->controller = new Controller();
         if ($withLetterHead) {
             $this->mpdf = new \mPDF('', 'A4', '', '', 8, 8, 28, 10, 10, 10);
         } else {
@@ -58,7 +62,6 @@ abstract class BaseReport {
     
     public function RenderReport() {
         $this->mpdf->autoScriptToLang = true;
-        //$mpdf->baseScript = 1;	// Use values in classes/ucdn.php  1 = LATIN
         $this->mpdf->autoVietnamese = true;
         $this->mpdf->autoArabic = true;
         $this->mpdf->autoLangToFont = true;
@@ -70,5 +73,4 @@ abstract class BaseReport {
         $this->mpdf->WriteHTML($this->SetHtmlBody(), 2);
         $this->mpdf->Output($this->reportName, 'I');
     }
-
 }

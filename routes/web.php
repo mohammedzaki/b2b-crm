@@ -71,13 +71,10 @@ Route::resource('attendance', 'AttendanceController');
 
 Route::resource('feasibilityStudy', 'FeasibilityStudyController');
 
-//api
-Route::group(['prefix' => 'api'], function() {
-    Route::get('getEmployeesCheckinDate', 'AttendanceController@getEmployeesCheckinDate');
-    Route::get('getTaxesRate', 'FacilityController@getTaxesRate');
-});
+Route::resource('invoice', 'InvoiceController');
 
 //reports
+/*
 Route::group(['prefix' => 'reports'], function() {
 
     Route::group(['prefix' => 'client'], function() {
@@ -93,5 +90,4 @@ Route::group(['prefix' => 'reports'], function() {
         Route::get('printDetailedPDF', 'Reports\SupplierReportsController@printDetailedPDF');
         Route::any('viewSupplierReport', 'Reports\SupplierReportsController@viewReport')->name('reports.supplier.viewSupplierReport');
     });
-    
-});
+});*/

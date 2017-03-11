@@ -9,7 +9,7 @@
                 <h3 class="panel-title">تسجيل الدخول</h3>
             </div>
             <div class="panel-body">
-                <form role="form" method="POST" action="{{ url('/login') }}">
+                <form role="form" method="POST" action="{{ route('login') }}">
                     {{ csrf_field() }}
                     <div class="form-group">
                         <!-- time start -->
@@ -32,12 +32,14 @@
                     </div>
                     <fieldset>
                         <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
-                            <input class="form-control" placeholder="اسم المستخدم" name="username" type="text" autofocus> @if ($errors->has('username'))
+                            <input class="form-control" placeholder="اسم المستخدم" name="username" type="text" value="{{ old('username') }}" autofocus> 
+                            @if ($errors->has('username'))
                             <label for="inputError" class="control-label">{{ $errors->first('username') }}</label>
                             @endif
                         </div>
                         <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
-                            <input class="form-control" placeholder="كلمة المرور" name="password" type="password" value=""> @if ($errors->has('password'))
+                            <input class="form-control" placeholder="كلمة المرور" name="password" type="password" value=""> 
+                            @if ($errors->has('password'))
                             <label for="inputError" class="control-label">{{ $errors->first('password') }}</label>
                             @endif
                         </div>
@@ -48,11 +50,11 @@
                         </div>
                         <div class="checkbox">
                             <label>
-                                <input name="remember" type="checkbox" value="Remember Me">تذكرنى
+                                <input name="remember" type="checkbox" {{ old('remember') ? 'checked' : '' }}>تذكرنى
                             </label>
                         </div>
                         <!-- Change this to a button or input when using this as a form -->
-                        <button class="btn btn-lg btn-success btn-block">دخول</button>
+                        <button type="submit" class="btn btn-lg btn-success btn-block">دخول</button>
                     </fieldset>
                 </form>
             </div>

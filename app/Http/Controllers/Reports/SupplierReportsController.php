@@ -151,7 +151,7 @@ class SupplierReportsController extends Controller {
                 
                 foreach ($supplierProcess->withdrawals() as $withdrawal) {
                     $totalWithdrawalValue += $withdrawal->withdrawValue;
-                    $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($withdrawal->created_at)->format('Y-m-d');
+                    $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($withdrawal->due_date)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = $supplierProcess->total_price_taxes - $totalWithdrawalValue;
                     $proceses[$id]['processDetails'][$index]['paid'] = $withdrawal->withdrawValue;
                     $proceses[$id]['processDetails'][$index]['totalPrice'] = "";

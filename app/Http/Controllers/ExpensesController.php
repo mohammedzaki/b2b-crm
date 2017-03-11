@@ -69,6 +69,7 @@ class ExpensesController extends Controller
             return redirect()->back()->with('success', 'تم تعديل بيانات المصروف.');
         }
     }
+    
     // FIXME: must be softDelete
     public function destroy($id) {
         $expenses = Expenses::findOrFail($id);
