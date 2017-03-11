@@ -62,7 +62,7 @@ $(document).ready(function () {
 
     function calculate_taxes() {
         taxes = 0;
-        if ($('input[name="require_bill"]').is(':checked')) {
+        if ($('input[name="require_invoice"]').is(':checked')) {
             taxes = (calculate_process_price() - calculate_discount()) * parseFloat(TaxesRate);
             taxes = roundDecimals(taxes, 3);
         }
@@ -222,7 +222,7 @@ $(document).ready(function () {
         update_prices();
     });
 
-    $("#require_bill, #has_discount").change(function () {
+    $("#require_invoice, #has_discount").change(function () {
         update_prices();
     });
 

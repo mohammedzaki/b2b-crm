@@ -93,7 +93,7 @@
             <!-- /.panel -->
         </div>
     </div>
-    <div class="col-lg-8">
+    <div class="col-lg-6">
         <div class="panel panel-default">
             <div class="panel-heading">
                 بيانات الفاتورة
@@ -246,7 +246,7 @@
                 /*
                  *created_at,deleted_at,description,id,process_id,quantity,unit_price,updated_at
                  */
-                //<tr class="{{($i !=count($items) - 1) ? 'skip' : ''}}" >{{Form::hidden('items['.$i.'][id]')}}<td> <div class="form-group{{$errors->has('items.'.$i.'.description') ? ' has-error' : ''}}">{{Form::text('items['.$i.'][description]', $items[$i]['description'], array( 'class'=> 'form-control', 'placeholder'=> 'ادخل تفاصيل البيان') )}}@if ($errors->has('items.'.$i.'.description')) <label for="inputError" class="control-label">{{$errors->first('items.'.$i.'.description')}}</label> @endif </div></td><td> <div class="form-group{{$errors->has('items.'.$i.'.quantity') ? ' has-error' : ''}}">{{Form::text('items['.$i.'][quantity]', $items[$i]['quantity'], array( 'class'=> 'form-control quantity', 'placeholder'=> 'ادخل الكمية') )}}@if ($errors->has('items.'.$i.'.quantity')) <label for="inputError" class="control-label">{{$errors->first('items.'.$i.'.quantity')}}</label> @endif </div></td><td> <div class="form-group{{$errors->has('items.'.$i.'.unit_price') ? ' has-error' : ''}}">{{Form::text('items['.$i.'][unit_price]', $items[$i]['unit_price'], array( 'class'=> 'form-control unit_price', 'placeholder'=> 'ادخل سعر الوحدة') )}}@if ($errors->has('items.'.$i.'.unit_price')) <label for="inputError" class="control-label">{{$errors->first('items.'.$i.'.unit_price')}}</label> @endif </div></td><td> <div class="form-group{{$errors->has('items.'.$i.'.total_price') ? ' has-error' : ''}}">{{Form::text('items['.$i.'][total_price]', $items[$i]['total_price'], array( 'class'=> 'form-control total_price') )}}@if ($errors->has('items.'.$i.'.total_price')) <label for="inputError" class="control-label">{{$errors->first('items.'.$i.'.total_price')}}</label> @endif </div></td><td> <div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td></tr>
+                
             });
         } else {
             //console.log('Remove process items');

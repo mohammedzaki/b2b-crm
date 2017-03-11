@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use Validator;
-use App\Client;
-use App\ClientProcess;
-use App\Supplier;
-use App\SupplierProcess;
-use App\DepositWithdraw;
+use App\Models\Client;
+use App\Models\ClientProcess;
+use App\Models\Supplier;
+use App\Models\SupplierProcess;
+use App\Models\DepositWithdraw;
 use Carbon\Carbon;
 use App\Reports\Client\ClientTotal;
 use App\Reports\Client\ClientDetailed;
@@ -138,7 +138,7 @@ class SupplierReportsController extends Controller {
                     $proceses[$id]['processDetails'][$index]['desc'] = "خصم بسبب : " . $supplierProcess->discount_reason;
                     $index++;
                 }
-                if ($supplierProcess->require_bill == "1") {
+                if ($supplierProcess->require_invoice == "1") {
                     $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($item->created_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
                     $proceses[$id]['processDetails'][$index]['paid'] = "";

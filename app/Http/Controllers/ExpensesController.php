@@ -6,8 +6,8 @@ use Illuminate\Http\Request;
 
 use App\Http\Requests;
 
-use App\Expenses;
-use App\User;
+use App\Models\Expenses;
+use App\Models\User;
 use Validator;
 
 class ExpensesController extends Controller

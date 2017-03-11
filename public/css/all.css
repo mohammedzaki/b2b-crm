@@ -6815,12 +6815,12 @@ body .ui-tooltip {
         width: 30%;
         float: right;
     }
-    .closebills form .col-lg-12,
-    .closebills form .col-lg-4 {
+    .closeinvoices form .col-lg-12,
+    .closeinvoices form .col-lg-4 {
         float: none;
     }
-    .billoutcome .no-padding-left,
-    .billoutcome .no-padding-right,
+    .invoiceoutcome .no-padding-left,
+    .invoiceoutcome .no-padding-right,
     .permission .no-padding-left,
     .permission .no-padding-right,
     .profloss .no-padding-left,
@@ -6843,7 +6843,7 @@ body .ui-tooltip {
     }
     .feasibility-study .dataTables_wrapper .col-sm-12,
     .permission .dataTables_wrapper .col-sm-12,
-    .printbill .dataTable_wrapper,
+    .printinvoice .dataTable_wrapper,
     .recexpbank .dataTable_wrapper .col-sm-12,
     .reportclient .dataTable_wrapper,
     .reportcostcenter .dataTable_wrapper,
@@ -6866,7 +6866,7 @@ body .ui-tooltip {
 
 @media(min-width:769px) and (max-width:1199px) {
     .permission .dataTables_wrapper .col-sm-12,
-    .printbill .dataTable_wrapper,
+    .printinvoice .dataTable_wrapper,
     .recexpbank .dataTable_wrapper .col-sm-12,
     .reportclient .dataTable_wrapper,
     .reportcostcenter .dataTable_wrapper,
@@ -6894,8 +6894,8 @@ body .ui-tooltip {
         width: 50%;
         float: right;
     }
-    .billoutcome .no-padding-left,
-    .billoutcome .no-padding-right {
+    .invoiceoutcome .no-padding-left,
+    .invoiceoutcome .no-padding-right {
         padding: 0px;
     }
     .col-lg-6 {
@@ -6909,8 +6909,8 @@ body .ui-tooltip {
     .feasibility-study .col-lg-6 {
         width: 100%;
     }
-    .closebills form .col-lg-12,
-    .closebills form .col-lg-4 {
+    .closeinvoices form .col-lg-12,
+    .closeinvoices form .col-lg-4 {
         float: none;
     }
     .col-lg-2 {

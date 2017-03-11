@@ -6,11 +6,11 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use Validator;
-use App\Client;
-use App\ClientProcess;
-use App\Supplier;
-use App\SupplierProcess;
-use App\DepositWithdraw;
+use App\Models\Client;
+use App\Models\ClientProcess;
+use App\Models\Supplier;
+use App\Models\SupplierProcess;
+use App\Models\DepositWithdraw;
 use Carbon\Carbon;
 use App\Reports\Client\ClientTotal;
 use App\Reports\Client\ClientDetailed;
@@ -142,7 +142,7 @@ class ClientReportsController extends Controller {
                     $index++;
                 }
                 //$proceses[$id]['processTotalPaid'] += $discount;
-                if ($clientProcess->require_bill == "1") {
+                if ($clientProcess->require_invoice == "1") {
                     $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($clientProcess->created_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
                     $proceses[$id]['processDetails'][$index]['paid'] = "";

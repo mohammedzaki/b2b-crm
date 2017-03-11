@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Client;
-use App\Employee;
-use App\ClientProcess;
-use App\ClientProcessItem;
+use App\Models\Client;
+use App\Models\Employee;
+use App\Models\ClientProcess;
+use App\Models\ClientProcessItem;
 use Validator;
 
 class ClientProcessController extends Controller {
@@ -27,7 +27,7 @@ class ClientProcessController extends Controller {
                     //'has_discount' => 'boolean',
                     //'discount_value' => 'required_with:has_discount|numeric',
                     //'discount_reason' => 'required_with:has_discount|string',
-                    //'require_bill' => 'boolean',
+                    //'require_invoice' => 'boolean',
                     'total_price' => 'required|numeric',
                     'items.*.description' => 'required|string',
                     'items.*.quantity' => 'required|numeric',
@@ -43,7 +43,7 @@ class ClientProcessController extends Controller {
             'has_discount' => 'الخصم',
             'discount_value' => 'مبلغ الخصم',
             'discount_reason' => 'سبب الخصم',
-            'require_bill' => 'فاتورة',
+            'require_invoice' => 'فاتورة',
             'items.*.description' => 'البيان',
             'items.*.quantity' => 'الكمية',
             'items.*.unit_price' => 'سعر الوحدة',
@@ -100,10 +100,10 @@ class ClientProcessController extends Controller {
             } else {
 
                 $all['status'] = 'active';
-                if (isset($request->require_bill)) {
-                    $all['require_bill'] = 1;
+                if (isset($request->require_invoice)) {
+                    $all['require_invoice'] = 1;
                 } else {
-                    $all['require_bill'] = 0;
+                    $all['require_invoice'] = 0;
                 }
 
                 if (isset($request->has_discount)) {
@@ -166,10 +166,10 @@ class ClientProcessController extends Controller {
             if ($client->credit_limit < ($total_opened_processes_price + $request->total_price)) {
                 return redirect()->back()->withInput($all)->with('error', "خطأ في انشاء عملية جديدة، العميل " . $client->name . " قد تعدى الحد اﻻئتماني المسموح له.");
             } else {
-                if (isset($request->require_bill)) {
-                    $all['require_bill'] = 1;
+                if (isset($request->require_invoice)) {
+                    $all['require_invoice'] = 1;
                 } else {
-                    $all['require_bill'] = 0;
+                    $all['require_invoice'] = 0;
                 }
 
                 if (isset($request->has_discount)) {

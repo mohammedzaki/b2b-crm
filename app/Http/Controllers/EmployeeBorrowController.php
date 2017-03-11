@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Employee;
-use App\EmployeeBorrow;
-use App\DepositWithdraw;
+use App\Models\Employee;
+use App\Models\EmployeeBorrow;
+use App\Models\DepositWithdraw;
 use App\Constants\EmployeeActions;
 use App\Constants\PaymentMethods;
 use Carbon\Carbon;

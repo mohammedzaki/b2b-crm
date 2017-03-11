@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -27,22 +27,22 @@ class DepositWithdraw extends Model {
 
 
     public function items() {
-        return $this->hasMany('App\ClientProcessItem', 'process_id');
+        return $this->hasMany('App\Models\ClientProcessItem', 'process_id');
     }
 
     public function employee() {
-        return $this->hasOne('App\Employee', 'id');
+        return $this->hasOne('App\Models\Employee', 'id');
     }
     
     public function client() {
-        return $this->hasOne('App\Client', 'id');
+        return $this->hasOne('App\Models\Client', 'id');
     }
     
     public function supplier() {
-        return $this->hasOne('App\Supplier', 'id');
+        return $this->hasOne('App\Models\Supplier', 'id');
     }
 
     public function expenses() {
-        return $this->hasOne('App\Expenses', 'id');
+        return $this->hasOne('App\Models\Expenses', 'id');
     }
 }

@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Client;
-use App\ClientProcess;
+use App\Models\Client;
+use App\Models\ClientProcess;
 
 class InvoiceController extends Controller {
 
@@ -30,7 +30,7 @@ class InvoiceController extends Controller {
         foreach ($clients as $client) {
             $clients_tmp[$client->id] = $client->name;
 
-            foreach ($client->unBilledProcesses as $process) {
+            foreach ($client->unInvoiceProcesses as $process) {
                 $clientProcesses[$client->id][$process->id]['name'] = $process->name;
                 $clientProcesses[$client->id][$process->id]['totalPrice'] = $process->total_price;
                 $clientProcesses[$client->id][$process->id]['status'] = $process->status;

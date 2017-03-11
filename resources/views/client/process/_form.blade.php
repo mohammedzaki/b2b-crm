@@ -149,12 +149,12 @@
 
                 <div class="col-lg-12 no-padding">
                     <div class="legend">
-                        {{ Form::checkbox('require_bill', '1', null, 
+                        {{ Form::checkbox('require_invoice', '1', null, 
                             array(
-                                'id' => 'require_bill'
+                                'id' => 'require_invoice'
                             )
                         ) }} 
-                        {{ Form::label('require_bill', 'فاتورة') }}
+                        {{ Form::label('require_invoice', 'فاتورة') }}
                     </div>
                 </div>
 

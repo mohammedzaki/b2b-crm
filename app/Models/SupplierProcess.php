@@ -1,57 +1,55 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class ClientProcess extends Model {
+class SupplierProcess extends Model {
 
     use SoftDeletes;
 
     protected $dates = ['deleted_at'];
+    
     protected $fillable = [
         'name',
-        'client_id',
+        'client_process_id',
+        'supplier_id',
         'employee_id',
         'notes',
         'has_discount',
-        'status',
         'discount_percentage',
         'discount_value',
         'discount_reason',
-        'require_bill',
+        'require_invoice',
         'total_price',
         'total_price_taxes',
-        'taxes_value',
-        'is_billed'
+        'taxes_value'
     ];
+    public $client_id = 0;
 
-    const isBilled = 1;
-    const unBilled = 0;
-
-    public function client() {
-        return $this->belongsTo('App\Client');
+    public function supplier() {
+        return $this->belongsTo('App\Models\Supplier');
     }
 
     public function items() {
-        return $this->hasMany('App\ClientProcessItem', 'process_id');
+        return $this->hasMany('App\Models\SupplierProcessItem', 'process_id');
     }
 
     public function employee() {
-        return $this->hasOne('App\Employee', 'id');
+        return $this->hasOne('App\Models\Employee', 'id');
+    }
+    
+    private function supplierProcessWithdrawals() {
+        return $this->hasMany('App\Models\DepositWithdraw', 'cbo_processes');
+    }
+    
+    public function withdrawals() {
+        return $this->supplierProcessWithdrawals()->where('supplier_id', $this->supplier->id)->get();
     }
 
-    private function clientProcessDeposits() {
-        return $this->hasMany('App\DepositWithdraw', 'cbo_processes');
-    }
-
-    public function deposits() {
-        return $this->clientProcessDeposits()->where('client_id', $this->client->id)->get();
-    }
-
-    public function totalDeposits() {
-        return $this->clientProcessDeposits()->where('client_id', $this->client->id)->sum('depositValue');
+    public function totalWithdrawals() {
+        return $this->supplierProcessWithdrawals()->where('supplier_id', $this->supplier->id)->sum('withdrawValue');
     }
 
     public function totalPriceAfterTaxes() {
@@ -59,7 +57,7 @@ class ClientProcess extends Model {
     }
 
     public function CheckProcessMustClosed() {
-        if ($this->totalPriceAfterTaxes() == $this->totalDeposits()) {
+        if ($this->totalPriceAfterTaxes() == $this->totalWithdrawals()) {
             $this->status = 'closed';
             $this->save();
             return TRUE;
@@ -72,7 +70,7 @@ class ClientProcess extends Model {
 
     public function discountValue() {
         if ($this->has_discount == "1") {
-            return $this->discount_value;
+            return $this->discount_value; //* ($this->discount_percentage / 100);
         }
         return 0;
     }
@@ -85,14 +83,16 @@ class ClientProcess extends Model {
     }
 
     public function taxesValue() {
-        if ($this->require_bill == "1") {
+        if ($this->require_invoice == "1") {
+            //$facility = Facility::findOrFail(1);
+            //($this->total_price - $this->discountValue()) * $facility->getTaxesRate();
             return $this->taxes_value;
         }
         return 0;
     }
 
     public static function allOpened() {
-        return ClientProcess::where('status', 'active');
+        return SupplierProcess::where('status', 'active');
     }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,7 +12,7 @@ class AbsentType extends Model {
     ];
     
     public function attendances(){
-        return $this->hasMany('App\Attendance');
+        return $this->hasMany('App\Models\Attendance');
     }
 
 }

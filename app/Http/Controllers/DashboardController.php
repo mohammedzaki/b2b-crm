@@ -4,14 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Client;
-use App\Supplier;
-use App\ClientProcess;
-use App\Employee;
-use App\Expenses;
-use App\SupplierProcess;
-use App\DepositWithdraw;
-use App\Facility;
+use App\Models\Client;
+use App\Models\Supplier;
+use App\Models\ClientProcess;
+use App\Models\Employee;
+use App\Models\Expenses;
+use App\Models\SupplierProcess;
+use App\Models\DepositWithdraw;
+use App\Models\Facility;
 use Validator;
 
 class DashboardController extends Controller {

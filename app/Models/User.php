@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Zizaco\Entrust\Traits\EntrustUserTrait;
@@ -28,7 +28,7 @@ class User extends Authenticatable {
     ];
 
     public function additional_info() {
-        return $this->hasOne('App\Employee', 'id');
+        return $this->hasOne('App\Models\Employee', 'id');
     }
 
 }

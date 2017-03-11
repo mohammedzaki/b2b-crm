@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
@@ -33,15 +33,15 @@ class Attendance extends Model {
     public $is_managment_process;
 
     public function employee() {
-        return $this->belongsTo('App\Employee');
+        return $this->belongsTo('App\Models\Employee');
     }
 
     public function absentType() {
-        return $this->belongsTo('App\AbsentType');
+        return $this->belongsTo('App\Models\AbsentType');
     }
 
     public function process() {
-        return $this->belongsTo('App\ClientProcess');
+        return $this->belongsTo('App\Models\ClientProcess');
     }
 
     public function employeeGuardianship() {

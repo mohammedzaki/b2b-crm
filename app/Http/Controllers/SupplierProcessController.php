@@ -5,12 +5,12 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use Validator;
-use App\Supplier;
-use App\Employee;
-use App\SupplierProcess;
-use App\SupplierProcessItem;
-use App\Client;
-use App\ClientProcess;
+use App\Models\Supplier;
+use App\Models\Employee;
+use App\Models\SupplierProcess;
+use App\Models\SupplierProcessItem;
+use App\Models\Client;
+use App\Models\ClientProcess;
 
 class SupplierProcessController extends Controller {
 
@@ -31,7 +31,7 @@ class SupplierProcessController extends Controller {
                     //'has_discount' => 'boolean',
                     //'discount_value' => 'required_with:has_discount|numeric',
                     //'discount_reason' => 'required_with:has_discount|string',
-                    //'require_bill' => 'boolean',
+                    //'require_invoice' => 'boolean',
                     'total_price' => 'required|numeric',
                     'items.*.description' => 'required|string',
                     'items.*.quantity' => 'required|numeric',
@@ -49,7 +49,7 @@ class SupplierProcessController extends Controller {
             'has_discount' => 'الخصم',
             'discount_value' => 'مبلغ الخصم',
             'discount_reason' => 'سبب الخصم',
-            'require_bill' => 'فاتورة',
+            'require_invoice' => 'فاتورة',
             'items.*.description' => 'البيان',
             'items.*.quantity' => 'الكمية',
             'items.*.unit_price' => 'سعر الوحدة',
@@ -107,10 +107,10 @@ class SupplierProcessController extends Controller {
             $total_opened_processes_price = 0;
 
             $all['status'] = 'active';
-            if (isset($request->require_bill)) {
-                $all['require_bill'] = 1;
+            if (isset($request->require_invoice)) {
+                $all['require_invoice'] = 1;
             } else {
-                $all['require_bill'] = 0;
+                $all['require_invoice'] = 0;
             }
 
             if (isset($request->has_discount)) {
@@ -118,7 +118,7 @@ class SupplierProcessController extends Controller {
             } else {
                 $all['has_discount'] = 0;
             }
-            $all['name'] = \App\ClientProcess::findOrFail($all['client_process_id'])->name;
+            $all['name'] = \App\Models\ClientProcess::findOrFail($all['client_process_id'])->name;
             $supplierProcess = SupplierProcess::create($all);
 
             foreach ($all['items'] as $item) {
@@ -191,10 +191,10 @@ class SupplierProcessController extends Controller {
 //                    "خطأ في انشاء عملية جديدة، العميل ".$supplier->name." قد تعدى الحد اﻻئتماني المسموح له."
 //                );
 //            }else{
-            if (isset($request->require_bill)) {
-                $all['require_bill'] = 1;
+            if (isset($request->require_invoice)) {
+                $all['require_invoice'] = 1;
             } else {
-                $all['require_bill'] = 0;
+                $all['require_invoice'] = 0;
             }
 
             if (isset($request->has_discount)) {
@@ -202,7 +202,7 @@ class SupplierProcessController extends Controller {
             } else {
                 $all['has_discount'] = 0;
             }
-            $all['name'] = \App\ClientProcess::findOrFail($all['client_process_id'])->name;
+            $all['name'] = \App\Models\ClientProcess::findOrFail($all['client_process_id'])->name;
             $process->update($all);
             $items_ids = [];
 

@@ -4,9 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Facility;
-use App\User;
-use App\Employee;
+use App\Models\Facility;
+use App\Models\User;
+use App\Models\Employee;
 use Validator;
 
 class FacilityController extends Controller {

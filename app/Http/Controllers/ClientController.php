@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Client;
-use App\AuthorizedPerson;
-use App\User;
-use App\Employee;
+use App\Models\Client;
+use App\Models\AuthorizedPerson;
+use App\Models\User;
+use App\Models\Employee;
 use Validator;
 
 class ClientController extends Controller {

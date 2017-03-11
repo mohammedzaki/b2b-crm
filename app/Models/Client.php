@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -22,11 +22,14 @@ class Client extends Model {
     ];
 
     public function processes() {
-        return $this->hasMany('App\ClientProcess');
+        return $this->hasMany('App\Models\ClientProcess');
     }
     
-    public function unBilledProcesses() {
-        return $this->hasMany('App\ClientProcess')->where('is_billed', ClientProcess::unBilled);
+    public function unInvoiceProcesses() {
+        return $this->hasMany('App\Models\ClientProcess')->where([
+            ['invoice_billed', "=", ClientProcess::invoiceUnBilled],
+            ['require_invoice', "=", TRUE],
+        ]);
     }
 
     public function closedProcess() {

@@ -5,10 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Http\Requests;
 use Validator;
-use App\User;
-use App\Role;
-use App\Permission;
-use App\Employee;
+use App\Models\User;
+use App\Models\Role;
+use App\Models\Permission;
+use App\Models\Employee;
 use Crypt;
 
 class EmployeeController extends Controller {

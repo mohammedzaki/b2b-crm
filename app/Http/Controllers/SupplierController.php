@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests;
-use App\Supplier;
-use App\User;
+use App\Models\Supplier;
+use App\Models\User;
 use Validator;
 
 class SupplierController extends Controller {

@@ -1,10 +1,10 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\DepositWithdraw;
+use App\Models\DepositWithdraw;
 use App\Constants\EmployeeActions;
 
 class Employee extends Model {
@@ -36,12 +36,12 @@ class Employee extends Model {
     public $password = "";
 
     public function users() {
-        //return $this->belongsTo('App\User', 'employee_id');
-        return $this->hasMany('App\User', 'employee_id');
+        //return $this->belongsTo('App\Models\User', 'employee_id');
+        return $this->hasMany('App\Models\User', 'employee_id');
     }
 
     /* public function employeeBorrow() {
-      return $this->hasMany('App\EmployeeBorrow', 'id');
+      return $this->hasMany('App\Models\EmployeeBorrow', 'id');
       } */
 
     public function employeeSmallBorrows() {

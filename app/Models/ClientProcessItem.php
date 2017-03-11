@@ -1,16 +1,15 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class SupplierProcessItem extends Model
-{
+class ClientProcessItem extends Model {
+
     use SoftDeletes;
 
     protected $dates = ['deleted_at'];
-
     protected $fillable = [
         'process_id',
         'description',
@@ -18,8 +17,8 @@ class SupplierProcessItem extends Model
         'unit_price'
     ];
 
-    public function process()
-    {
-        return $this->belongsTo('App\SupplierProcess');
+    public function process() {
+        return $this->belongsTo('App\Models\ClientProcess');
     }
+
 }
