@@ -115,63 +115,63 @@
                         <tbody id="prcoess_items">
                             @if($items)
                             @for ($i = 0; $i < count($items); $i++)
-                            <tr class="{{ ($i != count($items) - 1) ? 'skip' : '' }}" >
-                                {{ Form::hidden('items['.$i.'][id]') }}
+                            <tr class="{{ ($i != count($items) - 1) ? "skip" : "" }}" >
+                                {{ Form::hidden("items[".$i."][id]") }}
                                 <td>
-                                    <div class="form-group{{ $errors->has('items.'.$i.'.description') ? ' has-error' : '' }}">
-                                        {{ Form::text('items['.$i.'][description]', $items[$i]['description'], 
+                                    <div class="form-group{{ $errors->has("items.".$i.".description") ? " has-error" : "" }}">
+                                        {{ Form::text("items[".$i."][description]", $items[$i]["description"], 
                                             array(
-                                                'class' => 'form-control', 
-                                                'placeholder' => 'ادخل تفاصيل البيان')
+                                                "class" => "form-control", 
+                                                "placeholder" => "ادخل تفاصيل البيان")
                                             )
                                         }}
-                                        @if ($errors->has('items.'.$i.'.description'))
+                                        @if ($errors->has("items.".$i.".description"))
                                         <label for="inputError" class="control-label">
-                                            {{ $errors->first('items.'.$i.'.description') }}
+                                            {{ $errors->first("items.".$i.".description") }}
                                         </label>
                                         @endif
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="form-group{{ $errors->has('items.'.$i.'.quantity') ? ' has-error' : '' }}">
-                                        {{ Form::text('items['.$i.'][quantity]', $items[$i]['quantity'], 
+                                    <div class="form-group{{ $errors->has("items.".$i.".quantity") ? " has-error" : "" }}">
+                                        {{ Form::text("items[".$i."][quantity]", $items[$i]["quantity"], 
                                             array(
-                                                'class' => 'form-control quantity', 
-                                                'placeholder' => 'ادخل الكمية')
+                                                "class" => "form-control quantity", 
+                                                "placeholder" => "ادخل الكمية")
                                             )
                                         }}
-                                        @if ($errors->has('items.'.$i.'.quantity'))
+                                        @if ($errors->has("items.".$i.".quantity"))
                                         <label for="inputError" class="control-label">
-                                            {{ $errors->first('items.'.$i.'.quantity') }}
+                                            {{ $errors->first("items.".$i.".quantity") }}
                                         </label>
                                         @endif
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="form-group{{ $errors->has('items.'.$i.'.unit_price') ? ' has-error' : '' }}">
-                                        {{ Form::text('items['.$i.'][unit_price]', $items[$i]['unit_price'], 
+                                    <div class="form-group{{ $errors->has("items.".$i.".unit_price") ? " has-error" : "" }}">
+                                        {{ Form::text("items[".$i."][unit_price]", $items[$i]["unit_price"], 
                                             array(
-                                                'class' => 'form-control unit_price', 
-                                                'placeholder' => 'ادخل سعر الوحدة')
+                                                "class" => "form-control unit_price", 
+                                                "placeholder" => "ادخل سعر الوحدة")
                                             )
                                         }}
-                                        @if ($errors->has('items.'.$i.'.unit_price'))
+                                        @if ($errors->has("items.".$i.".unit_price"))
                                         <label for="inputError" class="control-label">
-                                            {{ $errors->first('items.'.$i.'.unit_price') }}
+                                            {{ $errors->first("items.".$i.".unit_price") }}
                                         </label>
                                         @endif
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="form-group{{ $errors->has('items.'.$i.'.total_price') ? ' has-error' : '' }}">
-                                        {{ Form::text('items['.$i.'][total_price]', $items[$i]['total_price'], 
+                                    <div class="form-group{{ $errors->has("items.".$i.".total_price") ? " has-error" : "" }}">
+                                        {{ Form::text("items[".$i."][total_price]", $items[$i]["total_price"], 
                                             array(
-                                                'class' => 'form-control total_price')
+                                                "class" => "form-control total_price")
                                             )
                                         }}
-                                        @if ($errors->has('items.'.$i.'.total_price'))
+                                        @if ($errors->has("items.".$i.".total_price"))
                                         <label for="inputError" class="control-label">
-                                            {{ $errors->first('items.'.$i.'.total_price') }}
+                                            {{ $errors->first("items.".$i.".total_price") }}
                                         </label>
                                         @endif
                                     </div>
@@ -240,14 +240,19 @@
         }
         inputProcessId.prop("disabled", flag);
         inputChk.prop("checked", flag);
+        var index = 0;
         if (flag) {
             //console.log('Load process items', inputProcessId.val());
-            $.each(allProcesses[currentClientId][inputProcessId.val()]['items'], function (key, value) { 
+            $.each(allProcesses[currentClientId][inputProcessId.val()]['items'], function (item) { 
                 /*
                  *created_at,deleted_at,description,id,process_id,quantity,unit_price,updated_at
                  */
-                
+                index = $("#prcoess_items").children().length;
+                $("#prcoess_items").append('<tr class="skip" >{{Form::hidden("items[' + index + '][id]")}}<td> <div class="form-group{{$errors->has("items.' + index + '.description") ? " has-error" : ""}}">{{Form::text("items[' + index + '][description]", "description", array( "class"=> "form-control", "placeholder"=> "ادخل تفاصيل البيان") )}}@if ($errors->has("items.' + index + '.description")) <label for="inputError" class="control-label">{{$errors->first("items.' + index + '.description")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("items.' + index + '.quantity") ? " has-error" : ""}}">{{Form::text("items[' + index + '][quantity]", "quantity", array( "class"=> "form-control quantity", "placeholder"=> "ادخل الكمية") )}}@if ($errors->has("items.' + index + '.quantity")) <label for="inputError" class="control-label">{{$errors->first("items.' + index + '.quantity")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("items.' + index + '.unit_price") ? " has-error" : ""}}">{{Form::text("items[' + index + '][unit_price]", "unit_price", array( "class"=> "form-control unit_price", "placeholder"=> "ادخل سعر الوحدة") )}}@if ($errors->has("items.' + index + '.unit_price")) <label for="inputError" class="control-label">{{$errors->first("items.' + index + '.unit_price")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("items.' + index + '.total_price") ? " has-error" : ""}}">{{Form::text("items[' + index + '][total_price]", "total_price", array( "class"=> "form-control total_price") )}}@if ($errors->has("items.' + index + '.total_price")) <label for="inputError" class="control-label">{{$errors->first("items.' + index + '.total_price")}}</label> @endif </div></td><td> <div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td></tr>');
             });
+            /*
+             <tr class="skip" ><input name="items[" + index + "][id]" type="hidden"><td> <div class="form-group"><input class="form-control" placeholder="ادخل تفاصيل البيان" name="items[" + index + "][description]" type="text" value="description"> </div></td><td> <div class="form-group"><input class="form-control quantity" placeholder="ادخل الكمية" name="items[" + index + "][quantity]" type="text" value="quantity"> </div></td><td> <div class="form-group"><input class="form-control unit_price" placeholder="ادخل سعر الوحدة" name="items[" + index + "][unit_price]" type="text" value="unit_price"> </div></td><td> <div class="form-group"><input class="form-control total_price" name="items[" + index + "][total_price]" type="text" value="total_price"> </div></td><td> <div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td></tr>
+             */
         } else {
             //console.log('Remove process items');
         }
