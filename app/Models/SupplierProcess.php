@@ -39,6 +39,10 @@ class SupplierProcess extends Model {
     public function employee() {
         return $this->hasOne('App\Models\Employee', 'id');
     }
+
+    public function clientProcess() {
+        return $this->hasOne(ClientProcess::class, 'id');
+    }
     
     private function supplierProcessWithdrawals() {
         return $this->hasMany('App\Models\DepositWithdraw', 'cbo_processes');

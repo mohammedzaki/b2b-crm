@@ -818,7 +818,7 @@
             depositValue.parent().removeClass("has-error");
             withdrawValue.parent().removeClass("has-error");
         }
-        if (supplier_id.val() === '' && client_id.val() === '' && employee_id.val() === '') {
+        if (supplier_id.val() === '' && client_id.val() === '' && employee_id.val() === '' && expenses_id.val() === '') {
             cbo_processes.parent().addClass("has-error");
             client_id.parent().addClass("has-error");
             supplier_id.parent().addClass("has-error");
@@ -1112,8 +1112,6 @@
                             }
                         });
                     }
-                    
-                    
                 } else {
                     depositValue.val('');
                     $.each(expenses, function (key, process) {
@@ -1128,7 +1126,6 @@
                     depositValue.val('');
                 }
                 cbo_processes.empty();
-                
                 break;
             case "payMethod":
                 break;
@@ -1170,15 +1167,7 @@
     }
 
     function SetIsNumberOnly() {
-        $(".IsNumberOnly").keypress(function (evt) {
-            evt = (evt) ? evt : window.event;
-            var charCode = (evt.which) ? evt.which : evt.keyCode;
-            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                return false;
-            }
-            AddNewRow(evt.currentTarget);
-            return true;
-        });
+        
     }
 
     function SetRowReadonly(rowIndex) {
