@@ -16,6 +16,7 @@ use App\Models\SupplierProcess;
 use App\Models\DepositWithdraw;
 use App\Models\Facility;
 use App\Models\User;
+use App\Models\OpeningAmount;
 use App\Constants\EmployeeActions;
 use App\Constants\PaymentMethods;
 use Validator;
@@ -213,6 +214,7 @@ class DepositWithdrawController extends Controller {
         $numbers['process_number'] = ClientProcess::count();
         $numbers['Supplierprocess_number'] = SupplierProcess::count();
         $numbers['current_amount'] = $this->CalculateCurrentAmount();
+        $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate, $endDate);
         $dt = Carbon::parse($startDate);
         $numbers['current_dayOfWeek'] = $dt->dayOfWeek;
         $numbers['current_dayOfMonth'] = $dt->day;
@@ -339,6 +341,14 @@ class DepositWithdrawController extends Controller {
 
     private function CalculateCurrentAmount() {
         return (DepositWithdraw::sum('depositValue') + Facility::sum('opening_amount')) - DepositWithdraw::sum('withdrawValue');
+    }
+    
+    private function CalculateCurrentAmountOff($startDate, $endDate) {
+        $startDate = Carbon::today()->format('2017-01-01 00:00:00');
+        $depositValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+        $withdrawValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
+        $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
+        return ($depositValue + $openingAmount) - $withdrawValue;
     }
 
     private function CheckProcessClosed(DepositWithdraw $depositWithdraw) {

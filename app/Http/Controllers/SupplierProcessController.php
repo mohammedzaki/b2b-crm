@@ -26,7 +26,7 @@ class SupplierProcessController extends Controller {
                     'client_process_id' => 'required|exists:client_processes,id',
                     'supplier_id' => 'required|exists:suppliers,id',
                     'employee_id' => 'required|exists:employees,id',
-                    'notes' => 'string',
+                    //'notes' => 'string',
                     // FIXME: Solve validation 
                     //'has_discount' => 'boolean',
                     //'discount_value' => 'required_with:has_discount|numeric',
@@ -45,7 +45,7 @@ class SupplierProcessController extends Controller {
             'client_process_id' => 'اسم العملية',
             'supplier_id' => 'اسم المورد',
             'employee_id' => 'مشرف العملية',
-            'notes' => 'ملاحظات',
+            //'notes' => 'ملاحظات',
             'has_discount' => 'الخصم',
             'discount_value' => 'مبلغ الخصم',
             'discount_reason' => 'سبب الخصم',

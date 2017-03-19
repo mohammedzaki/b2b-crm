@@ -21,7 +21,7 @@ class ClientController extends Controller {
         $validator = Validator::make($data, [
                     'name' => 'required|unique:clients,name,' . $id . '|string',
                     'address' => 'required|string',
-                    'telephone' => 'digits_between:8,14',
+                    'telephone' => 'digits_between:6,14',
                     'mobile' => 'required|numeric',
                     //FIXME: this valdiation
                     //'referral' => 'required_without:is_client_company|exists:users,username',

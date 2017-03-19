@@ -1,6 +1,3 @@
-@section('css_scripts')
-<link href="{{ url('vendors/flatpickr/dist/flatpickr.min.css') }}" rel="stylesheet">
-@endsection
 @if($checkin === -1)
 @section('title', 'بيانات الحضور و الانصراف')   
 @elseif ($checkin)
@@ -227,8 +224,6 @@
 </div>
 
 @section('scripts')
-<script src="{{ url('/vendors/flatpickr/dist/flatpickr.min.js') }}"></script>
-<script src="{{ url('/vendors/flatpickr/dist/l10n/ar.js') }}"></script>
 <script>
 var employeesSalaries = {
     @foreach($employeesSalaries as $k => $info) 

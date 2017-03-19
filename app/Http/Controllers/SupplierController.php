@@ -19,7 +19,7 @@ class SupplierController extends Controller {
         $validator = Validator::make($data, [
                     'name' => 'required|unique:suppliers,name,' . $id . '|string',
                     'address' => 'required|string',
-                    'telephone' => 'digits_between:8,14',
+                    'telephone' => 'digits_between:6,14',
                     'mobile' => 'required|numeric',
                     'debit_limit' => 'required|numeric'
         ]);

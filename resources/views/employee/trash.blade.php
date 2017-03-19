@@ -89,6 +89,9 @@
     <!-- /.col-lg-12 -->
 </div>
 
+@endsection
+
+@section('scripts')
 
 <script>
     function ConfirmDelete() {

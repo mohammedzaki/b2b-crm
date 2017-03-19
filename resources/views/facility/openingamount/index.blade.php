@@ -78,7 +78,9 @@
     </div>
     <!-- /.col-lg-12 -->
 </div>
+@endsection
 
+@section('scripts')
 <script>
     function ConfirmDelete() {
         return confirm("هل انت متأكد من حذف الرصيد ؟");

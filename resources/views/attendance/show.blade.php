@@ -2,10 +2,6 @@
 
 @section('title', 'حضور وانصراف الموظفين')
 
-@section('css_scripts')
-<link href="{{ url('vendors/flatpickr/dist/flatpickr.min.css') }}" rel="stylesheet">
-@endsection
-
 @section('content')
 <div class="row">
     <div class="col-lg-12">
@@ -285,8 +281,6 @@
 @endif
 @endsection
 @section('scripts')
-<script src="{{ url('/vendors/flatpickr/dist/flatpickr.min.js') }}"></script>
-<script src="{{ url('/vendors/flatpickr/dist/l10n/ar.js') }}"></script>
 <script>
     var datepicker = $("#datepicker").flatpickr({
         enableTime: false,

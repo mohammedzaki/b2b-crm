@@ -113,17 +113,6 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12 no-padding">
-                <div class="legend">
-                    {{ Form::checkbox('start_discount', 'true', null,
-                        array(
-                            'id' => 'start_discount',
-                            'class' => ''
-                        )
-                    ) }}
-                    {{ Form::label('start_discount', 'تخصم ابتداءا من هذا الشهر') }}
-                </div>
-            </div>
         </div>
         <!-- /.panel-body -->
     </div>

@@ -20,7 +20,7 @@ mix.js([
 
 
 mix.js([
-    'resources/assets/js/jquery-1.10.2.js',
+    'resources/assets/js/app.js',
     'resources/assets/js/jquery-ui.js',
     'resources/assets/js/bootstrap.min.js',
     'resources/assets/js/metisMenu.min.js',
@@ -46,7 +46,8 @@ mix.styles([
     'resources/assets/css/jquery-ui.css',
     'resources/assets/css/responsive.css',
     'resources/assets/css/bootstrap-select.min.css',
-    'resources/assets/css/custom.css'
+    'resources/assets/css/custom.css',
+    'node_modules/flatpickr/dist/flatpickr.css'
 ], 'public/css/app.css').version();
 
 

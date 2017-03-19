@@ -18,7 +18,7 @@ class EmployeeBorrowController extends Controller {
         $this->middleware('auth');
         $this->middleware('ability:admin,employees-permissions');
     }
-    
+
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
                     'employee_id' => 'required|exists:employees,id',
@@ -46,7 +46,7 @@ class EmployeeBorrowController extends Controller {
      */
     public function index() {
         $employeeBorrows = EmployeeBorrow::all();
-    
+
         return view('employee.borrow.index', compact('employeeBorrows'));
     }
 
@@ -88,19 +88,18 @@ class EmployeeBorrowController extends Controller {
 
             $all['is_active'] = 1;
             $employeeBorrow = EmployeeBorrow::create($all);
-            
-            if ($request->start_discount) {
-                $depositWithdraw = new DepositWithdraw();
-                $depositWithdraw->withdrawValue = $employeeBorrow->pay_amount;
-                $depositWithdraw->due_date = Carbon::now();
-                $depositWithdraw->recordDesc = "سلفة مستديمة دفعة شهر {$depositWithdraw->due_date->month} سنة {$depositWithdraw->due_date->year}";
-                $depositWithdraw->employee_id = $employee->id;
-                $depositWithdraw->expenses_id = EmployeeActions::LongBorrow;
-                $depositWithdraw->payMethod = PaymentMethods::CASH;
-                $depositWithdraw->notes = Carbon::now();
-                $depositWithdraw->save();
-            }
-            
+
+            $depositWithdraw = new DepositWithdraw();
+            $depositWithdraw->withdrawValue = $employeeBorrow->pay_amount;
+            $depositWithdraw->due_date = Carbon::now();
+            $depositWithdraw->recordDesc = "سلفة مستديمة شهر {$depositWithdraw->due_date->month} سنة {$depositWithdraw->due_date->year}";
+            $depositWithdraw->employee_id = $employee->id;
+            $depositWithdraw->expenses_id = EmployeeActions::LongBorrow;
+            $depositWithdraw->payMethod = PaymentMethods::CASH;
+            $depositWithdraw->notes = Carbon::now();
+            $depositWithdraw->save();
+
+
             return redirect()->route('employeeBorrow.index')->with('success', 'تم اضافة سلفية جديدة.');
         }
     }
@@ -126,7 +125,7 @@ class EmployeeBorrowController extends Controller {
         $employee = Employee::where('id', $borrow->employee_id)->firstOrFail();
         $employees_tmp[$employee->id] = $employee->name;
         $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
-        
+
         $employees = $employees_tmp;
 
         //return $employees_salary;
@@ -172,4 +171,5 @@ class EmployeeBorrowController extends Controller {
 
         return redirect()->back()->with('success', 'تم حذف موظف.');
     }
+
 }

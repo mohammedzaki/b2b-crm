@@ -124,16 +124,7 @@
                         {{ $errors->first('birth_date') }}
                     </label>
                     @endif
-                    <script>
-                        $(function () {
-                            $("#datepicker").datepicker({
-                                changeMonth: true,
-                                changeYear: true,
-                                yearRange: "-60:-15",
-                                dateFormat: 'yy-mm-dd'
-                            });
-                        });
-                    </script>
+
                 </div>
             </div>
 
@@ -152,16 +143,7 @@
                         {{ $errors->first('hiring_date') }}
                     </label>
                     @endif
-                    <script>
-                        $(function () {
-                            $("#datepicker2").datepicker({
-                                changeMonth: true,
-                                changeYear: true,
-                                yearRange: "-20:+0",
-                                dateFormat: 'yy-mm-dd'
-                            });
-                        });
-                    </script>
+
                 </div>
             </div>
 
@@ -292,7 +274,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-lg-12 no-padding">
                 <div class="legend">
                     {{ Form::checkbox('borrow_system', '1', null, 
@@ -370,3 +352,23 @@
         </button>
     </div>
 </row>
+
+
+@section('scripts')
+<script>
+    $(function () {
+        $("#datepicker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-60:-15",
+            dateFormat: 'yy-mm-dd'
+        });
+        $("#datepicker2").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            yearRange: "-20:+0",
+            dateFormat: 'yy-mm-dd'
+        });
+    });
+</script>
+@endsection

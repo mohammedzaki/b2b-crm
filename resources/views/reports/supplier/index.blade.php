@@ -159,8 +159,9 @@
     </div>
     <!-- /.col-lg-12 -->
 </div>
+@endsection
 
-
+@section('scripts')
 <script>
     var allProcesses  = [@foreach($supplierProcesses as $k => $info) {id: '{{ $k }}', name: '{{ $info["name"] }}', clientId: '{{ $info["supplierId"] }}', totalPrice: '{{ $info["totalPrice"] }}', status: '{{ $info["status"] }}'}, @endforeach];
     //var supplierProcess = null;

@@ -22,7 +22,7 @@ class ClientProcessController extends Controller {
                     'name' => 'required|unique:client_processes,name,' . $id . '|min:5|max:255',
                     'client_id' => 'required|exists:clients,id',
                     'employee_id' => 'required|exists:employees,id',
-                    'notes' => 'string',
+                    //'notes' => 'string',
                     // FIXME: Solve validation 
                     //'has_discount' => 'boolean',
                     //'discount_value' => 'required_with:has_discount|numeric',
@@ -39,7 +39,7 @@ class ClientProcessController extends Controller {
             'name' => 'اسم العملية',
             'client_id' => 'اسم العميل',
             'employee_id' => 'مشرف العملية',
-            'notes' => 'مﻻحظات',
+            //'notes' => 'ملاحظات',
             'has_discount' => 'الخصم',
             'discount_value' => 'مبلغ الخصم',
             'discount_reason' => 'سبب الخصم',

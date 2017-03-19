@@ -28,9 +28,4 @@
     </div>
     <!-- /.col-lg-12 -->
 </div>
-
-
-<script>
-
-</script>
 @endsection

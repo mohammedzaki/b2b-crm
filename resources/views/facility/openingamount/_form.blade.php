@@ -39,11 +39,6 @@
                 <div class="form-group">
                     {{ Form::label('depositdate', 'التاريخ') }}
                     <input type="text"  id="depositdate" name="depositdate" readonly class="form-control">
-                    <script>
-                        $(function () {
-                            $("#depositdate").datepicker();
-                        });
-                    </script>
                 </div>
             </div>
             <!-- /.panel-body -->
@@ -62,6 +57,10 @@
 
 </div>
 
+@section('scripts')
 <script>
-
+    $(function () {
+        $("#depositdate").datepicker();
+    });
 </script>
+@endsection

@@ -38,7 +38,7 @@
 	                                <th width="40">الرقم</th>
 	                                <th>اسم العميلة</th>
 	                                <th>اسم المورد</th>
-	                                <th>مﻻحظات</th>
+	                                <th>ملاحظات</th>
 	                                <th>مبلغ العملية</th>
 	                                <th width="150">تحكم</th>
 	                            </tr>
@@ -70,8 +70,9 @@
 	</div>
 	<!-- /.col-lg-12 -->
 </div>
+@endsection
 
-
+@section('scripts')
 <script>
 function ConfirmDelete() {
     return confirm("هل انت متأكد من حذف المورد ؟");

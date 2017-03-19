@@ -182,10 +182,17 @@
                                 </label>
                             </div>
 
-                            <div class="col-sm-6 text-left">
+                            <div class="col-sm-3 text-left">
                                 <div id="dataTables-example_filter" class="dataTables_filter">
                                     <button type="button" class="btn btn-primary disabled"> 
                                         <label>الرصيد الحالى : <span id="currentAmount">{{ $numbers['current_amount'] }}</span> جنيه</label>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-sm-3 text-left">
+                                <div id="dataTables-example_filter" class="dataTables_filter">
+                                    <button type="button" class="btn btn-primary disabled"> 
+                                        <label>رصيد اليوم : <span id="currentAmount">{{ $numbers['currentDay_amountOff'] }}</span> جنيه</label>
                                     </button>
 
                                 </div>
@@ -667,7 +674,9 @@
     </div>
     <!-- /.col-lg-12 -->
 </div>
+@endsection
 
+@section('scripts')
 <script>
     var supplierProcesses = [@foreach($supplierProcesses as $k => $info) { id: '{{ $k }}', name: '{{ $info["name"] }}', supplier_id: '{{ $info["supplier_id"] }}'}, @endforeach];
     var clientProcesses = [@foreach($clientProcesses as $k => $info) { id: '{{ $k }}', name: '{{ $info["name"] }}', client_id: '{{ $info["client_id"] }}'}, @endforeach];

@@ -93,6 +93,9 @@
     <!-- /.col-lg-12 -->
 </div>
 <!-- /.row -->
+@endsection
+
+@section('scripts')
 <script>
 function ConfirmDelete() {
     return confirm("هل انت متأكد من حذف الموظف ؟");

@@ -311,38 +311,41 @@
     </div>
 </div>
 
+@section('scripts')
 <script>
     var clientProcesses = [@foreach($clientProcesses as $k => $info) { id: '{{ $k }}', name: '{{ $info["name"] }}', client_id: '{{ $info["client_id"] }}'}, @endforeach];
     var cbo_processes = $('#client_process_id');
     var client_id = $('#client_id');
     $(document).ready(function ($) {
-    $('#client_id').change(function () {
+        $('#client_id').change(function () {
 
-    cbo_processes.empty();
-    cbo_processes.append($("<option></option>"));
-    $.each(clientProcesses, function (key, process) {
-    //console.log(process);
-    if (process.client_id == client_id.val()) {
-    cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
-    }
-    });
-    });
+            cbo_processes.empty();
+            cbo_processes.append($("<option></option>"));
+            $.each(clientProcesses, function (key, process) {
+                //console.log(process);
+                if (process.client_id == client_id.val()) {
+                    cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+                }
+            });
+        });
     });
     LoadProcess();
+
     function LoadProcess() {
-    var clientprocesses_val = "@if(isset($model)) {{ $process->client_process_id }} @else -1 @endif"; //$("#client_process_id").val();
-    //alert(clientprocesses_val);
-    cbo_processes.empty();
-    cbo_processes.append($("<option></option>"));
-    $.each(clientProcesses, function (key, process) {
-    //console.log(process);
-    if (process.client_id == client_id.val()) {
-    if (process.id == clientprocesses_val) {
-    cbo_processes.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
-    } else {
-    cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
-    }
-    }
-    });
-    }
+        var clientprocesses_val = "@if(isset($model)) {{ $process->client_process_id }} @else -1 @endif"; //$("#client_process_id").val();
+        //alert(clientprocesses_val);
+        cbo_processes.empty();
+        cbo_processes.append($("<option></option>"));
+        $.each(clientProcesses, function (key, process) {
+            //console.log(process);
+            if (process.client_id == client_id.val()) {
+                if (process.id == clientprocesses_val) {
+                    cbo_processes.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
+                } else {
+                    cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+                }
+            }
+        });
+    } 
 </script>
+@endsection
