@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Carbon\Carbon;
+use App\Extensions\DateTime;
 use App\Constants\EmployeeActions;
 
 class Attendance extends Model {
@@ -45,8 +45,8 @@ class Attendance extends Model {
     }
 
     public function employeeGuardianship() {
-        $startDate = Carbon::parse($this->date)->format('Y-m-d 00:00:00');
-        $endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
+        $startDate = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
+        $endDate = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
                     ['employee_id', '=', $this->employee_id],
                     ['expenses_id', '=', EmployeeActions::Guardianship],
@@ -65,8 +65,8 @@ class Attendance extends Model {
     }
 
     public function employeeGuardianshipReturn() {
-        $startDate = Carbon::parse($this->date)->format('Y-m-d 00:00:00');
-        $endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
+        $startDate = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
+        $endDate = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
                     ['employee_id', '=', $this->employee_id],
                     ['expenses_id', '=', EmployeeActions::GuardianshipReturn],
@@ -85,8 +85,8 @@ class Attendance extends Model {
     }
 
     public function employeeSmallBorrow() {
-        $startDate = Carbon::parse($this->date)->format('Y-m-d 00:00:00');
-        $endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
+        $startDate = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
+        $endDate = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
                     ['employee_id', '=', $this->employee_id],
                     ['expenses_id', '=', EmployeeActions::SmallBorrow],
@@ -101,8 +101,8 @@ class Attendance extends Model {
     }
 
     public function employeeLongBorrow() {
-        $startDate = Carbon::parse($this->date)->format('Y-m-d 00:00:00');
-        $endDate = Carbon::parse($this->date)->format('Y-m-d 23:59:59');
+        $startDate = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
+        $endDate = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
                     ['employee_id', '=', $this->employee_id],
                     ['expenses_id', '=', EmployeeActions::LongBorrow],
@@ -135,8 +135,8 @@ class Attendance extends Model {
     }
 
     public function workingHoursToSeconds() {
-        $check_out = Carbon::parse($this->check_out);
-        $check_in = Carbon::parse($this->check_in);
+        $check_out = DateTime::parse($this->check_out);
+        $check_in = DateTime::parse($this->check_in);
 
         $totalDuration = $check_out->diffInSeconds($check_in);
         return $totalDuration;

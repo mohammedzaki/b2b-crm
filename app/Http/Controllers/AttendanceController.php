@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
+use App\Extensions\DateTime;
 use App\Http\Requests;
 use App\Models\Client;
 use App\Models\Supplier;
@@ -40,8 +40,8 @@ class AttendanceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $startDate = Carbon::today()->format('Y-m-d 00:00:00');
-        $endDate = Carbon::today()->format('Y-m-d 23:59:59');
+        $startDate = DateTime::today()->format('Y-m-d 00:00:00');
+        $endDate = DateTime::today()->format('Y-m-d 23:59:59');
         
         return $this->getAttendanceItems('all', $startDate, $endDate, 1, TRUE);
     }
@@ -57,13 +57,13 @@ class AttendanceController extends Controller {
         if (!$user->ability('admin', 'attendance-edit')) {
             return response()->view('errors.403', [], 403);
         }
-        $date = Carbon::parse($request['targetdate']);
+        $date = DateTime::parse($request['targetdate']);
         return $this->getAttendanceItems($employee_id, $date, null, 1);
     }
 
     private function getAttendanceItems($id, $startDate, $endDate, $canEdit, $isToday = FALSE) {
         $employees = Employee::all();
-        $dt = Carbon::parse($startDate);
+        $dt = DateTime::parse($startDate);
         $hasData = FALSE;
         if ($id == "all") {
             $attendances = []; //Attendance::all();
@@ -93,7 +93,7 @@ class AttendanceController extends Controller {
         foreach ($attendances as $attendance) {
             $attendance->workingHours = $attendance->workingHoursToString();
             $attendance->employeeName = $attendance->employee->name;
-            $attendance->date = Carbon::parse($attendance->date)->format('l, d-m-Y');
+            $attendance->date = DateTime::parse($attendance->date)->format('l, d-m-Y');
             if ($attendance->process) {
                 $attendance->processName = $attendance->process->name;
             } else {
@@ -261,16 +261,16 @@ class AttendanceController extends Controller {
                 } else if (isset($attendanceToday->check_in) && isset($attendanceToday->check_out) && !isset($request->is_second_shift)) {
                     return redirect()->back()->withInput($all)->with('error', 'لقد تم تسجيل حضور و انصراف هذا العامل يرجى التعديل من شاشة التعديل');
                 } else if (isset($request->check_in)) {
-                    $checkinDate = Carbon::parse($request->check_in);
-                    $checkoutDate = Carbon::parse($attendanceToday->check_out);
+                    $checkinDate = DateTime::parse($request->check_in);
+                    $checkoutDate = DateTime::parse($attendanceToday->check_out);
                     if (empty($attendanceToday->check_out)) {
                         return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل انصراف اولا');
                     } else if ($checkoutDate->gt($checkinDate)) {
                         return redirect()->back()->withInput($all)->with('error', 'تاريخ الدخول اكبر من اخر تاريخ انصراف');
                     }
                 } else if (isset($request->check_out)) {
-                    $checkinDate = Carbon::parse($attendanceToday->check_in);
-                    $checkoutDate = Carbon::parse($request->check_out);
+                    $checkinDate = DateTime::parse($attendanceToday->check_in);
+                    $checkoutDate = DateTime::parse($request->check_out);
                     if (isset($request->is_second_shift)) {
                         if ($attendanceToday->shift == 1) {
                             return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل حضور الوردية الاولى اولا');
@@ -295,16 +295,16 @@ class AttendanceController extends Controller {
                     $errors['is_second_shift'] = "يجب تسجيل الوردية الاولى اولا";
                     return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($errors);
                 } else if (isset($request->check_in)) {
-                    $checkinDate = Carbon::parse($request->check_in);
-                    $checkoutDate = Carbon::parse($attendance->check_out);
+                    $checkinDate = DateTime::parse($request->check_in);
+                    $checkoutDate = DateTime::parse($attendance->check_out);
                     if (empty($attendance->check_out)) {
                         return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل انصراف اولا');
                     } else if ($checkoutDate->gt($checkinDate)) {
                         return redirect()->back()->withInput($all)->with('error', 'تاريخ الدخول اكبر من اخر تاريخ انصراف');
                     }
                 } else if (isset($request->check_out)) {
-                    $checkinDate = Carbon::parse($attendance->check_in);
-                    $checkoutDate = Carbon::parse($request->check_out);
+                    $checkinDate = DateTime::parse($attendance->check_in);
+                    $checkoutDate = DateTime::parse($request->check_out);
                     if (empty($attendance->check_in)) {
                         return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل حضور اولا');
                     } else if ($checkinDate->gt($checkoutDate)) {
@@ -339,7 +339,7 @@ class AttendanceController extends Controller {
      */
     public function show(Request $request, $id) {
         $employees = Employee::all();
-        $dt = Carbon::parse($request->date);
+        $dt = DateTime::parse($request->date);
         $hourlyRate = 0;
         $hasData = FALSE;
         if ($id == "all") {
@@ -372,7 +372,7 @@ class AttendanceController extends Controller {
         foreach ($attendances as $attendance) {
             $attendance->workingHours = $attendance->workingHoursToString();
             $attendance->employeeName = $attendance->employee->name;
-            $attendance->date = Carbon::parse($attendance->date)->format('l, d-m-Y');
+            $attendance->date = DateTime::parse($attendance->date)->format('l, d-m-Y');
 
             $attendance->GuardianshipValue = $attendance->employeeGuardianship();
             $attendance->GuardianshipReturnValue = $attendance->employeeGuardianshipReturn();
@@ -423,8 +423,8 @@ class AttendanceController extends Controller {
      */
     public function edit($id) {
         $attendance = Attendance::findOrFail($id);
-        $check_out = Carbon::parse($attendance->check_out);
-        $check_in = Carbon::parse($attendance->check_in);
+        $check_out = DateTime::parse($attendance->check_out);
+        $check_in = DateTime::parse($attendance->check_in);
         //$attendance->check_out = $attendance->check_out
         $attendance->workingHours = $check_out->diffInHours($check_in);
         $attendance->employeeName = $attendance->employee->name;
@@ -512,8 +512,8 @@ class AttendanceController extends Controller {
 
         foreach ($attendances as $attendance) {
             //$attendance->check_out - $attendance->check_in
-            $check_out = Carbon::parse($attendance->check_out);
-            $check_in = Carbon::parse($attendance->check_in);
+            $check_out = DateTime::parse($attendance->check_out);
+            $check_in = DateTime::parse($attendance->check_in);
             //$attendance->check_out = $attendance->check_out
 
             $attendance->workingHours = $check_out->diffInHours($check_in);
@@ -550,7 +550,7 @@ class AttendanceController extends Controller {
 
     public function guardianship(Request $request, $employee_id) {
         $employees = Employee::all();
-        $dt = Carbon::parse($request->date);
+        $dt = DateTime::parse($request->date);
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
         }
@@ -577,7 +577,7 @@ class AttendanceController extends Controller {
 
     public function guardianshipaway(Request $request, $employee_id) {
         $employee = Employee::findOrFail($employee_id);
-        $newDate = Carbon::parse($request->date);
+        $newDate = DateTime::parse($request->date);
         $newDate->addMonth(1);
         $depositWithdraw = DepositWithdraw::findOrFail($employee->lastGuardianshipId());
         $depositWithdraw->due_date = $newDate;
@@ -587,7 +587,7 @@ class AttendanceController extends Controller {
 
     public function printSalaryReport(Request $request, $employee_id) {
         $employees = Employee::all();
-        $dt = Carbon::parse($request->date);
+        $dt = DateTime::parse($request->date);
         $hourlyRate = 0;
         if ($employee_id == "all") {
             $attendances = []; //Attendance::all();
@@ -665,8 +665,8 @@ class AttendanceController extends Controller {
     public function payEmpolyeeSalary(Request $request, $employee_id) {
         try {
             $employee = Employee::findOrFail($employee_id);
-            $dt = Carbon::parse($request->date);
-            $all['due_date'] = Carbon::today();
+            $dt = DateTime::parse($request->date);
+            $all['due_date'] = DateTime::today();
             $all['withdrawValue'] = $request->totalNetSalary;
             $all['recordDesc'] = "دفع مرتب {$employee->name}";
             $all['employee_id'] = $employee_id;
@@ -705,7 +705,7 @@ class AttendanceController extends Controller {
     
     private function getEmployeeData() {
         $employees = Employee::all();
-        $dt = Carbon::parse($request->date);
+        $dt = DateTime::parse($request->date);
         $hourlyRate = 0;
         $hasData = FALSE;
         if ($id == "all") {
@@ -738,7 +738,7 @@ class AttendanceController extends Controller {
         foreach ($attendances as $attendance) {
             $attendance->workingHours = $attendance->workingHoursToString();
             $attendance->employeeName = $attendance->employee->name;
-            $attendance->date = Carbon::parse($attendance->date)->format('l, d-m-Y');
+            $attendance->date = DateTime::parse($attendance->date)->format('l, d-m-Y');
 
             $attendance->GuardianshipValue = $attendance->employeeGuardianship();
             $attendance->GuardianshipReturnValue = $attendance->employeeGuardianshipReturn();

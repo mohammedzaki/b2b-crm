@@ -11,7 +11,7 @@ use App\Models\ClientProcess;
 use App\Models\Supplier;
 use App\Models\SupplierProcess;
 use App\Models\DepositWithdraw;
-use Carbon\Carbon;
+use App\Extensions\DateTime;
 use App\Reports\Client\ClientTotal;
 use App\Reports\Client\ClientDetailed;
 use App\Reports\Supplier\SupplierTotal;
@@ -109,7 +109,7 @@ class SupplierReportsController extends Controller {
             $proceses[$id]['processTotalPrice'] = $supplierProcess->total_price_taxes;
             $proceses[$id]['processTotalPaid'] = $supplierProcess->totalWithdrawals() + $supplierProcess->discountValue();
             $proceses[$id]['processTotalRemaining'] = $supplierProcess->total_price_taxes - $supplierProcess->totalWithdrawals();
-            $proceses[$id]['processDate'] = Carbon::today()->format('Y-m-d'); //Carbon::parse($supplierProcess->created_at)->format('Y-m-d');
+            $proceses[$id]['processDate'] = DateTime::today()->format('Y-m-d'); //DateTime::parse($supplierProcess->created_at)->format('Y-m-d');
             $proceses[$id]['processNum'] = $id;
             $allProcessesTotalPrice += $proceses[$id]['processTotalPrice'];
             $allProcessTotalPaid += $proceses[$id]['processTotalPaid'];
@@ -119,7 +119,7 @@ class SupplierReportsController extends Controller {
                 $index = 0;
                 $totalWithdrawalValue = 0;
                 foreach ($supplierProcess->items as $item) {
-                    $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($item->created_at)->format('Y-m-d');
+                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($item->created_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
                     $proceses[$id]['processDetails'][$index]['paid'] = "";
                     $proceses[$id]['processDetails'][$index]['totalPrice'] = $item->quantity * $item->unit_price;
@@ -129,7 +129,7 @@ class SupplierReportsController extends Controller {
                     $index++;
                 }
                 if ($supplierProcess->has_discount == "1") {
-                    $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($item->created_at)->format('Y-m-d');
+                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($item->created_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
                     $proceses[$id]['processDetails'][$index]['paid'] = $supplierProcess->discountValue();
                     $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
@@ -139,7 +139,7 @@ class SupplierReportsController extends Controller {
                     $index++;
                 }
                 if ($supplierProcess->require_invoice == "1") {
-                    $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($item->created_at)->format('Y-m-d');
+                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($item->created_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
                     $proceses[$id]['processDetails'][$index]['paid'] = "";
                     $proceses[$id]['processDetails'][$index]['totalPrice'] = $supplierProcess->taxesValue();
@@ -151,7 +151,7 @@ class SupplierReportsController extends Controller {
                 
                 foreach ($supplierProcess->withdrawals() as $withdrawal) {
                     $totalWithdrawalValue += $withdrawal->withdrawValue;
-                    $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($withdrawal->due_date)->format('Y-m-d');
+                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($withdrawal->due_date)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = $supplierProcess->total_price_taxes - $totalWithdrawalValue;
                     $proceses[$id]['processDetails'][$index]['paid'] = $withdrawal->withdrawValue;
                     $proceses[$id]['processDetails'][$index]['totalPrice'] = "";

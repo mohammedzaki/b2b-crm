@@ -9,7 +9,7 @@ use App\Models\EmployeeBorrow;
 use App\Models\DepositWithdraw;
 use App\Constants\EmployeeActions;
 use App\Constants\PaymentMethods;
-use Carbon\Carbon;
+use App\Extensions\DateTime;
 use Validator;
 
 class EmployeeBorrowController extends Controller {
@@ -91,12 +91,12 @@ class EmployeeBorrowController extends Controller {
 
             $depositWithdraw = new DepositWithdraw();
             $depositWithdraw->withdrawValue = $employeeBorrow->pay_amount;
-            $depositWithdraw->due_date = Carbon::now();
+            $depositWithdraw->due_date = DateTime::now();
             $depositWithdraw->recordDesc = "سلفة مستديمة شهر {$depositWithdraw->due_date->month} سنة {$depositWithdraw->due_date->year}";
             $depositWithdraw->employee_id = $employee->id;
             $depositWithdraw->expenses_id = EmployeeActions::LongBorrow;
             $depositWithdraw->payMethod = PaymentMethods::CASH;
-            $depositWithdraw->notes = Carbon::now();
+            $depositWithdraw->notes = DateTime::now();
             $depositWithdraw->save();
 
 

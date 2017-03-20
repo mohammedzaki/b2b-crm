@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
+use App\Extensions\DateTime;
 use App\Http\Requests;
 use App\Models\Client;
 use App\Models\Supplier;
@@ -39,8 +39,8 @@ class DepositWithdrawController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $startDate = Carbon::today()->format('Y-m-d 00:00:00');
-        $endDate = Carbon::today()->format('Y-m-d 23:59:59');
+        $startDate = DateTime::today()->startOfDay();
+        $endDate = DateTime::today()->endOfDay();
         return $this->getDepositWithdrawsItems($startDate, $endDate, 0);
     }
 
@@ -129,7 +129,7 @@ class DepositWithdrawController extends Controller {
             }
         }
         $all = $request->all();
-        $all['due_date'] = Carbon::parse($request->due_date);
+        $all['due_date'] = DateTime::parse($request->due_date);
         $depositWithdraw = DepositWithdraw::create($all);
         $this->CheckProcessClosed($depositWithdraw);
         return response()->json(array(
@@ -208,37 +208,40 @@ class DepositWithdrawController extends Controller {
         if (!$user->ability('admin', 'deposit-withdraw-edit')) {
             return response()->view('errors.403', [], 403);
         }
-        $startDate = Carbon::parse($request['targetdate'])->format('Y-m-d 00:00:00');
-        $endDate = Carbon::parse($request['targetdate'])->format('Y-m-d 23:59:59');
+        $startDate = DateTime::parse($request['targetdate'])->startOfDay();
+        $endDate = DateTime::parse($request['targetdate'])->endOfDay();
         return $this->getDepositWithdrawsItems($startDate, $endDate, 1, TRUE);
     }
 
-    private function getDepositWithdrawsItems($startDate, $endDate, $canEdit, $isSearch = FALSE) {
+    private function getDepositWithdrawsItems(DateTime $startDate, DateTime $endDate, $canEdit, $isSearch = FALSE) {
         $numbers['clients_number'] = Client::count();
         $numbers['suppliers_number'] = Supplier::count();
         $numbers['process_number'] = ClientProcess::count();
         $numbers['Supplierprocess_number'] = SupplierProcess::count();
         $numbers['current_amount'] = $this->CalculateCurrentAmount();
-        $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate, $endDate);
-        $dt = Carbon::parse($startDate);
-        $numbers['current_dayOfWeek'] = $dt->dayOfWeek;
-        $numbers['current_dayOfMonth'] = $dt->day;
-        $numbers['current_month'] = $dt->month - 1;
-        $numbers['current_year'] = $dt->year;
+        $numbers['withdraws_amount'] = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
+        $numbers['deposits_amount'] = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+        $numbers['current_dayOfWeek'] = $startDate->dayOfWeek;
+        $numbers['current_dayOfMonth'] = $startDate->day;
+        $numbers['current_month'] = $startDate->month - 1;
+        $numbers['current_year'] = $startDate->year;
+        $employees = Employee::select('id', 'name')->get();
+        $expenses = Expenses::all();
+        $depositWithdraws = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->get();
+        
         if ($isSearch) {
             $clients = Client::all();
             $suppliers = Supplier::all();
             $clientProcesses = ClientProcess::all();
             $supplierProcesses = SupplierProcess::all();
+            $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate, $endDate);
         } else {
             $clients = Client::allHasOpenProcess();
             $suppliers = Supplier::allHasOpenProcess();
             $clientProcesses = ClientProcess::allOpened()->get();
             $supplierProcesses = SupplierProcess::allOpened()->get();
+            $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate->addDay(-1), $endDate->addDay(-1));
         }
-        $employees = Employee::select('id', 'name')->get();
-        $expenses = Expenses::all();
-        $depositWithdraws = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->get();
 
         $clients_tmp = [];
         $employees_tmp = [];
@@ -277,7 +280,7 @@ class DepositWithdrawController extends Controller {
         $suppliers = $suppliers_tmp;
         $expenses = $expenses_tmp;
         $canEdit = $canEdit;
-        return view('depositwithdraw', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit', 'clientProcesses', 'supplierProcesses', 'employeeActions']));
+        return view('depositwithdraw.index', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit', 'clientProcesses', 'supplierProcesses', 'employeeActions']));
     }
 
     /**
@@ -320,7 +323,7 @@ class DepositWithdrawController extends Controller {
           ));
           } else { */
 
-        $all['due_date'] = Carbon::parse($request->due_date);
+        $all['due_date'] = DateTime::parse($request->due_date);
         $depositWithdraw->update($all);
         $this->CheckProcessClosed($depositWithdraw);
         return response()->json(array(
@@ -349,7 +352,7 @@ class DepositWithdrawController extends Controller {
     }
     
     private function CalculateCurrentAmountOff($startDate, $endDate) {
-        $startDate = Carbon::today()->format('2017-01-01 00:00:00');
+        $startDate = DateTime::today()->format('2017-01-01 00:00:00');
         $depositValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
         $withdrawValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
         $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');

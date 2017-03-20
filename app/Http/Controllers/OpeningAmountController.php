@@ -9,7 +9,7 @@ use App\Models\User;
 use App\Models\Employee;
 use App\Models\OpeningAmount;
 use Validator;
-use Carbon\Carbon;
+use App\Extensions\DateTime;
 
 class OpeningAmountController extends Controller {
 
@@ -56,7 +56,7 @@ class OpeningAmountController extends Controller {
             $all = $request->all();
 
             $openingAmount = OpeningAmount::create($all);
-            $openingAmount->deposit_date = Carbon::parse($request['depositdate'])->format('Y-m-d');
+            $openingAmount->deposit_date = DateTime::parse($request['depositdate'])->format('Y-m-d');
             $openingAmount->save();
             $this->updateFacilityOpeningAmount();
             return redirect()->route('facilityopeningamount.index')->with('success', 'تم اضافة رصيد جديد.');
@@ -78,7 +78,7 @@ class OpeningAmountController extends Controller {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
             $openingAmount->update($all);
-            $openingAmount->deposit_date = Carbon::parse($request['depositdate'])->format('Y-m-d');
+            $openingAmount->deposit_date = DateTime::parse($request['depositdate'])->format('Y-m-d');
             $openingAmount->save();
             $this->updateFacilityOpeningAmount();
             return redirect()->back()->with('success', 'تم تعديل بيانات الرصيد.');
