@@ -170,10 +170,11 @@
                         {{ Form::label('require_invoice', 'فاتورة') }}
                     </div>
                 </div>
-
+            
                 {{ Form::hidden('total_price') }}
                 {{ Form::hidden('total_price_taxes') }}
                 {{ Form::hidden('taxes_value') }}
+                {{ Form::hidden('source_discount_value') }}
 
             </div>
             <!-- /.panel-body -->
@@ -190,9 +191,13 @@
                     <span class="price discount_price">0</span>
                 </h4>
                 <h4>
-                    <span>ضريبة مبيعات </span>
+                    <span>الضريبة المضافة </span>
                     <span class="price taxes_price">0</span>
                 </h4>
+                <!--<h4>
+                    <span>خصم من المنبع </span>
+                    <span class="price source_discount_value">0</span>
+                </h4>-->
                 <hr>
                 <h4>
                     <span>القيمة اﻻجمالية </span>

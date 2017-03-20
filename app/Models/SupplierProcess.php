@@ -44,16 +44,15 @@ class SupplierProcess extends Model {
         return $this->hasOne(ClientProcess::class, 'id');
     }
     
-    private function supplierProcessWithdrawals() {
-        return $this->hasMany('App\Models\DepositWithdraw', 'cbo_processes');
-    }
-    
     public function withdrawals() {
-        return $this->supplierProcessWithdrawals()->where('supplier_id', $this->supplier->id)->get();
+        return $this->hasMany('App\Models\DepositWithdraw', 'cbo_processes')->where([
+            ['supplier_id', "=",  $this->supplier->id],
+            ['withdrawValue', ">", 0],
+        ]);
     }
 
     public function totalWithdrawals() {
-        return $this->supplierProcessWithdrawals()->where('supplier_id', $this->supplier->id)->sum('withdrawValue');
+        return $this->withdrawals()->sum('withdrawValue');
     }
 
     public function totalPriceAfterTaxes() {

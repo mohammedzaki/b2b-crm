@@ -91,3 +91,5 @@ Route::group(['prefix' => 'reports'], function() {
         Route::any('viewSupplierReport', 'Reports\SupplierReportsController@viewReport')->name('reports.supplier.viewSupplierReport');
     });
 });*/
+
+Route::get('getEmployeesCheckinDate', 'AttendanceController@getEmployeesCheckinDate');

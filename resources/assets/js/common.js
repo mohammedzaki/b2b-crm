@@ -1,8 +1,8 @@
-var he = require('he');
-
 var processItemsCount = 0;
 var discount_value = 0;
 var discount_percentage = 0;
+var source_discount_percentage = 0.005;
+var source_discount_value = 0;
 var total_price = 0;
 var taxes = 0;
 var priceAfterTaxes = 0;
@@ -72,8 +72,17 @@ $(document).ready(function () {
 
     function calculate_process_price_taxes() {
         priceAfterTaxes = 0;
-        priceAfterTaxes = roundDecimals(((calculate_process_price() - calculate_discount()) + calculate_taxes()), 3);
+        priceAfterTaxes = roundDecimals(((calculate_process_price() - calculate_discount()) + (calculate_taxes() - calculate_source_discount_price())), 3);
         return priceAfterTaxes;
+    }
+
+    function calculate_source_discount_price() {
+        source_discount_value = 0;
+        /*if ($('input[name="require_invoice"]').is(':checked')) {
+            total_price = calculate_process_price();
+            source_discount_value = total_price * source_discount_percentage;
+        }*/
+        return source_discount_value;
     }
 
     function update_prices() {
@@ -81,15 +90,18 @@ $(document).ready(function () {
         var discount_price_html = $('.discount_price');
         var taxes_price_html = $('.taxes_price');
         var final_price_html = $('.final_price');
+        var source_discount_price = $('.source_discount_value');
 
         process_price_html.text(calculate_process_price());
         discount_price_html.text(calculate_discount());
         taxes_price_html.text(calculate_taxes());
         final_price_html.text(calculate_process_price_taxes());
+        source_discount_price.text(calculate_source_discount_price());
 
         $('input[name="total_price"]').val(calculate_process_price());
         $('input[name="total_price_taxes"]').val(calculate_process_price_taxes());
         $('input[name="taxes_value"]').val(calculate_taxes());
+        $('input[name="source_discount_value"]').val(calculate_source_discount_price());
 
     }
 
@@ -237,17 +249,6 @@ $(document).ready(function () {
         update_prices();
     });
 
-    if (processItemsCount == 0) {
-        add_new_process_item();
-    } else {
-        for (var i = 0; i < processItemsCount; i++) {
-            var qty = parseFloat($('input[name="items[' + i + '][quantity]"]').val());
-            var unit = parseFloat($('input[name="items[' + i + '][unit_price]"]').val());
-            $('input[name="items[' + i + '][total_price]"]').val(roundDecimals((qty * unit), 3));
-        }
-    }
-    update_prices();
-
     $(".IsNumberOnly").keypress(function (evt) {
         evt = (evt) ? evt : window.event;
         var charCode = (evt.which) ? evt.which : evt.keyCode;
@@ -258,7 +259,7 @@ $(document).ready(function () {
         AddNewRow(evt.currentTarget);
         return true;
     });
-    
+
     $(".IsNumberDecimal").keypress(function (evt) {
         evt = (evt) ? evt : window.event;
         var charCode = (evt.which) ? evt.which : evt.keyCode;
@@ -269,5 +270,17 @@ $(document).ready(function () {
         AddNewRow(evt.currentTarget);
         return true;
     });
+
+    processItemsCount = $("#prcoess_items").children().length;
+    if (processItemsCount == 0) {
+        add_new_process_item();
+    } else {
+        for (var i = 0; i < processItemsCount; i++) {
+            var qty = parseFloat($('input[name="items[' + i + '][quantity]"]').val());
+            var unit = parseFloat($('input[name="items[' + i + '][unit_price]"]').val());
+            $('input[name="items[' + i + '][total_price]"]').val(roundDecimals((qty * unit), 3));
+        }
+    }
+    update_prices();
 });
 

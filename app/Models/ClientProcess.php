@@ -47,16 +47,15 @@ class ClientProcess extends Model {
         return $this->hasOne('App\Models\Employee', 'id');
     }
 
-    private function clientProcessDeposits() {
-        return $this->hasMany('App\Models\DepositWithdraw', 'cbo_processes');
-    }
-
     public function deposits() {
-        return $this->clientProcessDeposits()->where('client_id', $this->client->id)->get();
+        return $this->hasMany('App\Models\DepositWithdraw', 'cbo_processes')->where([
+            ['client_id', "=",  $this->client->id],
+            ['depositValue', ">", 0],
+        ]);
     }
 
     public function totalDeposits() {
-        return $this->clientProcessDeposits()->where('client_id', $this->client->id)->sum('depositValue');
+        return $this->deposits()->sum('depositValue');
     }
 
     public function totalPriceAfterTaxes() {
@@ -99,5 +98,4 @@ class ClientProcess extends Model {
     public static function allOpened() {
         return ClientProcess::where('status', 'active');
     }
-
 }

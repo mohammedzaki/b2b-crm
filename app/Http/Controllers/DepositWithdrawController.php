@@ -180,7 +180,12 @@ class DepositWithdrawController extends Controller {
         $rowsIds = [];
 
         foreach ($all['rowsIds'] as $id) {
-            DepositWithdraw::where('id', $id)->delete(); //->update(['saveStatus' => 2]);
+            $depositWithdraw = DepositWithdraw::findOrFail($id);
+            $depositWithdraw->depositValue = 0;
+            $depositWithdraw->withdrawValue = 0;
+            $depositWithdraw->save();
+            $this->CheckProcessClosed($depositWithdraw);
+            DepositWithdraw::where('id', $id)->delete();
             $rowsIds[$id] = "Done";
         }
         return response()->json(array(

@@ -276,8 +276,8 @@ $(function () {
         locale: "ar",
         onChange: function (selectedDates, dateStr, instance) {
             selecteddatepicker = selectedDates[0];
-            SetCheckIndatetime();
             check_inPickr.setDate(selectedDates[0]);
+            SetCheckIndatetime();
             //check_inPickr.open();
         }
     });
@@ -305,8 +305,8 @@ $(function () {
         locale: "ar",
         onChange: function (selectedDates, dateStr, instance) {
             selecteddatepicker = selectedDates[0];
-            SetCheckIndatetime();
             timepicker.setDate(selectedDates[0]);
+            //SetCheckIndatetime();
             //timepicker.open();
         }
     }); 
@@ -373,8 +373,8 @@ function RemoveAbsent() {
 function SetCheckIndatetime() {
     //check_inPickr.setDate(employeesCheckinDates[$("#employee_id").val()].checkinDate);
     selecteddatepicker = $("#datepicker").val();
-    //console.log(selecteddatepicker);
-    $.get("{{ url('api/getEmployeesCheckinDate/') }}", 
+    check_inPickr.setDate("", true);
+    $.get("{{ url('getEmployeesCheckinDate/') }}", 
         {employee_id: $("#employee_id").val(), date: selecteddatepicker, is_second_shift: $("#is_second_shift").is(":checked")},
         function (data) {
             console.log(data);

@@ -152,7 +152,7 @@ class ClientReportsController extends Controller {
                     $proceses[$id]['processDetails'][$index]['desc'] = "قيمة الضريبة المضافة";
                     $index++;
                 }
-                foreach ($clientProcess->deposits() as $deposit) {
+                foreach ($clientProcess->deposits as $deposit) {
                     $totalDepositValue += $deposit->depositValue;
                     $proceses[$id]['processDetails'][$index]['date'] = Carbon::parse($deposit->due_date)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = $clientProcess->total_price_taxes - $totalDepositValue;
