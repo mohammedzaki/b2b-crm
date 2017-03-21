@@ -112,6 +112,12 @@ class ClientProcessController extends Controller {
                     $all['has_discount'] = 0;
                 }
 
+                if (isset($request->has_source_discount)) {
+                    $all['has_source_discount'] = 1;
+                } else {
+                    $all['has_source_discount'] = 0;
+                }
+
                 $clientProcess = ClientProcess::create($all);
 
                 foreach ($all['items'] as $item) {
@@ -176,6 +182,12 @@ class ClientProcessController extends Controller {
                     $all['has_discount'] = 1;
                 } else {
                     $all['has_discount'] = 0;
+                }
+
+                if (isset($request->has_source_discount)) {
+                    $all['has_source_discount'] = 1;
+                } else {
+                    $all['has_source_discount'] = 0;
                 }
 
                 $process->update($all);

@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
 namespace App\Http\Controllers\Reports;
 
 use App\Http\Controllers\Controller;
@@ -17,9 +23,12 @@ use App\Reports\Client\ClientDetailed;
 use App\Reports\Supplier\SupplierTotal;
 use App\Reports\Supplier\SupplierDetailed;
 use App\Http\Controllers\FacilityController;
-
-class ClientReportsController extends Controller {
-
+/**
+ * Description of ClientAnalyticalCenterController
+ *
+ * @author mohammedzaki
+ */
+class ClientAnalyticalCenterController extends Controller {
     /**
      * Create a new controller instance.
      *
@@ -77,23 +86,16 @@ class ClientReportsController extends Controller {
     public function index() {
         $clients = Client::all();
         $clients_tmp = [];
+        $index = 0;
         foreach ($clients as $client) {
-            $clients_tmp[$client->id] = $client->name;
+            $clients_tmp[$index]['id'] = $client->id; 
+            $clients_tmp[$index]['name'] = $client->name;
+            $clients_tmp[$index]['totalPaid'] = $client->getTotalPaid();
+            $clients_tmp[$index]['totalRemaining'] = $client->getTotalRemaining();
         }
         $clients = $clients_tmp;
         
-        $clientProcesses = ClientProcess::all();
-
-        $clientProcesses_tmp = [];
-        foreach ($clientProcesses as $process) {
-            $clientProcesses_tmp[$process->id]['clientId'] = $process->client->id;
-            $clientProcesses_tmp[$process->id]['name'] = $process->name;
-            $clientProcesses_tmp[$process->id]['totalPrice'] = $process->total_price;
-            $clientProcesses_tmp[$process->id]['status'] = $process->status;
-        }
-        $clientProcesses = $clientProcesses_tmp;
-        
-        return view('reports.client.index', compact("clients", "clientProcesses"));
+        return view('reports.ClientAnalyticalCenter.index', compact("clients"));
     }
 
     public function viewReport(Request $request) {
@@ -174,9 +176,9 @@ class ClientReportsController extends Controller {
             'allProcessTotalRemaining' => $allProcessTotalRemaining
         ]);
         if ($request->ch_detialed == "0") {
-            return view("reports.client.total", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
+            return view("reports.ClientAnalyticalCenter.total", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
         } else {
-            return view("reports.client.detialed", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
+            return view("reports.ClientAnalyticalCenter.detialed", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
         }
     }
 
@@ -201,5 +203,4 @@ class ClientReportsController extends Controller {
         $pdfReport->allProcessTotalRemaining = $allProcessTotalRemaining;
         return $pdfReport->RenderReport();
     }
-
 }

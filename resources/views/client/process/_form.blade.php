@@ -149,6 +149,63 @@
 
                 <div class="col-lg-12 no-padding">
                     <div class="legend">
+                        {{ Form::checkbox('has_source_discount', '1', null, 
+                            array(
+                                'id' => 'has_source_discount',
+                                'class' => 'checkbox_source_show_input'
+                            )
+                        ) }} 
+                        {{ Form::label('has_source_discount', 'خصم من المنبع') }}
+                    </div>
+                    <div class="source_hidden_input">
+
+                        <div class="col-lg-5">
+                            <div class="form-group{{ $errors->has('source_discount_percentage') ? ' has-error' : '' }}">
+                                {{ Form::label('source_discount_percentage', 'نسبة الخصم') }} 
+                                <div class="input-group">
+                                    {{ Form::text('source_discount_percentage', null, 
+                                        array(
+                                            'id' => 'source_discount_percentage',
+                                            'class' => 'form-control', 
+                                            'placeholder' => 'ادخل النسبة'
+                                            )
+                                        )
+                                    }}
+                                    <span class="input-group-addon">
+                                        %
+                                    </span>    
+                                </div><!-- /input-group -->
+                                @if ($errors->has('source_discount_percentage'))
+                                <label for="inputError" class="control-label">
+                                    {{ $errors->first('source_discount_percentage') }}
+                                </label>
+                                @endif
+                            </div>
+                        </div>
+
+                        <div class="col-lg-7">
+                            <div class="form-group{{ $errors->has('source_discount_value') ? ' has-error' : '' }}">
+                                {{ Form::label('source_discount_value', 'القيمة') }} 
+                                {{ Form::text('source_discount_value', null, 
+                                    array(
+                                        'class' => 'form-control', 
+                                        'placeholder' => 'ادخل القيمة'
+                                        )
+                                    )
+                                }}
+                                @if ($errors->has('source_discount_value'))
+                                <label for="inputError" class="control-label">
+                                    {{ $errors->first('source_discount_value') }}
+                                </label>
+                                @endif
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+                <div class="col-lg-12 no-padding">
+                    <div class="legend">
                         {{ Form::checkbox('require_invoice', '1', null, 
                             array(
                                 'id' => 'require_invoice'
@@ -161,7 +218,6 @@
                 {{ Form::hidden('total_price') }}
                 {{ Form::hidden('total_price_taxes') }}
                 {{ Form::hidden('taxes_value') }}
-                {{ Form::hidden('source_discount_value') }}
 
             </div>
             <!-- /.panel-body -->
@@ -181,10 +237,10 @@
                     <span>الضريبة المضافة </span>
                     <span class="price taxes_price">0</span>
                 </h4>
-                <!--<h4>
+                <h4>
                     <span>خصم من المنبع </span>
                     <span class="price source_discount_value">0</span>
-                </h4>-->
+                </h4>
                 <hr>
                 <h4>
                     <span>القيمة اﻻجمالية </span>

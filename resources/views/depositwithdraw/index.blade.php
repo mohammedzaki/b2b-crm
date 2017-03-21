@@ -181,11 +181,10 @@
                                     </div>
                                 </label>
                             </div>
-
-                            <div class="col-sm-3 text-left">
+                            <div class="col-sm-6 text-left">
                                 <div id="dataTables-example_filter" class="dataTables_filter">
                                     <button type="button" class="btn btn-primary disabled"> 
-                                        <label>الرصيد السابق : <span id="currentAmount">{{ $numbers['currentDay_amountOff'] }}</span> جنيه</label>
+                                        <label>الرصيد الحالى : <span id="currentAmount">{{ $numbers['current_amount'] }}</span> جنيه</label>
                                     </button>
                                 </div>
                             </div>
@@ -194,7 +193,7 @@
                             <div class="col-sm-6 text-left">
                                 <div id="dataTables-example_filter" class="dataTables_filter">
                                     <button type="button" class="btn btn-primary disabled"> 
-                                        <label>الرصيد الحالى : <span id="currentAmount">{{ $numbers['current_amount'] }}</span> جنيه</label>
+                                        <label>الرصيد السابق : <span id="currentAmount">{{ $numbers['currentDay_amountOff'] }}</span> جنيه</label>
                                     </button>
                                 </div>
                             </div>

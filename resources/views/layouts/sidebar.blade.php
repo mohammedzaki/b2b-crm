@@ -105,6 +105,8 @@
                 <ul>
                     <li><a href="{{ URL::to('/reports/client') }}">عميل</a></li>
                     <li><a href="{{ URL::to('/reports/supplier') }}">مورد</a></li>
+                    <li><a href="{{ URL::to('/reports/client/ClientAnalyticalCenter') }}">المركز التحليلى للعملاء</a></li>
+                    <li><a href="{{ URL::to('/reports/supplier/SupplierAnalyticalCenter') }}">المركز التحليلى للموردين</a></li>
                 </ul>
 
             </li>

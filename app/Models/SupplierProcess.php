@@ -21,6 +21,9 @@ class SupplierProcess extends Model {
         'discount_percentage',
         'discount_value',
         'discount_reason',
+        'has_source_discount',
+        'source_discount_percentage',
+        'source_discount_value',
         'require_invoice',
         'total_price',
         'total_price_taxes',
@@ -56,7 +59,7 @@ class SupplierProcess extends Model {
     }
 
     public function totalPriceAfterTaxes() {
-        return ($this->total_price - $this->discountValue()) + $this->taxesValue();
+        return ($this->total_price - $this->discount_value) + $this->taxesValue();
     }
 
     public function CheckProcessMustClosed() {
@@ -71,24 +74,8 @@ class SupplierProcess extends Model {
         }
     }
 
-    public function discountValue() {
-        if ($this->has_discount == "1") {
-            return $this->discount_value; //* ($this->discount_percentage / 100);
-        }
-        return 0;
-    }
-
-    public function discountPercentage() {
-        if ($this->has_discount == "1") {
-            return ($this->discount_value / $this->total_price) * 100;
-        }
-        return 0;
-    }
-
     public function taxesValue() {
         if ($this->require_invoice == "1") {
-            //$facility = Facility::findOrFail(1);
-            //($this->total_price - $this->discountValue()) * $facility->getTaxesRate();
             return $this->taxes_value;
         }
         return 0;

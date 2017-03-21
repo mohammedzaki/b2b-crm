@@ -280,7 +280,7 @@ class DepositWithdrawController extends Controller {
         $suppliers = $suppliers_tmp;
         $expenses = $expenses_tmp;
         $canEdit = $canEdit;
-        return view('depositwithdraw.index', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit', 'clientProcesses', 'supplierProcesses', 'employeeActions']));
+        return view('depositwithdraw.index', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit', 'clientProcesses', 'supplierProcesses', 'employeeActions', 'isSearch']));
     }
 
     /**

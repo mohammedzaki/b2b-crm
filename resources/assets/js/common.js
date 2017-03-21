@@ -72,16 +72,34 @@ $(document).ready(function () {
 
     function calculate_process_price_taxes() {
         priceAfterTaxes = 0;
-        priceAfterTaxes = roundDecimals(((calculate_process_price() - calculate_discount()) + (calculate_taxes() - calculate_source_discount_price())), 3);
+        priceAfterTaxes = roundDecimals(((calculate_process_price() - calculate_discount()) + (calculate_taxes() - calculate_source_discount())), 3);
         return priceAfterTaxes;
     }
-
-    function calculate_source_discount_price() {
+    
+    function calculate_source_discount() {
         source_discount_value = 0;
-        /*if ($('input[name="require_invoice"]').is(':checked')) {
-            total_price = calculate_process_price();
-            source_discount_value = total_price * source_discount_percentage;
-        }*/
+        if ($('input[name="has_source_discount"]').is(':checked')) {
+            source_discount_value = roundDecimals($("#source_discount_value").val(), 3);;
+        }
+        return source_discount_value;
+    }
+
+    function calculate_source_percentage() {
+        source_discount_percentage = 0;
+        if ($('input[name="has_source_discount"]').is(':checked')) {
+            source_discount_percentage = (calculate_source_discount() / calculate_process_price()) * 100;
+            source_discount_percentage = roundDecimals(source_discount_percentage, 3);
+        }
+        return source_discount_percentage;
+    }
+
+    function calculate_source_discount_from_percentage() {
+        source_discount_value = 0;
+        if ($('input[name="has_source_discount"]').is(':checked')) {
+            source_discount_percentage = $("#source_discount_percentage").val();
+            source_discount_value = (calculate_process_price() / 100) * source_discount_percentage;
+            source_discount_value = roundDecimals(source_discount_value, 3);
+        }
         return source_discount_value;
     }
 
@@ -96,12 +114,12 @@ $(document).ready(function () {
         discount_price_html.text(calculate_discount());
         taxes_price_html.text(calculate_taxes());
         final_price_html.text(calculate_process_price_taxes());
-        source_discount_price.text(calculate_source_discount_price());
+        source_discount_price.text(calculate_source_discount());
 
         $('input[name="total_price"]').val(calculate_process_price());
         $('input[name="total_price_taxes"]').val(calculate_process_price_taxes());
         $('input[name="taxes_value"]').val(calculate_taxes());
-        $('input[name="source_discount_value"]').val(calculate_source_discount_price());
+        $('input[name="source_discount_value"]').val(calculate_source_discount());
 
     }
 
@@ -111,6 +129,12 @@ $(document).ready(function () {
     $('.checkbox_show_input, .checkbox_hide_input').click(function () {
         $(".hidden_input").slideToggle(this.checked);
         $(".visible_input").slideToggle(this.checked);
+        
+        $(".source_hidden_input").slideToggle(this.checked);
+    });
+    
+    $('.checkbox_source_show_input').click(function () {
+        $(".source_hidden_input").slideToggle(this.checked);
     });
 
     $('#can_not_use_program').click(function () {
@@ -120,20 +144,25 @@ $(document).ready(function () {
     if ($('.checkbox_show_input').length) {
         if ($('.checkbox_show_input').is(':checked')) {
             $(".hidden_input").show();
-            $(".visible_input").hide();
         } else {
             $(".hidden_input").hide();
-            $(".visible_input").show();
         }
     } else if ($('.checkbox_hide_input').length) {
         if ($('.checkbox_hide_input').is(':checked')) {
             $(".hidden_input").hide();
-            $(".visible_input").show();
         } else {
             $(".hidden_input").show();
-            $(".visible_input").hide();
         }
     }
+    
+    if ($('.checkbox_source_show_input').length) {
+        if ($('.checkbox_source_show_input').is(':checked')) {
+            $(".source_hidden_input").show();
+        } else {
+            $(".source_hidden_input").hide();
+        }
+    }
+    
     /******************
      Client
      ****************************************************************/
@@ -235,7 +264,7 @@ $(document).ready(function () {
         update_prices();
     });
 
-    $("#require_invoice, #has_discount").change(function () {
+    $("#require_invoice, #has_discount, #has_source_discount").change(function () {
         update_prices();
     });
 
@@ -246,6 +275,16 @@ $(document).ready(function () {
 
     $("#discount_percentage").change(function () {
         $("#discount_value").val(calculate_discount_from_percentage());
+        update_prices();
+    });
+
+    $("#source_discount_value").change(function () {
+        $("#source_discount_percentage").val(calculate_source_percentage());
+        update_prices();
+    });
+
+    $("#source_discount_percentage").change(function () {
+        $("#source_discount_value").val(calculate_source_discount_from_percentage());
         update_prices();
     });
 

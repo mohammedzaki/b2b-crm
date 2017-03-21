@@ -118,6 +118,13 @@ class SupplierProcessController extends Controller {
             } else {
                 $all['has_discount'] = 0;
             }
+
+            if (isset($request->has_source_discount)) {
+                $all['has_source_discount'] = 1;
+            } else {
+                $all['has_source_discount'] = 0;
+            }
+
             $all['name'] = \App\Models\ClientProcess::findOrFail($all['client_process_id'])->name;
             $supplierProcess = SupplierProcess::create($all);
 
@@ -202,6 +209,13 @@ class SupplierProcessController extends Controller {
             } else {
                 $all['has_discount'] = 0;
             }
+
+            if (isset($request->has_source_discount)) {
+                $all['has_source_discount'] = 1;
+            } else {
+                $all['has_source_discount'] = 0;
+            }
+            
             $all['name'] = \App\Models\ClientProcess::findOrFail($all['client_process_id'])->name;
             $process->update($all);
             $items_ids = [];

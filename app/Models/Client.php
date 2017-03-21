@@ -42,5 +42,13 @@ class Client extends Model {
             ->get();
         return $clients;
     }
+    
+    public function getTotalPaid() {
+        return 0;
+    }
+    
+    public function getTotalRemaining() {
+        return 0;
+    }
 
 }

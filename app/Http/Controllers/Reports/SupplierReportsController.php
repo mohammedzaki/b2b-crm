@@ -107,7 +107,7 @@ class SupplierReportsController extends Controller {
             $supplierProcess = SupplierProcess::findOrFail($id);
             $proceses[$id]['processName'] = $supplierProcess->name;
             $proceses[$id]['processTotalPrice'] = $supplierProcess->total_price_taxes;
-            $proceses[$id]['processTotalPaid'] = $supplierProcess->totalWithdrawals() + $supplierProcess->discountValue();
+            $proceses[$id]['processTotalPaid'] = $supplierProcess->totalWithdrawals() + $supplierProcess->discount_value;
             $proceses[$id]['processTotalRemaining'] = $supplierProcess->total_price_taxes - $supplierProcess->totalWithdrawals();
             $proceses[$id]['processDate'] = DateTime::today()->format('Y-m-d'); //DateTime::parse($supplierProcess->created_at)->format('Y-m-d');
             $proceses[$id]['processNum'] = $id;
@@ -131,7 +131,7 @@ class SupplierReportsController extends Controller {
                 if ($supplierProcess->has_discount == "1") {
                     $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($item->created_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
-                    $proceses[$id]['processDetails'][$index]['paid'] = $supplierProcess->discountValue();
+                    $proceses[$id]['processDetails'][$index]['paid'] = $supplierProcess->discount_value;
                     $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
                     $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
                     $proceses[$id]['processDetails'][$index]['quantity'] = "";
