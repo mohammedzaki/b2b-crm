@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Reports\Client;
+namespace App\Reports\Supplier;
 
 use App\Reports\BaseReport;
 
-class ClientAnalyticalCenterDetailed extends BaseReport {
+class SupplierAnalyticalCenterDetailed extends BaseReport {
 
-    public $clientName,
+    public $supplierName,
             $proceses,
             $allProcessesTotalPrice,
             $allProcessTotalPaid,
             $allProcessTotalRemaining;
     
-    protected $reportName = "ClientTotalReport.pdf";
+    protected $reportName = "SupplierTotalReport.pdf";
 
     function SetHtmlBody() {
         return '<!DOCTYPE html>
@@ -29,7 +29,7 @@ class ClientAnalyticalCenterDetailed extends BaseReport {
     }
 
     function SetCSS() {
-        $path = public_path('ReportsHtml/Client/ClientDetailed.css');
+        $path = public_path('ReportsHtml/Supplier/SupplierDetailed.css');
         return file_get_contents($path);
     }
 
@@ -41,27 +41,27 @@ class ClientAnalyticalCenterDetailed extends BaseReport {
         return $processesHtml;
     }
 
-    function AddProcess($client) {
+    function AddProcess($supplier) {
         $processHtml = '<div class="clientProcess">';
-        $processHtml .= $this->SetProcessHeader($client['clientName'], $client['clientNum']);
+        $processHtml .= $this->SetProcessHeader($supplier['supplierName'], $supplier['supplierNum']);
         $processHtml .= '   <table class="tg">';
-        $processHtml .= $this->AddProcessItems($client['processDetails']);
-        $processHtml .= $this->AddProcessItemsFooter($client['clientTotalPrice'], $client['clientTotalPaid'], $client['clientTotalRemaining']);
+        $processHtml .= $this->AddProcessItems($supplier['processDetails']);
+        $processHtml .= $this->AddProcessItemsFooter($supplier['supplierTotalPrice'], $supplier['supplierTotalPaid'], $supplier['supplierTotalRemaining']);
         $processHtml .= '   </table>
                             <div class="lineBreak"></div>
                         </div>';
         return $processHtml;
     }
 
-    function SetProcessHeader($clientName, $clientNum) {
+    function SetProcessHeader($supplierName, $supplierNum) {
         return '
                 <div class="processHeader">
                     <table class="headerTable">
                         <tr>
                             <td class="noLabel">مسلسل :</td>
-                            <td class="noValue" colspan="3">' . $clientNum . '</td>
-                            <td class="clientLabel">اسم العميل :</td>
-                            <td class="clientName">' . $clientName . '</td>
+                            <td class="noValue" colspan="3">' . $supplierNum . '</td>
+                            <td class="clientLabel">اسم المورد :</td>
+                            <td class="clientName">' . $supplierName . '</td>
                         </tr>
                     </table>
                 </div>';

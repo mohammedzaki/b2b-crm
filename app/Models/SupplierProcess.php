@@ -30,17 +30,19 @@ class SupplierProcess extends Model {
         'taxes_value'
     ];
     public $client_id = 0;
+    const statusClosed = 'closed';
+    const statusOpened = 'active';
 
     public function supplier() {
-        return $this->belongsTo('App\Models\Supplier');
+        return $this->belongsTo(Supplier::class);
     }
 
     public function items() {
-        return $this->hasMany('App\Models\SupplierProcessItem', 'process_id');
+        return $this->hasMany(SupplierProcessItem::class, 'process_id');
     }
 
     public function employee() {
-        return $this->hasOne('App\Models\Employee', 'id');
+        return $this->hasOne(Employee::class, 'id');
     }
 
     public function clientProcess() {
@@ -48,7 +50,7 @@ class SupplierProcess extends Model {
     }
     
     public function withdrawals() {
-        return $this->hasMany('App\Models\DepositWithdraw', 'cbo_processes')->where([
+        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
             ['supplier_id', "=",  $this->supplier->id],
             ['withdrawValue', ">", 0],
         ]);
@@ -64,25 +66,25 @@ class SupplierProcess extends Model {
 
     public function CheckProcessMustClosed() {
         if ($this->totalPriceAfterTaxes() == $this->totalWithdrawals()) {
-            $this->status = 'closed';
+            $this->status = static::statusClosed;
             $this->save();
             return TRUE;
         } else {
-            $this->status = 'active';
+            $this->status = static::statusOpened;
             $this->save();
             return FALSE;
         }
     }
 
     public function taxesValue() {
-        if ($this->require_invoice == "1") {
+        if ($this->require_invoice == TRUE) {
             return $this->taxes_value;
         }
         return 0;
     }
 
     public static function allOpened() {
-        return SupplierProcess::where('status', 'active');
+        return SupplierProcess::where('status', static::statusOpened);
     }
 
 }

@@ -9,12 +9,13 @@
                 <!-- /.panel-heading -->
                 <div class="panel-body">
                     <div class="col-lg-12 no-padding">
-                        <div class="col-lg-6 no-padding">
-                            <div class="form-group">
-                                <label>اسم العميل :</label> {{ $supplierName }}
-                            </div>
+                        <div class="col-lg-12 no-padding">
+                            <img src="/ReportsHtml/letr.png" class="letrHead" style="width: 100%; margin-bottom: 20px;" />
                         </div>
                         <div class="col-lg-6 no-padding">
+                            <div class="form-group">
+                                <label>المركز التحليلى للموردين</label>
+                            </div>
                         </div>
                         <div class="col-lg-12 no-padding">
                             <div class="panel-body">
@@ -25,28 +26,27 @@
                                             <thead>
                                                 <tr>
 
-                                                    <th>اسم العملية</th>
+                                                    <th>اسم المورد</th>
                                                     <th>الاجمالى</th>
                                                     <th>المدفوع</th>
                                                     <th>المتبقى</th>
-
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse ($proceses as $process)
+                                                @forelse ($suppliers as $supplier)
                                                 <tr class="odd">
-                                                    <td>{{ $process['processName'] }}</td>
-                                                    <td>{{ $process['processTotalPrice'] }}</td>
-                                                    <td style="color: red;">{{ $process['processTotalPaid'] }}</td>
-                                                    <td>{{ $process['processTotalRemaining'] }}</td>
+                                                    <td>{{ $supplier['supplierName'] }}</td>
+                                                    <td>{{ $supplier['supplierTotalPrice'] }}</td>
+                                                    <td style="color: red;">{{ $supplier['supplierTotalPaid'] }}</td>
+                                                    <td>{{ $supplier['supplierTotalRemaining'] }}</td>
                                                 </tr>
                                                 @empty
                                                 @endforelse
                                                 <tr class="info">
                                                     <td style="color: red;"> الاجمالـــــــــــــــــــــــــــــــــــى</td>
-                                                    <td style="color: red;">{{ $allProcessesTotalPrice }}</td>
-                                                    <td style="color: red;">{{ $allProcessTotalPaid }}</td>
-                                                    <td style="color: red;">{{ $allProcessTotalRemaining }}</td>
+                                                    <td style="color: red;">{{ $allSuppliersTotalPrice }}</td>
+                                                    <td style="color: red;">{{ $allSuppliersTotalPaid }}</td>
+                                                    <td style="color: red;">{{ $allSuppliersTotalRemaining }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>  

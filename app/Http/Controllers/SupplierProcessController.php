@@ -100,29 +100,36 @@ class SupplierProcessController extends Controller {
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
+            $sup = SupplierProcess::where([
+                        ['client_process_id', '=', $request->client_process_id],
+                        ['supplier_id', '=', $request->supplier_id]
+                    ])->first();
+            if (!empty($sup)) {
+                return redirect()->back()->withInput()->with('error', 'لا يمكن اختيار نفس المورد لنفس العملية');
+            }
             /* get supplier info */
             $supplier = Supplier::find($request->supplier_id);
             /* get supplier all processes */
             $supplier_processes = $supplier->processes;
             $total_opened_processes_price = 0;
 
-            $all['status'] = 'active';
+            $all['status'] = SupplierProcess::statusOpened;
             if (isset($request->require_invoice)) {
-                $all['require_invoice'] = 1;
+                $all['require_invoice'] = TRUE;
             } else {
-                $all['require_invoice'] = 0;
+                $all['require_invoice'] = FALSE;
             }
 
             if (isset($request->has_discount)) {
-                $all['has_discount'] = 1;
+                $all['has_discount'] = TRUE;
             } else {
-                $all['has_discount'] = 0;
+                $all['has_discount'] = FALSE;
             }
 
             if (isset($request->has_source_discount)) {
-                $all['has_source_discount'] = 1;
+                $all['has_source_discount'] = TRUE;
             } else {
-                $all['has_source_discount'] = 0;
+                $all['has_source_discount'] = FALSE;
             }
 
             $all['name'] = \App\Models\ClientProcess::findOrFail($all['client_process_id'])->name;
@@ -199,23 +206,23 @@ class SupplierProcessController extends Controller {
 //                );
 //            }else{
             if (isset($request->require_invoice)) {
-                $all['require_invoice'] = 1;
+                $all['require_invoice'] = TRUE;
             } else {
-                $all['require_invoice'] = 0;
+                $all['require_invoice'] = FALSE;
             }
 
             if (isset($request->has_discount)) {
-                $all['has_discount'] = 1;
+                $all['has_discount'] = TRUE;
             } else {
-                $all['has_discount'] = 0;
+                $all['has_discount'] = FALSE;
             }
 
             if (isset($request->has_source_discount)) {
-                $all['has_source_discount'] = 1;
+                $all['has_source_discount'] = TRUE;
             } else {
-                $all['has_source_discount'] = 0;
+                $all['has_source_discount'] = FALSE;
             }
-            
+
             $all['name'] = \App\Models\ClientProcess::findOrFail($all['client_process_id'])->name;
             $process->update($all);
             $items_ids = [];
@@ -259,30 +266,4 @@ class SupplierProcessController extends Controller {
         SupplierProcessItem::withTrashed()->where('process_id', $id)->restore();
         return redirect()->route('supplier.process.index')->with('success', 'تم استرجاع العملية.');
     }
-
-    /*
-      public function getSupplierProcesses(Request $request) {
-      $input = $request->input('option');
-      $clientProcesses = SupplierProcess::allOpened()->where('supplier_id', $input)->get();
-      $clientProcesses_tmp = [];
-      foreach ($clientProcesses as $process) {
-      $clientProcesses_tmp[$process->id] = $process->name;
-      }
-      $clientProcesses = $clientProcesses_tmp;
-      return response()->json($clientProcesses);
-      }
-
-      public function getSupplierReportProcesses(Request $request) {
-      $input = $request->input('option');
-      $supplierProcesses = SupplierProcess::where('supplier_id', $input)->get();
-
-      $supplierProcesses_tmp = [];
-      foreach ($supplierProcesses as $process) {
-      $supplierProcesses_tmp[$process->id]['name'] = $process->name;
-      $supplierProcesses_tmp[$process->id]['totalPrice'] = $process->total_price;
-      $supplierProcesses_tmp[$process->id]['status'] = $process->status;
-      }
-      $supplierProcesses = $supplierProcesses_tmp;
-      return response()->json($supplierProcesses);
-      } */
 }

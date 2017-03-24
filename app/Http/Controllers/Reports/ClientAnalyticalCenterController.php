@@ -8,27 +8,21 @@
 
 namespace App\Http\Controllers\Reports;
 
-use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Http\Requests;
-use Validator;
-use App\Models\Client;
-use App\Models\ClientProcess;
-use App\Models\Supplier;
-use App\Models\SupplierProcess;
-use App\Models\DepositWithdraw;
 use App\Extensions\DateTime;
-use App\Reports\Client\ClientTotal;
-use App\Reports\Client\ClientDetailed;
-use App\Reports\Supplier\SupplierTotal;
-use App\Reports\Supplier\SupplierDetailed;
-use App\Http\Controllers\FacilityController;
+use App\Http\Controllers\Controller;
+use App\Models\Client;
+use App\Reports\Client\ClientAnalyticalCenterDetailed;
+use App\Reports\Client\ClientAnalyticalCenterTotal;
+use Illuminate\Http\Request;
+use Validator;
+
 /**
  * Description of ClientAnalyticalCenterController
  *
  * @author mohammedzaki
  */
 class ClientAnalyticalCenterController extends Controller {
+
     /**
      * Create a new controller instance.
      *
@@ -84,117 +78,84 @@ class ClientAnalyticalCenterController extends Controller {
     }
 
     public function index() {
-        $clients = Client::all();
+        $clients = Client::allHasOpenProcess();
         $clients_tmp = [];
         $index = 0;
         foreach ($clients as $client) {
-            $clients_tmp[$index]['id'] = $client->id; 
+            $clients_tmp[$index]['id'] = $client->id;
             $clients_tmp[$index]['name'] = $client->name;
+            $clients_tmp[$index]['totalDeal'] = $client->getTotalDeal();
             $clients_tmp[$index]['totalPaid'] = $client->getTotalPaid();
             $clients_tmp[$index]['totalRemaining'] = $client->getTotalRemaining();
+            $index++;
         }
         $clients = $clients_tmp;
-        
+
         return view('reports.ClientAnalyticalCenter.index', compact("clients"));
     }
 
     public function viewReport(Request $request) {
         //{"ch_detialed":"0","client_id":"1","processes":["1","2"]}
-        $client = Client::findOrFail($request->client_id);
-        $clientName = $client->name;
-        $allProcessesTotalPrice = 0;
-        $allProcessTotalPaid = 0;
-        $allProcessTotalRemaining = 0;
+        $clientName = "";
+        $allClientsTotalPrice = 0;
+        $allClientsTotalPaid = 0;
+        $allClientsTotalRemaining = 0;
 
-        $proceses = [];
-        foreach ($request->processes as $id) {
-            $clientProcess = ClientProcess::findOrFail($id);
-            $proceses[$id]['processName'] = $clientProcess->name;
+        $clients = [];
+        foreach ($request->selectedIds as $id) {
+            $client = Client::findOrFail($id);
+            $clients[$id]['clientName'] = $client->name;
+            $clients[$id]['clientNum'] = $client->id;
             
-            $proceses[$id]['processTotalPrice'] = $clientProcess->total_price_taxes;
-            $proceses[$id]['processTotalPaid'] = $clientProcess->totalDeposits() + $clientProcess->discount_value;
-            $proceses[$id]['processTotalRemaining'] = $clientProcess->total_price_taxes - $clientProcess->totalDeposits();
-            $proceses[$id]['processDate'] = DateTime::today()->format('Y-m-d'); //Print Date
-            $proceses[$id]['processNum'] = $id;
-            $allProcessesTotalPrice += $proceses[$id]['processTotalPrice'];
-            $allProcessTotalPaid += $proceses[$id]['processTotalPaid'];
-            $allProcessTotalRemaining += $proceses[$id]['processTotalRemaining'];
+            $clients[$id]['clientTotalPrice'] = $client->getTotalDeal();
+            $clients[$id]['clientTotalPaid'] = $client->getTotalPaid();
+            $clients[$id]['clientTotalRemaining'] = $client->getTotalRemaining();
+            
+            $allClientsTotalPrice += $clients[$id]['clientTotalPrice'];
+            $allClientsTotalPaid += $clients[$id]['clientTotalPaid'];
+            $allClientsTotalRemaining += $clients[$id]['clientTotalRemaining'];
 
-            if ($request->ch_detialed == "1") {
+            if ($request->ch_detialed == TRUE) {
                 $index = 0;
-                $totalDepositValue = 0;
-                foreach ($clientProcess->items as $item) {
-                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($item->created_at)->format('Y-m-d');
-                    $proceses[$id]['processDetails'][$index]['remaining'] = "";
-                    $proceses[$id]['processDetails'][$index]['paid'] = "";
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $item->quantity * $item->unit_price;
-                    $proceses[$id]['processDetails'][$index]['unitPrice'] = $item->unit_price;
-                    $proceses[$id]['processDetails'][$index]['quantity'] = $item->quantity;
-                    $proceses[$id]['processDetails'][$index]['desc'] = $item->description;
-                    $index++;
-                }
-                if ($clientProcess->has_discount == "1") {
-                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($clientProcess->created_at)->format('Y-m-d');
-                    $proceses[$id]['processDetails'][$index]['remaining'] = "";
-                    $proceses[$id]['processDetails'][$index]['paid'] = $clientProcess->discount_value;
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
-                    $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
-                    $proceses[$id]['processDetails'][$index]['quantity'] = "";
-                    $proceses[$id]['processDetails'][$index]['desc'] = "خصم بسبب : " . $clientProcess->discount_reason;
-                    $index++;
-                }
-                //$proceses[$id]['processTotalPaid'] += $discount;
-                if ($clientProcess->require_invoice == "1") {
-                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($clientProcess->created_at)->format('Y-m-d');
-                    $proceses[$id]['processDetails'][$index]['remaining'] = "";
-                    $proceses[$id]['processDetails'][$index]['paid'] = "";
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $clientProcess->taxesValue();
-                    $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
-                    $proceses[$id]['processDetails'][$index]['quantity'] = "";
-                    $proceses[$id]['processDetails'][$index]['desc'] = "قيمة الضريبة المضافة";
-                    $index++;
-                }
-                foreach ($clientProcess->deposits as $deposit) {
-                    $totalDepositValue += $deposit->depositValue;
-                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($deposit->due_date)->format('Y-m-d');
-                    $proceses[$id]['processDetails'][$index]['remaining'] = $clientProcess->total_price_taxes - $totalDepositValue;
-                    $proceses[$id]['processDetails'][$index]['paid'] = $deposit->depositValue;
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
-                    $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
-                    $proceses[$id]['processDetails'][$index]['quantity'] = "";
-                    $proceses[$id]['processDetails'][$index]['desc'] = $deposit->recordDesc;
+                $clients[$id]['processDetails'] = [];
+                foreach ($client->processes as $process) {
+                    $clients[$id]['processDetails'][$index]['name'] = $process->name;
+                    $clients[$id]['processDetails'][$index]['totalPrice'] = $process->total_price_taxes;
+                    $clients[$id]['processDetails'][$index]['paid'] = $process->totalDeposits();
+                    $clients[$id]['processDetails'][$index]['remaining'] = $process->total_price_taxes - $process->totalDeposits();
+                    $clients[$id]['processDetails'][$index]['date'] = $process->created_at;
                     $index++;
                 }
             }
         }
 
         session([
-            'clientName' => $clientName,
-            'proceses' => $proceses,
-            'allProcessesTotalPrice' => $allProcessesTotalPrice,
-            'allProcessTotalPaid' => $allProcessTotalPaid,
-            'allProcessTotalRemaining' => $allProcessTotalRemaining
+            'clientName' => "",
+            'clients' => $clients,
+            'allClientsTotalPrice' => $allClientsTotalPrice,
+            'allClientsTotalPaid' => $allClientsTotalPaid,
+            'allClientsTotalRemaining' => $allClientsTotalRemaining
         ]);
-        if ($request->ch_detialed == "0") {
-            return view("reports.ClientAnalyticalCenter.total", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
+        if ($request->ch_detialed == FALSE) {
+            return view("reports.ClientAnalyticalCenter.total", compact('clientName', 'clients', 'allClientsTotalPrice', 'allClientsTotalPaid', 'allClientsTotalRemaining'));
         } else {
-            return view("reports.ClientAnalyticalCenter.detialed", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
+            return view("reports.ClientAnalyticalCenter.detialed", compact('clientName', 'clients', 'allClientsTotalPrice', 'allClientsTotalPaid', 'allClientsTotalRemaining'));
         }
     }
 
     public function printTotalPDF(Request $request) {
-        return $this->printClientPDF($request->ch_detialed, $request->withLetterHead, session('clientName'), session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
+        return $this->printClientPDF($request->ch_detialed, $request->withLetterHead, session('clientName'), session('clients'), session('allClientsTotalPrice'), session('allClientsTotalPaid'), session('allClientsTotalRemaining'));
     }
 
     public function printDetailedPDF(Request $request) {
-        return $this->printClientPDF($request->ch_detialed, $request->withLetterHead, session('clientName'), session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
+        return $this->printClientPDF($request->ch_detialed, $request->withLetterHead, session('clientName'), session('clients'), session('allClientsTotalPrice'), session('allClientsTotalPaid'), session('allClientsTotalRemaining'));
     }
 
     private function printClientPDF($ch_detialed, $withLetterHead, $clientName, $proceses, $allProcessesTotalPrice, $allProcessTotalPaid, $allProcessTotalRemaining) {
-        if ($ch_detialed == "0") {
-            $pdfReport = new ClientTotal($withLetterHead);
+        if ($ch_detialed == FALSE) {
+            $pdfReport = new ClientAnalyticalCenterTotal($withLetterHead);
         } else {
-            $pdfReport = new ClientDetailed($withLetterHead);
+            $pdfReport = new ClientAnalyticalCenterDetailed($withLetterHead);
         }
         $pdfReport->clientName = $clientName;
         $pdfReport->proceses = $proceses;
@@ -203,4 +164,5 @@ class ClientAnalyticalCenterController extends Controller {
         $pdfReport->allProcessTotalRemaining = $allProcessTotalRemaining;
         return $pdfReport->RenderReport();
     }
+
 }

@@ -14,7 +14,7 @@
                         </div>
                         <div class="col-lg-6 no-padding">
                             <div class="form-group">
-                                <label>اسم العميل :</label> {{ $clientName }}
+                                <label>المركز التحليلى للعملاء</label>
                             </div>
                         </div>
                         <div class="col-lg-12 no-padding">
@@ -26,28 +26,27 @@
                                             <thead>
                                                 <tr>
 
-                                                    <th>اسم العملية</th>
+                                                    <th>اسم العميل</th>
                                                     <th>الاجمالى</th>
                                                     <th>المدفوع</th>
                                                     <th>المتبقى</th>
-
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse ($proceses as $process)
+                                                @forelse ($clients as $client)
                                                 <tr class="odd">
-                                                    <td>{{ $process['processName'] }}</td>
-                                                    <td>{{ $process['processTotalPrice'] }}</td>
-                                                    <td style="color: red;">{{ $process['processTotalPaid'] }}</td>
-                                                    <td>{{ $process['processTotalRemaining'] }}</td>
+                                                    <td>{{ $client['clientName'] }}</td>
+                                                    <td>{{ $client['clientTotalPrice'] }}</td>
+                                                    <td style="color: red;">{{ $client['clientTotalPaid'] }}</td>
+                                                    <td>{{ $client['clientTotalRemaining'] }}</td>
                                                 </tr>
                                                 @empty
                                                 @endforelse
                                                 <tr class="info">
                                                     <td style="color: red;"> الاجمالـــــــــــــــــــــــــــــــــــى</td>
-                                                    <td style="color: red;">{{ $allProcessesTotalPrice }}</td>
-                                                    <td style="color: red;">{{ $allProcessTotalPaid }}</td>
-                                                    <td style="color: red;">{{ $allProcessTotalRemaining }}</td>
+                                                    <td style="color: red;">{{ $allClientsTotalPrice }}</td>
+                                                    <td style="color: red;">{{ $allClientsTotalPaid }}</td>
+                                                    <td style="color: red;">{{ $allClientsTotalRemaining }}</td>
                                                 </tr>
                                             </tbody>
                                         </table>  

@@ -11,55 +11,45 @@
                     <div class="col-lg-12 no-padding">
                         <img src="/ReportsHtml/letr.png" class="letrHead" style="width: 100%; margin-bottom: 20px;" />
                     </div>
-                    @forelse ($proceses as $process)
+                    @forelse ($suppliers as $supplier)
                     <div class="col-lg-12 no-padding">
                         <div class="col-lg-6 no-padding">
-                            <label>اسم العميل :</label> {{ $supplierName }}
+                            <label>اسم المورد :</label> {{ $supplier['supplierName'] }}
                         </div>
                         <div class="col-lg-6 no-padding">
-                            <label>اسم العملية :</label> {{ $process['processName'] }}
+                            <label>مسلسل :</label> {{ $supplier['supplierNum'] }}
                         </div>
-                        <div class="col-lg-6 no-padding">
-                            <label>مسلسل :</label> {{ $process['processNum'] }}
-                        </div>
-                        <div class="col-lg-6 no-padding">
-                            <label>تاريخ :</label> {{ $process['processDate'] }}
-                        </div>
-
                         <div class="col-lg-12 no-padding">
                             <div class="panel-body">
+
                                 <div class="dataTable_wrapper">
                                     <div class="table-responsive">
                                         <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                                             <thead>
                                                 <tr>
-                                                    <th>تاريخ</th>
-                                                    <th>المتبقى</th>
-                                                    <th>المدفوع</th>
+                                                    <th>اسم العملية</th>
                                                     <th>الاجمالى</th>
-                                                    <th>سعر الوحدة</th>
-                                                    <th>الكمية</th>
-                                                    <th>بيان</th>
+                                                    <th>المدفوع</th>
+                                                    <th>المتبقى</th>
+                                                    <th>تاريخ</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse ($process['processDetails'] as $details)
+                                                @forelse ($supplier['processDetails'] as $details)
                                                 <tr class="odd">
-                                                    <td> {{ $details['date'] }} </td>
-                                                    <td> {{ $details['remaining'] }} </td>
-                                                    <td> {{ $details['paid'] }} </td>
+                                                    <td> {{ $details['name'] }} </td>
                                                     <td> {{ $details['totalPrice'] }} </td>
-                                                    <td> {{ $details['unitPrice'] }} </td>
-                                                    <td> {{ $details['quantity'] }} </td>
-                                                    <td> {{ $details['desc'] }} </td>
+                                                    <td style="color: red;"> {{ $details['paid'] }} </td>
+                                                    <td> {{ $details['remaining'] }} </td>
+                                                    <td> {{ $details['date'] }} </td>
                                                 </tr>
                                                 @empty
                                                 @endforelse
                                                 <tr class="info">
-                                                    <td style="color: red;"></td>
-                                                    <td style="color: red;">{{ $process['processTotalRemaining'] }}</td>
-                                                    <td style="color: red;">{{ $process['processTotalPaid'] }}</td>
-                                                    <td style="color: red;" colspan="3">{{ $process['processTotalPrice'] }}</td>
+                                                    <td></td>
+                                                    <td style="color: red;">{{ $supplier['supplierTotalPrice'] }}</td>
+                                                    <td style="color: red;">{{ $supplier['supplierTotalPaid'] }}</td>
+                                                    <td style="color: red;">{{ $supplier['supplierTotalRemaining'] }}</td>
                                                     <td style="color: red;"> الاجمالـــــــــــــــــــــــــــــــــــى</td>
                                                 </tr>
                                             </tbody>

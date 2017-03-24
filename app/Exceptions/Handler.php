@@ -5,9 +5,10 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Mail;
 
-class Handler extends ExceptionHandler
-{
+class Handler extends ExceptionHandler {
+
     /**
      * A list of the exception types that should not be reported.
      *
@@ -30,8 +31,14 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $exception
      * @return void
      */
-    public function report(Exception $exception)
-    {
+    public function report(Exception $exception) {
+        /*if ($exception instanceof \Exception) {
+            // emails.exception is the template of your email
+            // it will have access to the $error that we are passing below
+            Mail::send('emails.exception', ['error' => $exception->getMessage()], function ($m) {
+                $m->to('mohammedzaki.dev@gmail.com', 'Mohammed Zaki')->subject('B2B POS ERROR');
+            });
+        }*/
         parent::report($exception);
     }
 
@@ -42,8 +49,7 @@ class Handler extends ExceptionHandler
      * @param  \Exception  $exception
      * @return \Illuminate\Http\Response
      */
-    public function render($request, Exception $exception)
-    {
+    public function render($request, Exception $exception) {
         return parent::render($request, $exception);
     }
 
@@ -54,12 +60,12 @@ class Handler extends ExceptionHandler
      * @param  \Illuminate\Auth\AuthenticationException  $exception
      * @return \Illuminate\Http\Response
      */
-    protected function unauthenticated($request, AuthenticationException $exception)
-    {
+    protected function unauthenticated($request, AuthenticationException $exception) {
         if ($request->expectsJson()) {
             return response()->json(['error' => 'Unauthenticated.'], 401);
         }
 
         return redirect()->guest('login');
     }
+
 }

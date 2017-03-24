@@ -33,6 +33,9 @@ class ClientProcess extends Model {
 
     const invoiceUnBilled = 0;
     const invoiceBilled = 1;
+    const statusClosed = 'closed';
+    const statusOpened = 'active';
+    
 
     public function client() {
         return $this->belongsTo('App\Models\Client');
@@ -67,24 +70,24 @@ class ClientProcess extends Model {
 
     public function CheckProcessMustClosed() {
         if ($this->totalPriceAfterTaxes() == $this->totalDeposits()) {
-            $this->status = 'closed';
+            $this->status = static::statusClosed;
             $this->save();
             return TRUE;
         } else {
-            $this->status = 'active';
+            $this->status = static::statusOpened;
             $this->save();
             return FALSE;
         }
     }
 
     public function taxesValue() {
-        if ($this->require_invoice == "1") {
+        if ($this->require_invoice == TRUE) {
             return $this->taxes_value;
         }
         return 0;
     }
 
     public static function allOpened() {
-        return ClientProcess::where('status', 'active');
+        return ClientProcess::where('status', static::statusOpened);
     }
 }

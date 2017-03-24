@@ -99,23 +99,23 @@ class ClientProcessController extends Controller {
                 );
             } else {
 
-                $all['status'] = 'active';
+                $all['status'] = ClientProcess::statusOpened;
                 if (isset($request->require_invoice)) {
-                    $all['require_invoice'] = 1;
+                    $all['require_invoice'] = TRUE;
                 } else {
-                    $all['require_invoice'] = 0;
+                    $all['require_invoice'] = FALSE;
                 }
 
                 if (isset($request->has_discount)) {
-                    $all['has_discount'] = 1;
+                    $all['has_discount'] = TRUE;
                 } else {
-                    $all['has_discount'] = 0;
+                    $all['has_discount'] = FALSE;
                 }
 
                 if (isset($request->has_source_discount)) {
-                    $all['has_source_discount'] = 1;
+                    $all['has_source_discount'] = TRUE;
                 } else {
-                    $all['has_source_discount'] = 0;
+                    $all['has_source_discount'] = FALSE;
                 }
 
                 $clientProcess = ClientProcess::create($all);
@@ -173,21 +173,21 @@ class ClientProcessController extends Controller {
                 return redirect()->back()->withInput($all)->with('error', "خطأ في انشاء عملية جديدة، العميل " . $client->name . " قد تعدى الحد اﻻئتماني المسموح له.");
             } else {
                 if (isset($request->require_invoice)) {
-                    $all['require_invoice'] = 1;
+                    $all['require_invoice'] = TRUE;
                 } else {
-                    $all['require_invoice'] = 0;
+                    $all['require_invoice'] = FALSE;
                 }
 
                 if (isset($request->has_discount)) {
-                    $all['has_discount'] = 1;
+                    $all['has_discount'] = TRUE;
                 } else {
-                    $all['has_discount'] = 0;
+                    $all['has_discount'] = FALSE;
                 }
 
                 if (isset($request->has_source_discount)) {
-                    $all['has_source_discount'] = 1;
+                    $all['has_source_discount'] = TRUE;
                 } else {
-                    $all['has_source_discount'] = 0;
+                    $all['has_source_discount'] = FALSE;
                 }
 
                 $process->update($all);
@@ -232,31 +232,4 @@ class ClientProcessController extends Controller {
         ClientProcessItem::withTrashed()->where('process_id', $id)->restore();
         return redirect()->route('client.process.index')->with('success', 'تم استرجاع العملية.');
     }
-
-    /*
-    public function getClientProcesses(Request $request) {
-        $input = $request->input('option');
-        $clientProcesses = ClientProcess::allOpened()->where('client_id', $input)->get();
-        $clientProcesses_tmp = [];
-        foreach ($clientProcesses as $process) {
-            $clientProcesses_tmp[$process->id] = $process->name;
-        }
-        $clientProcesses = $clientProcesses_tmp;
-        return response()->json($clientProcesses);
-    }
-
-    public function getClientReportProcesses(Request $request) {
-        $input = $request->input('option');
-        $clientProcesses = ClientProcess::where('client_id', $input)->get();
-
-        $clientProcesses_tmp = [];
-        foreach ($clientProcesses as $process) {
-            $clientProcesses_tmp[$process->id]['name'] = $process->name;
-            $clientProcesses_tmp[$process->id]['totalPrice'] = $process->total_price;
-            $clientProcesses_tmp[$process->id]['status'] = $process->status;
-        }
-        $clientProcesses = $clientProcesses_tmp;
-        return response()->json($clientProcesses);
-    }*/
-
 }

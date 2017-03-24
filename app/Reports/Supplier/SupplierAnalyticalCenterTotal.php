@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Reports\Client;
+namespace App\Reports\Supplier;
 
 use App\Reports\BaseReport;
 
-class ClientAnalyticalCenterTotal extends BaseReport {
+class SupplierAnalyticalCenterTotal extends BaseReport {
 
-    public $clientName,
+    public $supplierName,
             $proceses,
             $allProcessesTotalPrice,
             $allProcessTotalPaid,
             $allProcessTotalRemaining;
     
-    protected $reportName = "ClientTotalReport.pdf";
+    protected $reportName = "SupplierTotalReport.pdf";
 
     function SetHtmlBody() {
         return '<!DOCTYPE html>
@@ -23,7 +23,7 @@ class ClientAnalyticalCenterTotal extends BaseReport {
                     <body>
                         ' . $this->SetPageHeader() . '
                         ' . $this->SetPageFooter() . '
-                        ' . $this->SetReportHeader($this->clientName) . '
+                        ' . $this->SetReportHeader($this->supplierName) . '
                         <table class="tg">
                             ' . $this->AddProcess() . '
                         </table>
@@ -33,11 +33,11 @@ class ClientAnalyticalCenterTotal extends BaseReport {
     }
     
     function SetCSS() {
-        $path = public_path('ReportsHtml/Client/ClientTotal.css');
+        $path = public_path('ReportsHtml/Supplier/SupplierTotal.css');
         return file_get_contents($path);
     }
     
-    function SetReportHeader($clientName) {
+    function SetReportHeader($supplierName) {
         return '<div class="processHeader">
                     <table class="headerTable">
                         <tr>
@@ -60,7 +60,7 @@ class ClientAnalyticalCenterTotal extends BaseReport {
     
     function AddProcessItemHeader() {
         return '<tr>
-                    <th>اسم العميل</th>
+                    <th>اسم المورد</th>
                     <th>الاجمالى</th>
                     <th>المدفوع</th>
                     <th>المتبقى</th>

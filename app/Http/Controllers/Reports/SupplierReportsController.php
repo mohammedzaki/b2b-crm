@@ -115,7 +115,7 @@ class SupplierReportsController extends Controller {
             $allProcessTotalPaid += $proceses[$id]['processTotalPaid'];
             $allProcessTotalRemaining += $proceses[$id]['processTotalRemaining'];
 
-            if ($request->ch_detialed == "1") {
+            if ($request->ch_detialed == TRUE) {
                 $index = 0;
                 $totalWithdrawalValue = 0;
                 foreach ($supplierProcess->items as $item) {
@@ -128,7 +128,7 @@ class SupplierReportsController extends Controller {
                     $proceses[$id]['processDetails'][$index]['desc'] = $item->description;
                     $index++;
                 }
-                if ($supplierProcess->has_discount == "1") {
+                if ($supplierProcess->has_discount == TRUE) {
                     $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($item->created_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
                     $proceses[$id]['processDetails'][$index]['paid'] = $supplierProcess->discount_value;
@@ -138,7 +138,7 @@ class SupplierReportsController extends Controller {
                     $proceses[$id]['processDetails'][$index]['desc'] = "خصم بسبب : " . $supplierProcess->discount_reason;
                     $index++;
                 }
-                if ($supplierProcess->require_invoice == "1") {
+                if ($supplierProcess->require_invoice == TRUE) {
                     $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($item->created_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
                     $proceses[$id]['processDetails'][$index]['paid'] = "";
@@ -169,7 +169,7 @@ class SupplierReportsController extends Controller {
             'allProcessTotalPaid' => $allProcessTotalPaid,
             'allProcessTotalRemaining' => $allProcessTotalRemaining
         ]);
-        if ($request->ch_detialed == "0") {
+        if ($request->ch_detialed == FALSE) {
             return view("reports.supplier.total", compact('supplierName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
         } else {
             return view("reports.supplier.detialed", compact('supplierName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
@@ -177,7 +177,7 @@ class SupplierReportsController extends Controller {
     }
 
     private function printPDF($ch_detialed, $withLetterHead, $supplierName, $proceses, $allProcessesTotalPrice, $allProcessTotalPaid, $allProcessTotalRemaining) {
-        if ($ch_detialed == "0") {
+        if ($ch_detialed == FALSE) {
             $pdfReport = new SupplierTotal($withLetterHead);
         } else {
             $pdfReport = new SupplierDetailed($withLetterHead);

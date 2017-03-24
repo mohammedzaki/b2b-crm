@@ -118,7 +118,7 @@ class ClientReportsController extends Controller {
             $allProcessTotalPaid += $proceses[$id]['processTotalPaid'];
             $allProcessTotalRemaining += $proceses[$id]['processTotalRemaining'];
 
-            if ($request->ch_detialed == "1") {
+            if ($request->ch_detialed == TRUE) {
                 $index = 0;
                 $totalDepositValue = 0;
                 foreach ($clientProcess->items as $item) {
@@ -131,7 +131,7 @@ class ClientReportsController extends Controller {
                     $proceses[$id]['processDetails'][$index]['desc'] = $item->description;
                     $index++;
                 }
-                if ($clientProcess->has_discount == "1") {
+                if ($clientProcess->has_discount == TRUE) {
                     $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($clientProcess->created_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
                     $proceses[$id]['processDetails'][$index]['paid'] = $clientProcess->discount_value;
@@ -142,7 +142,7 @@ class ClientReportsController extends Controller {
                     $index++;
                 }
                 //$proceses[$id]['processTotalPaid'] += $discount;
-                if ($clientProcess->require_invoice == "1") {
+                if ($clientProcess->require_invoice == TRUE) {
                     $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($clientProcess->created_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
                     $proceses[$id]['processDetails'][$index]['paid'] = "";
@@ -173,7 +173,7 @@ class ClientReportsController extends Controller {
             'allProcessTotalPaid' => $allProcessTotalPaid,
             'allProcessTotalRemaining' => $allProcessTotalRemaining
         ]);
-        if ($request->ch_detialed == "0") {
+        if ($request->ch_detialed == FALSE) {
             return view("reports.client.total", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
         } else {
             return view("reports.client.detialed", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
@@ -189,7 +189,7 @@ class ClientReportsController extends Controller {
     }
 
     private function printClientPDF($ch_detialed, $withLetterHead, $clientName, $proceses, $allProcessesTotalPrice, $allProcessTotalPaid, $allProcessTotalRemaining) {
-        if ($ch_detialed == "0") {
+        if ($ch_detialed == FALSE) {
             $pdfReport = new ClientTotal($withLetterHead);
         } else {
             $pdfReport = new ClientDetailed($withLetterHead);

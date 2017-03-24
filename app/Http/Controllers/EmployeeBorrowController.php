@@ -86,7 +86,7 @@ class EmployeeBorrowController extends Controller {
 
             /* Can't create new borrow if employee has payment lower than the borrow  */
 
-            $all['is_active'] = 1;
+            $all['is_active'] = TRUE;
             $employeeBorrow = EmployeeBorrow::create($all);
 
             $depositWithdraw = new DepositWithdraw();
