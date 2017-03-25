@@ -2,21 +2,14 @@
 
 namespace App\Http\Controllers\Reports;
 
+use App\Extensions\DateTime;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use App\Http\Requests;
-use Validator;
-use App\Models\Client;
-use App\Models\ClientProcess;
 use App\Models\Supplier;
 use App\Models\SupplierProcess;
-use App\Models\DepositWithdraw;
-use App\Extensions\DateTime;
-use App\Reports\Client\ClientTotal;
-use App\Reports\Client\ClientDetailed;
-use App\Reports\Supplier\SupplierTotal;
 use App\Reports\Supplier\SupplierDetailed;
-use App\Http\Controllers\FacilityController;
+use App\Reports\Supplier\SupplierTotal;
+use Illuminate\Http\Request;
+use Validator;
 
 class SupplierReportsController extends Controller {
 
@@ -77,24 +70,28 @@ class SupplierReportsController extends Controller {
     public function index() {
         $suppliers = Supplier::all();
         $suppliers_tmp = [];
+        $supplierProcesses = [];
+        $index = 0;
         foreach ($suppliers as $supplier) {
-            $suppliers_tmp[$supplier->id] = $supplier->name;
+            $suppliers_tmp[$index]['id'] = $supplier->id;
+            $suppliers_tmp[$index]['name'] = $supplier->name;
+            $suppliers_tmp[$index]['hasOpenProcess'] = $supplier->hasOpenProcess();
+            $suppliers_tmp[$index]['hasClosedProcess'] = $supplier->hasClosedProcess();
+            
+            foreach ($supplier->processes as $process) {
+                $supplierProcesses[$supplier->id][$process->id]['name'] = $process->name;
+                $supplierProcesses[$supplier->id][$process->id]['totalPrice'] = $process->total_price;
+                $supplierProcesses[$supplier->id][$process->id]['status'] = $process->status;
+            }
+            $index++;
         }
-        $suppliers = $suppliers_tmp;
-        
-        $supplierProcesses = SupplierProcess::all();
+        $suppliers = json_encode($suppliers_tmp);
 
-        $supplierProcesses_tmp = [];
-        foreach ($supplierProcesses as $process) {
-            $supplierProcesses_tmp[$process->id]['supplierId'] = $process->supplier->id;
-            $supplierProcesses_tmp[$process->id]['name'] = $process->name;
-            $supplierProcesses_tmp[$process->id]['totalPrice'] = $process->total_price;
-            $supplierProcesses_tmp[$process->id]['status'] = $process->status;
-        }
-        $supplierProcesses = $supplierProcesses_tmp;
+        $supplierProcesses = json_encode($supplierProcesses);
+
         return view('reports.supplier.index', compact("suppliers", "supplierProcesses"));
     }
-
+    
     public function viewReport(Request $request) {
         $supplier = Supplier::findOrFail($request->supplier_id);
         $supplierName = $supplier->name;

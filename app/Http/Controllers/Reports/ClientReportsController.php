@@ -77,22 +77,25 @@ class ClientReportsController extends Controller {
     public function index() {
         $clients = Client::all();
         $clients_tmp = [];
+        $clientProcesses = [];
+        $index = 0;
         foreach ($clients as $client) {
-            $clients_tmp[$client->id] = $client->name;
+            $clients_tmp[$index]['id'] = $client->id;
+            $clients_tmp[$index]['name'] = $client->name;
+            $clients_tmp[$index]['hasOpenProcess'] = $client->hasOpenProcess();
+            $clients_tmp[$index]['hasClosedProcess'] = $client->hasClosedProcess();
+            
+            foreach ($client->processes as $process) {
+                $clientProcesses[$client->id][$process->id]['name'] = $process->name;
+                $clientProcesses[$client->id][$process->id]['totalPrice'] = $process->total_price;
+                $clientProcesses[$client->id][$process->id]['status'] = $process->status;
+            }
+            $index++;
         }
-        $clients = $clients_tmp;
-        
-        $clientProcesses = ClientProcess::all();
+        $clients = json_encode($clients_tmp);
 
-        $clientProcesses_tmp = [];
-        foreach ($clientProcesses as $process) {
-            $clientProcesses_tmp[$process->id]['clientId'] = $process->client->id;
-            $clientProcesses_tmp[$process->id]['name'] = $process->name;
-            $clientProcesses_tmp[$process->id]['totalPrice'] = $process->total_price;
-            $clientProcesses_tmp[$process->id]['status'] = $process->status;
-        }
-        $clientProcesses = $clientProcesses_tmp;
-        
+        $clientProcesses = json_encode($clientProcesses);
+
         return view('reports.client.index', compact("clients", "clientProcesses"));
     }
 
@@ -108,7 +111,7 @@ class ClientReportsController extends Controller {
         foreach ($request->processes as $id) {
             $clientProcess = ClientProcess::findOrFail($id);
             $proceses[$id]['processName'] = $clientProcess->name;
-            
+
             $proceses[$id]['processTotalPrice'] = $clientProcess->total_price_taxes;
             $proceses[$id]['processTotalPaid'] = $clientProcess->totalDeposits() + $clientProcess->discount_value;
             $proceses[$id]['processTotalRemaining'] = $clientProcess->total_price_taxes - $clientProcess->totalDeposits();

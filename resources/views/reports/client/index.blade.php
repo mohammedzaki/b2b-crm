@@ -1,3 +1,4 @@
+<?php  use App\Models\ClientProcess; ?>
 @extends("layouts.app") 
 @section("title", "تقرير عملية عميل - التقارير")
 @section("content")
@@ -29,7 +30,7 @@
                 تقرير عملية عميل
             </div>
             <!-- /.panel-heading -->
-            {{ Form::open(["route" => "reports.client.viewClientReport", 'id' => 'depositwithdrawForm']) }}
+            {{ Form::open(["route" => "reports.client.viewClientReport"]) }}
             <div class="panel-body">
 
                 <div class="legend">
@@ -57,7 +58,7 @@
                         array(
                             "id" => "ch_openprocess",
                             "class" => "checkbox_show_input",
-                            "onchange" => "FillterProcess()",
+                            "onchange" => "LoadClients()",
                             "checked" => "checked"
                         )
                     ) }} 
@@ -67,14 +68,14 @@
                         array(
                             "id" => "ch_closedprocess",
                             "class" => "checkbox_show_input",
-                            "onchange" => "FillterProcess()"
+                            "onchange" => "LoadClients()"
                         )
                     ) }} 
                     {{ Form::label(null, "عمليات مغلقة") }}
                 </div>
                 <div class="form-group">
                     {{ Form::label("client_id", "اسم العميل") }}
-                    {{ Form::select("client_id", $clients, null,
+                    {{ Form::select("client_id", [], null,
                                                         array(
                                                             "class" => "form-control",
                                                             "placeholder" => "",
@@ -163,62 +164,77 @@
 
 @section('scripts')
 <script>
-    var allProcesses  = [@foreach($clientProcesses as $k => $info) {id: '{{ $k }}', name: '{{ $info["name"] }}', clientId: '{{ $info["clientId"] }}', totalPrice: '{{ $info["totalPrice"] }}', status: '{{ $info["status"] }}'}, @endforeach];
-    var currentClientId =0;
+    var allProcesses = JSON.parse(he.decode('{{ $clientProcesses }}'));
+    var clients = JSON.parse(he.decode('{{ $clients }}'));
+    console.log(clients);
+    var currentClientId = 0;
+    LoadClients();
+    
+    function LoadClients() {
+        currentClientId = $(client_id).val();
+        $("#client_id").empty();
+        $("#grid_ClientProcess").empty();
+        if (clients != null) {
+            $("#client_id").append('<option></option>');
+            $.each(clients, function (index, client) {
+                if (($("#ch_closedprocess").is(":checked") && client.hasClosedProcess == true) || ($("#ch_openprocess").is(":checked") && client.hasOpenProcess == true)) {
+                    if (client.id == currentClientId) {
+                        $("#client_id").append('<option selected value="' + client.id + '">' + client.name + '</option>');
+                        FillterProcess();
+                    } else {
+                        $("#client_id").append('<option value="' + client.id + '">' + client.name + '</option>');
+                    }
+                }
+            });
+        }
+    }
+    
     function GetClientProcess(client_id) {
         currentClientId = $(client_id).val();
         FillterProcess();
     }
-
+    
     function SelectAll(ch_all) {
         var rowsCount = $("#grid_ClientProcess").children().length;
-        if ($(ch_all).is(":checked")) {
-            for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
-                $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(0)").children(0).prop("checked", true);
-                $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0).prop("disabled", false);
-            }
-        } else {
-            for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
-                $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(0)").children(0).prop("checked", false);
-                $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0).prop("disabled", true);
-            }
+        for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
+            SelectProcessByIndex(rowIndex, $(ch_all).is(":checked"));
         }
     }
 
     function FillterProcess() {
         $("#grid_ClientProcess").empty();
         var index = 0;
-        if (allProcesses != null) {
-            $.each(allProcesses, function (key, value) {
-                if (value.clientId == currentClientId) {
-                    if ($("#ch_openprocess").is(":checked") && value.status == "active") {
-                        $("#grid_ClientProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled="disabled" name="processes[' + index + ']" type="hidden" value="' + value.id + '"></td></tr>');
-                    }
-                    if ($("#ch_closedprocess").is(":checked") && value.status == "closed") {
-                        $("#grid_ClientProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled="disabled" name="processes[' + index + ']" type="hidden" value="' + value.id + '"></td></tr>');
-                    }
-                    index++;
+        if (allProcesses[currentClientId] != null) {
+            $.each(allProcesses[currentClientId], function (processId, value) {
+                if (($("#ch_closedprocess").is(":checked") && value.status == '{{ ClientProcess::statusClosed }}') || ($("#ch_openprocess").is(":checked") && value.status == '{{ ClientProcess::statusOpened }}')) {
+                    $("#grid_ClientProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled name="processes[' + index + ']" type="hidden" value="' + processId + '"></td></tr>');
                 }
+                index++;
             });
         }
     }
-
+    
     function SelectProcess(CurrentCell) {
         if ($("#grid_ClientProcess").children().length > 0) {
             rowIndex = $(CurrentCell)
                     .closest('tr') // Get the closest tr parent element
                     .prevAll() // Find all sibling elements in front of it
                     .length; // Get their count
-
-            var inputProcessId = $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0);
-            if (inputProcessId.is(":disabled")) {
-                $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0).prop("disabled", false);
-            } else {
-                $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0).prop("disabled", true);
-            }
+            SelectProcessByIndex(rowIndex);
         }
     }
 
-
+    function SelectProcessByIndex(rowIndex, flag = false) {
+        var inputProcessId = $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0);
+        var inputChk = $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(0)").children(0);
+        if (!flag) {
+            inputProcessId.prop("disabled", !inputProcessId.is(":disabled"));
+            inputChk.prop("checked", !inputProcessId.is(":disabled"));
+        } else {
+            inputProcessId.prop("disabled", !flag);
+            inputChk.prop("checked", flag);
+        }
+    }
+    
 </script>
 @endsection

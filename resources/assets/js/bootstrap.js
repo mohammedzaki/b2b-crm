@@ -13,4 +13,4 @@ import {ar as Arabic} from 'flatpickr/dist/l10n/ar.js';
 
 Flatpickr.localize(Arabic);
 
-var he = require('he');
+window.he = require('he');

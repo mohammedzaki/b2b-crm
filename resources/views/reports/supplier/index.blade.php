@@ -1,3 +1,4 @@
+<?php  use App\Models\SupplierProcess; ?>
 @extends("layouts.app") 
 @section("title", "تقرير عملية عميل - التقارير")
 @section("content")
@@ -29,7 +30,7 @@
                 تقرير عملية مورد
             </div>
             <!-- /.panel-heading -->
-            {{ Form::open(["route" => "reports.supplier.viewSupplierReport", 'id' => 'depositwithdrawForm']) }}
+            {{ Form::open(["route" => "reports.supplier.viewSupplierReport"]) }}
             <div class="panel-body">
 
                 <div class="legend">
@@ -57,7 +58,7 @@
                         array(
                             "id" => "ch_openprocess",
                             "class" => "checkbox_show_input",
-                            "onchange" => "FillterProcess()",
+                            "onchange" => "LoadSuppliers()",
                             "checked" => "checked"
                         )
                     ) }} 
@@ -67,14 +68,14 @@
                         array(
                             "id" => "ch_closedprocess",
                             "class" => "checkbox_show_input",
-                            "onchange" => "FillterProcess()"
+                            "onchange" => "LoadSuppliers()"
                         )
                     ) }} 
                     {{ Form::label(null, "عمليات مغلقة") }}
                 </div>
                 <div class="form-group">
                     {{ Form::label("supplier_id", "اسم المورد") }}
-                    {{ Form::select("supplier_id", $suppliers, null,
+                    {{ Form::select("supplier_id", [], null,
                                                         array(
                                                             "class" => "form-control",
                                                             "placeholder" => "",
@@ -163,64 +164,76 @@
 
 @section('scripts')
 <script>
-    var allProcesses  = [@foreach($supplierProcesses as $k => $info) {id: '{{ $k }}', name: '{{ $info["name"] }}', clientId: '{{ $info["supplierId"] }}', totalPrice: '{{ $info["totalPrice"] }}', status: '{{ $info["status"] }}'}, @endforeach];
-    //var supplierProcess = null;
+    var allProcesses = JSON.parse(he.decode('{{ $supplierProcesses }}'));
+    var suppliers = JSON.parse(he.decode('{{ $suppliers }}'));
+    console.log(suppliers);
     var currentSupplierId = 0;
+    LoadSuppliers();
+    
+    function LoadSuppliers() {
+        currentSupplierId = $(supplier_id).val();
+        $("#supplier_id").empty();
+        $("#grid_SupplierProcess").empty();
+        if (suppliers != null) {
+            $("#supplier_id").append('<option></option>');
+            $.each(suppliers, function (index, supplier) {
+                if (($("#ch_closedprocess").is(":checked") && supplier.hasClosedProcess == true) || ($("#ch_openprocess").is(":checked") && supplier.hasOpenProcess == true)) {
+                    if (supplier.id == currentSupplierId) {
+                        $("#supplier_id").append('<option selected value="' + supplier.id + '">' + supplier.name + '</option>');
+                        FillterProcess();
+                    } else {
+                        $("#supplier_id").append('<option value="' + supplier.id + '">' + supplier.name + '</option>');
+                    }
+                }
+            });
+        }
+    }
     
     function GetSupplierProcess(supplier_id) {
         currentSupplierId = $(supplier_id).val();
         FillterProcess();
     }
-
+    
     function SelectAll(ch_all) {
         var rowsCount = $("#grid_SupplierProcess").children().length;
-        if ($(ch_all).is(":checked")) {
-            for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
-                $("#grid_SupplierProcess tr:eq(" + rowIndex + ") td:eq(0)").children(0).prop("checked", true);
-                $("#grid_SupplierProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0).prop("disabled", false);
-            }
-        } else {
-            for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
-                $("#grid_SupplierProcess tr:eq(" + rowIndex + ") td:eq(0)").children(0).prop("checked", false);
-                $("#grid_SupplierProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0).prop("disabled", true);
-            }
+        for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
+            SelectProcessByIndex(rowIndex, $(ch_all).is(":checked"));
         }
     }
 
     function FillterProcess() {
         $("#grid_SupplierProcess").empty();
         var index = 0;
-        if (allProcesses != null) {
-            $.each(allProcesses, function (key, value) {
-                if (value.clientId == currentSupplierId) {
-                    if ($("#ch_openprocess").is(":checked") && value.status == "active") {
-                        $("#grid_SupplierProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled="disabled" name="processes[' + index + ']" type="hidden" value="' + value.id + '"></td></tr>');
-                    }
-                    if ($("#ch_closedprocess").is(":checked") && value.status == "closed") {
-                        $("#grid_SupplierProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled="disabled" name="processes[' + index + ']" type="hidden" value="' + value.id + '"></td></tr>');
-                    }
-                    index++;
+        if (allProcesses[currentSupplierId] != null) {
+            $.each(allProcesses[currentSupplierId], function (processId, value) {
+                if (($("#ch_closedprocess").is(":checked") && value.status == '{{ SupplierProcess::statusClosed }}') || ($("#ch_openprocess").is(":checked") && value.status == '{{ SupplierProcess::statusOpened }}')) {
+                    $("#grid_SupplierProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled name="processes[' + index + ']" type="hidden" value="' + processId + '"></td></tr>');
                 }
+                index++;
             });
         }
     }
-
+    
     function SelectProcess(CurrentCell) {
         if ($("#grid_SupplierProcess").children().length > 0) {
             rowIndex = $(CurrentCell)
                     .closest('tr') // Get the closest tr parent element
                     .prevAll() // Find all sibling elements in front of it
                     .length; // Get their count
-
-            var inputProcessId = $("#grid_SupplierProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0);
-            if (inputProcessId.is(":disabled")) {
-                $("#grid_SupplierProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0).prop("disabled", false);
-            } else {
-                $("#grid_SupplierProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0).prop("disabled", true);
-            }
+            SelectProcessByIndex(rowIndex);
         }
     }
 
-
+    function SelectProcessByIndex(rowIndex, flag = false) {
+        var inputProcessId = $("#grid_SupplierProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0);
+        var inputChk = $("#grid_SupplierProcess tr:eq(" + rowIndex + ") td:eq(0)").children(0);
+        if (!flag) {
+            inputProcessId.prop("disabled", !inputProcessId.is(":disabled"));
+            inputChk.prop("checked", !inputProcessId.is(":disabled"));
+        } else {
+            inputProcessId.prop("disabled", !flag);
+            inputChk.prop("checked", flag);
+        }
+    }
 </script>
 @endsection

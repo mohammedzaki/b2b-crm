@@ -195,7 +195,7 @@
 
 @section('scripts')
 <script>
-    var allProcesses = JSON.parse(he.decode('{{ $clientProcesses }}'));
+    var allProcesses = JSON.parse(he.decode("{{ $clientProcesses }}"));
     console.log(allProcesses);
     var currentClientId = 0;
     function GetClientProcess(client_id) {
@@ -208,7 +208,6 @@
         for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
             SelectProcessByIndex(rowIndex, $(ch_all).is(":checked"));
         }
-
     }
 
     function FillterProcess() {

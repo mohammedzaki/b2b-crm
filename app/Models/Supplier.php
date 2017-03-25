@@ -34,25 +34,50 @@ class Supplier extends Model {
     public static function allHasOpenProcess() {
         $suppliers = Supplier::join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
                 ->select('suppliers.*')->where('supplier_processes.status', SupplierProcess::statusOpened)
+                ->distinct()
                 ->get();
         return $suppliers;
     }
+
+    public function hasOpenProcess(): bool {
+        $supplier = Supplier::join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
+                ->select('suppliers.*')->where([
+                    ['supplier_processes.status', "=", SupplierProcess::statusOpened],
+                    ['suppliers.id', '=', $this->id]])
+                ->distinct()
+                ->get();
+        
+        if ($supplier->count() > 0) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+
+    public function hasClosedProcess(): bool {
+        $supplier = Supplier::join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
+                ->select('suppliers.*')->where([
+                    ['supplier_processes.status', "=", SupplierProcess::statusClosed],
+                    ['suppliers.id', '=', $this->id]])
+                ->distinct()
+                ->get();
+        
+        if ($supplier->count() > 0) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
     
     public function getTotalPaid() {
-        /*return DB::table('suppliers')
+        return DB::table('suppliers')
                 ->join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
                 ->join('deposit_withdraws', 'supplier_processes.id', '=', 'deposit_withdraws.cbo_processes')
-                ->where('suppliers.id', 'deposit_withdraws.supplier_id')
-                ->where('supplier_processes.status', ClientProcess::statusOpened)
+                ->join('deposit_withdraws as dw', 'suppliers.id', '=', 'deposit_withdraws.supplier_id')
+                ->distinct()
+                ->where('supplier_processes.status', SupplierProcess::statusOpened)
                 ->where('suppliers.id', $this->id)
-                ->sum('withdrawValue');*/
-        return DB::select('SELECT 
-          sum(deposit_withdraws.withdrawValue) as withdrawValue
-          FROM suppliers
-          join supplier_processes on supplier_processes.supplier_id = suppliers.id
-          join deposit_withdraws on supplier_processes.id = deposit_withdraws.cbo_processes and suppliers.id = deposit_withdraws.supplier_id
-          WHERE `status` = "active" and suppliers.id = ' . $this->id)[0]->withdrawValue;
-        //return $this->hasMany(DepositWithdraw::class)->where([['withdrawValue', '>', 0]])->sum('withdrawValue');
+                ->sum('deposit_withdraws.withdrawValue');
     }
     
     public function getTotalRemaining() {

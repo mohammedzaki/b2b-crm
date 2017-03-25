@@ -41,32 +41,53 @@ class Client extends Model {
         return $this->hasMany(ClientProcess::class)->where('status', ClientProcess::statusOpened);
     }
 
+    public function hasOpenProcess(): bool {
+        $client = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
+                ->select('clients.*')->where([
+                    ['client_processes.status', "=", ClientProcess::statusOpened],
+                    ['clients.id', '=', $this->id]])
+                ->distinct()
+                ->get();
+        
+        if ($client->count() > 0) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+
+    public function hasClosedProcess(): bool {
+        $client = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
+                ->select('clients.*')->where([
+                    ['client_processes.status', "=", ClientProcess::statusClosed],
+                    ['clients.id', '=', $this->id]])
+                ->distinct()
+                ->get();
+        
+        if ($client->count() > 0) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+    
     public static function allHasOpenProcess() {
         $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
                 ->select('clients.*')->where('client_processes.status', ClientProcess::statusOpened)
+                ->distinct()
                 ->get();
         return $clients;
     }
 
     public function getTotalPaid() {
-        /*
-         * 
-         */
-        /*return DB::table('clients')
-                ->join('client_processes', 'client_processes.client_id', '=', 'clients.id')
-                ->join('deposit_withdraws', 'client_processes.id', '=', 'deposit_withdraws.cbo_processes')
-                ->on('clients.id', 'deposit_withdraws.client_id')
-                ->where('client_processes.status', ClientProcess::statusOpened)
-                ->where('clients.id', $this->id)
-                ->sum('depositValue');*/
-        return DB::select('SELECT 
-          sum(deposit_withdraws.depositValue) as depositValue
-          FROM clients
-          join client_processes on client_processes.client_id = clients.id
-          join deposit_withdraws on client_processes.id = deposit_withdraws.cbo_processes and clients.id = deposit_withdraws.client_id
-          WHERE `status` = "active" and clients.id = ' . $this->id)[0]->depositValue;
-        
-        //return $this->hasMany(DepositWithdraw::class)->where([['depositValue', '>', 0]])->sum('depositValue');
+        return DB::table('clients')
+                        ->join('client_processes', 'client_processes.client_id', '=', 'clients.id')
+                        ->join('deposit_withdraws', 'client_processes.id', '=', 'deposit_withdraws.cbo_processes')
+                        ->join('deposit_withdraws as dw', 'clients.id', '=', 'deposit_withdraws.client_id')
+                        ->distinct()
+                        ->where('client_processes.status', ClientProcess::statusOpened)
+                        ->where('clients.id', $this->id)
+                        ->sum('deposit_withdraws.depositValue');
     }
 
     public function getTotalRemaining() {
