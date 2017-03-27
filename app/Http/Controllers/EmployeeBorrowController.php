@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Http\Requests;
-use App\Models\Employee;
-use App\Models\EmployeeBorrow;
-use App\Models\DepositWithdraw;
 use App\Constants\EmployeeActions;
 use App\Constants\PaymentMethods;
 use App\Extensions\DateTime;
+use App\Models\DepositWithdraw;
+use App\Models\Employee;
+use App\Models\EmployeeBorrow;
+use App\Models\EmployeeBorrowBilling;
+use Illuminate\Http\Request;
 use Validator;
 
 class EmployeeBorrowController extends Controller {
@@ -87,7 +87,9 @@ class EmployeeBorrowController extends Controller {
             /* Can't create new borrow if employee has payment lower than the borrow  */
 
             $all['is_active'] = TRUE;
+
             $employeeBorrow = EmployeeBorrow::create($all);
+
 
             $depositWithdraw = new DepositWithdraw();
             $depositWithdraw->withdrawValue = $employeeBorrow->pay_amount;
@@ -99,6 +101,33 @@ class EmployeeBorrowController extends Controller {
             $depositWithdraw->notes = DateTime::now();
             $depositWithdraw->save();
 
+            $times = $employeeBorrow->amount / $employeeBorrow->pay_amount;
+            $times = intval($times) + 1;
+            $stratDate = DateTime::now();
+            if (!$request->start_discount) {
+                $stratDate->addMonth(1);
+            }
+            for ($index = 1; $index <= $times; $index++) {
+                if ($index == $times) {
+                    $value = $employeeBorrow->amount % $employeeBorrow->pay_amount;
+                    if ($value > 0) {
+                        $em = new EmployeeBorrowBilling;
+                        $em->pay_amount = $value;
+                        $em->due_date = $stratDate;
+                        $em->is_paid = FALSE;
+                        $em->employee_borrow_id = $employeeBorrow->id;
+                        $em->save();
+                    }
+                } else {
+                    $em = new EmployeeBorrowBilling;
+                    $em->pay_amount = $employeeBorrow->pay_amount;
+                    $em->due_date = $stratDate;
+                    $em->is_paid = FALSE;
+                    $em->employee_borrow_id = $employeeBorrow->id;
+                    $em->save();
+                }
+                $stratDate->addMonth(1);
+            }
 
             return redirect()->route('employeeBorrow.index')->with('success', 'تم اضافة سلفية جديدة.');
         }

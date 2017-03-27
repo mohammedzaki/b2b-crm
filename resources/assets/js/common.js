@@ -6,7 +6,7 @@ var source_discount_value = 0;
 var total_price = 0;
 var taxes = 0;
 var priceAfterTaxes = 0;
-var roundDecimals = function (value, decimals) {
+window.roundDecimals = function (value, decimals) {
     decimals = decimals || 0;
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
 };

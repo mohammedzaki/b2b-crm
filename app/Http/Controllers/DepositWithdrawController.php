@@ -2,23 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Constants\EmployeeActions;
+use App\Constants\PaymentMethods;
+use App\Extensions\DateTime;
+use App\Models\Client;
+use App\Models\ClientProcess;
+use App\Models\DepositWithdraw;
+use App\Models\Employee;
+use App\Models\Expenses;
+use App\Models\OpeningAmount;
+use App\Models\Supplier;
+use App\Models\SupplierProcess;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Auth;
-use App\Extensions\DateTime;
-use App\Http\Requests;
-use App\Models\Client;
-use App\Models\Supplier;
-use App\Models\ClientProcess;
-use App\Models\Employee;
-use App\Models\Expenses;
-use App\Models\SupplierProcess;
-use App\Models\DepositWithdraw;
-use App\Models\Facility;
-use App\Models\User;
-use App\Models\OpeningAmount;
-use App\Constants\EmployeeActions;
-use App\Constants\PaymentMethods;
 use Validator;
 
 class DepositWithdrawController extends Controller {
@@ -36,7 +33,7 @@ class DepositWithdrawController extends Controller {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function index() {
         $startDate = DateTime::today()->startOfDay();
@@ -77,7 +74,7 @@ class DepositWithdrawController extends Controller {
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function create() {
         //
@@ -86,8 +83,8 @@ class DepositWithdrawController extends Controller {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function store(Request $request) {
         //$validator = $this->validator($request->all());
@@ -145,8 +142,8 @@ class DepositWithdrawController extends Controller {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function LockSaveToAll(Request $request) {
         $validator = $this->validator($request->all());
@@ -170,8 +167,8 @@ class DepositWithdrawController extends Controller {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return Response
      */
     public function RemoveSelected(Request $request) {
         $validator = $this->validator($request->all());
@@ -201,7 +198,7 @@ class DepositWithdrawController extends Controller {
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function search(Request $request) {
         $user = Auth::user();
@@ -287,7 +284,7 @@ class DepositWithdrawController extends Controller {
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function show($id) {
         //
@@ -297,7 +294,7 @@ class DepositWithdrawController extends Controller {
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id) {
         //
@@ -306,9 +303,9 @@ class DepositWithdrawController extends Controller {
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function update(Request $request, $id) {
         $depositWithdraw = DepositWithdraw::findOrFail($id);
@@ -341,14 +338,19 @@ class DepositWithdrawController extends Controller {
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function destroy($id) {
         //
     }
 
     private function CalculateCurrentAmount() {
-        return (DepositWithdraw::sum('depositValue') + Facility::sum('opening_amount')) - DepositWithdraw::sum('withdrawValue');
+        $startDate = DateTime::today()->format('2017-01-01 00:00:00');
+        $endDate = DateTime::today()->format('2017-12-31 00:00:00');
+        $depositValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+        $withdrawValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
+        $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
+        return ($depositValue + $openingAmount) - $withdrawValue;
     }
     
     private function CalculateCurrentAmountOff($startDate, $endDate) {

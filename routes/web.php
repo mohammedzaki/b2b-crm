@@ -64,6 +64,7 @@ Route::get('/attendance/checkout', 'AttendanceController@checkout')->name('atten
 Route::get('/attendance/manualadding', 'AttendanceController@manualadding')->name('attendance.manualadding');
 Route::get('/attendance/guardianship/{employee_id}', 'AttendanceController@guardianship')->name('attendance.guardianship');
 Route::get('/attendance/guardianshipaway/{employee_id}', 'AttendanceController@guardianshipaway')->name('attendance.guardianshipaway');
+Route::get('/attendance/longBorrowaway/{employee_id}', 'AttendanceController@longBorrowAway')->name('attendance.longBorrowAway');
 Route::get('/attendance/printSalaryReport/{employee_id}', 'AttendanceController@printSalaryReport')->name('attendance.printSalaryReport');
 Route::post('/attendance/paySalary/{employee_id}', 'AttendanceController@payEmpolyeeSalary')->name('attendance.payEmpolyeeSalary');
 

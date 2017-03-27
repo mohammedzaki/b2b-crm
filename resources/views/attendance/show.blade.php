@@ -240,16 +240,22 @@
                         </div>
                     </div>
                     <div class="form-group col-lg-3">
-                        <div class="col-lg-6 ">
+                        <div class="col-lg-4 ">
                             <div class="form-group">
                                 <label>></label>
                                 <button class="btn btn-primary form-control" type="button" onclick="SubmitSearchGuardianship()">كشف حساب العهد</button>
                             </div>
                         </div>
-                        <div class="col-lg-6 ">
+                        <div class="col-lg-4 ">
                             <div class="form-group">
                                 <label>></label>
                                 {{ link_to_route('attendance.guardianshipaway', 'ترحيل العهدة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
+                            </div>
+                        </div>
+                        <div class="col-lg-4 ">
+                            <div class="form-group">
+                                <label>></label>
+                                {{ link_to_route('attendance.longBorrowAway', 'ترحيل السلفة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
                             </div>
                         </div>
                     </div>

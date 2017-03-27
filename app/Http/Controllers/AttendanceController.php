@@ -2,25 +2,23 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Auth;
-use App\Extensions\DateTime;
-use App\Http\Requests;
-use App\Models\Client;
-use App\Models\Supplier;
-use App\Models\ClientProcess;
-use App\Models\Employee;
-use App\Models\Expenses;
-use App\Models\SupplierProcess;
-use App\Models\Attendance;
-use App\Models\Facility;
-use App\Models\AbsentType;
-use App\Models\User;
-use App\Models\DepositWithdraw;
 use App\Constants\EmployeeActions;
 use App\Constants\PaymentMethods;
+use App\Extensions\DateTime;
+use App\Models\AbsentType;
+use App\Models\Attendance;
+use App\Models\ClientProcess;
+use App\Models\DepositWithdraw;
+use App\Models\Employee;
+use App\Models\EmployeeBorrowBilling;
+use App\Reports\Employee\Salary;
+use DB;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Validator;
+use function redirect;
+use function response;
+use function view;
 
 class AttendanceController extends Controller {
 
@@ -42,7 +40,7 @@ class AttendanceController extends Controller {
     public function index() {
         $startDate = DateTime::today()->format('Y-m-d 00:00:00');
         $endDate = DateTime::today()->format('Y-m-d 23:59:59');
-        
+
         return $this->getAttendanceItems('all', $startDate, $endDate, 1, TRUE);
     }
 
@@ -394,12 +392,12 @@ class AttendanceController extends Controller {
             $totalGuardianshipReturnValue += $attendance->GuardianshipReturnValue;
             $totalBorrowValue += $attendance->borrowValue;
         }
-        /*try {
+        try {
             $attendances[0]->borrowValue = $attendances[0]->employeeLongBorrow();
             $totalLongBorrowValue = $attendances[0]->employeeLongBorrow();
         } catch (\Exception $exc) {
             
-        }*/
+        }
         $totalSmallBorrowValue = $totalBorrowValue;
         $totalBorrowValue += $totalLongBorrowValue;
         $totalHoursSalary = $totalWorkingHours * (($hourlyRate / 60) / 60);
@@ -585,6 +583,30 @@ class AttendanceController extends Controller {
         return redirect()->back()->with('success', 'تم الترحيل');
     }
 
+    public function longBorrowAway(Request $request, $employee_id) {
+        $date = DateTime::parse($request->date);
+
+        $employeeBorrowBilling = DB::table('employees')
+                ->join('employee_borrows', 'employee_borrows.employee_id', '=', 'employees.id')
+                ->join('employee_borrow_billing', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
+                ->distinct()
+                ->where([
+                    ['is_paid', '=', FALSE],
+                    ['employees.id', '=', $employee_id]
+                ])
+                ->whereMonth('due_date', '>=', $date->month)
+                ->select('employee_borrow_billing.id')
+                ->get();
+        foreach ($employeeBorrowBilling as $key => $emb) {
+            $date->addMonth(1);
+            $borrowBilling = EmployeeBorrowBilling::findOrFail($emb->id);
+            $borrowBilling->due_date = $date;
+            $borrowBilling->save();
+        }
+
+        return redirect()->back()->with('success', 'تم الترحيل');
+    }
+
     public function printSalaryReport(Request $request, $employee_id) {
         $employees = Employee::all();
         $dt = DateTime::parse($request->date);
@@ -654,7 +676,7 @@ class AttendanceController extends Controller {
         }
         $employees = $employees_tmp;
         $employeeName = $employee->name;
-        $pdfReport = new \App\Reports\Employee\Salary(TRUE);
+        $pdfReport = new Salary(TRUE);
 
         $pdfReport->htmlContent = view('reports.employee.salary', compact(['employeeName', 'employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date']))->render();
 
@@ -679,6 +701,23 @@ class AttendanceController extends Controller {
                         ['expenses_id', '=', EmployeeActions::TakeSalary]
                     ])->whereMonth('notes', '=', $dt->month)->first();
 
+            $employeeBorrowBilling = DB::table('employees')
+                    ->join('employee_borrows', 'employee_borrows.employee_id', '=', 'employees.id')
+                    ->join('employee_borrow_billing', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
+                    ->distinct()
+                    ->where([
+                        ['is_paid', '=', FALSE],
+                        ['employees.id', '=', $employee_id]
+                    ])
+                    ->whereMonth('due_date', $dt->month)
+                    ->select('employee_borrow_billing.id')
+                    ->first();
+            if (!empty($employeeBorrowBilling->id)) {
+                $borrowBilling = EmployeeBorrowBilling::findOrFail($employeeBorrowBilling->id);
+                $borrowBilling->is_paid = TRUE;
+                $borrowBilling->save();
+            }
+
             if (empty($depositWithdraw)) {
                 DepositWithdraw::create($all);
                 return redirect()->back()->with('success', 'تم دفع المرتب');
@@ -702,7 +741,7 @@ class AttendanceController extends Controller {
         else
             return $attendance->check_in;
     }
-    
+
     private function getEmployeeData() {
         $employees = Employee::all();
         $dt = DateTime::parse($request->date);
@@ -760,12 +799,12 @@ class AttendanceController extends Controller {
             $totalGuardianshipReturnValue += $attendance->GuardianshipReturnValue;
             $totalBorrowValue += $attendance->borrowValue;
         }
-        /*try {
-            $attendances[0]->borrowValue = $attendances[0]->employeeLongBorrow();
-            $totalLongBorrowValue = $attendances[0]->employeeLongBorrow();
-        } catch (\Exception $exc) {
-            
-        }*/
+        /* try {
+          $attendances[0]->borrowValue = $attendances[0]->employeeLongBorrow();
+          $totalLongBorrowValue = $attendances[0]->employeeLongBorrow();
+          } catch (\Exception $exc) {
+
+          } */
         $totalSmallBorrowValue = $totalBorrowValue;
         $totalBorrowValue += $totalLongBorrowValue;
         $totalHoursSalary = $totalWorkingHours * (($hourlyRate / 60) / 60);

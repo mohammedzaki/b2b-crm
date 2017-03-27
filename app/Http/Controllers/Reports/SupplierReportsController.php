@@ -135,6 +135,26 @@ class SupplierReportsController extends Controller {
                     $proceses[$id]['processDetails'][$index]['desc'] = "خصم بسبب : " . $supplierProcess->discount_reason;
                     $index++;
                 }
+                if ($clientProcess->has_source_discount == TRUE) {
+                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($clientProcess->created_at)->format('Y-m-d');
+                    $proceses[$id]['processDetails'][$index]['remaining'] = "";
+                    $proceses[$id]['processDetails'][$index]['paid'] = "";
+                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $clientProcess->source_discount_value;
+                    $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
+                    $proceses[$id]['processDetails'][$index]['quantity'] = "";
+                    $proceses[$id]['processDetails'][$index]['desc'] = "خصم من المنبع";
+                    $index++;
+                }
+                if ($supplierProcess->has_source_discount == TRUE) {
+                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($supplierProcess->created_at)->format('Y-m-d');
+                    $proceses[$id]['processDetails'][$index]['remaining'] = "";
+                    $proceses[$id]['processDetails'][$index]['paid'] = "";
+                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $supplierProcess->source_discount_value;
+                    $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
+                    $proceses[$id]['processDetails'][$index]['quantity'] = "";
+                    $proceses[$id]['processDetails'][$index]['desc'] = "خصم من المنبع";
+                    $index++;
+                }
                 if ($supplierProcess->require_invoice == TRUE) {
                     $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($item->created_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";

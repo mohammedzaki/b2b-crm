@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Extensions\DateTime;
 use App\Constants\EmployeeActions;
+use DB;
 
 class Attendance extends Model {
 
@@ -101,16 +102,26 @@ class Attendance extends Model {
     }
 
     public function employeeLongBorrow() {
-        $startDate = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
-        $endDate = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
+        $startDate = DateTime::parse($this->date);
+        /*
         $depositWithdraws = DepositWithdraw::where([
                     ['employee_id', '=', $this->employee_id],
                     ['expenses_id', '=', EmployeeActions::LongBorrow],
                     ['due_date', '>=', $startDate],
                     ['due_date', '<=', $endDate]
-                ])->get();
+                ])->get();*/
+        $employeeBorrowBilling = DB::table('employees')
+                ->join('employee_borrows', 'employee_borrows.employee_id', '=', 'employees.id')
+                ->join('employee_borrow_billing', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
+                ->distinct()
+                ->where([
+                    ['is_paid', '=', FALSE],
+                    ['employees.id', '=', $this->employee_id]
+                ])
+                ->whereMonth('due_date', $startDate->month)
+                ->get();
         try {
-            return $depositWithdraws[0]->withdrawValue;
+            return $employeeBorrowBilling[0]->pay_amount;
         } catch (\Exception $exc) {
             return 0;
         }

@@ -46,7 +46,7 @@ class SupplierProcess extends Model {
     }
 
     public function clientProcess() {
-        return $this->hasOne(ClientProcess::class, 'id');
+        return $this->belongsTo(ClientProcess::class);
     }
     
     public function withdrawals() {
