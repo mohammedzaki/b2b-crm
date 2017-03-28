@@ -215,9 +215,10 @@ class DepositWithdrawController extends Controller {
         $numbers['suppliers_number'] = Supplier::count();
         $numbers['process_number'] = ClientProcess::count();
         $numbers['Supplierprocess_number'] = SupplierProcess::count();
-        $numbers['current_amount'] = $this->CalculateCurrentAmount();
+
         $numbers['withdraws_amount'] = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
         $numbers['deposits_amount'] = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+
         $numbers['current_dayOfWeek'] = $startDate->dayOfWeek;
         $numbers['current_dayOfMonth'] = $startDate->day;
         $numbers['current_month'] = $startDate->month - 1;
@@ -225,18 +226,20 @@ class DepositWithdrawController extends Controller {
         $employees = Employee::select('id', 'name')->get();
         $expenses = Expenses::all();
         $depositWithdraws = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->get();
-        
+
         if ($isSearch) {
             $clients = Client::all();
             $suppliers = Supplier::all();
             $clientProcesses = ClientProcess::all();
             $supplierProcesses = SupplierProcess::all();
-            $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate, $endDate);
+            $numbers['current_amount'] = $this->CalculateCurrentAmountOff($startDate, $endDate);
+            $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate->addDay(-2), $endDate->addDay(-2));
         } else {
             $clients = Client::allHasOpenProcess();
             $suppliers = Supplier::allHasOpenProcess();
             $clientProcesses = ClientProcess::allOpened()->get();
             $supplierProcesses = SupplierProcess::allOpened()->get();
+            $numbers['current_amount'] = $this->CalculateCurrentAmount();
             $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate->addDay(-1), $endDate->addDay(-1));
         }
 
@@ -352,7 +355,7 @@ class DepositWithdrawController extends Controller {
         $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
         return ($depositValue + $openingAmount) - $withdrawValue;
     }
-    
+
     private function CalculateCurrentAmountOff($startDate, $endDate) {
         $startDate = DateTime::today()->format('2017-01-01 00:00:00');
         $depositValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');

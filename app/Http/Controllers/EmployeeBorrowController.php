@@ -92,7 +92,7 @@ class EmployeeBorrowController extends Controller {
 
 
             $depositWithdraw = new DepositWithdraw();
-            $depositWithdraw->withdrawValue = $employeeBorrow->pay_amount;
+            $depositWithdraw->withdrawValue = $employeeBorrow->amount;
             $depositWithdraw->due_date = DateTime::now();
             $depositWithdraw->recordDesc = "سلفة مستديمة شهر {$depositWithdraw->due_date->month} سنة {$depositWithdraw->due_date->year}";
             $depositWithdraw->employee_id = $employee->id;
