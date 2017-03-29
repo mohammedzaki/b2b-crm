@@ -74,6 +74,36 @@
                         </table>
                     </div>
                 </div>
+                <hr>
+                <div class="panel panel-default">
+                    <div class="panel-body">
+                        <h4>
+                            <span>مبلغ العملية </span>
+                            <span class="price process_price">0</span>
+                        </h4>
+                        <h4>
+                            <span>مبلغ الخصم </span>
+                            <span class="price discount_price">0</span>
+                        </h4>
+                        <h4>
+                            <span>الضريبة المضافة </span>
+                            <span class="price taxes_price">0</span>
+                        </h4>
+                        <h4>
+                            <span>خصم من المنبع </span>
+                            <span class="price source_discount_value">0</span>
+                        </h4>
+                        <hr>
+                        <h4>
+                            <span>القيمة اﻻجمالية </span>
+                            <span class="price final_price">0</span>
+                        </h4>
+                    </div>
+                </div>
+
+                {{ Form::hidden('total_price') }}
+                {{ Form::hidden('total_price_taxes') }}
+                {{ Form::hidden('taxes_value') }}
                 <div class="row">
                     <div class="col-md-12">
                         {{ Form::checkbox("withLetterHead", "1", 1, 
@@ -234,26 +264,30 @@
     function SelectProcessByIndex(rowIndex, flag = false) {
         var inputProcessId = $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0);
         var inputChk = $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(0)").children(0);
-        if(!flag) {
+        if (!flag) {
             flag = !inputProcessId.is(":disabled")
         }
         inputProcessId.prop("disabled", flag);
         inputChk.prop("checked", flag);
-        var index = 0;
         if (flag) {
-            //console.log('Load process items', inputProcessId.val());
-            $.each(allProcesses[currentClientId][inputProcessId.val()]['items'], function (item) { 
+            console.log('Load process items', inputProcessId.val(), allProcesses[currentClientId][inputProcessId.val()]['items']);
+            $.each(allProcesses[currentClientId][inputProcessId.val()]['items'], function (index, item) {
                 /*
                  *created_at,deleted_at,description,id,process_id,quantity,unit_price,updated_at
                  */
-                index = $("#prcoess_items").children().length;
-                $("#prcoess_items").append('<tr class="skip" >{{Form::hidden("items[' + index + '][id]")}}<td> <div class="form-group{{$errors->has("items.' + index + '.description") ? " has-error" : ""}}">{{Form::text("items[' + index + '][description]", "description", array( "class"=> "form-control", "placeholder"=> "ادخل تفاصيل البيان") )}}@if ($errors->has("items.' + index + '.description")) <label for="inputError" class="control-label">{{$errors->first("items.' + index + '.description")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("items.' + index + '.quantity") ? " has-error" : ""}}">{{Form::text("items[' + index + '][quantity]", "quantity", array( "class"=> "form-control quantity", "placeholder"=> "ادخل الكمية") )}}@if ($errors->has("items.' + index + '.quantity")) <label for="inputError" class="control-label">{{$errors->first("items.' + index + '.quantity")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("items.' + index + '.unit_price") ? " has-error" : ""}}">{{Form::text("items[' + index + '][unit_price]", "unit_price", array( "class"=> "form-control unit_price", "placeholder"=> "ادخل سعر الوحدة") )}}@if ($errors->has("items.' + index + '.unit_price")) <label for="inputError" class="control-label">{{$errors->first("items.' + index + '.unit_price")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("items.' + index + '.total_price") ? " has-error" : ""}}">{{Form::text("items[' + index + '][total_price]", "total_price", array( "class"=> "form-control total_price") )}}@if ($errors->has("items.' + index + '.total_price")) <label for="inputError" class="control-label">{{$errors->first("items.' + index + '.total_price")}}</label> @endif </div></td><td> <div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td></tr>');
+                processItemsCount = $("#prcoess_items").children().length + 1;
+                var html = '<tr>';
+                html += '<td><div class="form-group"><input class="form-control" name="items[' + processItemsCount + '][description]" placeholder="ادخل تفاصيل البيان" value="' + item.description + '"/></div></td>';
+                html += '<td><div class="form-group"><input class="form-control quantity" name="items[' + processItemsCount + '][quantity]" value="' + item.quantity + '" placeholder="ادخل الكمية" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control unit_price" name="items[' + processItemsCount + '][unit_price]" value="' + item.unit_price + '" placeholder="ادخل سعر الوحدة" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control total_price" name="items[' + processItemsCount + '][total_price]" value="' + (item.quantity * item.unit_price) + '" /></div></td>';
+                html += '<td><div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td>';
+                html += '</tr>';
+                $('#prcoess_items').append(html);
             });
-            /*
-             <tr class="skip" ><input name="items[" + index + "][id]" type="hidden"><td> <div class="form-group"><input class="form-control" placeholder="ادخل تفاصيل البيان" name="items[" + index + "][description]" type="text" value="description"> </div></td><td> <div class="form-group"><input class="form-control quantity" placeholder="ادخل الكمية" name="items[" + index + "][quantity]" type="text" value="quantity"> </div></td><td> <div class="form-group"><input class="form-control unit_price" placeholder="ادخل سعر الوحدة" name="items[" + index + "][unit_price]" type="text" value="unit_price"> </div></td><td> <div class="form-group"><input class="form-control total_price" name="items[" + index + "][total_price]" type="text" value="total_price"> </div></td><td> <div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td></tr>
-             */
+            setEvents();
         } else {
-            //console.log('Remove process items');
+            console.log('Remove process items');
         }
     }
 </script>
