@@ -11,33 +11,36 @@ class Invoice extends BaseReport {
             $allProcessesTotalPrice,
             $allProcessTotalPaid,
             $allProcessTotalRemaining;
-
+    
+    public $employeeName;
+    
+    protected $reportName = "Invoice.pdf";
+    //public function __construct($mode = '', $format = 'A4', $default_font_size = 0, $default_font = '', $mgl = 15, $mgr = 15, $mgt = 16, $mgb = 16, $mgh = 9, $mgf = 9, $orientation = 'P')
     public function __construct($withLetterHead = true) {
         if ($withLetterHead) {
-            $this->mpdf = new \mPDF('', 'A4', '', '', 8, 8, 28, 10, 10, 10);
+            $this->mpdf = new \mPDF('', 'A4', 0, '', 8, 8, 28, 8, 10, 10);
         } else {
-            $this->mpdf = new \mPDF('', 'A4', '', '', 8, 8, 8, 10, 10, 10);
+            $this->mpdf = new \mPDF('', 'A4', '', 0, '', 8, 8, 8, 8, 10, 10);
         }
-        $this->reportName = "SupplierDetailedReport.pdf";
         $this->withLetterHead = $withLetterHead;
     }
-    
+
     function SetHtmlBody() {
-        return '<!DOCTYPE html>
-                <html>
-                    <head>
-                        
-                    </head>
-                    <body>
-                        ' . $this->SetPageHeader() . '
-                        ' . $this->SetPageFooter() . '
-                        ' . $this->AddAllProcess() . '
-                    </body>
-                </html>';
+        $this->employeeName = "Test Test";
+        $employeeName = $this->employeeName;
+        $this->SetPageHeader();
+        $this->SetPageFooter();
+        //TODO: update this line of code to new structure 
+        return view('reports.invoice.invoice', compact(['employeeName']))->render();
     }
 
     function SetCSS() {
-        $path = public_path('ReportsHtml/Supplier/SupplierDetailed.css');
+        $path = public_path('ReportsHtml/Invoice/Invoice.css');
         return file_get_contents($path);
+    }
+    
+    public function RenderReport() {
+        parent::RenderReport();
+        //$this->mpdf->SetMargins(.1, 11, 10);
     }
 }

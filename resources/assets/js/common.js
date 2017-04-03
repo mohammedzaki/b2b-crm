@@ -1,15 +1,16 @@
-var processItemsCount = 0;
-var discount_value = 0;
-var discount_percentage = 0;
-var source_discount_percentage = 0.005;
-var source_discount_value = 0;
-var total_price = 0;
-var taxes = 0;
-var priceAfterTaxes = 0;
+window.processItemsCount = 0;
+window.discount_value = 0;
+window.discount_percentage = 0;
+window.source_discount_percentage = 0.005;
+window.source_discount_value = 0;
+window.totxal_price = 0;
+window.taxes = 0;
+window.priceAfterTaxes = 0;
+
 window.roundDecimals = function (value, decimals) {
     decimals = decimals || 0;
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
-};
+}
 
 window.add_new_process_item = function () {
     var html = '<tr>';
@@ -122,20 +123,6 @@ window.update_prices = function () {
 
 }
 
-window.setEvents = function () {
-    $(document).delegate("#prcoess_items .delete", "click", function (e) {
-        var parent = $(this).parent().parent();
-        if (processItemsCount > 1) {
-            if (parent.prev() && !parent.next().is('tr')) {
-                parent.prev().removeClass('skip');
-            }
-            parent.remove();
-            processItemsCount--;
-            update_prices();
-        }
-    });
-}
-
 $(document).ready(function () {
 
     /******************
@@ -241,6 +228,7 @@ $(document).ready(function () {
     $(document).delegate("#prcoess_items .delete", "click", function (e) {
         console.log('Working');
         var parent = $(this).parent().parent();
+        console.log(processItemsCount);
         if (processItemsCount > 1) {
             if (parent.prev() && !parent.next().is('tr')) {
                 parent.prev().removeClass('skip');
@@ -249,6 +237,7 @@ $(document).ready(function () {
             processItemsCount--;
             update_prices();
         }
+        console.log(processItemsCount);
     });
 
     $(document).delegate('#prcoess_items input.quantity', 'change', function () {

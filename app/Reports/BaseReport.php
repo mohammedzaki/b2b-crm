@@ -5,14 +5,12 @@ namespace App\Reports;
 use App\Http\Controllers\Controller;
 
 abstract class BaseReport {
-    
+
     protected $mpdf;
     protected $reportName = "BaseReport.pdf";
     protected $withLetterHead;
-    protected $controller;
 
     public function __construct($withLetterHead = true) {
-        $this->controller = new Controller();
         if ($withLetterHead) {
             $this->mpdf = new \mPDF('', 'A4', '', '', 8, 8, 28, 10, 10, 10);
         } else {
@@ -20,11 +18,11 @@ abstract class BaseReport {
         }
         $this->withLetterHead = $withLetterHead;
     }
-    
+
     abstract function SetHtmlBody();
-    
+
     abstract function SetCSS();
- 
+
     function SetPageHeader() {
         if ($this->withLetterHead) {
             $path = public_path('ReportsHtml/letr.png');
@@ -44,10 +42,11 @@ abstract class BaseReport {
                     <sethtmlpageheader name="myheader" value="on" show-this-page="1" />
                     mpdf-->';
         }
-        
     }
 
     function SetPageFooter() {
+        $path = public_path('ReportsHtml/footer.png');
+        $this->mpdf->footerImg = file_get_contents($path);
         return '<!--mpdf
                 <htmlpagefooter name="myfooter">
                 <div class="reportPageFooterLine" ></div>
@@ -59,7 +58,7 @@ abstract class BaseReport {
                 <sethtmlpagefooter name="myfooter" value="on" />
                 mpdf-->';
     }
-    
+
     public function RenderReport() {
         $this->mpdf->autoScriptToLang = true;
         $this->mpdf->autoVietnamese = true;
@@ -73,4 +72,5 @@ abstract class BaseReport {
         $this->mpdf->WriteHTML($this->SetHtmlBody(), 2);
         $this->mpdf->Output($this->reportName, 'I');
     }
+
 }

@@ -74,23 +74,9 @@ Route::resource('feasibilityStudy', 'FeasibilityStudyController');
 
 Route::resource('invoice', 'InvoiceController');
 
-//reports
-/*
-Route::group(['prefix' => 'reports'], function() {
-
-    Route::group(['prefix' => 'client'], function() {
-        Route::get('/', 'Reports\ClientReportsController@index');
-        Route::get('printTotalPDF', 'Reports\ClientReportsController@printTotalPDF');
-        Route::get('printDetailedPDF', 'Reports\ClientReportsController@printDetailedPDF');
-        Route::any('viewClientReport', 'Reports\ClientReportsController@viewReport')->name('reports.client.viewClientReport');
-    });
-
-    Route::group(['prefix' => 'supplier'], function() {
-        Route::get('/', 'Reports\SupplierReportsController@index');
-        Route::get('printTotalPDF', 'Reports\SupplierReportsController@printTotalPDF');
-        Route::get('printDetailedPDF', 'Reports\SupplierReportsController@printDetailedPDF');
-        Route::any('viewSupplierReport', 'Reports\SupplierReportsController@viewReport')->name('reports.supplier.viewSupplierReport');
-    });
-});*/
+Route::group(['prefix' => 'invoice'], function() {
+    Route::post('preview', 'InvoiceController@printPreview')->name('invoice.printPreview');
+    Route::get('test/preview', 'InvoiceController@testPreview')->name('invoice.testPreview');
+});
 
 Route::get('getEmployeesCheckinDate', 'AttendanceController@getEmployeesCheckinDate');

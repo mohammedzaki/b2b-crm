@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Client;
-use App\Models\ClientProcess;
+use App\Reports\Invoice\Invoice;
+use Illuminate\Http\Request;
 
 class InvoiceController extends Controller {
 
@@ -24,7 +24,7 @@ class InvoiceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function create() {
-        $clients = Client::all();
+        $clients = Client::allHasInvoiceProcess();
         $clients_tmp = [];
         $clientProcesses = [];
         foreach ($clients as $client) {
@@ -33,6 +33,10 @@ class InvoiceController extends Controller {
             foreach ($client->unInvoiceProcesses as $process) {
                 $clientProcesses[$client->id][$process->id]['name'] = $process->name;
                 $clientProcesses[$client->id][$process->id]['totalPrice'] = $process->total_price;
+                $clientProcesses[$client->id][$process->id]['totalPriceTaxes'] = $process->total_price_taxes;
+                $clientProcesses[$client->id][$process->id]['discount'] = $process->discount_value ? $process->discount_value : 0;
+                $clientProcesses[$client->id][$process->id]['sourceDiscount'] = $process->source_discount_value ? $process->source_discount_value : 0;
+                $clientProcesses[$client->id][$process->id]['taxes'] = $process->taxes_value ? $process->taxes_value : 0;
                 $clientProcesses[$client->id][$process->id]['status'] = $process->status;
                 $clientProcesses[$client->id][$process->id]['items'] = $process->items;
             }
@@ -44,7 +48,17 @@ class InvoiceController extends Controller {
         return view('invoice.create', compact("clients", "clientProcesses"));
     }
 
-    /**
+    public function printPreview(Request $request) {
+        $pdfReport = new Invoice(TRUE);
+        return $pdfReport->RenderReport();
+    }
+
+    public function testPreview(Request $request) {
+        $employeeName = 'Mai Gado';
+        return view('reports.invoice.invoice', compact(['employeeName']))->render();
+    }
+
+        /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request

@@ -23,11 +23,11 @@ class Client extends Model {
     ];
 
     public function processes() {
-        return $this->hasMany('App\Models\ClientProcess');
+        return $this->hasMany(ClientProcess::class);
     }
 
     public function unInvoiceProcesses() {
-        return $this->hasMany('App\Models\ClientProcess')->where([
+        return $this->hasMany(ClientProcess::class)->where([
                     ['invoice_billed', "=", ClientProcess::invoiceUnBilled],
                     ['require_invoice', "=", TRUE],
         ]);
@@ -79,6 +79,18 @@ class Client extends Model {
         return $clients;
     }
 
+    public static function allHasInvoiceProcess() {
+        $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
+                ->select('clients.*')->where([
+                    //['client_processes.status', ClientProcess::statusOpened],
+                    ['client_processes.invoice_billed', "=", ClientProcess::invoiceUnBilled],
+                    ['client_processes.require_invoice', "=", TRUE],
+                ])
+                ->distinct()
+                ->get();
+        return $clients;
+    }
+    
     public function getTotalPaid() {
         return DB::table('clients')
                         ->join('client_processes', 'client_processes.client_id', '=', 'clients.id')
