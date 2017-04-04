@@ -135,11 +135,11 @@ class SupplierReportsController extends Controller {
                     $proceses[$id]['processDetails'][$index]['desc'] = "خصم بسبب : " . $supplierProcess->discount_reason;
                     $index++;
                 }
-                if ($clientProcess->has_source_discount == TRUE) {
-                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($clientProcess->created_at)->format('Y-m-d');
+                if ($supplierProcess->has_source_discount == TRUE) {
+                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($supplierProcess->created_at)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = "";
                     $proceses[$id]['processDetails'][$index]['paid'] = "";
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $clientProcess->source_discount_value;
+                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $supplierProcess->source_discount_value;
                     $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
                     $proceses[$id]['processDetails'][$index]['quantity'] = "";
                     $proceses[$id]['processDetails'][$index]['desc'] = "خصم من المنبع";
@@ -208,11 +208,11 @@ class SupplierReportsController extends Controller {
     }
 
     public function printTotalPDF(Request $request) {
-        return $this->printSupplierPDF($request->ch_detialed, $request->withLetterHead, session('supplierName'), session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
+        return $this->printPDF($request->ch_detialed, $request->withLetterHead, session('supplierName'), session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
     }
 
     public function printDetailedPDF(Request $request) {
-        return $this->printSupplierPDF($request->ch_detialed, $request->withLetterHead, session('supplierName'),  session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
+        return $this->printPDF($request->ch_detialed, $request->withLetterHead, session('supplierName'),  session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
     }
 
 }

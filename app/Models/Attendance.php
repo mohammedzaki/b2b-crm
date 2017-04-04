@@ -46,20 +46,26 @@ class Attendance extends Model {
     }
 
     public function employeeGuardianship() {
-        $startDate = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
-        $endDate = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
-        $depositWithdraws = DepositWithdraw::where([
-                    ['employee_id', '=', $this->employee_id],
-                    ['expenses_id', '=', EmployeeActions::Guardianship],
-                    ['due_date', '>=', $startDate],
-                    ['due_date', '<=', $endDate]
-        ]);
+        $startDate = DateTime::parse($this->date)->startOfDay(); //->format('Y-m-d 00:00:00');
+        $endDate = DateTime::parse($this->date)->endOfDay(); //->format('Y-m-d 23:59:59');
+        $depositWithdraws = DB::select("SELECT distinct dw.* from deposit_withdraws as dw
+JOIN employees emp ON dw.employee_id = emp.id
+WHERE emp.id = {$this->employee_id}
+AND dw.expenses_id = " . EmployeeActions::Guardianship . " 
+AND 
+((dw.due_date BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayFormat()}' AND dw.notes is null)
+OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayFormat()}')");
+
         try {
-            if ($this->shift == 1) {
-                return $depositWithdraws->sum('withdrawValue');
-            } else {
-                return 0;
+            //if ($this->shift == 1) {
+            $withdrawValue = 0;
+            foreach ($depositWithdraws as $key => $value) {
+                $withdrawValue += $value->withdrawValue;
             }
+            return $withdrawValue;
+            //} else {
+            //    return 0;
+            //}
         } catch (\Exception $exc) {
             return 0;
         }
@@ -93,9 +99,9 @@ class Attendance extends Model {
                     ['expenses_id', '=', EmployeeActions::SmallBorrow],
                     ['due_date', '>=', $startDate],
                     ['due_date', '<=', $endDate]
-                ])->get();
+                ]);
         try {
-            return $depositWithdraws[0]->withdrawValue;
+            return $depositWithdraws->sum('withdrawValue');
         } catch (\Exception $exc) {
             return 0;
         }
@@ -103,13 +109,6 @@ class Attendance extends Model {
 
     public function employeeLongBorrow() {
         $startDate = DateTime::parse($this->date);
-        /*
-        $depositWithdraws = DepositWithdraw::where([
-                    ['employee_id', '=', $this->employee_id],
-                    ['expenses_id', '=', EmployeeActions::LongBorrow],
-                    ['due_date', '>=', $startDate],
-                    ['due_date', '<=', $endDate]
-                ])->get();*/
         $employeeBorrowBilling = DB::table('employees')
                 ->join('employee_borrows', 'employee_borrows.employee_id', '=', 'employees.id')
                 ->join('employee_borrow_billing', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')

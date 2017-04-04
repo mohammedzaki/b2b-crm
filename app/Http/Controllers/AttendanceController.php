@@ -578,7 +578,7 @@ class AttendanceController extends Controller {
         $newDate = DateTime::parse($request->date);
         $newDate->addMonth(1);
         $depositWithdraw = DepositWithdraw::findOrFail($employee->lastGuardianshipId());
-        $depositWithdraw->due_date = $newDate;
+        $depositWithdraw->notes = $newDate;
         $depositWithdraw->save();
         return redirect()->back()->with('success', 'تم الترحيل');
     }
