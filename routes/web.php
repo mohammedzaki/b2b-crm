@@ -72,11 +72,11 @@ Route::resource('attendance', 'AttendanceController');
 
 Route::resource('feasibilityStudy', 'FeasibilityStudyController');
 
-Route::resource('invoice', 'InvoiceController');
+/*Route::resource('invoice', 'InvoiceController');
 
 Route::group(['prefix' => 'invoice'], function() {
     Route::post('preview', 'InvoiceController@printPreview')->name('invoice.printPreview');
     Route::get('test/preview', 'InvoiceController@testPreview')->name('invoice.testPreview');
-});
+});*/
 
 Route::get('getEmployeesCheckinDate', 'AttendanceController@getEmployeesCheckinDate');

@@ -4291,5 +4291,62 @@
             "laravel",
             "pdf"
         ]
+    },
+    {
+        "name": "laravelcollective/annotations",
+        "version": "v5.4.2",
+        "version_normalized": "5.4.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/LaravelCollective/annotations.git",
+            "reference": "f8daa30e9478c7ff83491fd9cac005afa59fd89d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/LaravelCollective/annotations/zipball/f8daa30e9478c7ff83491fd9cac005afa59fd89d",
+            "reference": "f8daa30e9478c7ff83491fd9cac005afa59fd89d",
+            "shasum": ""
+        },
+        "require": {
+            "doctrine/annotations": "~1.0",
+            "illuminate/console": "5.4.*",
+            "illuminate/filesystem": "5.4.*",
+            "illuminate/support": "5.4.*",
+            "php": ">=5.6.4"
+        },
+        "require-dev": {
+            "illuminate/database": "5.4.*",
+            "mockery/mockery": "~0.9.4",
+            "phpunit/phpunit": "~5.4"
+        },
+        "time": "2017-01-31 11:16:13",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "5.4-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Collective\\Annotations\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Adam Engebretson",
+                "email": "adam@enge.me"
+            },
+            {
+                "name": "Taylor Otwell",
+                "email": "taylorotwell@gmail.com"
+            }
+        ],
+        "description": "Route Annotations for The Laravel Framework.",
+        "homepage": "http://laravelcollective.com"
     }
 ]

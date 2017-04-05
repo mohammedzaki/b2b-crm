@@ -6,6 +6,11 @@ use App\Models\Client;
 use App\Reports\Invoice\Invoice;
 use Illuminate\Http\Request;
 
+/**
+ * @Controller(prefix="invoice")
+ * @Resource("invoice")
+ * @Middleware("web")
+ */
 class InvoiceController extends Controller {
 
     /**
@@ -47,18 +52,26 @@ class InvoiceController extends Controller {
 
         return view('invoice.create', compact("clients", "clientProcesses"));
     }
-
+    
+    /**
+     * Show the Index Page
+     * @Post("preview", as="invoice.printPreview")
+     */
     public function printPreview(Request $request) {
         $pdfReport = new Invoice(TRUE);
         return $pdfReport->RenderReport();
     }
 
+    /**
+     * Show the Index Page
+     * @Get("test/preview", as="invoice.testPreview")
+     */
     public function testPreview(Request $request) {
         $employeeName = 'Mai Gado';
         return view('reports.invoice.invoice', compact(['employeeName']))->render();
     }
 
-        /**
+    /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request

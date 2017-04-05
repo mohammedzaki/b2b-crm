@@ -62,7 +62,7 @@
                     </tr>
                 </table>
             </div>
-            <div>
+            <div class="itemsTbl">
                 <table>
                     <tr>
                         <td><div>100,000.55</div></td>
