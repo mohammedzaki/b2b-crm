@@ -24,8 +24,8 @@
         </div>
     @endif
 
-    {{ Form::open(['route' => 'invoice.store']) }}
-        @include('invoice._form', ['items' => old('items')])
+    {{ Form::open(['route' => 'invoice.store', 'id' => 'invoiceForm']) }}
+        @include('invoice._form', ['invoiceItems' => old('items')])
     {{ Form::close() }}
 
     <script type="text/javascript">

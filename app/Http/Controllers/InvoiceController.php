@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Client;
-use App\Models\ClientProcess;
+use App\Reports\Invoice\Invoice;
+use Illuminate\Http\Request;
 
+/**
+ * @Controller(prefix="invoice")
+ * @Resource("invoice")
+ * @Middleware("web")
+ */
 class InvoiceController extends Controller {
 
     /**
@@ -24,7 +29,7 @@ class InvoiceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function create() {
-        $clients = Client::all();
+        $clients = Client::allHasInvoiceProcess();
         $clients_tmp = [];
         $clientProcesses = [];
         foreach ($clients as $client) {
@@ -33,6 +38,10 @@ class InvoiceController extends Controller {
             foreach ($client->unInvoiceProcesses as $process) {
                 $clientProcesses[$client->id][$process->id]['name'] = $process->name;
                 $clientProcesses[$client->id][$process->id]['totalPrice'] = $process->total_price;
+                $clientProcesses[$client->id][$process->id]['totalPriceTaxes'] = $process->total_price_taxes;
+                $clientProcesses[$client->id][$process->id]['discount'] = $process->discount_value ? $process->discount_value : 0;
+                $clientProcesses[$client->id][$process->id]['sourceDiscount'] = $process->source_discount_value ? $process->source_discount_value : 0;
+                $clientProcesses[$client->id][$process->id]['taxes'] = $process->taxes_value ? $process->taxes_value : 0;
                 $clientProcesses[$client->id][$process->id]['status'] = $process->status;
                 $clientProcesses[$client->id][$process->id]['items'] = $process->items;
             }
@@ -42,6 +51,35 @@ class InvoiceController extends Controller {
         $clientProcesses = json_encode($clientProcesses);
 
         return view('invoice.create', compact("clients", "clientProcesses"));
+    }
+    
+    /**
+     * Show the Index Page
+     * @Post("preview", as="invoice.printPreview")
+     */
+    public function printPreview(Request $request) {
+        $pdfReport = new Invoice(TRUE);
+        $client = Client::findOrFail($request->client_id);
+        $pdfReport->clinetName = $client->name;
+        $pdfReport->invoiceItems = $request->invoiceItems;
+        $pdfReport->discountPrice = $request->discount_priceI;
+        $pdfReport->discountReason = 'N\A';
+        $pdfReport->sourceDiscountPrice = $request->source_discount_valueI;
+        $pdfReport->totalPrice = $request->invoice_priceI;
+        $pdfReport->totalTaxes = $request->taxes_priceI;
+        $pdfReport->totalPriceAfterTaxes = $request->invoice_priceI;
+        
+        return $pdfReport->RenderReport();
+        //print_r($request->invoiceItems);
+    }
+
+    /**
+     * Show the Index Page
+     * @Get("test/preview", as="invoice.testPreview")
+     */
+    public function testPreview(Request $request) {
+        $clientName = 'Mai Gado';
+        return view('reports.invoice.invoice', compact(['clientName']))->render();
     }
 
     /**

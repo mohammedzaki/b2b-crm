@@ -11408,129 +11408,131 @@ if ("undefined" == typeof jQuery) throw new Error("Bootstrap's JavaScript requir
 /* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/* WEBPACK VAR INJECTION */(function($) {var processItemsCount = 0;
-var discount_value = 0;
-var discount_percentage = 0;
-var source_discount_percentage = 0.005;
-var source_discount_value = 0;
-var total_price = 0;
-var taxes = 0;
-var priceAfterTaxes = 0;
+/* WEBPACK VAR INJECTION */(function($) {window.processItemsCount = 0;
+window.discount_value = 0;
+window.discount_percentage = 0;
+window.source_discount_percentage = 0.005;
+window.source_discount_value = 0;
+window.totxal_price = 0;
+window.taxes = 0;
+window.priceAfterTaxes = 0;
+
 window.roundDecimals = function (value, decimals) {
     decimals = decimals || 0;
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
 };
 
+window.add_new_process_item = function () {
+    var html = '<tr>';
+    html += '<td><div class="form-group"><input class="form-control" name="items[' + processItemsCount + '][description]" placeholder="ادخل تفاصيل البيان" /></div></td>';
+    html += '<td><div class="form-group"><input class="form-control quantity" name="items[' + processItemsCount + '][quantity]" value="0" placeholder="ادخل الكمية" /></div></td>';
+    html += '<td><div class="form-group"><input class="form-control unit_price" name="items[' + processItemsCount + '][unit_price]" value="0" placeholder="ادخل سعر الوحدة" /></div></td>';
+    html += '<td><div class="form-group"><input class="form-control total_price" name="items[' + processItemsCount + '][total_price]" value="0" /></div></td>';
+    html += '<td><div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td>';
+    html += '</tr>';
+    $('#prcoess_items').append(html);
+    processItemsCount++;
+};
+
+window.calculate_process_price = function () {
+    total_price = 0;
+    $('.total_price').each(function () {
+        total_price = parseFloat($(this).val()) + total_price;
+        total_price = roundDecimals(total_price, 3);
+    });
+    return total_price;
+};
+
+window.calculate_percentage = function () {
+    discount_percentage = 0;
+    if ($('input[name="has_discount"]').is(':checked')) {
+        discount_percentage = calculate_discount() / calculate_process_price() * 100;
+        discount_percentage = roundDecimals(discount_percentage, 3);
+    }
+    return discount_percentage;
+};
+
+window.calculate_discount_from_percentage = function () {
+    discount_value = 0;
+    if ($('input[name="has_discount"]').is(':checked')) {
+        discount_percentage = $("#discount_percentage").val();
+        discount_value = calculate_process_price() / 100 * discount_percentage;
+        discount_value = roundDecimals(discount_value, 3);
+    }
+    return discount_value;
+};
+
+window.calculate_discount = function () {
+    discount_value = 0;
+    if ($('input[name="has_discount"]').is(':checked')) {
+        discount_value = roundDecimals($("#discount_value").val(), 3);
+    }
+    return discount_value;
+};
+
+window.calculate_taxes = function () {
+    taxes = 0;
+    if ($('input[name="require_invoice"]').is(':checked')) {
+        taxes = (calculate_process_price() - calculate_discount()) * parseFloat(TaxesRate);
+        taxes = roundDecimals(taxes, 3);
+    }
+    return taxes;
+};
+
+window.calculate_process_price_taxes = function () {
+    priceAfterTaxes = 0;
+    priceAfterTaxes = roundDecimals(calculate_process_price() - calculate_discount() + (calculate_taxes() - calculate_source_discount()), 3);
+    return priceAfterTaxes;
+};
+
+window.calculate_source_discount = function () {
+    source_discount_value = 0;
+    if ($('input[name="has_source_discount"]').is(':checked')) {
+        source_discount_value = roundDecimals($("#source_discount_value").val(), 3);
+        ;
+    }
+    return source_discount_value;
+};
+
+window.calculate_source_percentage = function () {
+    source_discount_percentage = 0;
+    if ($('input[name="has_source_discount"]').is(':checked')) {
+        source_discount_percentage = calculate_source_discount() / calculate_process_price() * 100;
+        source_discount_percentage = roundDecimals(source_discount_percentage, 3);
+    }
+    return source_discount_percentage;
+};
+
+window.calculate_source_discount_from_percentage = function () {
+    source_discount_value = 0;
+    if ($('input[name="has_source_discount"]').is(':checked')) {
+        source_discount_percentage = $("#source_discount_percentage").val();
+        source_discount_value = calculate_process_price() / 100 * source_discount_percentage;
+        source_discount_value = roundDecimals(source_discount_value, 3);
+    }
+    return source_discount_value;
+};
+
+window.update_prices = function () {
+    var process_price_html = $('.process_price');
+    var discount_price_html = $('.discount_price');
+    var taxes_price_html = $('.taxes_price');
+    var final_price_html = $('.final_price');
+    var source_discount_price = $('.source_discount_value');
+
+    process_price_html.text(calculate_process_price());
+    discount_price_html.text(calculate_discount());
+    taxes_price_html.text(calculate_taxes());
+    final_price_html.text(calculate_process_price_taxes());
+    source_discount_price.text(calculate_source_discount());
+
+    $('input[name="total_price"]').val(calculate_process_price());
+    $('input[name="total_price_taxes"]').val(calculate_process_price_taxes());
+    $('input[name="taxes_value"]').val(calculate_taxes());
+    $('input[name="source_discount_value"]').val(calculate_source_discount());
+};
+
 $(document).ready(function () {
-
-    function add_new_process_item() {
-        var html = '<tr>';
-        html += '<td><div class="form-group"><input class="form-control" name="items[' + processItemsCount + '][description]" placeholder="ادخل تفاصيل البيان" /></div></td>';
-        html += '<td><div class="form-group"><input class="form-control quantity" name="items[' + processItemsCount + '][quantity]" value="0" placeholder="ادخل الكمية" /></div></td>';
-        html += '<td><div class="form-group"><input class="form-control unit_price" name="items[' + processItemsCount + '][unit_price]" value="0" placeholder="ادخل سعر الوحدة" /></div></td>';
-        html += '<td><div class="form-group"><input class="form-control total_price" name="items[' + processItemsCount + '][total_price]" value="0" /></div></td>';
-        html += '<td><div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td>';
-        html += '</tr>';
-        $('#prcoess_items').append(html);
-        processItemsCount++;
-    }
-
-    function calculate_process_price() {
-        total_price = 0;
-        $('.total_price').each(function () {
-            total_price = parseFloat($(this).val()) + total_price;
-            total_price = roundDecimals(total_price, 3);
-        });
-        return total_price;
-    }
-
-    function calculate_percentage() {
-        discount_percentage = 0;
-        if ($('input[name="has_discount"]').is(':checked')) {
-            discount_percentage = calculate_discount() / calculate_process_price() * 100;
-            discount_percentage = roundDecimals(discount_percentage, 3);
-        }
-        return discount_percentage;
-    }
-
-    function calculate_discount_from_percentage() {
-        discount_value = 0;
-        if ($('input[name="has_discount"]').is(':checked')) {
-            discount_percentage = $("#discount_percentage").val();
-            discount_value = calculate_process_price() / 100 * discount_percentage;
-            discount_value = roundDecimals(discount_value, 3);
-        }
-        return discount_value;
-    }
-
-    function calculate_discount() {
-        discount_value = 0;
-        if ($('input[name="has_discount"]').is(':checked')) {
-            discount_value = roundDecimals($("#discount_value").val(), 3);
-        }
-        return discount_value;
-    }
-
-    function calculate_taxes() {
-        taxes = 0;
-        if ($('input[name="require_invoice"]').is(':checked')) {
-            taxes = (calculate_process_price() - calculate_discount()) * parseFloat(TaxesRate);
-            taxes = roundDecimals(taxes, 3);
-        }
-        return taxes;
-    }
-
-    function calculate_process_price_taxes() {
-        priceAfterTaxes = 0;
-        priceAfterTaxes = roundDecimals(calculate_process_price() - calculate_discount() + (calculate_taxes() - calculate_source_discount()), 3);
-        return priceAfterTaxes;
-    }
-
-    function calculate_source_discount() {
-        source_discount_value = 0;
-        if ($('input[name="has_source_discount"]').is(':checked')) {
-            source_discount_value = roundDecimals($("#source_discount_value").val(), 3);;
-        }
-        return source_discount_value;
-    }
-
-    function calculate_source_percentage() {
-        source_discount_percentage = 0;
-        if ($('input[name="has_source_discount"]').is(':checked')) {
-            source_discount_percentage = calculate_source_discount() / calculate_process_price() * 100;
-            source_discount_percentage = roundDecimals(source_discount_percentage, 3);
-        }
-        return source_discount_percentage;
-    }
-
-    function calculate_source_discount_from_percentage() {
-        source_discount_value = 0;
-        if ($('input[name="has_source_discount"]').is(':checked')) {
-            source_discount_percentage = $("#source_discount_percentage").val();
-            source_discount_value = calculate_process_price() / 100 * source_discount_percentage;
-            source_discount_value = roundDecimals(source_discount_value, 3);
-        }
-        return source_discount_value;
-    }
-
-    function update_prices() {
-        var process_price_html = $('.process_price');
-        var discount_price_html = $('.discount_price');
-        var taxes_price_html = $('.taxes_price');
-        var final_price_html = $('.final_price');
-        var source_discount_price = $('.source_discount_value');
-
-        process_price_html.text(calculate_process_price());
-        discount_price_html.text(calculate_discount());
-        taxes_price_html.text(calculate_taxes());
-        final_price_html.text(calculate_process_price_taxes());
-        source_discount_price.text(calculate_source_discount());
-
-        $('input[name="total_price"]').val(calculate_process_price());
-        $('input[name="total_price_taxes"]').val(calculate_process_price_taxes());
-        $('input[name="taxes_value"]').val(calculate_taxes());
-        $('input[name="source_discount_value"]').val(calculate_source_discount());
-    }
 
     /******************
      General
@@ -11633,7 +11635,9 @@ $(document).ready(function () {
      * Click event for delete item button.
      */
     $(document).delegate("#prcoess_items .delete", "click", function (e) {
+        console.log('Working');
         var parent = $(this).parent().parent();
+        console.log(processItemsCount);
         if (processItemsCount > 1) {
             if (parent.prev() && !parent.next().is('tr')) {
                 parent.prev().removeClass('skip');
@@ -11642,6 +11646,7 @@ $(document).ready(function () {
             processItemsCount--;
             update_prices();
         }
+        console.log(processItemsCount);
     });
 
     $(document).delegate('#prcoess_items input.quantity', 'change', function () {
