@@ -12,61 +12,60 @@
         <div class="header">
             <img src="var:letrImg">
         </div>
-        <div class="clientProcess">
-            <div class="processHeader">
+        <div class="invoice">
+            <div class="invoiceHeader">
+<!--                <table class="headerTable">
+                    <tr>
+                        <td ></td>
+                        <td ></td>
+                    </tr>
+                </table>-->
+                <span class="invoiceNoLabel">فاتورة <span class="invoiceNo">00000001</span></span>
+            </div>
+            <div class="clientDetails">
                 <table class="headerTable">
                     <tr>
                         <td class="employeeLabel">مطلوب من /</td>
-                        <td class="employeeName"> {{ $employeeName }} </td>
+                        <td class="employeeName"> {{ $clinetName }} </td>
                     </tr>
                 </table>
             </div>
             <div class="itemsTbl">
                 <table>
-                    <tr>
-                        
-                        <td class="first-child"><div>Total Price <br> السعر الاجمالي</div></td>
-                        <td><div>Unit Price <br> سعر الوحدة</div></td>
-                        <td><div>Qty <br> الكمية</div></td>
-                        <td><div>Size <br> المقاس</div></td>
-                        <td><div>Description <br> البيان</div></td>
+                    @for ($i = 0; $i < 17; $i++)
+                    @if ($i == 0)
+                    <tr class="first-child">
+                        <td class="first-child">Total Price <br> السعر الاجمالي</td>
+                        <td>Unit Price <br> سعر الوحدة</td>
+                        <td>Qty <br> الكمية</td>
+                        <td>Size <br> المقاس</td>
+                        <td>Description <br> البيان</td>
                     </tr>
-
-                    <tr>
-                        <td class="first-child">100,000.55</td>
-                        <td>5000</td>
-                        <td>100</td>
-                        <td>166</td>
-                        <td> لبيليل ليلي ليبل يبليبل يلي</td>
+                    @elseif ($i == 16)
+                    <tr class="last-child">
+                        <td class="first-child">{{ $invoiceItems[$i]["total_price"] }}</td>
+                        <td>{{ $invoiceItems[$i]["unit_price"] }}</td>
+                        <td>{{ $invoiceItems[$i]["quantity"] }}</td>
+                        <td>{{ $invoiceItems[$i]["size"] }}</td>
+                        <td>{{ $invoiceItems[$i]["description"] }}</td>
                     </tr>
+                    @else
                     <tr>
-                        <td class="first-child">100,000.55</td>
-                        <td>5000</td>
-                        <td>100</td>
-                        <td>166</td>
-                        <td> لبيليل ليلي ليبل يبليبل يلي</td>
+                        <td class="first-child">{{ $invoiceItems[$i]["total_price"] }}</td>
+                        <td>{{ $invoiceItems[$i]["unit_price"] }}</td>
+                        <td>{{ $invoiceItems[$i]["quantity"] }}</td>
+                        <td>{{ $invoiceItems[$i]["size"] }}</td>
+                        <td>{{ $invoiceItems[$i]["description"] }}</td>
                     </tr>
-                    <tr>
-                        <td class="first-child">100,000.55</td>
-                        <td>5000</td>
-                        <td>100</td>
-                        <td>166</td>
-                        <td> لبيليل ليلي ليبل يبليبل يلي</td>
-                    </tr>
-                    <tr>
-                        <td class="first-child">100,000.55</td>
-                        <td>5000</td>
-                        <td>100</td>
-                        <td>166</td>
-                        <td> لبيليل ليلي ليبل يبليبل يلي</td>
-                    </tr>
+                    @endif
+                    @endfor
                 </table>
             </div>
-            <div class="itemsTbl">
+            <div class="footerTbl">
                 <table>
                     <tr>
-                        <td><div>100,000.55</div></td>
-                        <td colspan="4"><div><span>فقط وقدره : <span>ثلاثة الالف فقط لاغير</span></span></div></td>
+                        <td><div>{{ $totalPriceAfterTaxes }}</div></td>
+                        <td colspan="4"><div><span>فقط وقدره : <span>{{ $arabicPriceAfterTaxes }}</span></span></div></td>
                     </tr>
                 </table>
             </div>

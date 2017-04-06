@@ -59,7 +59,18 @@ class InvoiceController extends Controller {
      */
     public function printPreview(Request $request) {
         $pdfReport = new Invoice(TRUE);
+        $client = Client::findOrFail($request->client_id);
+        $pdfReport->clinetName = $client->name;
+        $pdfReport->invoiceItems = $request->invoiceItems;
+        $pdfReport->discountPrice = $request->discount_priceI;
+        $pdfReport->discountReason = 'N\A';
+        $pdfReport->sourceDiscountPrice = $request->source_discount_valueI;
+        $pdfReport->totalPrice = $request->invoice_priceI;
+        $pdfReport->totalTaxes = $request->taxes_priceI;
+        $pdfReport->totalPriceAfterTaxes = $request->invoice_priceI;
+        
         return $pdfReport->RenderReport();
+        //print_r($request->invoiceItems);
     }
 
     /**
@@ -67,8 +78,8 @@ class InvoiceController extends Controller {
      * @Get("test/preview", as="invoice.testPreview")
      */
     public function testPreview(Request $request) {
-        $employeeName = 'Mai Gado';
-        return view('reports.invoice.invoice', compact(['employeeName']))->render();
+        $clientName = 'Mai Gado';
+        return view('reports.invoice.invoice', compact(['clientName']))->render();
     }
 
     /**

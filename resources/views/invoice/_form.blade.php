@@ -101,9 +101,11 @@
                     </div>
                 </div>
 
-                {{ Form::hidden('total_price') }}
-                {{ Form::hidden('total_price_taxes') }}
-                {{ Form::hidden('taxes_value') }}
+                {{ Form::hidden('invoice_priceI') }}
+                {{ Form::hidden('discount_priceI') }}
+                {{ Form::hidden('taxes_priceI') }}
+                {{ Form::hidden('source_discount_valueI') }}
+                {{ Form::hidden('final_priceI') }}
                 <div class="row">
                     <div class="col-md-12">
                         {{ Form::checkbox("withLetterHead", "1", 1, 
@@ -138,22 +140,23 @@
                             <table class="table table-striped table-bordered table-hover">
                                 <thead>
                                     <tr>
-                                        <th>بيان</th>
-                                        <th>الكمية</th>
-                                        <th>سعر الوحدة</th>
                                         <th>القيمة</th>
+                                        <th>سعر الوحدة</th>
+                                        <th>الكمية</th>
+                                        <th>المقاس</th>
+                                        <th>بيان</th>
                                         <th>تحكم</th>
                                     </tr>
                                 </thead>
 
-                                <tbody id="prcoess_items">
-                                    @if($items)
-                                    @for ($i = 0; $i < count($items); $i++)
-                                    <tr class="{{ ($i != count($items) - 1) ? "skip" : "" }}" >
-                                        {{ Form::hidden("items[".$i."][id]") }}
+                                <tbody id="invoiceItems">
+                                    @if($invoiceItems)
+                                    @for ($i = 0; $i < count($invoiceItems); $i++)
+                                    <tr class="{{ ($i != count($invoiceItems) - 1) ? "skip" : "" }}" >
+                                        {{ Form::hidden("invoiceItems[".$i."][id]") }}
                                         <td>
                                             <div class="form-group{{ $errors->has("items.".$i.".description") ? " has-error" : "" }}">
-                                                {{ Form::text("items[".$i."][description]", $items[$i]["description"], 
+                                                {{ Form::text("invoiceItems[".$i."][description]", $invoiceItems[$i]["description"], 
                                             array(
                                                 "class" => "form-control", 
                                                 "placeholder" => "ادخل تفاصيل البيان")
@@ -167,23 +170,22 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="form-group{{ $errors->has("items.".$i.".quantity") ? " has-error" : "" }}">
-                                                {{ Form::text("items[".$i."][quantity]", $items[$i]["quantity"], 
+                                            <div class="form-group{{ $errors->has("items.".$i.".total_price") ? " has-error" : "" }}">
+                                                {{ Form::text("invoiceItems[".$i."][total_price]", $invoiceItems[$i]["total_price"], 
                                             array(
-                                                "class" => "form-control quantity", 
-                                                "placeholder" => "ادخل الكمية")
+                                                "class" => "form-control total_price")
                                             )
                                                 }}
-                                                @if ($errors->has("items.".$i.".quantity"))
+                                                @if ($errors->has("items.".$i.".total_price"))
                                                 <label for="inputError" class="control-label">
-                                                    {{ $errors->first("items.".$i.".quantity") }}
+                                                    {{ $errors->first("items.".$i.".total_price") }}
                                                 </label>
                                                 @endif
                                             </div>
                                         </td>
                                         <td>
                                             <div class="form-group{{ $errors->has("items.".$i.".unit_price") ? " has-error" : "" }}">
-                                                {{ Form::text("items[".$i."][unit_price]", $items[$i]["unit_price"], 
+                                                {{ Form::text("invoiceItems[".$i."][unit_price]", $invoiceItems[$i]["unit_price"], 
                                             array(
                                                 "class" => "form-control unit_price", 
                                                 "placeholder" => "ادخل سعر الوحدة")
@@ -197,15 +199,31 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="form-group{{ $errors->has("items.".$i.".total_price") ? " has-error" : "" }}">
-                                                {{ Form::text("items[".$i."][total_price]", $items[$i]["total_price"], 
+                                            <div class="form-group{{ $errors->has("items.".$i.".quantity") ? " has-error" : "" }}">
+                                                {{ Form::text("invoiceItems[".$i."][quantity]", $invoiceItems[$i]["quantity"], 
                                             array(
-                                                "class" => "form-control total_price")
+                                                "class" => "form-control quantity", 
+                                                "placeholder" => "ادخل الكمية")
                                             )
                                                 }}
-                                                @if ($errors->has("items.".$i.".total_price"))
+                                                @if ($errors->has("items.".$i.".quantity"))
                                                 <label for="inputError" class="control-label">
-                                                    {{ $errors->first("items.".$i.".total_price") }}
+                                                    {{ $errors->first("items.".$i.".quantity") }}
+                                                </label>
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group{{ $errors->has("items.".$i.".size") ? " has-error" : "" }}">
+                                                {{ Form::text("invoiceItems[".$i."][size]", $invoiceItems[$i]["size"], 
+                                            array(
+                                                "class" => "form-control quantity", 
+                                                "placeholder" => "ادخل المقاس")
+                                            )
+                                                }}
+                                                @if ($errors->has("items.".$i.".size"))
+                                                <label for="inputError" class="control-label">
+                                                    {{ $errors->first("items.".$i.".size") }}
                                                 </label>
                                                 @endif
                                             </div>
@@ -267,7 +285,7 @@
 
     function FillterProcess() {
         $("#grid_ClientProcess").empty();
-        $("#prcoess_items").empty();
+        $("#invoiceItems").empty();
         resetProcessPrices();
         var index = 0;
         if (allProcesses[currentClientId] != null) {
@@ -301,15 +319,16 @@
             //console.log('Load process items', inputProcessId.val(), allProcesses[currentClientId][inputProcessId.val()]['items']);
             addProcessPrices(currentClientId, inputProcessId.val());
             $.each(allProcesses[currentClientId][inputProcessId.val()]['items'], function (index, item) {
-                processItemsCount = $("#prcoess_items").children().length + 1;
+                processItemsCount = $("#invoiceItems").children().length + 1;
                 var html = '<tr class="processId_' + inputProcessId.val() + '">';
-                html += '<td><div class="form-group"><input class="form-control" name="items[' + processItemsCount + '][description]" placeholder="ادخل تفاصيل البيان" value="' + item.description + '"/></div></td>';
-                html += '<td><div class="form-group"><input class="form-control quantity" name="items[' + processItemsCount + '][quantity]" value="' + item.quantity + '" placeholder="ادخل الكمية" /></div></td>';
-                html += '<td><div class="form-group"><input class="form-control unit_price" name="items[' + processItemsCount + '][unit_price]" value="' + item.unit_price + '" placeholder="ادخل سعر الوحدة" /></div></td>';
-                html += '<td><div class="form-group"><input class="form-control total_price" name="items[' + processItemsCount + '][total_price]" value="' + (item.quantity * item.unit_price) + '" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control total_price" name="invoiceItems[' + processItemsCount + '][total_price]" value="' + (item.quantity * item.unit_price) + '" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control unit_price" name="invoiceItems[' + processItemsCount + '][unit_price]" value="' + item.unit_price + '" placeholder="ادخل سعر الوحدة" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control quantity" name="invoiceItems[' + processItemsCount + '][quantity]" value="' + item.quantity + '" placeholder="ادخل الكمية" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control quantity" name="invoiceItems[' + processItemsCount + '][size]" value="" placeholder="ادخل المقاس" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control" name="invoiceItems[' + processItemsCount + '][description]" placeholder="ادخل تفاصيل البيان" value="' + item.description + '"/></div></td>';
                 html += '<td><div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td>';
                 html += '</tr>';
-                $('#prcoess_items').append(html);
+                $('#invoiceItems').append(html);
             });
         } else {
             removeProcessItems(currentClientId, inputProcessId.val());
@@ -349,6 +368,12 @@
         $('.taxes_priceI').html(roundDecimals(taxes, 2));
         $('.source_discount_valueI').html(roundDecimals(sourceDiscount, 2));
         $('.final_priceI').html(roundDecimals(totalPriceTaxes, 2));
+        
+        $('input[name="invoice_priceI"]').val(roundDecimals(totalPrice, 2));
+        $('input[name="discount_priceI"]').val(roundDecimals(discount, 2));
+        $('input[name="taxes_priceI"]').val(roundDecimals(taxes, 2));
+        $('input[name="source_discount_valueI"]').val(roundDecimals(sourceDiscount, 2));
+        $('input[name="final_priceI"]').val(roundDecimals(totalPriceTaxes, 2));
     }
 
     function removeProcessItems(clientId, processId) {

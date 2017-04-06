@@ -3,6 +3,7 @@
 namespace App\Reports\Invoice;
 
 use App\Reports\BaseReport;
+use App\Helpers\Helpers;
 
 class Invoice extends BaseReport {
 
@@ -12,8 +13,15 @@ class Invoice extends BaseReport {
             $allProcessTotalPaid,
             $allProcessTotalRemaining;
     
-    public $employeeName;
-    
+    public $clinetName;
+    public $invoiceItems;
+    public $discountPrice;
+    public $discountReason;
+    public $sourceDiscountPrice;
+    public $totalPrice;
+    public $totalPriceAfterTaxes;
+    public $totalTaxes;
+
     protected $reportName = "Invoice.pdf";
     //public function __construct($mode = '', $format = 'A4', $default_font_size = 0, $default_font = '', $mgl = 15, $mgr = 15, $mgt = 16, $mgb = 16, $mgh = 9, $mgf = 9, $orientation = 'P')
     public function __construct($withLetterHead = true) {
@@ -27,11 +35,19 @@ class Invoice extends BaseReport {
 
     function SetHtmlBody() {
         $this->employeeName = "Test Test";
-        $employeeName = $this->employeeName;
+        $clinetName = $this->clinetName;
+        $totalPriceAfterTaxes = $this->totalPrice;
+        $arabicPriceAfterTaxes = Helpers::numberToArabicWords($this->totalPriceAfterTaxes);
+        
+        $invoiceItems = $this->invoiceItems;
+        $discountPrice = $this->discountPrice;
+        $discountReason = $this->discountReason;
+        $sourceDiscountPrice = $this->sourceDiscountPrice;
+        $totalPrice = $this->totalPrice;
+        $totalTaxes = $this->totalTaxes;
         $this->SetPageHeader();
         $this->SetPageFooter();
-        //TODO: update this line of code to new structure 
-        return view('reports.invoice.invoice', compact(['employeeName']))->render();
+        return view('reports.invoice.invoice', compact(['clinetName', 'totalPriceAfterTaxes', 'arabicPriceAfterTaxes', 'invoiceItems', 'discountPrice', 'discountReason', 'sourceDiscountPrice', 'totalPrice', 'totalTaxes']))->render();
     }
 
     function SetCSS() {
