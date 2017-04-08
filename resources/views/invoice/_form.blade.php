@@ -118,6 +118,8 @@
                         <br>
                         <button type="button" class="btn btn-block btn-primary center-block" onclick="submitForm()">معاينة طباعة</button>
                         <br>
+                        <button type="button" class="btn btn-block btn-primary center-block" onclick="myTest()">My Test</button>
+                        <br>
                         <button type="button" class="btn btn-block btn-primary center-block">اصدار</button>
                     </div>
                 </div>
@@ -267,6 +269,10 @@
     
     function submitForm() {
         $('#invoiceForm').prop('action', 'preview').submit();
+    }
+    
+    function myTest() {
+        $('#invoiceForm').prop('action', 'test/preview').submit();
     }
     
     function GetClientProcess(client_id) {

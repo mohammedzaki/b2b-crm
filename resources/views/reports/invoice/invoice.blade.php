@@ -25,23 +25,26 @@
             <div class="clientDetails">
                 <table class="headerTable">
                     <tr>
-                        <td class="employeeLabel">مطلوب من /</td>
-                        <td class="employeeName"> {{ $clinetName }} </td>
+                        <td class="clientLabel">مطلوب من /</td>
+                        <td class="clientName"> {{ $clinetName }} </td>
+                        <td class="invoice-date-sep"></td>
+                        <td class="invoice-date-lbl" >بتاريخ /</td>
+                        <td class="invoice-date">12/03/2014</td>
                     </tr>
                 </table>
             </div>
             <div class="itemsTbl">
                 <table>
-                    @for ($i = 0; $i < 17; $i++)
+                    @for ($i = 0; $i <= 20; $i++)
                     @if ($i == 0)
                     <tr class="first-child">
-                        <td class="first-child">Total Price <br> السعر الاجمالي</td>
-                        <td>Unit Price <br> سعر الوحدة</td>
-                        <td>Qty <br> الكمية</td>
-                        <td>Size <br> المقاس</td>
-                        <td>Description <br> البيان</td>
+                        <td class="first-child total-price">Total Price <br> السعر الاجمالي</td>
+                        <td class="unit-price" >Unit Price <br> سعر الوحدة</td>
+                        <td class="qty">Qty <br> الكمية</td>
+                        <td class="size">Size <br> المقاس</td>
+                        <td class="desc">Description <br> البيان</td>
                     </tr>
-                    @elseif ($i == 16)
+                    @elseif ($i == 20)
                     <tr class="last-child">
                         <td class="first-child">{{ $invoiceItems[$i]["total_price"] }}</td>
                         <td>{{ $invoiceItems[$i]["unit_price"] }}</td>
@@ -61,13 +64,10 @@
                     @endfor
                 </table>
             </div>
-            <div class="footerTbl">
-                <table>
-                    <tr>
-                        <td><div>{{ $totalPriceAfterTaxes }}</div></td>
-                        <td colspan="4"><div><span>فقط وقدره : <span>{{ $arabicPriceAfterTaxes }}</span></span></div></td>
-                    </tr>
-                </table>
+            <div class="items-footerTbl">
+                <div class="total-price">{{ $totalPriceAfterTaxes }}</div>
+                <div class="arabic-price"><span class="lbl">فقط وقدره : <div class="text">{{ $arabicPriceAfterTaxes }}</div></span></div>
+                
             </div>
 
         </div>

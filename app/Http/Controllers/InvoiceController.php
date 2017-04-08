@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Client;
 use App\Reports\Invoice\Invoice;
 use Illuminate\Http\Request;
+use App\Helpers\Helpers;
 
 /**
  * @Controller(prefix="invoice")
@@ -67,7 +68,7 @@ class InvoiceController extends Controller {
         $pdfReport->sourceDiscountPrice = $request->source_discount_valueI;
         $pdfReport->totalPrice = $request->invoice_priceI;
         $pdfReport->totalTaxes = $request->taxes_priceI;
-        $pdfReport->totalPriceAfterTaxes = $request->invoice_priceI;
+        $pdfReport->totalPriceAfterTaxes = $request->final_priceI;
         
         return $pdfReport->RenderReport();
         //print_r($request->invoiceItems);
@@ -75,11 +76,21 @@ class InvoiceController extends Controller {
 
     /**
      * Show the Index Page
-     * @Get("test/preview", as="invoice.testPreview")
+     * @Any("test/preview", as="invoice.testPreview")
      */
     public function testPreview(Request $request) {
-        $clientName = 'Mai Gado';
-        return view('reports.invoice.invoice', compact(['clientName']))->render();
+        $pdfReport = new Invoice(TRUE);
+        $client = Client::findOrFail($request->client_id);
+        $pdfReport->clinetName = $client->name;
+        $pdfReport->invoiceItems = $request->invoiceItems;
+        $pdfReport->discountPrice = $request->discount_priceI;
+        $pdfReport->discountReason = 'N\A';
+        $pdfReport->sourceDiscountPrice = $request->source_discount_valueI;
+        $pdfReport->totalPrice = $request->invoice_priceI;
+        $pdfReport->totalTaxes = $request->taxes_priceI;
+        $pdfReport->totalPriceAfterTaxes = $request->final_priceI;
+        
+        return $pdfReport->RenderTestReport();
     }
 
     /**

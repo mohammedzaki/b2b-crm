@@ -73,4 +73,13 @@ abstract class BaseReport {
         $this->mpdf->Output($this->reportName, 'I');
     }
 
+    public function RenderTestReport() {
+        $path = url('ReportsHtml/letr.png');
+        $str = str_replace('var:letrImg', $path, $this->SetHtmlBody());
+        $path = url('ReportsHtml/footer.png');
+        $str = str_replace('var:footerImg', $path, $str);
+        
+        return $str;
+    }
+
 }

@@ -34,11 +34,9 @@ class Invoice extends BaseReport {
     }
 
     function SetHtmlBody() {
-        $this->employeeName = "Test Test";
         $clinetName = $this->clinetName;
-        $totalPriceAfterTaxes = $this->totalPrice;
+        $totalPriceAfterTaxes = $this->totalPriceAfterTaxes;
         $arabicPriceAfterTaxes = Helpers::numberToArabicWords($this->totalPriceAfterTaxes);
-        
         $invoiceItems = $this->invoiceItems;
         $discountPrice = $this->discountPrice;
         $discountReason = $this->discountReason;

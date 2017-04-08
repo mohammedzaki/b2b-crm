@@ -12,15 +12,15 @@
     {{ csrf_field() }}
     <row>
         @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
+        <div class="alert alert-success">
+            {{ session('success') }}
+        </div>
         @endif
 
         @if (session('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
         @endif
         <div class="col-lg-12">
             <div class="panel panel-default">
@@ -221,6 +221,11 @@
                                         "id" => "TotalSalary",
                                         'class' => 'form-control')) }}
                     </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <button class="btn btn-success form-control" type="button" onclick="SubmitSearchPrintReport()">طباعة كشف حساب الموظف</button>
+                        </div>
+                    </div>
                 </div>
                 <div class="row">
                     <div class="col-lg-3 ">
@@ -240,41 +245,36 @@
                         </div>
                     </div>
                     <div class="form-group col-lg-3">
-                        <div class="col-lg-4 ">
-                            <div class="form-group">
-                                <label>></label>
-                                <button class="btn btn-primary form-control" type="button" onclick="SubmitSearchGuardianship()">كشف حساب العهد</button>
-                            </div>
-                        </div>
-                        <div class="col-lg-4 ">
-                            <div class="form-group">
-                                <label>></label>
-                                {{ link_to_route('attendance.guardianshipaway', 'ترحيل العهدة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
-                            </div>
-                        </div>
-                        <div class="col-lg-4 ">
-                            <div class="form-group">
-                                <label>></label>
-                                {{ link_to_route('attendance.longBorrowAway', 'ترحيل السلفة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group col-lg-3">
                         <label>الصافى المستحق</label>
                         {{ Form::text('TotalNetSalary', $totalNetSalary, array(
                                         "id" => "TotalNetSalary",
                                         'class' => 'form-control')) }}
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-lg-6">
-                        <div class="form-group">
-                            <button class="btn btn-success form-control" type="button" onclick="SubmitSearchPrintReport()">طباعة كشف حساب الموظف</button>
-                        </div>
-                    </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-3">
                         <div class="form-group">
                             <button class="btn btn-danger form-control" type="button" onclick="SubmitPaySalary()">دفع المرتب</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-3 ">
+                        <div class="form-group">
+                            <button class="btn btn-primary form-control" type="button" onclick="SubmitSearchGuardianship()">كشف حساب العهد</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 ">
+                        <div class="form-group">
+                            {{ link_to_route('attendance.guardianshipaway', 'ترحيل العهدة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
+                        </div>
+                    </div>
+                    <div class="col-lg-3 ">
+                        <div class="form-group">
+                            {{ link_to_route('attendance.guardianshipback', 'الغاء ترحيل العهدة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
+                        </div>
+                    </div>
+                    <div class="col-lg-3 ">
+                        <div class="form-group">
+                            {{ link_to_route('attendance.longBorrowAway', 'ترحيل السلفة المستديمة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
                         </div>
                     </div>
                 </div>
@@ -315,10 +315,10 @@
     function SubmitPaySalary() {
         var empId = $("#employee_id").val();
         /*if (empId == '') {
-            return alert('يجب اختيار موظف اولا.');
-        }*/
+         return alert('يجب اختيار موظف اولا.');
+         }*/
         if (ConfirmPay()) {
-            
+
             $('#SearchForm').append('<input type="hidden" name="totalNetSalary" value="' + $('#TotalNetSalary').val() + '" />');
             $('#SearchForm').prop('method', 'post').prop('action', 'paySalary/' + empId).submit();
         }
