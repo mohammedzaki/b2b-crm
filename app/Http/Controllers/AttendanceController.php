@@ -237,6 +237,12 @@ class AttendanceController extends Controller {
                     ])
                     ->orderBy('id', 'desc')
                     ->first();
+            $attendanceBeforeToday = Attendance::where([
+                        ["date", "=", DateTime::parse($all['date'])->addDay(-1)],
+                        ["employee_id", "=", $all['employee_id']]
+                    ])
+                    ->orderBy('id', 'desc')
+                    ->first();
             if ($request->checkin == -1) {
                 $attendance = Attendance::firstOrCreate([
                             ["date", "=", $all['date']],
@@ -288,6 +294,8 @@ class AttendanceController extends Controller {
                     $all['shift'] = 2;
                     goto skip;
                 }
+            } else if (empty($attendanceBeforeToday)){
+                return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل اليوم السابق اولا');
             } else { // There are no checkin at this day
                 if (isset($request->is_second_shift)) {
                     $errors['is_second_shift'] = "يجب تسجيل الوردية الاولى اولا";
@@ -582,7 +590,15 @@ class AttendanceController extends Controller {
         $depositWithdraw->save();
         return redirect()->back()->with('success', 'تم الترحيل');
     }
-
+    
+    public function guardianshipback(Request $request, $employee_id) {
+        $employee = Employee::findOrFail($employee_id);
+        $depositWithdraw = DepositWithdraw::findOrFail($employee->lastGuardianshipId());
+        $depositWithdraw->notes = $depositWithdraw->due_date;
+        $depositWithdraw->save();
+        return redirect()->back()->with('success', 'تم الغاء ترحيل العهدة');
+    }
+    
     public function longBorrowAway(Request $request, $employee_id) {
         $date = DateTime::parse($request->date);
 

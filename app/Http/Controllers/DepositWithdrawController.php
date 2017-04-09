@@ -233,7 +233,7 @@ class DepositWithdrawController extends Controller {
             $clientProcesses = ClientProcess::all();
             $supplierProcesses = SupplierProcess::all();
             $numbers['current_amount'] = $this->CalculateCurrentAmountOff($startDate, $endDate);
-            $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate->addDay(-2), $endDate->addDay(-2));
+            $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate->addDay(-1), $endDate->addDay(-1));
         } else {
             $clients = Client::allHasOpenProcess();
             $suppliers = Supplier::allHasOpenProcess();
