@@ -24,7 +24,15 @@ $(document).ready(function () {
         }
         return true;
     });
-
+    
+    $(".datepickerCommon").flatpickr({
+        enableTime: false,
+        maxDate: new Date(),
+        altInput: true,
+        altFormat: "l, j F, Y",
+        locale: "ar"
+    });
+    
     $('.checkbox_show_input, .checkbox_hide_input').click(function () {
         $(".hidden_input").slideToggle(this.checked);
         $(".visible_input").slideToggle(this.checked);

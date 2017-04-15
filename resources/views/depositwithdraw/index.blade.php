@@ -669,12 +669,7 @@
                             @if(Entrust::ability('admin', 'deposit-withdraw-edit'))
                             <!-- Date Picker-->
                             {{ Form::open(['route' => 'depositwithdraw.search', 'method' => 'get']) }}
-                            <input type="text" style="width:100px"  id="targetdate" name="targetdate" readonly class="form-control">
-                            <script>
-                                $(function () {
-                                    $("#targetdate").datepicker();
-                                });
-                            </script>
+                            <input type="text" id="targetdate" name="targetdate" readonly class="form-control datepickerCommon">
                             <button type="submit" class="btn btn-danger">بحث</button>
                             {{ Form::close() }}
                             @endif
