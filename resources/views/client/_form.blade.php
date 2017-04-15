@@ -241,3 +241,42 @@
         </button>
     </div>
 </row>
+
+@section('scripts')
+<script>
+    $('#add_authorized_people').click(function (e) {
+        e.preventDefault();
+        var html = '<div class="authorized_person">';
+
+        html += '<div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div>';
+
+        html += '<div class="form-group">';
+        html += '<label>اسم الشخص المفوض</label>';
+        html += '<input class="form-control" name="authorized[' + authorizedPeopleCount + '][name]" placeholder="ادخل الشخص المفوض" />';
+        html += '</div>';
+
+        html += '<div class="form-group">';
+        html += '<label>المسمى الوظيفي</label>';
+        html += '<input class="form-control" name="authorized[' + authorizedPeopleCount + '][jobtitle]" placeholder="ادخل المسمى الوظيفي" />';
+        html += '</div>';
+
+        html += '<div class="form-group">';
+        html += '<label>التليفون</label>';
+        html += '<input class="form-control" name="authorized[' + authorizedPeopleCount + '][telephone]" placeholder="ادخل التليفون" />';
+        html += '</div>';
+
+        html += '<div class="form-group">';
+        html += '<label>البريد اﻻلكتروني</label>';
+        html += '<input class="form-control" name="authorized[' + authorizedPeopleCount + '][email]" placeholder="ادخل البريد اﻻلكتروني" />';
+        html += '</div></div>';
+
+        $('.authorized_people').append(html);
+        authorizedPeopleCount++;
+    });
+
+    $(document).delegate(".authorized_person .delete", "click", function (e) {
+        $(this).parent().remove();
+        authorizedPeopleCount--;
+    });
+</script>
+@endsection

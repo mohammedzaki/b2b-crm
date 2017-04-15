@@ -373,6 +373,7 @@
 </div>
 
 @section('scripts')
+<script src="{{ mix('js/prcoess_items.js') }}"></script>
 <script>
     var clientProcesses = [@foreach($clientProcesses as $k => $info) { id: '{{ $k }}', name: '{{ $info["name"] }}', client_id: '{{ $info["client_id"] }}'}, @endforeach];
     var cbo_processes = $('#client_process_id');

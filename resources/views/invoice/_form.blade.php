@@ -138,6 +138,15 @@
             <div class="panel-body operationdes">
                 <div class="row">
                     <div class="col-md-12">
+                        <div class="form-group">
+                            <label>التاريخ</label>
+                            {{ Form::text('invoice_date', null, array(
+                                        "id" => "invoice_date",
+                                        'class' => 'form-control datepicker',
+                                        'placeholder' => 'ادخل التاريخ')) }}
+                        </div>
+                    </div>
+                    <div class="col-md-12">
                         <div class="table-responsive">
                             <table class="table table-striped table-bordered table-hover">
                                 <thead>
@@ -258,6 +267,115 @@
 
 @section('scripts')
 <script>
+    function add_new_invoice_item() {
+        var html = '<tr>';
+        html += '<td><div class="form-group"><input class="form-control" name="items[' + invoiceItemsCount + '][description]" placeholder="ادخل تفاصيل البيان" /></div></td>';
+        html += '<td><div class="form-group"><input class="form-control quantity" name="items[' + invoiceItemsCount + '][quantity]" value="0" placeholder="ادخل الكمية" /></div></td>';
+        html += '<td><div class="form-group"><input class="form-control unit_price" name="items[' + invoiceItemsCount + '][unit_price]" value="0" placeholder="ادخل سعر الوحدة" /></div></td>';
+        html += '<td><div class="form-group"><input class="form-control total_price" name="items[' + invoiceItemsCount + '][total_price]" value="0" /></div></td>';
+        html += '<td><div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td>';
+        html += '</tr>';
+        $('#invoiceItemss').append(html);
+        invoiceItemsCount++;
+    }
+    function updateInvoicePrices() {
+        var process_price_html = $('.process_price');
+        var discount_price_html = $('.discount_price');
+        var taxes_price_html = $('.taxes_price');
+        var final_price_html = $('.final_price');
+        var source_discount_price = $('.source_discount_value');
+
+        process_price_html.text(calculate_process_price());
+        discount_price_html.text(calculate_discount());
+        taxes_price_html.text(calculate_taxes());
+        final_price_html.text(calculate_process_price_taxes());
+        source_discount_price.text(calculate_source_discount());
+
+        $('input[name="total_price"]').val(calculate_process_price());
+        $('input[name="total_price_taxes"]').val(calculate_process_price_taxes());
+        $('input[name="taxes_value"]').val(calculate_taxes());
+        $('input[name="source_discount_value"]').val(calculate_source_discount());
+
+    }
+    
+    $(document).delegate(".unit_price, .quantity, .total_price", "focus", function (e) {
+        var parent = $(this).parent().closest('tr');
+        if (!parent.hasClass('skip')) {
+            /* add new row */
+            var html = '<tr>';
+            html += '<td><div class="form-group"><input class="form-control" name="items[' + invoiceItemsCount + '][description]" placeholder="ادخل تفاصيل البيان" /></div></td>';
+            html += '<td><div class="form-group"><input class="form-control quantity" name="items[' + invoiceItemsCount + '][quantity]" value="0" placeholder="ادخل الكمية" /></div></td>';
+            html += '<td><div class="form-group"><input class="form-control unit_price" name="items[' + invoiceItemsCount + '][unit_price]" value="0" placeholder="ادخل سعر الوحدة" /></div></td>';
+            html += '<td><div class="form-group"><input class="form-control total_price" name="items[' + invoiceItemsCount + '][total_price]" value="0" /></div></td>';
+            html += '<td><div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td>';
+            html += '</tr>';
+            console.log('test');
+            $('#invoiceItems').append(html);
+            invoiceItemsCount++;
+            parent.addClass('skip');
+        }
+    });
+
+    /*
+     * Click event for delete item button.
+     */
+    $(document).delegate("#invoiceItems .delete", "click", function (e) {
+        console.log('Working');
+        var parent = $(this).parent().parent();
+        console.log(invoiceItemsCount);
+        if (invoiceItemsCount > 1) {
+            if (parent.prev() && !parent.next().is('tr')) {
+                parent.prev().removeClass('skip');
+            }
+            parent.remove();
+            invoiceItemsCount--;
+            updateInvoicePrices();
+        }
+        console.log(invoiceItemsCount);
+    });
+
+    $(document).delegate('#invoiceItems input.quantity', 'change', function () {
+        var quantity = $(this);
+        var unit_price = $(this).parent().parent().next().find('input');
+        var total_price = unit_price.parent().parent().next().find('input');
+
+        if (quantity.val() == "") {
+            quantity.val(0);
+        }
+        var pr = parseFloat(unit_price.val()) * parseFloat(quantity.val());
+        pr = roundDecimals(pr, 3);
+        total_price.val(pr);
+
+        updateInvoicePrices();
+    });
+
+    $(document).delegate('#invoiceItems input.unit_price', 'change', function () {
+        var unit_price = $(this);
+        var quantity = $(this).parent().parent().prev().find('input');
+        var total_price = unit_price.parent().parent().next().find('input');
+
+        if (unit_price.val() == "") {
+            unit_price.val(0);
+        }
+        var pr = parseFloat(unit_price.val()) * parseFloat(quantity.val());
+        pr = roundDecimals(pr, 3);
+        total_price.val(pr);
+        updateInvoicePrices();
+    });
+
+    invoiceItemsCount = $("#invoiceItems").children().length;
+    if (invoiceItemsCount == 0) {
+        add_new_invoice_item();
+    } else {
+        for (var i = 0; i < invoiceItemsCount; i++) {
+            var qty = parseFloat($('input[name="items[' + i + '][quantity]"]').val());
+            var unit = parseFloat($('input[name="items[' + i + '][unit_price]"]').val());
+            $('input[name="items[' + i + '][total_price]"]').val(roundDecimals((qty * unit), 3));
+        }
+    }
+    updateInvoicePrices();
+</script>
+<script>
     var allProcesses = JSON.parse(he.decode("{{ $clientProcesses }}"));
     console.log(allProcesses);
     var currentClientId = 0;
@@ -266,15 +384,24 @@
     var discount = 0;
     var sourceDiscount = 0;
     var taxes = 0;
-    
+    $(".datepicker").flatpickr({
+        enableTime: false,
+        maxDate: new Date(),
+        altInput: true,
+        altFormat: "l, j F, Y",
+        locale: "ar"
+    });
+
     function submitForm() {
-        $('#invoiceForm').prop('action', 'preview').submit();
+        if ($('.final_price').html() === $('.invoice_priceI').html()) {
+            $('#invoiceForm').prop('action', 'preview').submit();
+        }
     }
-    
+
     function myTest() {
         $('#invoiceForm').prop('action', 'test/preview').submit();
     }
-    
+
     function GetClientProcess(client_id) {
         currentClientId = $(client_id).val();
         FillterProcess();
@@ -286,7 +413,7 @@
         for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
             SelectProcessByIndex(rowIndex, $(ch_all).is(":checked"));
         }
-        update_prices();
+        updateInvoicePrices();
     }
 
     function FillterProcess() {
@@ -325,13 +452,13 @@
             //console.log('Load process items', inputProcessId.val(), allProcesses[currentClientId][inputProcessId.val()]['items']);
             addProcessPrices(currentClientId, inputProcessId.val());
             $.each(allProcesses[currentClientId][inputProcessId.val()]['items'], function (index, item) {
-                processItemsCount = $("#invoiceItems").children().length + 1;
+                invoiceItemsCount = $("#invoiceItems").children().length + 1;
                 var html = '<tr class="processId_' + inputProcessId.val() + '">';
-                html += '<td><div class="form-group"><input class="form-control total_price" name="invoiceItems[' + processItemsCount + '][total_price]" value="' + (item.quantity * item.unit_price) + '" /></div></td>';
-                html += '<td><div class="form-group"><input class="form-control unit_price" name="invoiceItems[' + processItemsCount + '][unit_price]" value="' + item.unit_price + '" placeholder="ادخل سعر الوحدة" /></div></td>';
-                html += '<td><div class="form-group"><input class="form-control quantity" name="invoiceItems[' + processItemsCount + '][quantity]" value="' + item.quantity + '" placeholder="ادخل الكمية" /></div></td>';
-                html += '<td><div class="form-group"><input class="form-control quantity" name="invoiceItems[' + processItemsCount + '][size]" value="" placeholder="ادخل المقاس" /></div></td>';
-                html += '<td><div class="form-group"><input class="form-control" name="invoiceItems[' + processItemsCount + '][description]" placeholder="ادخل تفاصيل البيان" value="' + item.description + '"/></div></td>';
+                html += '<td><div class="form-group"><input class="form-control total_price" name="invoiceItems[' + invoiceItemsCount + '][total_price]" value="' + (item.quantity * item.unit_price) + '" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control unit_price" name="invoiceItems[' + invoiceItemsCount + '][unit_price]" value="' + item.unit_price + '" placeholder="ادخل سعر الوحدة" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control quantity" name="invoiceItems[' + invoiceItemsCount + '][quantity]" value="' + item.quantity + '" placeholder="ادخل الكمية" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control quantity" name="invoiceItems[' + invoiceItemsCount + '][size]" value="" placeholder="ادخل المقاس" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control" name="invoiceItems[' + invoiceItemsCount + '][description]" placeholder="ادخل تفاصيل البيان" value="' + item.description + '"/></div></td>';
                 html += '<td><div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td>';
                 html += '</tr>';
                 $('#invoiceItems').append(html);
@@ -342,6 +469,7 @@
         }
         setProcessPricesText();
     }
+    
     function resetProcessPrices() {
         totalPrice = 0;
         discount = 0;
@@ -374,7 +502,7 @@
         $('.taxes_priceI').html(roundDecimals(taxes, 2));
         $('.source_discount_valueI').html(roundDecimals(sourceDiscount, 2));
         $('.final_priceI').html(roundDecimals(totalPriceTaxes, 2));
-        
+
         $('input[name="invoice_priceI"]').val(roundDecimals(totalPrice, 2));
         $('input[name="discount_priceI"]').val(roundDecimals(discount, 2));
         $('input[name="taxes_priceI"]').val(roundDecimals(taxes, 2));
@@ -386,5 +514,6 @@
         console.log('Remove process items');
         $(".processId_" + processId).remove();
     }
+    
 </script>
 @endsection

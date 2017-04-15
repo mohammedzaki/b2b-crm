@@ -51,4 +51,5 @@ mix.styles([
 ], 'public/css/app.css').version();
 
 
+mix.js('resources/assets/js/prcoess_items.js', 'public/js').version();
 mix.copy('resources/assets/fonts', 'public/fonts');

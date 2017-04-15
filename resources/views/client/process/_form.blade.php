@@ -357,3 +357,6 @@
         <!-- /.panel -->
     </div>
 </div>
+@section('scripts')
+<script src="{{ mix('js/prcoess_items.js') }}"></script>
+@endsection
