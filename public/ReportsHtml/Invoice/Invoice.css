@@ -5,14 +5,16 @@ body {
     font-family: sans-serif;
     color: #110f2d;
 }
-.header {
-    position: absolute;
-    left: 2.5%;
-    top: 2.5%;
-    width: 95%;
+
+.invoicePageheader {
 }
-.header img {
+.invoicePageheader .header {
+}
+.invoicePageheader .header img {
     width: 100%;
+}
+.invoicePageFooter {
+    position: absolute;
 }
 .footer {
     position: absolute;
@@ -21,7 +23,7 @@ body {
     width: 100%;
 }
 .footer img {
-    width: 100%;
+    
 }
 .invoice {
     color: #110f2d;
@@ -152,9 +154,9 @@ body {
     color: #110f2d;
 }
 .items-footerTbl .arabic-price {
-    margin: -6.5% 22% 0px 0px;
+    margin: -6.5% 19.5% 0px 0px;
     color: #110f2d;
     width: 80%;
 }
-.items-footerTbl .arabic-price .lbl {font-size: 18px;}
-.items-footerTbl .arabic-price .text {background-color: #c1c1c1;padding: 4px 10px 5px 33px;margin: -5.8% 15% 0% 0%;color: red;font-size: 18px;}
+.items-footerTbl .arabic-price .lbl {font-size: 18px;font-weight: bold;}
+.items-footerTbl .arabic-price .text {background-color: #c1c1c1;padding: 4px 10px 5px 33px;margin: -5.8% 15% 0% 0%;color: red;font-size: 16px;font-weight: normal;}
