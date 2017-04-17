@@ -2,8 +2,11 @@
 
 namespace App\Models;
 
+use App\Constants\PaymentMethods;
+use App\Extensions\DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
 
 class ClientProcess extends Model {
 
@@ -35,7 +38,6 @@ class ClientProcess extends Model {
     const invoiceBilled = 1;
     const statusClosed = 'closed';
     const statusOpened = 'active';
-    
 
     public function client() {
         return $this->belongsTo('App\Models\Client');
@@ -44,7 +46,7 @@ class ClientProcess extends Model {
     public function items() {
         return $this->hasMany('App\Models\ClientProcessItem', 'process_id');
     }
-    
+
     public function invoice() {
         return $this->belongsTo(Invoice::class);
     }
@@ -55,8 +57,8 @@ class ClientProcess extends Model {
 
     public function deposits() {
         return $this->hasMany('App\Models\DepositWithdraw', 'cbo_processes')->where([
-            ['client_id', "=",  $this->client->id],
-            ['depositValue', ">", 0],
+                    ['client_id', "=", $this->client_id],
+                    ['depositValue', ">", 0],
         ]);
     }
 
@@ -64,12 +66,28 @@ class ClientProcess extends Model {
         return $this->deposits()->sum('depositValue');
     }
 
-    public function totalPriceAfterTaxes() {
-        return ($this->total_price - $this->discount_value) + $this->taxesValue();
+    public function totalRemaining() {
+        return $this->total_price_taxes - $this->totalDeposits();
+    }
+
+    public function payRemaining($invoice_no) {
+        if ($this->totalRemaining() > 0) {
+            $all = [
+                'due_date' => DateTime::now(),
+                'depositValue' => $this->totalRemaining(),
+                'cbo_processes' => $this->id,
+                'client_id' => $this->client_id,
+                'recordDesc' => "تحصيل فاتورة رقم {$invoice_no}",
+                'payMethod' => PaymentMethods::CASH,
+                'notes' => ""
+            ];
+            DepositWithdraw::create($all);
+        }
+        $this->CheckProcessMustClosed();
     }
 
     public function CheckProcessMustClosed() {
-        if ($this->totalPriceAfterTaxes() == $this->totalDeposits()) {
+        if ($this->totalRemaining() == 0) {
             $this->status = static::statusClosed;
             $this->save();
             return TRUE;
@@ -90,4 +108,5 @@ class ClientProcess extends Model {
     public static function allOpened() {
         return ClientProcess::where('status', static::statusOpened);
     }
+
 }

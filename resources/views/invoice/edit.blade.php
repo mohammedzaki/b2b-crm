@@ -12,38 +12,23 @@
 <div class="row">
 
     @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
     @endif
 
     @if (session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
     @endif
 
-    {{ Form::model($process, 
-            array(
-                'route' => array('supplier.process.update', $process->id),
-                'method' => 'put'
-            )
-        ) 
+    {{ Form::model($invoice, array(
+                'route' => array('invoice.update', $invoice->id),
+                'method' => 'put')) 
     }}
-        @if (session('error'))
-            @include('supplier.process._form', ['model' => 'edit', 'items' => old('items')])
-        @else
-            @include('supplier.process._form', ['model' => 'edit', 'items' => $process->items])
-        @endif
+        @include('invoice._form', ['model' => 'edit', 'invoiceItems' => $invoice->items])
     {{ Form::close() }}
-
-    <script type="text/javascript">
-        @if (session('error'))
-            var processItemsCount = {{ count(old('items')) }};
-        @else
-            var processItemsCount = {{ count($process->items) }};
-        @endif
-    </script>
 
 </div>
 @endsection

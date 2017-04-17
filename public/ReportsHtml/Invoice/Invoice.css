@@ -35,13 +35,15 @@ body {
 }
 .invoiceHeader .invoiceNo {
     color: red;
+    background: rgb(212, 212, 212);
+    /* padding: 2px 15px 2px 15px; */
 }
 .invoiceHeader .invoiceNoLabel {
     
 }
 .clientDetails {
     padding: 0px 10px;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
 }
 .headerTable {border-collapse: collapse;border-spacing: 0;width: 100%;color: #110f2d;font-size: 20px;}
 .clientLabel {text-align: right;width: 15%;}
@@ -68,6 +70,9 @@ body {
     margin-bottom: 10px;
 }
 
+.redColor {
+    color: red;
+}
 
 .itemsTbl {
     border-style: solid;
@@ -91,7 +96,7 @@ body {
     border-right-style: solid;
     border-width: 0px 2px 1px 0px;
     text-align: center;
-    height: 34px;
+    height: 34.4px;
     min-width: 93px;
     padding: 0px 0px 4px 0px;
 }

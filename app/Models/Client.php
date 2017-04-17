@@ -33,6 +33,13 @@ class Client extends Model {
         ]);
     }
 
+    public function invoiceProcesses() {
+        return $this->hasMany(ClientProcess::class)->where([
+                    //['invoice_billed', "=", ClientProcess::invoiceUnBilled],
+                    ['require_invoice', "=", TRUE],
+        ]);
+    }
+
     public function closedProcess() {
         return $this->hasMany(ClientProcess::class)->where('status', ClientProcess::statusClosed);
     }
@@ -79,11 +86,23 @@ class Client extends Model {
         return $clients;
     }
 
-    public static function allHasInvoiceProcess() {
+    public static function allHasUnBilledInvoiceProcess() {
         $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
                 ->select('clients.*')->where([
                     //['client_processes.status', ClientProcess::statusOpened],
                     ['client_processes.invoice_billed', "=", ClientProcess::invoiceUnBilled],
+                    ['client_processes.require_invoice', "=", TRUE],
+                ])
+                ->distinct()
+                ->get();
+        return $clients;
+    }
+
+    public static function allHasInvoiceProcess() {
+        $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
+                ->select('clients.*')->where([
+                    //['client_processes.status', ClientProcess::statusOpened],
+                    //['client_processes.invoice_billed', "=", ClientProcess::invoiceUnBilled],
                     ['client_processes.require_invoice', "=", TRUE],
                 ])
                 ->distinct()

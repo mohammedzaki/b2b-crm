@@ -13,7 +13,7 @@ class Invoice extends Model {
      * Generated
      */
     protected $dates = ['deleted_at'];
-    protected $table = 'invoices';
+    protected $table = 'invoice';
     protected $fillable = ['id', 'invoice_number', 'total_price', 'client_id', 'invoice_date', 'deleted_at'];
 
     public function client() {
@@ -22,6 +22,11 @@ class Invoice extends Model {
 
     public function items() {
         return $this->hasMany(InvoiceItem::class, 'invoice_id');
+    }
+    
+    public static function newInvoiceNumber () {
+        $invoice_number = static::max('invoice_number');
+        return sprintf("%08d", ++$invoice_number);
     }
 
 }

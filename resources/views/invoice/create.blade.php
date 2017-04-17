@@ -25,12 +25,8 @@
     @endif
 
     {{ Form::open(['route' => 'invoice.store', 'id' => 'invoiceForm']) }}
-        @include('invoice._form', ['invoiceItems' => old('items')])
+        @include('invoice._form')
     {{ Form::close() }}
-
-    <script type="text/javascript">
-        var processItemsCount = {{ count(old('items')) }};
-    </script>
 
 </div>
 @endsection

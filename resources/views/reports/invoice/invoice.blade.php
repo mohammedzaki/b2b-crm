@@ -29,8 +29,6 @@
         </div>
         <div class="itemsTbl">
             <table>
-                @for ($i = 0; $i <= 20; $i++)
-                @if ($i == 0)
                 <tr class="first-child">
                     <td class="first-child total-price">Total Price <br> السعر الاجمالي</td>
                     <td class="unit-price" >Unit Price <br> سعر الوحدة</td>
@@ -38,21 +36,22 @@
                     <td class="size">Size <br> المقاس</td>
                     <td class="desc">Description <br> البيان</td>
                 </tr>
-                @elseif ($i == 20)
-                <tr class="last-child">
-                    <td class="first-child">{{ $invoiceItems[$i]["total_price"] }}</td>
+                @for ($i = 0; $i <= 19; $i++)
+                @if ($i < 19)
+                <tr>
+                    <td class="first-child {{ $invoiceItems[$i]["class"] }}">{{ $invoiceItems[$i]["total_price"] }}</td>
                     <td>{{ $invoiceItems[$i]["unit_price"] }}</td>
                     <td>{{ $invoiceItems[$i]["quantity"] }}</td>
                     <td>{{ $invoiceItems[$i]["size"] }}</td>
-                    <td>{{ $invoiceItems[$i]["description"] }}</td>
+                    <td class="{{ $invoiceItems[$i]["class"] }}">{{ $invoiceItems[$i]["description"] }}</td>
                 </tr>
                 @else
-                <tr>
-                    <td class="first-child">{{ $invoiceItems[$i]["total_price"] }}</td>
+                <tr class="last-child">
+                    <td class="first-child {{ $invoiceItems[$i]["class"] }}">{{ $invoiceItems[$i]["total_price"] }}</td>
                     <td>{{ $invoiceItems[$i]["unit_price"] }}</td>
                     <td>{{ $invoiceItems[$i]["quantity"] }}</td>
                     <td>{{ $invoiceItems[$i]["size"] }}</td>
-                    <td>{{ $invoiceItems[$i]["description"] }}</td>
+                    <td class="{{ $invoiceItems[$i]["class"] }}">{{ $invoiceItems[$i]["description"] }}</td>
                 </tr>
                 @endif
                 @endfor

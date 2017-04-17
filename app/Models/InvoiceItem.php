@@ -13,7 +13,7 @@ class InvoiceItem extends Model {
      * Generated
      */
     protected $dates = ['deleted_at'];
-    protected $table = 'invoice_items';
+    protected $table = 'invoice_item';
     protected $fillable = ['id', 'invoice_id', 'description', 'quantity', 'unit_price', 'deleted_at'];
 
     public function invoice() {
