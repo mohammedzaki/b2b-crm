@@ -38,25 +38,35 @@
                                     <th>رقم الفاتورة</th>
                                     <th>التاريخ</th>
                                     <th>اسم العميل</th>
-                                    <th>مبلغ الفاتورة</th>
-                                    <th>ملاحظات</th>
+                                    <th>الاجمالى</th>
+                                    <th>المدفع</th>
+                                    <th>المتبقى</th>
+                                    <th>الحالة</th>
                                     <th width="150">تحكم</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse ($processes as $process)
+                                @forelse ($invoices as $invoice)
                                 <tr role="row">
-                                    <td class="text-center">{{ $process->id }}</td>
-                                    <td>{{ $process->name }}</td>
-                                    <td>{{ $process->supplier->name }}</td>
-                                    <td>{{ $process->notes }}</td>
-                                    <td>{{ $process->total_price }}</td>
+                                    <td class="text-center">{{ $invoice->invoice_number }}</td>
+                                    <td>{{ $invoice->invoice_date }}</td>
+                                    <td>{{ $invoice->client->name }}</td>
+                                    <td>{{ $invoice->total_price }}</td>
+                                    <td>{{ $invoice->totalPaid() }}</td>
+                                    <td>{{ $invoice->totalRemaining() }}</td>
+                                    <td>{{ $invoice->status == 1 ? 'تم التحصيل' : 'غير محصلة' }}</td>
                                     <td>
-                                        {{ Form::open(['method' => 'DELETE', 'route' => ['supplier.process.destroy', $process->id], 'onsubmit' => 'return ConfirmDelete()', 'style' => 'display: inline-block;']) }}
+                                        @if ($invoice->status == 0)
+                                        {{ link_to_route('invoice.edit', 'تعديل', array('id' => $invoice->id), array('class' => 'btn btn-primary')) }}
+                                        
+                                        {{ Form::open(['method' => 'DELETE', 'route' => ['invoice.destroy', $invoice->id], 'onsubmit' => 'return ConfirmDelete()', 'style' => 'display: inline-block;']) }}
                                         {{ Form::button('حذف', array('type' => 'submit', 'class' => 'btn btn-danger')) }}
                                         {{ Form::close() }}
-
-                                        {{ link_to_route('supplier.process.edit', 'تعديل', array('id' => $process->id), array('class' => 'btn btn-primary')) }}
+                                        
+                                        {{ Form::open(['method' => 'GET', 'route' => ['invoice.pay', $invoice->id], 'onsubmit' => 'return ConfirmPay()', 'style' => 'display: inline-block;']) }}
+                                        {{ Form::button('تحصيل', array('type' => 'submit', 'class' => 'btn btn-success')) }}
+                                        {{ Form::close() }}
+                                        @endif
                                     </td>
                                 </tr>
                                 @empty
@@ -80,6 +90,10 @@
 <script>
     function ConfirmDelete() {
         return confirm("هل انت متأكد من حذف العميل ؟");
+    }
+    
+    function ConfirmPay() {
+        return confirm("هل انت متأكد من تحصيل الفاتورة ؟");
     }
 
     $(document).ready(function () {

@@ -23,8 +23,8 @@ class InvoiceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function index() {
-        $processes = [];
-        return view('invoice.index', compact('processes'));
+        $invoices = Invoice::all();
+        return view('invoice.index', compact('invoices'));
     }
 
     private function setData(Invoice $invoice = NULL) {
@@ -247,10 +247,10 @@ class InvoiceController extends Controller {
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function show($id) {
+    public function show(Invoice  $invoice) {
         //
     }
 
@@ -268,21 +268,34 @@ class InvoiceController extends Controller {
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id) {
+    public function update(Request $request, Invoice  $invoice) {
         //
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id) {
-        //
+    public function destroy(Invoice $invoice) {
+        //$invoice->delete();
+        return redirect()->back()->with('success', 'تم حذف الفاتورة.');
+    }
+    
+    /**
+     * Pay invoice.
+     *
+     * @param  Invoice  $invoice
+     * @return \Illuminate\Http\Response
+     * @Get("{invoice}/pay", as="invoice.pay")
+     */
+    public function payInvoice(Invoice $invoice) {
+        $invoice->pay();
+        return redirect()->back()->with('success', 'تم تحصيل الفاتورة.');
     }
 
 }
