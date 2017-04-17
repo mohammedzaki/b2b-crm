@@ -3,7 +3,7 @@
     <div class="col-lg-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                تقرير عملية عميل
+                العمليات
             </div>
             <!-- /.panel-heading -->
 
@@ -192,79 +192,79 @@
 
                                 <tbody id="invoiceItems">
                                     @if(isset($invoiceItems))
-                                    @for ($i = 0; $i < count($invoiceItems); $i++)
+                                    @forelse ($invoiceItems as $index => $item)
                                     <tr class="ItemRow" >
-                                        {{ Form::hidden("invoiceItems[".$i."][id]") }}
+                                        {{ Form::hidden("invoiceItems[" . $index . "][id]") }}
                                         <td>
-                                            <div class="form-group{{ $errors->has("items.".$i.".description") ? " has-error" : "" }}">
-                                                {{ Form::text("invoiceItems[".$i."][description]", $invoiceItems[$i]["description"], 
-                                            array(
-                                                "class" => "form-control description", 
-                                                "placeholder" => "ادخل تفاصيل البيان")
-                                            )
-                                                }}
-                                                @if ($errors->has("items.".$i.".description"))
-                                                <label for="inputError" class="control-label">
-                                                    {{ $errors->first("items.".$i.".description") }}
-                                                </label>
-                                                @endif
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="form-group{{ $errors->has("items.".$i.".total_price") ? " has-error" : "" }}">
-                                                {{ Form::text("invoiceItems[".$i."][total_price]", $invoiceItems[$i]["total_price"], 
+                                            <div class="form-group{{ $errors->has("items." . $index . ".total_price") ? " has-error" : "" }}">
+                                                {{ Form::text("invoiceItems[" . $index . "][total_price]", $item["total_price"], 
                                             array(
                                                 "class" => "form-control total_price")
                                             )
                                                 }}
-                                                @if ($errors->has("items.".$i.".total_price"))
+                                                @if ($errors->has("items." . $index . ".total_price"))
                                                 <label for="inputError" class="control-label">
-                                                    {{ $errors->first("items.".$i.".total_price") }}
+                                                    {{ $errors->first("items." . $index . ".total_price") }}
                                                 </label>
                                                 @endif
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="form-group{{ $errors->has("items.".$i.".unit_price") ? " has-error" : "" }}">
-                                                {{ Form::text("invoiceItems[".$i."][unit_price]", $invoiceItems[$i]["unit_price"], 
+                                            <div class="form-group{{ $errors->has("items." . $index . ".unit_price") ? " has-error" : "" }}">
+                                                {{ Form::text("invoiceItems[" . $index . "][unit_price]", $item["unit_price"], 
                                             array(
                                                 "class" => "form-control unit_price", 
                                                 "placeholder" => "ادخل سعر الوحدة")
                                             )
                                                 }}
-                                                @if ($errors->has("items.".$i.".unit_price"))
+                                                @if ($errors->has("items." . $index . ".unit_price"))
                                                 <label for="inputError" class="control-label">
-                                                    {{ $errors->first("items.".$i.".unit_price") }}
+                                                    {{ $errors->first("items." . $index . ".unit_price") }}
                                                 </label>
                                                 @endif
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="form-group{{ $errors->has("items.".$i.".quantity") ? " has-error" : "" }}">
-                                                {{ Form::text("invoiceItems[".$i."][quantity]", $invoiceItems[$i]["quantity"], 
+                                            <div class="form-group{{ $errors->has("items." . $index . ".quantity") ? " has-error" : "" }}">
+                                                {{ Form::text("invoiceItems[" . $index . "][quantity]", $item["quantity"], 
                                             array(
                                                 "class" => "form-control quantity", 
                                                 "placeholder" => "ادخل الكمية")
                                             )
                                                 }}
-                                                @if ($errors->has("items.".$i.".quantity"))
+                                                @if ($errors->has("items." . $index . ".quantity"))
                                                 <label for="inputError" class="control-label">
-                                                    {{ $errors->first("items.".$i.".quantity") }}
+                                                    {{ $errors->first("items." . $index . ".quantity") }}
                                                 </label>
                                                 @endif
                                             </div>
                                         </td>
                                         <td>
-                                            <div class="form-group{{ $errors->has("items.".$i.".size") ? " has-error" : "" }}">
-                                                {{ Form::text("invoiceItems[".$i."][size]", $invoiceItems[$i]["size"], 
+                                            <div class="form-group{{ $errors->has("items." . $index . ".size") ? " has-error" : "" }}">
+                                                {{ Form::text("invoiceItems[" . $index . "][size]", $item["size"], 
                                             array(
                                                 "class" => "form-control size", 
                                                 "placeholder" => "ادخل المقاس")
                                             )
                                                 }}
-                                                @if ($errors->has("items.".$i.".size"))
+                                                @if ($errors->has("items." . $index . ".size"))
                                                 <label for="inputError" class="control-label">
-                                                    {{ $errors->first("items.".$i.".size") }}
+                                                    {{ $errors->first("items." . $index . ".size") }}
+                                                </label>
+                                                @endif
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group{{ $errors->has("items." . $index . ".description") ? " has-error" : "" }}">
+                                                {{ Form::text("invoiceItems[" . $index . "][description]", $item["description"], 
+                                            array(
+                                                "class" => "form-control description", 
+                                                "placeholder" => "ادخل تفاصيل البيان")
+                                            )
+                                                }}
+                                                @if ($errors->has("items." . $index . ".description"))
+                                                <label for="inputError" class="control-label">
+                                                    {{ $errors->first("items." . $index . ".description") }}
                                                 </label>
                                                 @endif
                                             </div>
@@ -273,7 +273,8 @@
                                             <div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div>
                                         </td>
                                     </tr>
-                                    @endfor
+                                    @empty
+                                    @endforelse
                                     @endif
                                 </tbody>
                             </table>

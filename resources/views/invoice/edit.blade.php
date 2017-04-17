@@ -1,10 +1,10 @@
 @extends('layouts.app') 
-@section('title', 'تعديل بيانات عملية - عمليه جديدة مورد') 
+@section('title', 'تعديل بيانات فاتورة - الفاتورة') 
 @section('content')
 
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">عمليه جديدة مورد <small>تعديل بيانات عملية</small></h1>
+        <h1 class="page-header">الفاتورة <small>تعديل بيانات فاتورة</small></h1>
     </div>
 </div>
 <!-- /.row -->

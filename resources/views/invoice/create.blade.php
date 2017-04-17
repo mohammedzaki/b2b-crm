@@ -1,11 +1,11 @@
 @extends('layouts.app') 
-@section('title', 'اضف عملية جديدة - عمليه جديدة مورد') 
+@section('title', 'اضف فاتورة جديدة - الفاتورة') 
 
 @section('content')
 
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">عمليه جديدة مورد <small>أضف جديد</small></h1>
+        <h1 class="page-header">الفاتورة <small>أضف جديد</small></h1>
     </div>
 </div>
 <!-- /.row -->

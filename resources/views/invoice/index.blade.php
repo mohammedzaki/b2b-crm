@@ -4,7 +4,7 @@
 
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">عمليه جديدة عميل <small>عرض الكل</small></h1>
+        <h1 class="page-header">الفواتير <small>عرض الكل</small></h1>
     </div>
 </div>
 <!-- /.row -->
@@ -89,7 +89,7 @@
 @section('scripts')
 <script>
     function ConfirmDelete() {
-        return confirm("هل انت متأكد من حذف العميل ؟");
+        return confirm("هل انت متأكد من حذف الفاتورة ؟");
     }
     
     function ConfirmPay() {

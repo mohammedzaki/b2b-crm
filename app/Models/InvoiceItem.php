@@ -14,7 +14,7 @@ class InvoiceItem extends Model {
      */
     protected $dates = ['deleted_at'];
     protected $table = 'invoice_item';
-    protected $fillable = ['id', 'invoice_id', 'description', 'quantity', 'unit_price', 'deleted_at'];
+    protected $fillable = ['id', 'invoice_id', 'total_price', 'description', 'quantity', 'unit_price', 'size', 'deleted_at'];
 
     public function invoice() {
         return $this->belongsTo(Invoice::class);
