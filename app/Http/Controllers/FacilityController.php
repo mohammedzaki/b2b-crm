@@ -24,7 +24,8 @@ class FacilityController extends Controller {
     protected function validator(array $data) {
         $validator = Validator::make($data, [
                     'name' => 'required|max:255',
-                    'manager' => 'max:255',
+                    //'manager' => 'max:255',
+                    'start_invoice_number' => 'digits_between:1,8|numeric',
                     'type' => 'required|in:individual,joint,partnership,limited_partnership,stock',
                     'tax_file' => 'numeric',
                     'tax_card' => 'numeric',
@@ -38,7 +39,8 @@ class FacilityController extends Controller {
 
         $validator->setAttributeNames([
             'name' => 'اسم المنشأة',
-            'manager' => 'مدير المشأة',
+            //'manager' => 'مدير المشأة',
+            'start_invoice_number' => 'رقم الفاتورة',
             'type' => 'الكيان القانوني',
             'tax_file' => 'الملف الضريبي',
             'tax_card' => 'البطاقة الضريبية',
@@ -72,13 +74,8 @@ class FacilityController extends Controller {
 
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
-            if (!User::where('name', $request->manager)->exists()) {
-
-                return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors(['manager' => 'خطأ في اسم مدير النمشأة.']);
-            }
-
             $facility->name = $request->name;
-            $facility->manager_id = User::where('username', $request->manager)->first()->id;
+            //$facility->manager_id = User::where('username', $request->manager)->first()->id;
             $facility->type = $request->type;
             $facility->tax_file = $request->tax_file;
             $facility->tax_card = $request->tax_card;
@@ -94,6 +91,7 @@ class FacilityController extends Controller {
             $facility->address = $request->address;
             $facility->website = $request->website;
             $facility->opening_amount = $request->opening_amount;
+            $facility->start_invoice_number = sprintf("%08d", $request->start_invoice_number);
             $facility->save();
 
             return redirect()->back()->with('success', 'تم حفظ بيانات المنشأة.');

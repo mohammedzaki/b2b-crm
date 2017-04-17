@@ -168,6 +168,21 @@
                     </label>
                     @endif
                 </div>
+                
+                <div class="form-group{{ $errors->has('start_invoice_number') ? ' has-error' : '' }}">
+                    {{ Form::label('start_invoice_number', 'بداية الفاتورة') }} 
+                    {{ Form::text('start_invoice_number', null, 
+                        array(
+                            'class' => 'form-control', 
+                            'placeholder' => '########')
+                        )
+                    }}
+                    @if ($errors->has('start_invoice_number'))
+                    <label for="inputError" class="control-label">
+                        {{ $errors->first('start_invoice_number') }}
+                    </label>
+                    @endif
+                </div>
 
                 <div class="form-group{{ $errors->has('logo') ? ' has-error' : '' }}">
                     {{ Form::label('logo', 'رفع شعار الشركة') }}

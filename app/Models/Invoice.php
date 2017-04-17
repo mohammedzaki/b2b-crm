@@ -25,7 +25,11 @@ class Invoice extends Model {
     }
     
     public static function newInvoiceNumber () {
+        $start_invoice_number = Facility::max('start_invoice_number');
         $invoice_number = static::max('invoice_number');
+        if ($start_invoice_number > $invoice_number) {
+            $invoice_number = $start_invoice_number;
+        }
         return sprintf("%08d", ++$invoice_number);
     }
 

@@ -353,7 +353,7 @@ class DepositWithdrawController extends Controller {
         $depositValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
         $withdrawValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
         $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
-        return ($depositValue + $openingAmount) - $withdrawValue;
+        return round(($depositValue + $openingAmount) - $withdrawValue, 2);
     }
 
     private function CalculateCurrentAmountOff($startDate, $endDate) {
@@ -361,7 +361,7 @@ class DepositWithdrawController extends Controller {
         $depositValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
         $withdrawValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
         $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
-        return ($depositValue + $openingAmount) - $withdrawValue;
+        return round(($depositValue + $openingAmount) - $withdrawValue, 2);
     }
 
     private function CheckProcessClosed(DepositWithdraw $depositWithdraw) {
