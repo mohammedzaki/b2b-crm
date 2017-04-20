@@ -250,11 +250,13 @@
                                         "id" => "TotalNetSalary",
                                         'class' => 'form-control')) }}
                     </div>
+                    @if ($salaryIsPaid)
                     <div class="col-lg-3">
                         <div class="form-group">
                             <button class="btn btn-danger form-control" type="button" onclick="SubmitPaySalary()">دفع المرتب</button>
                         </div>
                     </div>
+                    @endif
                 </div>
                 <div class="row">
                     <div class="col-lg-3 ">
@@ -262,6 +264,7 @@
                             <button class="btn btn-primary form-control" type="button" onclick="SubmitSearchGuardianship()">كشف حساب العهد</button>
                         </div>
                     </div>
+                    @if ($salaryIsPaid)
                     <div class="col-lg-3 ">
                         <div class="form-group">
                             {{ link_to_route('attendance.guardianshipaway', 'ترحيل العهدة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
@@ -277,6 +280,7 @@
                             {{ link_to_route('attendance.longBorrowAway', 'ترحيل السلفة المستديمة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
                         </div>
                     </div>
+                    @endif
                 </div>
             </div>
             <!-- /.panel-body -->

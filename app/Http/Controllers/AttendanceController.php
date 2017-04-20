@@ -294,7 +294,7 @@ class AttendanceController extends Controller {
                     $all['shift'] = 2;
                     goto skip;
                 }
-            } else if (empty($attendanceBeforeToday)){
+            } else if (empty($attendanceBeforeToday)) {
                 return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل اليوم السابق اولا');
             } else { // There are no checkin at this day
                 if (isset($request->is_second_shift)) {
@@ -418,7 +418,17 @@ class AttendanceController extends Controller {
             $employees_tmp[$employee->id] = $employee->name;
         }
         $employees = $employees_tmp;
-        return view('attendance.show', compact(['employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date', 'hasData']));
+        $salaryIsPaid = FALSE;
+        $depositWithdraw = DepositWithdraw::where([
+                    ['employee_id', '=', $employee_id],
+                    ['expenses_id', '=', EmployeeActions::TakeSalary]
+                ])->whereMonth('notes', '=', $dt->month)->first();
+        if (empty($depositWithdraw)) {
+            $salaryIsPaid = TRUE;
+        } else {
+            $salaryIsPaid = FALSE;
+        }
+        return view('attendance.show', compact(['employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date', 'hasData', 'salaryIsPaid']));
     }
 
     /**
@@ -590,7 +600,7 @@ class AttendanceController extends Controller {
         $depositWithdraw->save();
         return redirect()->back()->with('success', 'تم الترحيل');
     }
-    
+
     public function guardianshipback(Request $request, $employee_id) {
         $employee = Employee::findOrFail($employee_id);
         $depositWithdraw = DepositWithdraw::findOrFail($employee->lastGuardianshipId());
@@ -598,7 +608,7 @@ class AttendanceController extends Controller {
         $depositWithdraw->save();
         return redirect()->back()->with('success', 'تم الغاء ترحيل العهدة');
     }
-    
+
     public function longBorrowAway(Request $request, $employee_id) {
         $date = DateTime::parse($request->date);
 
