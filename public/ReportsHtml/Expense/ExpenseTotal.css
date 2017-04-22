@@ -1,0 +1,122 @@
+body {
+    direction: rtl;
+    margin: 0px;
+    padding: 0px;
+}
+.letrHead {
+    width: 100%;
+    margin-bottom: 10px;
+}
+.processHeader {
+    font-family: Arial, sans-serif;
+    font-size: 15px;
+    font-weight: normal;
+    padding: 0px 10px;
+    margin-bottom: 10px;
+}
+.headerTable {border-collapse: collapse;border-spacing: 0;border-color: #ccc;width: 100%;}
+.expenseLabel {text-align: right;padding-right: 1%;width: 12%;}
+.expenseName {width: 87%;text-align: right;}
+.processLabel {text-align: right;width: 12%;}
+.processName {width: 32%;text-align: right;}
+.dateLabel {width: 11%;text-align: center;}
+.noLabel {text-align: right;}
+.noValue {text-align: right;}
+.dateValue {text-align: center;}
+
+.lineBreak {
+    background-color: black;
+    height: 3px;
+    width: 99%;
+    margin: auto;
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+.reportPageFooterLine {
+    background-color: black;
+    height: 1px;
+    width: 100%;
+    margin: auto;
+    margin-top: 30px;
+    margin-bottom: 5px;
+}
+.reportPageFooterText { 
+    font-size: 9px; 
+    text-align: center;
+}
+.tg  {
+    border-collapse:collapse;
+    border-spacing:0;
+    border-color:#ccc;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    font-family:Arial, Helvetica, sans-serif;
+    font-size:14px;
+}
+.tg tr {}
+
+.tg th {
+    font-weight:normal;
+    padding: 4px 0px;
+    border-style:solid;
+    border-width:1px;
+    overflow:hidden;
+    word-break:normal;
+    border-color: #000;
+    color:#333;
+    font-weight:bold;
+    background-color: #9c9c9c;
+}
+.tg th:nth-child(1) {
+    width: 8%;
+}
+.tg th:nth-child(2) {
+    width: 10%;
+}
+.tg th:nth-child(3) {
+    width: 10%;
+}
+.tg th:nth-child(4) {
+    width: 10%;
+}
+.tg th:nth-child(5) {
+    width: 12%;
+}
+.tg th:nth-child(6) {
+    width: 10%;
+}
+.tg th:nth-child(7) {
+    width: 32%;
+}
+.tg tr td {
+    padding: 4px 8px;
+    border-style:solid;
+    border-width: 1px;
+    overflow:hidden;
+    word-break:normal;
+    border-color: #000;
+    color:#333;
+    background-color:#fff;
+}
+.tg tr td.redColor {
+    color: #fe0000;
+}
+.tg tr td.textLeft {
+    text-align: left;
+}
+.tg tr td.textRight {
+    text-align: right;
+}
+.tg tr td.textCenter {
+    text-align: center;
+}
+
+
+.tg tr.last td {
+    border-top-style: solid;
+    border-top-color: black;
+    border-top-width: 3px;
+    background-color: #e2e2e2;
+}
+

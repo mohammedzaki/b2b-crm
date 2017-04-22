@@ -16,7 +16,7 @@ Route::group(['prefix' => 'client'], function() {
     Route::get('printTotalPDF', 'Reports\ClientReportsController@printTotalPDF');
     Route::get('printDetailedPDF', 'Reports\ClientReportsController@printDetailedPDF');
     Route::any('viewClientReport', 'Reports\ClientReportsController@viewReport')->name('reports.client.viewClientReport');
-    
+
     Route::group(['prefix' => 'ClientAnalyticalCenter'], function() {
         Route::get('/', 'Reports\ClientAnalyticalCenterController@index');
         Route::get('printTotalPDF', 'Reports\ClientAnalyticalCenterController@printTotalPDF');
@@ -25,12 +25,19 @@ Route::group(['prefix' => 'client'], function() {
     });
 });
 
+Route::group(['prefix' => 'expenses'], function() {
+    Route::get('/', 'Reports\ExpensesReportController@index');
+    Route::get('printTotalPDF', 'Reports\ExpensesReportController@printTotalPDF');
+    Route::get('printDetailedPDF', 'Reports\ExpensesReportController@printDetailedPDF');
+    Route::any('viewExpensesReport', 'Reports\ExpensesReportController@viewReport')->name('reports.expenses.viewClientReport');
+});
+
 Route::group(['prefix' => 'supplier'], function() {
     Route::get('/', 'Reports\SupplierReportsController@index');
     Route::get('printTotalPDF', 'Reports\SupplierReportsController@printTotalPDF');
     Route::get('printDetailedPDF', 'Reports\SupplierReportsController@printDetailedPDF');
     Route::any('viewSupplierReport', 'Reports\SupplierReportsController@viewReport')->name('reports.supplier.viewSupplierReport');
-    
+
     Route::group(['prefix' => 'SupplierAnalyticalCenter'], function() {
         Route::get('/', 'Reports\SupplierAnalyticalCenterController@index');
         Route::get('printTotalPDF', 'Reports\SupplierAnalyticalCenterController@printTotalPDF');

@@ -17,13 +17,13 @@
                 <a href="{{ URL::to('/') }}"><i class="fa fa-dashboard fa-fw"></i> لوحة التحكم</a>
             </li>
             <li>
-                <a href="#"><i class="fa fa fa-eye fa-fw"></i> صلاحيات الموظف</a>
+                <a href="{{ URL::to('/employee') }}"><i class="fa fa fa-eye fa-fw"></i> صلاحيات الموظف</a>
                 <ul>
                     <li><a href="{{ URL::to('/employee') }}">الكل</a></li>
                     <li><a href="{{ URL::to('/employee/create') }}">أضف جديد</a></li>
                     <li><a href="{{ URL::to('/employee/trash') }}">المحذوفات</a></li>
                     <li>
-                        <a href="#"><i class="fa fa-money fa-fw"></i> السلفيات </a>
+                        <a href="{{ URL::to('/employeeBorrow') }}"><i class="fa fa-money fa-fw"></i> السلفيات </a>
                         <ul>
                             <li><a href="{{ URL::to('/employeeBorrow') }}">الكل</a> </li>
                             <li><a href="{{ URL::to('/employeeBorrow/create') }}">أضف جديد</a> </li>
@@ -35,7 +35,7 @@
                 <a href="{{ URL::to('/depositwithdraw') }}"><i class="fa fa-briefcase fa-fw"></i>وارد / منصرف</a>
             </li>
             <li>
-                <a href="#"><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف</a>
+                <a href="{{ URL::to('/attendance') }}"><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف</a>
                 <ul>
                     <li><a href="{{ URL::to('/attendance') }}">الكل</a></li>
                     <li><a href="{{ URL::to('/attendance/checkin') }}">تسجيل حضور</a></li>
@@ -46,7 +46,7 @@
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-edit fa-fw"></i> عملية جديدة عميل</a>
+                <a href="{{ URL::to('/client/process') }}"><i class="fa fa-edit fa-fw"></i> عملية جديدة عميل</a>
                 <ul>
                     <li><a href="{{ URL::to('/client/process') }}">الكل</a></li>
                     <li><a href="{{ URL::to('/client/process/create') }}">أضف جديد</a></li>
@@ -54,7 +54,7 @@
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-share-square-o  fa-fw"></i> عملية جديدة مورد</a>
+                <a href="{{ URL::to('/supplier/process') }}"><i class="fa fa-share-square-o  fa-fw"></i> عملية جديدة مورد</a>
                 <ul>
                     <li><a href="{{ URL::to('/supplier/process') }}">الكل</a></li>
                     <li><a href="{{ URL::to('/supplier/process/create') }}">أضف جديد</a></li>
@@ -78,7 +78,7 @@
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-share-square-o  fa-fw"></i>إصدار فاتورة</a>
+                <a href="{{ URL::to('/invoice') }}"><i class="fa fa-share-square-o  fa-fw"></i>إصدار فاتورة</a>
                 <ul>
                     <li><a href="{{ URL::to('/invoice') }}">الكل</a></li>
                     <li><a href="{{ URL::to('/invoice/create') }}">أضف جديد</a></li>
@@ -107,6 +107,8 @@
                     <li><a href="{{ URL::to('/reports/supplier') }}">مورد</a></li>
                     <li><a href="{{ URL::to('/reports/client/ClientAnalyticalCenter') }}">المركز التحليلى للعملاء</a></li>
                     <li><a href="{{ URL::to('/reports/supplier/SupplierAnalyticalCenter') }}">المركز التحليلى للموردين</a></li>
+                    <li><a href="{{ URL::to('/reports/expenses') }}">استعلام عن مصروف</a></li>
+                    <li><a href="#">مرتبات الشهر</a></li>
                 </ul>
 
             </li>
