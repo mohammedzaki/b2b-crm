@@ -223,25 +223,23 @@ class DepositWithdrawController extends Controller {
         $numbers['current_dayOfMonth'] = $startDate->day;
         $numbers['current_month'] = $startDate->month - 1;
         $numbers['current_year'] = $startDate->year;
-        $employees = Employee::select('id', 'name')->get();
+        $employees = Employee::all('id', 'name');
         $expenses = Expenses::all();
         $depositWithdraws = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->get();
-
+        $clients = Client::all();
+        $suppliers = Supplier::all();
+        $clientProcesses = ClientProcess::all();
+        $supplierProcesses = SupplierProcess::all();
         if ($isSearch) {
-            $clients = Client::all();
-            $suppliers = Supplier::all();
-            $clientProcesses = ClientProcess::all();
-            $supplierProcesses = SupplierProcess::all();
             $numbers['current_amount'] = $this->CalculateCurrentAmountOff($startDate, $endDate);
-            $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate->addDay(-1), $endDate->addDay(-1));
         } else {
-            $clients = Client::allHasOpenProcess();
-            $suppliers = Supplier::allHasOpenProcess();
-            $clientProcesses = ClientProcess::allOpened()->get();
-            $supplierProcesses = SupplierProcess::allOpened()->get();
+            /* $clients = Client::allHasOpenProcess();
+              $suppliers = Supplier::allHasOpenProcess();
+              $clientProcesses = ClientProcess::allOpened()->get();
+              $supplierProcesses = SupplierProcess::allOpened()->get(); */
             $numbers['current_amount'] = $this->CalculateCurrentAmount();
-            $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate->addDay(-1), $endDate->addDay(-1));
         }
+        $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate->addDay(-1), $endDate->addDay(-1));
 
         $clients_tmp = [];
         $employees_tmp = [];
@@ -251,36 +249,40 @@ class DepositWithdrawController extends Controller {
         $supplierProcesses_tmp = [];
         $payMethods = PaymentMethods::all();
         $employeeActions = EmployeeActions::all();
-
-        foreach ($clients as $client) {
-            $clients_tmp[$client->id] = $client->name;
-        }
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
-        }
-        foreach ($suppliers as $supplier) {
-            $suppliers_tmp[$supplier->id] = $supplier->name;
         }
         foreach ($expenses as $expense) {
             $expenses_tmp[$expense->id] = $expense->name;
         }
-        foreach ($clientProcesses as $process) {
-            $clientProcesses_tmp[$process->id]['name'] = $process->name;
-            $clientProcesses_tmp[$process->id]['client_id'] = $process->client->id;
+        
+        foreach ($clients as $client) {
+            $clients_tmp[$client->id]['name'] = $client->name;
+            $clients_tmp[$client->id]['hasOpenProcess'] = $client->hasOpenProcess();
+            $clients_tmp[$client->id]['processes'] = [];
+            
+            foreach ($client->processes as $process) {
+                $clients_tmp[$client->id]['processes'][$process->id]['name'] = $process->name;
+                $clients_tmp[$client->id]['processes'][$process->id]['status'] = $process->status;
+            }
         }
-        foreach ($supplierProcesses as $process) {
-            $supplierProcesses_tmp[$process->id]['name'] = $process->name;
-            $supplierProcesses_tmp[$process->id]['supplier_id'] = $process->supplier->id;
+        foreach ($suppliers as $supplier) {
+            $suppliers_tmp[$supplier->id]['name'] = $supplier->name;
+            $suppliers_tmp[$supplier->id]['hasOpenProcess'] = $supplier->hasOpenProcess();
+            $suppliers_tmp[$supplier->id]['processes'] = [];
+            
+            foreach ($supplier->processes as $process) {
+                $suppliers_tmp[$supplier->id]['processes'][$process->id]['name'] = $process->name;
+                $suppliers_tmp[$supplier->id]['processes'][$process->id]['status'] = $process->status;
+            }
         }
-        $clientProcesses = $clientProcesses_tmp;
-        $supplierProcesses = $supplierProcesses_tmp;
-
-        $clients = $clients_tmp;
+        $clients = json_encode($clients_tmp);
+        $suppliers = json_encode($suppliers_tmp);
+        
         $employees = $employees_tmp;
-        $suppliers = $suppliers_tmp;
         $expenses = $expenses_tmp;
         $canEdit = $canEdit;
-        return view('depositwithdraw.index', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit', 'clientProcesses', 'supplierProcesses', 'employeeActions', 'isSearch']));
+        return view('depositwithdraw.index', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit', 'employeeActions', 'isSearch']));
     }
 
     /**

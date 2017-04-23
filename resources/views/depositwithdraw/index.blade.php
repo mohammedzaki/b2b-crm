@@ -22,12 +22,12 @@
         }
     }
     tr.InSave {
-        
+
     }
     tr.InSave td {
         background-color: red !important;
     }
-    
+
 </style>
 <div class="row">
     <div class="col-lg-12">
@@ -236,14 +236,14 @@
                                         @forelse ($depositWithdraws as $depositWithdraw)
                                         <tr class="gradeA odd ItemRow Saved" role="row">
                                             <td>
-                                                <input type="checkbox" value="">
+                                                <input type="checkbox" value="" class="checkDelete">
                                             </td>
                                             <td>
                                                 <div class="form-group{{ $errors->has("depositValue") ? " has-error" : "" }}">
                                                     {{ Form::text("depositValue", ($depositWithdraw->depositValue > 0 ? $depositWithdraw->depositValue : null), 
                                                                 array(
-                                                                    "class" => "form-control IsNumberDecimal", 
-                                                                    "id" => "depositValue",
+                                                                    "class" => "form-control IsNumberDecimal depositValue", 
+                                                                    "id" => "",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
@@ -261,8 +261,8 @@
                                                 <div class="form-group{{ $errors->has("withdrawValue") ? " has-error" : "" }}">
                                                     {{ Form::text("withdrawValue", ($depositWithdraw->withdrawValue > 0 ? $depositWithdraw->withdrawValue : null), 
                                                                 array(
-                                                                    "class" => "form-control IsNumberDecimal", 
-                                                                    "id" => "withdrawValue",
+                                                                    "class" => "form-control IsNumberDecimal withdrawValue", 
+                                                                    "id" => "",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
@@ -280,8 +280,8 @@
                                                 <div class="form-group{{ $errors->has("recordDesc") ? " has-error" : "" }}">
                                                     {{ Form::text("recordDesc", $depositWithdraw->recordDesc, 
                                                                 array(
-                                                                    "class" => "form-control", 
-                                                                    "id" => "recordDesc",
+                                                                    "class" => "form-control recordDesc", 
+                                                                    "id" => "",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
@@ -299,9 +299,9 @@
                                                 <div class="form-group{{ $errors->has("cbo_processes") ? " has-error" : "" }}">
                                                     {{ Form::select("cbo_processes", [$depositWithdraw->cbo_processes => $depositWithdraw->cbo_processes], $depositWithdraw->cbo_processes, 
                                                                 array(
-                                                                    "class" => "form-control",
+                                                                    "class" => "form-control cbo_processes",
                                                                     "placeholder" => "",
-                                                                    "id" => "client_id",
+                                                                    "id" => "",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
@@ -318,11 +318,11 @@
                                             </td>
                                             <td>
                                                 <div class="form-group{{ $errors->has("client_id") ? " has-error" : "" }}">
-                                                    {{ Form::select("client_id", $clients, $depositWithdraw->client_id,
+                                                    {{ Form::select("client_id", [$depositWithdraw->client_id => $depositWithdraw->client_id], $depositWithdraw->client_id,
                                                         array(
-                                                            "class" => "form-control",
+                                                            "class" => "form-control client_id",
                                                             "placeholder" => "",
-                                                            "id" => "client_id",
+                                                            "id" => "",
                                                             "style" => "width:85px;",
                                                             "onchange" => "AddNewRow(this)",
                                                             "onblur" => "OnRowLeave(this)",
@@ -338,11 +338,11 @@
                                             </td>
                                             <td>
                                                 <div class="form-group{{ $errors->has("supplier_id") ? " has-error" : "" }}">
-                                                    {{ Form::select("supplier_id", $suppliers, $depositWithdraw->supplier_id,
+                                                    {{ Form::select("supplier_id", [$depositWithdraw->supplier_id => $depositWithdraw->supplier_id], $depositWithdraw->supplier_id,
                                                         array(
-                                                            "class" => "form-control",
+                                                            "class" => "form-control supplier_id",
                                                             "placeholder" => "",
-                                                            "id" => "supplier_id",
+                                                            "id" => "",
                                                             "style" => "width:85px;",
                                                             "onchange" => "AddNewRow(this)",
                                                             "onblur" => "OnRowLeave(this)",
@@ -360,9 +360,9 @@
                                                 <div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">
                                                     {{ Form::select("employee_id", $employees, $depositWithdraw->employee_id,
                                                         array(
-                                                            "class" => "form-control",
+                                                            "class" => "form-control employee_id",
                                                             "placeholder" => "",
-                                                            "id" => "emplyee_id",
+                                                            "id" => "",
                                                             "style" => "width:85px;",
                                                             "onchange" => "AddNewRow(this)",
                                                             "onblur" => "OnRowLeave(this)",
@@ -378,11 +378,11 @@
                                             </td>
                                             <td>
                                                 <div class="form-group{{ $errors->has("expenses_id") ? " has-error" : "" }}">
-                                                    {{ Form::select("expenses_id", [$depositWithdraw->expenses_id => $depositWithdraw->expenses_id], [$depositWithdraw->expenses_id => $depositWithdraw->expenses_id],
+                                                    {{ Form::select("expenses_id", [$depositWithdraw->expenses_id => $depositWithdraw->expenses_id], $depositWithdraw->expenses_id,
                                                         array(
-                                                            "class" => "form-control",
+                                                            "class" => "form-control expenses_id",
                                                             "placeholder" => "",
-                                                            "id" => "expenses_id",
+                                                            "id" => "",
                                                             "style" => "width:85px;",
                                                             "onchange" => "AddNewRow(this)",
                                                             "onblur" => "OnRowLeave(this)",
@@ -400,9 +400,9 @@
                                                 <div class="form-group{{ $errors->has("payMethod") ? " has-error" : "" }}">
                                                     {{ Form::select("payMethod", $payMethods, $depositWithdraw->payMethod,
                                                         array(
-                                                            "class" => "form-control",
+                                                            "class" => "form-control payMethod",
                                                             "placeholder" => "",
-                                                            "id" => "payMethod",
+                                                            "id" => "",
                                                             "style" => "width:85px;",
                                                             "onchange" => "AddNewRow(this)",
                                                             "onblur" => "OnRowLeave(this)",
@@ -421,8 +421,8 @@
                                                 <div class="form-group{{ $errors->has("notes") ? " has-error" : "" }}">
                                                     {{ Form::text("notes", $depositWithdraw->notes, 
                                                                 array(
-                                                                    "class" => "form-control", 
-                                                                    "id" => "notes",
+                                                                    "class" => "form-control notes", 
+                                                                    "id" => "",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
@@ -437,24 +437,24 @@
                                                 </div>
                                             </td>
                                             <td hidden>
-                                                <input type="hidden" name="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="{{ $depositWithdraw->id }}">
+                                                <input type="hidden" class="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="{{ $depositWithdraw->id }}">
                                             </td>
                                             <td hidden>
-                                                <input type="hidden" name="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="{{ $depositWithdraw->saveStatus }}">
+                                                <input type="hidden" class="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="{{ $depositWithdraw->saveStatus }}">
                                             </td>
                                         </tr>
                                         @empty
                                         @endforelse
                                         <tr class="gradeA odd ItemRow" role="row">
                                             <td>
-                                                <input type="checkbox" value="">
+                                                <input type="checkbox" value="" class="checkDelete">
                                             </td>
                                             <td>
                                                 <div class="form-group{{ $errors->has("depositValue") ? " has-error" : "" }}">
                                                     {{ Form::text("depositValue", null, 
                                                                 array(
-                                                                    "class" => "form-control IsNumberDecimal", 
-                                                                    "id" => "client_id",
+                                                                    "class" => "form-control IsNumberDecimal depositValue", 
+                                                                    "id" => "",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
@@ -472,8 +472,8 @@
                                                 <div class="form-group{{ $errors->has("withdrawValue") ? " has-error" : "" }}">
                                                     {{ Form::text("withdrawValue", null, 
                                                                 array(
-                                                                    "class" => "form-control IsNumberDecimal", 
-                                                                    "id" => "withdrawValue",
+                                                                    "class" => "form-control IsNumberDecimal withdrawValue", 
+                                                                    "id" => "",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
@@ -491,8 +491,8 @@
                                                 <div class="form-group{{ $errors->has("recordDesc") ? " has-error" : "" }}">
                                                     {{ Form::text("recordDesc", null, 
                                                                 array(
-                                                                    "class" => "form-control", 
-                                                                    "id" => "recordDesc",
+                                                                    "class" => "form-control recordDesc", 
+                                                                    "id" => "",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
@@ -510,9 +510,9 @@
                                                 <div class="form-group{{ $errors->has("cbo_processes") ? " has-error" : "" }}">
                                                     {{ Form::select("cbo_processes", [], null, 
                                                                 array(
-                                                                    "class" => "form-control",
+                                                                    "class" => "form-control cbo_processes",
                                                                     "placeholder" => "",
-                                                                    "id" => "client_id",
+                                                                    "id" => "",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
@@ -529,9 +529,9 @@
                                             </td>
                                             <td>
                                                 <div class="form-group{{ $errors->has("client_id") ? " has-error" : "" }}">
-                                                    {{ Form::select("client_id", $clients, null,
+                                                    {{ Form::select("client_id", [], null,
                                                         array(
-                                                            "class" => "form-control",
+                                                            "class" => "form-control client_id",
                                                             "placeholder" => "",
                                                             "id" => "client_id",
                                                             "style" => "width:85px;",
@@ -549,11 +549,11 @@
                                             </td>
                                             <td>
                                                 <div class="form-group{{ $errors->has("supplier_id") ? " has-error" : "" }}">
-                                                    {{ Form::select("supplier_id", $suppliers, null,
+                                                    {{ Form::select("supplier_id", [], null,
                                                         array(
-                                                            "class" => "form-control",
+                                                            "class" => "form-control supplier_id",
                                                             "placeholder" => "",
-                                                            "id" => "supplier_id",
+                                                            "id" => "",
                                                             "style" => "width:85px;",
                                                             "onchange" => "AddNewRow(this)",
                                                             "onblur" => "OnRowLeave(this)",
@@ -571,9 +571,9 @@
                                                 <div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">
                                                     {{ Form::select("employee_id", $employees, null,
                                                         array(
-                                                            "class" => "form-control",
+                                                            "class" => "form-control emplyee_id",
                                                             "placeholder" => "",
-                                                            "id" => "emplyee_id",
+                                                            "id" => "",
                                                             "style" => "width:85px;",
                                                             "onchange" => "AddNewRow(this)",
                                                             "onblur" => "OnRowLeave(this)",
@@ -591,9 +591,9 @@
                                                 <div class="form-group{{ $errors->has("expenses_id") ? " has-error" : "" }}">
                                                     {{ Form::select("expenses_id", [], null,
                                                         array(
-                                                            "class" => "form-control",
+                                                            "class" => "form-control expenses_id",
                                                             "placeholder" => "",
-                                                            "id" => "expenses_id",
+                                                            "id" => "",
                                                             "style" => "width:85px;",
                                                             "onchange" => "AddNewRow(this)",
                                                             "onblur" => "OnRowLeave(this)",
@@ -611,9 +611,9 @@
                                                 <div class="form-group{{ $errors->has("payMethod") ? " has-error" : "" }}">
                                                     {{ Form::select("payMethod", $payMethods, null,
                                                         array(
-                                                            "class" => "form-control",
+                                                            "class" => "form-control payMethod",
                                                             "placeholder" => "",
-                                                            "id" => "payMethod",
+                                                            "id" => "",
                                                             "style" => "width:85px;",
                                                             "onchange" => "AddNewRow(this)",
                                                             "onblur" => "OnRowLeave(this)",
@@ -632,8 +632,8 @@
                                                 <div class="form-group{{ $errors->has("notes") ? " has-error" : "" }}">
                                                     {{ Form::text("notes", null, 
                                                                 array(
-                                                                    "class" => "form-control", 
-                                                                    "id" => "notes",
+                                                                    "class" => "form-control notes", 
+                                                                    "id" => "",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
@@ -648,10 +648,10 @@
                                                 </div>
                                             </td>
                                             <td hidden>
-                                                <input type="hidden" name="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="-1">
+                                                <input type="hidden" class="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="-1">
                                             </td>
                                             <td hidden>
-                                                <input type="hidden" name="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="0">
+                                                <input type="hidden" class="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="0">
                                             </td>
                                         </tr>
                                     </tbody>
@@ -660,20 +660,28 @@
                                 {{ Form::close() }}
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <a href="{{ url("/depositwithdraw") }}" class="btn btn-success">جديد</a>
                             <button type="button" class="btn btn-danger" onclick="RemoveSelected()">حذف</button>
                             <button type="button" class="btn btn-primary" onclick="LockSaveToAll()">حفظ</button>
                         </div>
-                        <div class="col-md-6 text-left">
-                            @if(Entrust::ability('admin', 'deposit-withdraw-edit'))
+                        @if(Entrust::ability('admin', 'deposit-withdraw-edit'))
+                        <div class="col-md-5 text-left">
+                            <label> تحميل الكل</label>
+                            {{ Form::checkbox("loadAllProcessAndClients", "1", 0, array(
+                                "id" => "loadAllProcessAndClients",
+                                "class" => "checkbox_show_input",
+                                "onchange" => "loadAllProcessAndClients()")) 
+                            }} 
+                        </div>
+                        <div class="col-md-3 text-left">
                             <!-- Date Picker-->
                             {{ Form::open(['route' => 'depositwithdraw.search', 'method' => 'get']) }}
                             <input type="text" id="targetdate" name="targetdate" readonly class="form-control datepickerCommon">
                             <button type="submit" class="btn btn-danger">بحث</button>
                             {{ Form::close() }}
-                            @endif
                         </div>
+                        @endif
                     </div>
                 </div> 
             </div>
@@ -687,79 +695,111 @@
 
 @section('scripts')
 <script>
-    var supplierProcesses = [@foreach($supplierProcesses as $k => $info) { id: '{{ $k }}', name: '{{ $info["name"] }}', supplier_id: '{{ $info["supplier_id"] }}'}, @endforeach];
-    var clientProcesses = [@foreach($clientProcesses as $k => $info) { id: '{{ $k }}', name: '{{ $info["name"] }}', client_id: '{{ $info["client_id"] }}'}, @endforeach];
-    var expenses = [@foreach($expenses as $k => $info) { id: '{{ $k }}', name: '{{ $info }}'}, @endforeach];
-    var employeeActions = [@foreach($employeeActions as $k => $info) { id: '{{ $k }}', name: '{{ $info }}'}, @endforeach];
+    var expenses = [@foreach($expenses as $k => $info) { id: '{{ $k }}', name: '{{ $info }}'
+    }
+    , @endforeach];
+            var employeeActions = [@foreach($employeeActions as $k => $info) { id: '{{ $k }}', name: '{{ $info }}'
+            }
+            , @endforeach];
+</script>
+<script>
+    var suppliers = JSON.parse(he.decode("{{ $suppliers }}"));
+    var clients = JSON.parse(he.decode("{{ $clients }}"));
     var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount;
     var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
-    //console.log(clientProcesses, supplierProcesses);
+    var loadAll = false;
+    //console.log(clients, suppliers);
     LockAll();
-    SetProcess();
+    SetGuardianshipDetailsProcess();
     currentAmount = $("#currentAmount");
     
-                    
+    function loadAllProcessAndClients() {
+        loadAll = $("#loadAllProcessAndClients").prop("checked");
+        SetGuardianshipDetailsProcess();
+    }
+
     function LoadProcess(rowIndex) {
-        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(5)').children(0).children(0);
-        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(6)').children(0).children(0);
-        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
-        cbo_processesVal = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0).val();
-        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(7)').children(0).children(0);
-        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(8)').children(0).children(0);
-        expenses_idVal = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(8)').children(0).children(0).val();
+        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .client_id');
+        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .supplier_id');
+        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .cbo_processes');
+        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .employee_id');
+        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .expenses_id');
+        cbo_processesVal = cbo_processes.val();
+        expenses_idVal = expenses_id.val();
+        client_idVal = client_id.val();
+        supplier_idVal = supplier_id.val();
         cbo_processes.empty();
         cbo_processes.append($("<option></option>"));
         expenses_id.empty();
         expenses_id.append($("<option></option>"));
-        if (client_id.val() > 0) {
-            $.each(clientProcesses, function (key, process) {
-                //console.log(process);
-                if (process.client_id == client_id.val()) {
-                    if (process.id == cbo_processesVal) {
-                        cbo_processes.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
-                    } else {
-                        cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+        client_id.empty();
+        client_id.append($("<option></option>"));
+        supplier_id.empty();
+        supplier_id.append($("<option></option>"));
+        if (client_idVal > 0) {
+            $.each(clients, function (clientId, client) {
+                if (clientId === client_idVal) {
+                    client_id.append($("<option selected></option>").attr("value", clientId).text(client.name));
+                } else {
+                    if (client.hasOpenProcess || loadAll) {
+                        client_id.append($("<option></option>").attr("value", clientId).text(client.name));
                     }
                 }
             });
-        } else if (supplier_id.val() > 0) {
-            $.each(supplierProcesses, function (key, process) {
-                //console.log(process);
-                if (process.supplier_id == supplier_id.val()) {
-                    if (process.id == cbo_processesVal) {
-                        cbo_processes.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
-                    } else {
-                        cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+            $.each(clients[client_idVal].processes, function (processId, process) {
+                if (processId === cbo_processesVal) {
+                    cbo_processes.append($("<option selected></option>").attr("value", processId).text(process.name));
+                } else {
+                    if (process.status === 'active' || loadAll) {
+                        cbo_processes.append($("<option></option>").attr("value", processId).text(process.name));
+                    }
+                }
+            });
+        } else if (supplier_idVal > 0) {
+            $.each(suppliers, function (supplierId, supplier) {
+                if (supplierId === supplier_idVal) {
+                    supplier_id.append($("<option selected></option>").attr("value", supplierId).text(supplier.name));
+                } else {
+                    if (supplier.hasOpenProcess || loadAll) {
+                        supplier_id.append($("<option></option>").attr("value", supplierId).text(supplier.name));
+                    }
+                }
+            });
+            $.each(suppliers[supplier_idVal].processes, function (processId, process) {
+
+                if (processId === cbo_processesVal) {
+                    cbo_processes.append($("<option selected></option>").attr("value", processId).text(process.name));
+                } else {
+                    if (process.status === 'active' || loadAll) {
+                        cbo_processes.append($("<option></option>").attr("value", processId).text(process.name));
                     }
                 }
             });
         }
         if (employee_id.val() > 0) {
-            $.each(employeeActions, function (key, process) {
-                if (process.id == expenses_idVal) {
-                    expenses_id.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
+            $.each(employeeActions, function (processId, process) {
+                if (processId == expenses_idVal) {
+                    expenses_id.append($("<option selected></option>").attr("value", processId).text(process.name));
                 } else {
-                    expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
+                    expenses_id.append($("<option></option>").attr("value", processId).text(process.name));
                 }
             });
 
-        } else {
-            $.each(expenses, function (key, process) {
-                if (process.id == expenses_idVal) {
-                    expenses_id.append($("<option selected='selected'></option>").attr("value", process.id).text(process.name));
+        } else if (expenses_idVal > 0) {
+            $.each(expenses, function (expenseId, expense) {
+                if (expenseId == expenses_idVal) {
+                    expenses_id.append($("<option selected></option>").attr("value", expenseId).text(expense.name));
                 } else {
-                    expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
+                    expenses_id.append($("<option></option>").attr("value", expenseId).text(expense.name));
                 }
             });
         }
     }
 
-    function SetProcess() {
+    function SetGuardianshipDetailsProcess() {
         var rowsCount = $('#grid_GuardianshipDetails').children().length;
         for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
-            //if ($('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0).val() == 2) {
             LoadProcess(rowIndex);
-            //}
         }
     }
 
@@ -767,10 +807,9 @@
         SetCurrentRowIndex(CellChildInput);
         if (currentRowIndex != lastRowIndex && lastRowIndex > -1) {
             // check valdiation
-            // // Save
             //console.log('check valdiation');
             if (IsValid(lastRowIndex)) {
-                SaveCurrentRow(lastRowIndex);
+                SaveCurrentRow();
                 //console.log('leave and save');
             }
             lastRowIndex = -1;
@@ -796,19 +835,19 @@
         if (rowIndex == -1) {
             return false;
         }
-        checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(0)').children(0);
-        depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(1)').children(0).children(0);
-        withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(2)').children(0).children(0);
-        recordDesc = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(3)').children(0).children(0);
-        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
-        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(5)').children(0).children(0);
-        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(6)').children(0).children(0);
-        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(7)').children(0).children(0);
-        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(8)').children(0).children(0);
-        payMethod = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(9)').children(0).children(0);
-        notes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(10)').children(0).children(0);
-        id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(11)').children(0);
-        saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0);
+        checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .checkDelete');
+        depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .depositValue');
+        withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .withdrawValue');
+        recordDesc = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .recordDesc');
+        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .cbo_processes');
+        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .client_id');
+        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .supplier_id');
+        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .employee_id');
+        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .expenses_id');
+        payMethod = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .payMethod');
+        notes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .notes');
+        id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .id');
+        saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .saveStatus');
         //console.log("saveStatus in IsValid: " + saveStatus.val());
         /*if (saveStatus.val() == 0) {
          return false;
@@ -826,7 +865,7 @@
         } else {
             payMethod.parent().removeClass("has-error");
         }
-        console.log("supplier_id.val() === '%s' \n employee_id.val() === '%s' \n expenses_id.val() === '%s' \n client_id.val() === '%s' \n cbo_processes.val() === '%s'", supplier_id.val(), employee_id.val(), expenses_id.val(), client_id.val(), cbo_processes.val());
+        console.log((expenses_id.val() == '' && cbo_processes.val() == '') + " supplier_id.val() === '%s' \n employee_id.val() === '%s' \n expenses_id.val() === '%s' \n client_id.val() === '%s' \n cbo_processes.val() === '%s'", supplier_id.val(), employee_id.val(), expenses_id.val(), client_id.val(), cbo_processes.val());
         if (depositValue.val() === '' && withdrawValue.val() === '') {
             depositValue.parent().addClass("has-error");
             withdrawValue.parent().addClass("has-error");
@@ -849,7 +888,7 @@
             employee_id.parent().removeClass("has-error");
             expenses_id.parent().removeClass("has-error");
         }
-        if (expenses_id.val() === ''  && cbo_processes.val() === '') {
+        if (expenses_id.val() === '' && cbo_processes.val() === '') {
             cbo_processes.parent().addClass("has-error");
             expenses_id.parent().addClass("has-error");
             flag = false;
@@ -860,7 +899,7 @@
         return flag;
     }
 
-    function SaveCurrentRow(rowIndex) {
+    function SaveCurrentRow() {
         //console.log('will save');
         $.ajaxSetup({
             headers: {
@@ -1039,7 +1078,26 @@
     function AddNewRow(CellChildInput) {
         SetCurrentRowIndex(CellChildInput);
         if ($(AfterCurrentRow).hasClass("ItemRow") == false) {
-            $("#depositwithdrawTable").append('<tr class="gradeA odd ItemRow" role="row"> <td> <input type="checkbox" value=""> </td><td> <div class="form-group{{$errors->has("depositValue") ? " has-error" : ""}}">{{Form::text("depositValue", null, array( "class"=> "form-control IsNumberDecimal", "id"=> "client_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("depositValue")) <label for="inputError" class="control-label">{{$errors->first("depositValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("withdrawValue") ? " has-error" : ""}}">{{Form::text("withdrawValue", null, array( "class"=> "form-control IsNumberDecimal", "id"=> "withdrawValue", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("withdrawValue")) <label for="inputError" class="control-label">{{$errors->first("withdrawValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("recordDesc") ? " has-error" : ""}}">{{Form::text("recordDesc", null, array( "class"=> "form-control", "id"=> "recordDesc", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("recordDesc")) <label for="inputError" class="control-label">{{$errors->first("recordDesc")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("cbo_processes") ? " has-error" : ""}}">{{Form::select("cbo_processes", [], null, array( "class"=> "form-control", "placeholder"=> "", "id"=> "client_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cbo_processes")) <label for="inputError" class="control-label">{{$errors->first("cbo_processes")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", $clients, null, array( "class"=> "form-control", "placeholder"=> "", "id"=> "client_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", $suppliers, null, array( "class"=> "form-control", "placeholder"=> "", "id"=> "supplier_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("employee_id") ? " has-error" : ""}}">{{Form::select("employee_id", $employees, null, array( "class"=> "form-control", "placeholder"=> "", "id"=> "emplyee_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("employee_id")) <label for="inputError" class="control-label">{{$errors->first("employee_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("expenses_id") ? " has-error" : ""}}">{{Form::select("expenses_id", $expenses, null, array( "class"=> "form-control", "placeholder"=> "", "id"=> "expenses_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("expenses_id")) <label for="inputError" class="control-label">{{$errors->first("expenses_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("payMethod") ? " has-error" : ""}}">{{Form::select("payMethod", $payMethods, null, array( "class"=> "form-control", "placeholder"=> "", "id"=> "payMethod", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("payMethod")) <label for="inputError" class="control-label">{{$errors->first("payMethod")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("notes") ? " has-error" : ""}}">{{Form::text("notes", null, array( "class"=> "form-control", "id"=> "notes", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("notes")) <label for="inputError" class="control-label">{{$errors->first("notes")}}</label> @endif </div></td><td hidden><input type="hidden" name="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="-1"></td><td hidden> <input type="hidden" name="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="0"> </td></tr>');
+            $("#depositwithdrawTable").append('<tr class="gradeA odd ItemRow" role="row"> <td> <input type="checkbox" value=""> </td><td> <div class="form-group{{$errors->has("depositValue") ? " has-error" : ""}}">{{Form::text("depositValue", null, array( "class"=> "form-control IsNumberDecimal depositValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("depositValue")) <label for="inputError" class="control-label">{{$errors->first("depositValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("withdrawValue") ? " has-error" : ""}}">{{Form::text("withdrawValue", null, array( "class"=> "form-control IsNumberDecimal withdrawValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("withdrawValue")) <label for="inputError" class="control-label">{{$errors->first("withdrawValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("recordDesc") ? " has-error" : ""}}">{{Form::text("recordDesc", null, array( "class"=> "form-control recordDesc", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("recordDesc")) <label for="inputError" class="control-label">{{$errors->first("recordDesc")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("cbo_processes") ? " has-error" : ""}}">{{Form::select("cbo_processes", [], null, array( "class"=> "form-control cbo_processes", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cbo_processes")) <label for="inputError" class="control-label">{{$errors->first("cbo_processes")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", [], null, array( "class"=> "form-control client_id", "placeholder"=> "", "id"=> "client_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "id"=> "supplier_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("employee_id") ? " has-error" : ""}}">{{Form::select("employee_id", $employees, null, array( "class"=> "form-control employee_id", "placeholder"=> "", "id"=> "emplyee_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("employee_id")) <label for="inputError" class="control-label">{{$errors->first("employee_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("expenses_id") ? " has-error" : ""}}">{{Form::select("expenses_id", $expenses, null, array( "class"=> "form-control expenses_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("expenses_id")) <label for="inputError" class="control-label">{{$errors->first("expenses_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("payMethod") ? " has-error" : ""}}">{{Form::select("payMethod", $payMethods, null, array( "class"=> "form-control payMethod", "placeholder"=> "", "id"=> "payMethod", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("payMethod")) <label for="inputError" class="control-label">{{$errors->first("payMethod")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("notes") ? " has-error" : ""}}">{{Form::text("notes", null, array( "class"=> "form-control notes", "id"=> "notes", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("notes")) <label for="inputError" class="control-label">{{$errors->first("notes")}}</label> @endif </div></td><td hidden><input type="hidden" class="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="-1"></td><td hidden> <input type="hidden" class="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="0"> </td></tr>');
+            var rowIndex = $("#depositwithdrawTable tr").length - 3;
+            console.log(rowIndex);
+            client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .client_id');
+            supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .supplier_id');
+            client_id.empty();
+            client_id.append($("<option></option>"));
+            supplier_id.empty();
+            supplier_id.append($("<option></option>"));
+            $.each(clients, function (clientId, client) {
+                if (client.hasOpenProcess || loadAll) {
+                    client_id.append($("<option></option>").attr("value", clientId).text(client.name));
+                }
+            });
+            $.each(suppliers, function (supplierId, supplier) {
+                if (supplier.hasOpenProcess || loadAll) {
+                    supplier_id.append($("<option></option>").attr("value", supplierId).text(supplier.name));
+                }
+            });
+
             DoChange(currentRowIndex, CurrentCellName);
         } else {
             DoChange(currentRowIndex, CurrentCellName);
@@ -1062,16 +1120,15 @@
                 employee_id.val('');
                 expenses_id.empty();
                 expenses_id.append($("<option></option>"));
-                
+
                 break;
             case "withdrawValue":
                 depositValue.val('');
-                //client_id.val('');
                 employee_id.val('');
                 expenses_id.empty();
                 expenses_id.append($("<option></option>"));
-                $.each(expenses, function (key, process) {
-                    expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
+                $.each(expenses, function (expenseId, expense) {
+                    expenses_id.append($("<option></option>").attr("value", expenseId).text(expense.name));
                 });
                 break;
             case "recordDesc":
@@ -1082,13 +1139,11 @@
                 supplier_id.val('');
                 employee_id.val('');
                 expenses_id.val('');
-                //withdrawValue.val('');
                 cbo_processes.empty();
                 cbo_processes.append($("<option></option>").attr("value", -1).text(''));
-                $.each(clientProcesses, function (key, process) {
-                    //console.log(process);
-                    if (process.client_id == client_id.val()) {
-                        cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+                $.each(clients[client_id.val()].processes, function (processId, process) {
+                    if (process.status === 'active' || loadAll) {
+                        cbo_processes.append($("<option></option>").attr("value", processId).text(process.name));
                     }
                 });
 
@@ -1098,10 +1153,12 @@
                 employee_id.val('');
                 expenses_id.val('');
                 depositValue.val('');
-                $.each(supplierProcesses, function (key, process) {
+                cbo_processes.empty();
+                cbo_processes.append($("<option></option>").attr("value", -1).text(''));
+                $.each(suppliers[supplier_id.val()].processes, function (processId, process) {
                     //console.log(process);
-                    if (process.supplier_id == supplier_id.val()) {
-                        cbo_processes.append($("<option></option>").attr("value", process.id).text(process.name));
+                    if (process.status === 'active' || loadAll) {
+                        cbo_processes.append($("<option></option>").attr("value", processId).text(process.name));
                     }
                 });
                 break;
@@ -1109,29 +1166,28 @@
                 client_id.val('');
                 supplier_id.val('');
                 expenses_id.val('');
-                //
                 cbo_processes.empty();
                 expenses_id.empty();
                 expenses_id.append($("<option></option>"));
                 //alert(employee_id.val());
                 if (employee_id.val() > 0) {
                     if (depositValue.val() > 0) {
-                        $.each(employeeActions, function (key, process) {
-                            if (process.id == 2) {
-                                expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
+                        $.each(employeeActions, function (processId, process) {
+                            if (processId == 2) {
+                                expenses_id.append($("<option></option>").attr("value", processId).text(process.name));
                             }
                         });
                     } else {
-                        $.each(employeeActions, function (key, process) {
-                            if (process.id != 2 && process.id != 4) {
-                                expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
+                        $.each(employeeActions, function (processId, process) {
+                            if (processId != 2 && processId != 4) {
+                                expenses_id.append($("<option></option>").attr("value", processId).text(process.name));
                             }
                         });
                     }
                 } else {
                     depositValue.val('');
-                    $.each(expenses, function (key, process) {
-                        expenses_id.append($("<option></option>").attr("value", process.id).text(process.name));
+                    $.each(expenses, function (expenseId, expense) {
+                        expenses_id.append($("<option></option>").attr("value", expenseId).text(expense.name));
                     });
                 }
                 break;

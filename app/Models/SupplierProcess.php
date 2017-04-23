@@ -18,6 +18,7 @@ class SupplierProcess extends Model {
         'employee_id',
         'notes',
         'has_discount',
+        'status',
         'discount_percentage',
         'discount_value',
         'discount_reason',
