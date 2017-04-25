@@ -60,8 +60,8 @@ class ExpensesReportController extends Controller {
         $expenses = [];
         foreach ($request->selectedIds as $id) {
             $expense = Expenses::findOrFail($id);
-            $expense->startDate = DateTime::parse($request->selectMonth)->startOfMonth();
-            $expense->endDate = DateTime::parse($request->selectMonth)->endOfMonth();
+            $expense->startDate = DateTime::parse($request->startDate)->startOfDay();
+            $expense->endDate = DateTime::parse($request->endDate)->endOfDay();
             
             $expenses[$id]['expenseName'] = $expense->name;
             $expenses[$id]['expenseTotalPaid'] = $expense->getTotalPaid();

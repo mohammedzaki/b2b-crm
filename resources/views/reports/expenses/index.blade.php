@@ -53,12 +53,24 @@
                     {{ Form::label("ch_total", "مجمع") }}
                 </div>
                 <div class="legend">
-                    {{ Form::label("selectMonth", "الشهر") }}
-                    {{ Form::text("selectMonth", null, array(
-                            "id" => "selectMonth",
+                    <div class="row">
+                        <div class="col-lg-6"> 
+                            {{ Form::label("startDate", "من") }}
+                            {{ Form::text("startDate", null, array(
+                            "id" => "startDate",
                             "class" => "form-control datepickerCommon",
                             "required" => "required")) 
-                    }} 
+                            }}
+                        </div>
+                        <div class="col-lg-6">
+                            {{ Form::label("endDate", "الى") }}
+                            {{ Form::text("endDate", null, array(
+                            "id" => "endDate",
+                            "class" => "form-control datepickerCommon",
+                            "required" => "required")) 
+                            }}
+                        </div>
+                    </div>
                 </div>
                 <div class="legend">
                     {{ Form::checkbox(null, "1", null, 
