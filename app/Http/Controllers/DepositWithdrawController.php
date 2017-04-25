@@ -224,7 +224,7 @@ class DepositWithdrawController extends Controller {
         $numbers['current_month'] = $startDate->month - 1;
         $numbers['current_year'] = $startDate->year;
         $employees = Employee::all('id', 'name');
-        $expenses = Expenses::all();
+        $expenses = Expenses::all('id', 'name');
         $depositWithdraws = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->get();
         $clients = Client::all();
         $suppliers = Supplier::all();
@@ -233,14 +233,10 @@ class DepositWithdrawController extends Controller {
         if ($isSearch) {
             $numbers['current_amount'] = $this->CalculateCurrentAmountOff($startDate, $endDate);
         } else {
-            /* $clients = Client::allHasOpenProcess();
-              $suppliers = Supplier::allHasOpenProcess();
-              $clientProcesses = ClientProcess::allOpened()->get();
-              $supplierProcesses = SupplierProcess::allOpened()->get(); */
             $numbers['current_amount'] = $this->CalculateCurrentAmount();
         }
         $numbers['currentDay_amountOff'] = $this->CalculateCurrentAmountOff($startDate->addDay(-1), $endDate->addDay(-1));
-
+        
         $clients_tmp = [];
         $employees_tmp = [];
         $suppliers_tmp = [];
@@ -248,14 +244,13 @@ class DepositWithdrawController extends Controller {
         $clientProcesses_tmp = [];
         $supplierProcesses_tmp = [];
         $payMethods = PaymentMethods::all();
-        $employeeActions = EmployeeActions::all();
+        $employeeActions = json_encode(EmployeeActions::all());
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
         }
         foreach ($expenses as $expense) {
             $expenses_tmp[$expense->id] = $expense->name;
         }
-        
         foreach ($clients as $client) {
             $clients_tmp[$client->id]['name'] = $client->name;
             $clients_tmp[$client->id]['hasOpenProcess'] = $client->hasOpenProcess();
@@ -278,9 +273,9 @@ class DepositWithdrawController extends Controller {
         }
         $clients = json_encode($clients_tmp);
         $suppliers = json_encode($suppliers_tmp);
+        $expenses = json_encode($expenses);
         
         $employees = $employees_tmp;
-        $expenses = $expenses_tmp;
         $canEdit = $canEdit;
         return view('depositwithdraw.index', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit', 'employeeActions', 'isSearch']));
     }

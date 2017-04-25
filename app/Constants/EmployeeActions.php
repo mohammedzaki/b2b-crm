@@ -11,12 +11,12 @@ class EmployeeActions {
     const TakeSalary = 5;
 
     public static function all() {
-        $employeeActions = [];
-        $employeeActions[EmployeeActions::Guardianship] = "عهدة شراء";
-        $employeeActions[EmployeeActions::GuardianshipReturn] = "رد عهدة";
-        $employeeActions[EmployeeActions::SmallBorrow] = "سلفة";
-        $employeeActions[EmployeeActions::LongBorrow] = "سلفة مستديمة";
-        //$employeeActions[EmployeeActions::TakeSalary] = "مرتبات";
+        $employeeActions = [
+            ['id' => EmployeeActions::Guardianship, 'name' => "عهدة شراء"],
+            ['id' => EmployeeActions::GuardianshipReturn, 'name' => "رد عهدة"],
+            ['id' => EmployeeActions::SmallBorrow, 'name' => "سلفة"],
+            ['id' => EmployeeActions::LongBorrow, 'name' => "سلفة مستديمة"]
+        ];
         return $employeeActions;
     }
 
