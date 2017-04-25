@@ -666,14 +666,14 @@
                             <button type="button" class="btn btn-primary" onclick="LockSaveToAll()">حفظ</button>
                         </div>
                         @if(Entrust::ability('admin', 'deposit-withdraw-edit'))
-                        <div class="col-md-5 text-left">
+                        <!--<div class="col-md-5 text-left">
                             <label> تحميل الكل</label>
                             {{ Form::checkbox("loadAllProcessAndClients", "1", 0, array(
                                 "id" => "loadAllProcessAndClients",
                                 "class" => "checkbox_show_input",
                                 "onchange" => "loadAllProcessAndClients()")) 
                             }} 
-                        </div>
+                        </div>-->
                         <div class="col-md-6 text-left">
                             <!-- Date Picker-->
                             {{ Form::open(['route' => 'depositwithdraw.search', 'method' => 'get']) }}
