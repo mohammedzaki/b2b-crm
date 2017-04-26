@@ -703,7 +703,6 @@
     var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount;
     var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
     var loadAll = false;
-    //console.log(clients, suppliers);
     LockAll();
     SetGuardianshipDetailsProcess();
     currentAmount = $("#currentAmount");
@@ -772,7 +771,7 @@
         }
         if (employee_id.val() > 0) {
             $.each(employeeActions, function (processId, process) {
-                if (processId == expenses_idVal) {
+                if (processId === expenses_idVal) {
                     expenses_id.append($("<option selected></option>").attr("value", processId).text(process.name));
                 } else {
                     expenses_id.append($("<option></option>").attr("value", processId).text(process.name));
@@ -780,7 +779,7 @@
             });
         } else if (expenses_idVal > 0) {
             $.each(expenses, function (expenseId, expense) {
-                if (expenseId == expenses_idVal) {
+                if (expenseId === expenses_idVal) {
                     expenses_id.append($("<option selected></option>").attr("value", expenseId).text(expense.name));
                 } else {
                     expenses_id.append($("<option></option>").attr("value", expenseId).text(expense.name));
@@ -798,34 +797,28 @@
 
     function OnRowFocus(CellChildInput) {
         SetCurrentRowIndex(CellChildInput);
-        if (currentRowIndex != lastRowIndex && lastRowIndex > -1) {
+        if (currentRowIndex !== lastRowIndex && lastRowIndex > -1) {
             // check valdiation
-            //console.log('check valdiation');
             if (IsValid(lastRowIndex)) {
                 SaveCurrentRow();
-                //console.log('leave and save');
             }
             lastRowIndex = -1;
         } else {
-            //console.log('still edit');
             SetLastRowIndex();
         }
     }
 
     function OnRowLeave(CellChildInput) {
         SetCurrentRowIndex(CellChildInput);
-        //console.log('currentRowIndex < rowCount: ' + currentRowIndex + ', ' + rowCount);
         if (currentRowIndex >= rowCount - 1) {
-            //console.log('last row');
             lastRowIndex = -1;
         } else {
-            //console.log('still edit');
             SetLastRowIndex();
         }
     }
 
     function IsValid(rowIndex) {
-        if (rowIndex == -1) {
+        if (rowIndex === -1) {
             return false;
         }
         checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .checkDelete');
@@ -841,24 +834,19 @@
         notes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .notes');
         id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .id');
         saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .saveStatus');
-        //console.log("saveStatus in IsValid: " + saveStatus.val());
-        /*if (saveStatus.val() == 0) {
-         return false;
-         }*/
         var flag = true;
-        if (recordDesc.val() == '') {
+        if (recordDesc.val() === '') {
             recordDesc.parent().addClass("has-error");
             flag = false;
         } else {
             recordDesc.parent().removeClass("has-error");
         }
-        if (payMethod.val() == '') {
+        if (payMethod.val() === '') {
             payMethod.parent().addClass("has-error");
             flag = false;
         } else {
             payMethod.parent().removeClass("has-error");
         }
-        console.log((expenses_id.val() == '' && cbo_processes.val() == '') + " supplier_id.val() === '%s' \n employee_id.val() === '%s' \n expenses_id.val() === '%s' \n client_id.val() === '%s' \n cbo_processes.val() === '%s'", supplier_id.val(), employee_id.val(), expenses_id.val(), client_id.val(), cbo_processes.val());
         if (depositValue.val() === '' && withdrawValue.val() === '') {
             depositValue.parent().addClass("has-error");
             withdrawValue.parent().addClass("has-error");
@@ -893,7 +881,6 @@
     }
 
     function SaveCurrentRow() {
-        //console.log('will save');
         $.ajaxSetup({
             headers: {
                 'X-CSRF-TOKEN': $('input[name="_token"]').val()
@@ -915,25 +902,21 @@
             payMethod: payMethod.val(),
             notes: notes.val(),
             saveStatus: saveStatus.val()
-        }
+        };
         //used to determine the http verb to use [add=POST], [update=PUT]
         var type = "POST"; //for creating new resource
         var saveurl = '{{ url("/depositwithdraw") }}';
-        if (saveStatus.val() == 1 || (saveStatus.val() == 2 && canEdit == 1)) {
+        if (saveStatus.val() === 1 || (saveStatus.val() === 2 && canEdit === 1)) {
             type = "PUT"; //for updating existing resource
             saveurl += '/' + id.val();
         }
         checkDelete.parent().parent().addClass('InSave');
-        //console.log(formData);
-
         $.ajax({
             type: type,
             url: saveurl,
             data: formData,
             dataType: 'json',
             success: function (data) {
-                //console.log("Success: " + data);
-                //console.log("Success: " + data.message);
                 if (data.success) {
                     saveStatus.val(1);
                     checkDelete.parent().parent().removeClass('InSave');
@@ -956,10 +939,8 @@
         for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
             checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(0)').children(0).is(":checked");
             id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(11)').children(0).val();
-            //console.log(checkDelete);
             if (checkDelete) {
                 rowsIds.push(id);
-                //console.log(rowIndex);
                 rowsIndexs.push(rowIndex);
             }
         }
@@ -971,22 +952,18 @@
             });
             var formData = {
                 rowsIds: rowsIds
-            }
+            };
             //used to determine the http verb to use [add=POST], [update=PUT]
             var type = "POST"; //for creating new resource
             var saveurl = '{{ url("/depositwithdraw/RemoveSelected") }}';
-            //console.log(formData);
             $.ajax({
                 type: type,
                 url: saveurl,
                 data: formData,
                 dataType: 'json',
                 success: function (data) {
-                    //console.log("Success: " + data);
-                    //console.log("Success: " + data.message);
                     if (data.success) {
                         $.each(rowsIndexs, function (arrIndex, rowIndex) {
-                            //console.log(value);
                             RemoveRowAtIndex(rowIndex);
                         });
                         currentAmount.html(data.current_amount);
@@ -1023,23 +1000,18 @@
             });
             var formData = {
                 rowsIds: rowsIds
-            }
+            };
             //used to determine the http verb to use [add=POST], [update=PUT]
             var type = "POST"; //for creating new resource
             var saveurl = '{{ url("/depositwithdraw/LockSaveToAll") }}';
-            //console.log(formData);
             $.ajax({
                 type: type,
                 url: saveurl,
                 data: formData,
                 dataType: 'json',
                 success: function (data) {
-                    //console.log("Success: " + data);
-                    //console.log("Success: " + data.message);
                     if (data.success) {
                         saveStatus.val(1);
-                        //id.val(data.id);
-                        //console.log(data.rowsIds);
                         $.each(rowsIndexs, function (arrIndex, rowIndex) {
                             console.log(rowIndex);
                             saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0);
@@ -1058,10 +1030,10 @@
     }
 
     function LockAll() {
-        if ($("#canEdit").val() != 1) {
+        if ($("#canEdit").val() !== 1) {
             var rowsCount = $('#grid_GuardianshipDetails').children().length;
             for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
-                if ($('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0).val() == 2) {
+                if ($('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0).val() === 2) {
                     SetRowReadonly(rowIndex);
                 }
             }
@@ -1070,7 +1042,7 @@
 
     function AddNewRow(CellChildInput) {
         SetCurrentRowIndex(CellChildInput);
-        if ($(AfterCurrentRow).hasClass("ItemRow") == false) {
+        if ($(AfterCurrentRow).hasClass("ItemRow") === false) {
             $("#depositwithdrawTable").append('<tr class="gradeA odd ItemRow" role="row"> <td> <input type="checkbox" value=""> </td><td> <div class="form-group{{$errors->has("depositValue") ? " has-error" : ""}}">{{Form::text("depositValue", null, array( "class"=> "form-control IsNumberDecimal depositValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("depositValue")) <label for="inputError" class="control-label">{{$errors->first("depositValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("withdrawValue") ? " has-error" : ""}}">{{Form::text("withdrawValue", null, array( "class"=> "form-control IsNumberDecimal withdrawValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("withdrawValue")) <label for="inputError" class="control-label">{{$errors->first("withdrawValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("recordDesc") ? " has-error" : ""}}">{{Form::text("recordDesc", null, array( "class"=> "form-control recordDesc", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("recordDesc")) <label for="inputError" class="control-label">{{$errors->first("recordDesc")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("cbo_processes") ? " has-error" : ""}}">{{Form::select("cbo_processes", [], null, array( "class"=> "form-control cbo_processes", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cbo_processes")) <label for="inputError" class="control-label">{{$errors->first("cbo_processes")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", [], null, array( "class"=> "form-control client_id", "placeholder"=> "", "id"=> "client_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "id"=> "supplier_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("employee_id") ? " has-error" : ""}}">{{Form::select("employee_id", $employees, null, array( "class"=> "form-control employee_id", "placeholder"=> "", "id"=> "emplyee_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("employee_id")) <label for="inputError" class="control-label">{{$errors->first("employee_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("expenses_id") ? " has-error" : ""}}">{{Form::select("expenses_id", [], null, array( "class"=> "form-control expenses_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("expenses_id")) <label for="inputError" class="control-label">{{$errors->first("expenses_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("payMethod") ? " has-error" : ""}}">{{Form::select("payMethod", $payMethods, null, array( "class"=> "form-control payMethod", "placeholder"=> "", "id"=> "payMethod", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("payMethod")) <label for="inputError" class="control-label">{{$errors->first("payMethod")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("notes") ? " has-error" : ""}}">{{Form::text("notes", null, array( "class"=> "form-control notes", "id"=> "notes", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("notes")) <label for="inputError" class="control-label">{{$errors->first("notes")}}</label> @endif </div></td><td hidden><input type="hidden" class="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="-1"></td><td hidden> <input type="hidden" class="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="0"> </td></tr>');
             var rowIndex = $("#depositwithdrawTable tr").length - 3;
             console.log(rowIndex);
@@ -1090,7 +1062,6 @@
                     supplier_id.append($("<option></option>").attr("value", supplierId).text(supplier.name));
                 }
             });
-
             DoChange(currentRowIndex, CurrentCellName);
         } else {
             DoChange(currentRowIndex, CurrentCellName);
@@ -1113,7 +1084,6 @@
                 employee_id.val('');
                 expenses_id.empty();
                 expenses_id.append($("<option></option>"));
-
                 break;
             case "withdrawValue":
                 depositValue.val('');
@@ -1139,7 +1109,6 @@
                         cbo_processes.append($("<option></option>").attr("value", processId).text(process.name));
                     }
                 });
-
                 break;
             case "supplier_id":
                 client_id.val('');
@@ -1149,7 +1118,6 @@
                 cbo_processes.empty();
                 cbo_processes.append($("<option></option>").attr("value", -1).text(''));
                 $.each(suppliers[supplier_id.val()].processes, function (processId, process) {
-                    //console.log(process);
                     if (process.status === 'active' || loadAll) {
                         cbo_processes.append($("<option></option>").attr("value", processId).text(process.name));
                     }
@@ -1162,7 +1130,6 @@
                 cbo_processes.empty();
                 expenses_id.empty();
                 expenses_id.append($("<option></option>"));
-                //alert(employee_id.val());
                 if (employee_id.val() > 0) {
                     if (depositValue.val() > 0) {
                         $.each(employeeActions, function (i, employeeAction) {
@@ -1187,7 +1154,7 @@
             case "expenses_id":
                 client_id.val('');
                 supplier_id.val('');
-                if (employee_id.val() == 0 && expenses_id.val() != 2) {
+                if (employee_id.val() === 0 && expenses_id.val() !== 2) {
                     depositValue.val('');
                 }
                 cbo_processes.empty();
@@ -1224,7 +1191,6 @@
                 .prevAll() // Find all sibling elements in front of it
                 .length; // Get their count
         rowCount = $(CurrentCell).closest('tr').parent().children().length;
-
     }
 
     function SetLastRowIndex() {
