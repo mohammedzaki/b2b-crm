@@ -166,7 +166,7 @@ class SupplierReportsController extends Controller {
                     $index++;
                 }
                 
-                foreach ($supplierProcess->withdrawals() as $withdrawal) {
+                foreach ($supplierProcess->withdrawals as $withdrawal) {
                     $totalWithdrawalValue += $withdrawal->withdrawValue;
                     $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($withdrawal->due_date)->format('Y-m-d');
                     $proceses[$id]['processDetails'][$index]['remaining'] = $supplierProcess->total_price_taxes - $totalWithdrawalValue;
