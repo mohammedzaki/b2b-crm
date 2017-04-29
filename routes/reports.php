@@ -32,6 +32,13 @@ Route::group(['prefix' => 'expenses'], function() {
     Route::any('viewExpensesReport', 'Reports\ExpensesReportController@viewReport')->name('reports.expenses.viewClientReport');
 });
 
+Route::group(['prefix' => 'employees'], function() {
+    Route::get('/', 'Reports\EmployeesReportController@index');
+    Route::get('printTotalPDF', 'Reports\EmployeesReportController@printTotalPDF');
+    Route::get('printDetailedPDF', 'Reports\EmployeesReportController@printDetailedPDF');
+    Route::any('viewEmployeesReport', 'Reports\EmployeesReportController@viewReport')->name('reports.employees.viewReport');
+});
+
 Route::group(['prefix' => 'supplier'], function() {
     Route::get('/', 'Reports\SupplierReportsController@index');
     Route::get('printTotalPDF', 'Reports\SupplierReportsController@printTotalPDF');
