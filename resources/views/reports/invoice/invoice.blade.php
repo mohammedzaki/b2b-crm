@@ -36,7 +36,7 @@
                     <td class="size">Size <br> المقاس</td>
                     <td class="desc">Description <br> البيان</td>
                 </tr>
-                @for ($i = 0; $i <= 19; $i++)
+                @for ($i = 0; $i < count($invoiceItems); $i++)
                 @if ($i < 19)
                 <tr>
                     <td class="first-child {{ $invoiceItems[$i]["class"] }}">{{ $invoiceItems[$i]["total_price"] }}</td>
@@ -52,6 +52,26 @@
                     <td>{{ $invoiceItems[$i]["quantity"] }}</td>
                     <td>{{ $invoiceItems[$i]["size"] }}</td>
                     <td class="{{ $invoiceItems[$i]["class"] }}">{{ $invoiceItems[$i]["description"] }}</td>
+                </tr>
+                @endif
+                @endfor
+                
+                @for ($i = 0; $i <= (19 - count($invoiceItems)); $i++)
+                @if ($i < (19 - count($invoiceItems)))
+                <tr>
+                    <td class="first-child"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                @else
+                <tr class="last-child">
+                    <td class="first-child"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
                 </tr>
                 @endif
                 @endfor

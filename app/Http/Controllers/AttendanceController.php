@@ -409,7 +409,7 @@ class AttendanceController extends Controller {
         $totalSmallBorrowValue = $totalBorrowValue;
         $totalBorrowValue += $totalLongBorrowValue;
         $totalHoursSalary = $totalWorkingHours * (($hourlyRate / 60) / 60);
-        $totalHoursSalary = round($totalHoursSalary, 2);
+        $totalHoursSalary = round($totalHoursSalary, 3);
         $totalWorkingHours = $this->diffInHoursMinutsToString($totalWorkingHours);
         $totalSalary = ($totalHoursSalary + $totalBonuses);
         $totalNetSalary = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
@@ -694,7 +694,7 @@ class AttendanceController extends Controller {
         $totalSmallBorrowValue = $totalBorrowValue;
         $totalBorrowValue += $totalLongBorrowValue;
         $totalHoursSalary = $totalWorkingHours * (($hourlyRate / 60) / 60);
-        $totalHoursSalary = round($totalHoursSalary, 2);
+        $totalHoursSalary = round($totalHoursSalary, 3);
         $totalSalary = ($totalHoursSalary + $totalBonuses);
         $totalNetSalary = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
         foreach ($employees as $employee) {
@@ -834,7 +834,7 @@ class AttendanceController extends Controller {
         $totalSmallBorrowValue = $totalBorrowValue;
         $totalBorrowValue += $totalLongBorrowValue;
         $totalHoursSalary = $totalWorkingHours * (($hourlyRate / 60) / 60);
-        $totalHoursSalary = round($totalHoursSalary, 2);
+        $totalHoursSalary = round($totalHoursSalary, 3);
         $totalWorkingHours = $this->diffInHoursMinutsToString($totalWorkingHours);
         $totalSalary = ($totalHoursSalary + $totalBonuses);
         $totalNetSalary = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);

@@ -132,7 +132,7 @@ class EmployeesReportController extends Controller {
             } catch (\Exception $exc) {
                 
             }
-            $HoursSalary = round(($WorkingHours * (($hourlyRate / 60) / 60)), 2);
+            $HoursSalary = round(($WorkingHours * (($hourlyRate / 60) / 60)), 3);
             $Salary = ($HoursSalary + $Bonuses);
             $NetSalary = $Salary - ($SalaryDeduction + $AbsentDeduction + ($GuardianshipValue - $GuardianshipReturnValue) + $SmallBorrowValue + $LongBorrowValue);
 

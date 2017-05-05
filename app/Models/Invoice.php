@@ -14,7 +14,14 @@ class Invoice extends Model {
      */
     protected $dates = ['deleted_at'];
     protected $table = 'invoice';
-    protected $fillable = ['id', 'invoice_number', 'total_price', 'client_id', 'invoice_date', 'status', 'deleted_at'];
+    
+    protected $fillable = ['id', 'invoice_number', 'invoice_price',
+        'discount_price',
+        'taxes_price',
+        'source_discount_value',
+        'total_price',
+        'total_paid',
+        'total_remaining', 'client_id', 'invoice_date', 'status', 'deleted_at'];
 
     const UN_PAID = 0;
     const PAID = 1;
@@ -61,6 +68,7 @@ class Invoice extends Model {
         $this->save();
         foreach ($this->processes as $process) {
             $process->payRemaining($this->invoice_number);
+            $process->CheckProcessMustClosed();
         }
     }
 

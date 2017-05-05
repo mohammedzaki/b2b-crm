@@ -16,6 +16,14 @@ namespace App\Helpers;
 class Helpers {
 
     static function numberToArabicWords($total) {
+        $arb[0] = '';
+        $arb[1] = '';
+        $arb[2] = '';
+        $arb[3] = '';
+        $arb[4] = '';
+        $arb[5] = '';
+        $arb[6] = '';
+        
         $total = explode(".", $total);
         $j = strlen($total[0]);
         $je = $j;
@@ -303,68 +311,68 @@ class Helpers {
             }
 
             if ($i == 4) {
-                /*if ($j == 5) {
-                    switch ($te[$i]) {
-                        case "0" : $arb[$i] = " ";
-                            break;
-                        case "1" :
-                            if ($te[3] == "1") {
-                                $arb[3] = " ";
-                                $arb[4] = " أحد عشر الفا";
-                            } elseif ($te[3] == "0") {
-                                $arb[4] = " عشرة آلاف";
-                            } else {
-                                $arb[$i] = " عشر الفا";
-                            }
-                            break;
-                        case "2" : $arb[$i] = " عشرون ";
-                            break;
-                        case "3" : $arb[$i] = " ثلاثون ";
-                            break;
-                        case "4" : $arb[$i] = " اربعون ";
-                            break;
-                        case "5" : $arb[$i] = " خمسون ";
-                            break;
-                        case "6" : $arb[$i] = " ستون ";
-                            break;
-                        case "7" : $arb[$i] = " سبعون ";
-                            break;
-                        case "8" : $arb[$i] = " ثمانون ";
-                            break;
-                        case "9" : $arb[$i] = " تسعون ";
-                            break;
-                    }
-                } else {*/
-                    switch ($te[$i]) {
-                        case "0" : $arb[$i] = " ";
-                            break;
-                        case "1" :
-                            if ($te[3] == "1") {
-                                $arb[3] = " ";
-                                $arb[4] = " وأحد عشر الفا";
-                            } elseif ($te[3] == "0") {
-                                $arb[4] = " وعشرة آلاف";
-                            } else {
-                                $arb[$i] = " عشر الفا";
-                            }
-                            break;
-                        case "2" : $arb[$i] = " وعشرون ";
-                            break;
-                        case "3" : $arb[$i] = " وثلاثون ";
-                            break;
-                        case "4" : $arb[$i] = " واربعون ";
-                            break;
-                        case "5" : $arb[$i] = " وخمسون ";
-                            break;
-                        case "6" : $arb[$i] = " وستون ";
-                            break;
-                        case "7" : $arb[$i] = " وسبعون ";
-                            break;
-                        case "8" : $arb[$i] = " وثمانون ";
-                            break;
-                        case "9" : $arb[$i] = " وتسعون ";
-                            break;
-                    }
+                /* if ($j == 5) {
+                  switch ($te[$i]) {
+                  case "0" : $arb[$i] = " ";
+                  break;
+                  case "1" :
+                  if ($te[3] == "1") {
+                  $arb[3] = " ";
+                  $arb[4] = " أحد عشر الفا";
+                  } elseif ($te[3] == "0") {
+                  $arb[4] = " عشرة آلاف";
+                  } else {
+                  $arb[$i] = " عشر الفا";
+                  }
+                  break;
+                  case "2" : $arb[$i] = " عشرون ";
+                  break;
+                  case "3" : $arb[$i] = " ثلاثون ";
+                  break;
+                  case "4" : $arb[$i] = " اربعون ";
+                  break;
+                  case "5" : $arb[$i] = " خمسون ";
+                  break;
+                  case "6" : $arb[$i] = " ستون ";
+                  break;
+                  case "7" : $arb[$i] = " سبعون ";
+                  break;
+                  case "8" : $arb[$i] = " ثمانون ";
+                  break;
+                  case "9" : $arb[$i] = " تسعون ";
+                  break;
+                  }
+                  } else { */
+                switch ($te[$i]) {
+                    case "0" : $arb[$i] = " ";
+                        break;
+                    case "1" :
+                        if ($te[3] == "1") {
+                            $arb[3] = " ";
+                            $arb[4] = " وأحد عشر الفا";
+                        } elseif ($te[3] == "0") {
+                            $arb[4] = " وعشرة آلاف";
+                        } else {
+                            $arb[$i] = " عشر الفا";
+                        }
+                        break;
+                    case "2" : $arb[$i] = " وعشرون ";
+                        break;
+                    case "3" : $arb[$i] = " وثلاثون ";
+                        break;
+                    case "4" : $arb[$i] = " واربعون ";
+                        break;
+                    case "5" : $arb[$i] = " وخمسون ";
+                        break;
+                    case "6" : $arb[$i] = " وستون ";
+                        break;
+                    case "7" : $arb[$i] = " وسبعون ";
+                        break;
+                    case "8" : $arb[$i] = " وثمانون ";
+                        break;
+                    case "9" : $arb[$i] = " وتسعون ";
+                        break;
+                }
                 //}
             }
 

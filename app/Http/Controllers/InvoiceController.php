@@ -24,6 +24,12 @@ class InvoiceController extends Controller {
      */
     public function index() {
         $invoices = Invoice::all();
+        for ($index = 0; $index < count($invoices); $index++) {
+            $invoices[$index]->processesNames = '';
+            foreach ($invoices[$index]->processes as $process) {
+                $invoices[$index]->processesNames .= "({$process->name}), ";
+            }
+        }
         return view('invoice.index', compact('invoices'));
     }
 
@@ -76,9 +82,10 @@ class InvoiceController extends Controller {
 
     /**
      * Show the Index Page
-     * @Post("preview", as="invoice.printPreview")
+     * @Post("preview", as="invoice.preview")
+     * @Post("{invoice}/preview", as="invoice.editPreview")
      */
-    public function printPreview(Request $request) {
+    public function preview(Request $request, Invoice $invoice = null) {
         $pdfReport = new InvoiceReport(TRUE);
         $index = count($request->invoiceItems) - 1;
         $invoiceItems = $request->invoiceItems;
@@ -86,7 +93,8 @@ class InvoiceController extends Controller {
         $taxesValue = 0;
         $has_source_discount = FALSE;
         $require_invoice = FALSE;
-        foreach ($request->processes as $processId) {
+        $processes = $invoice ? $invoice->processes : $request->processes;
+        foreach ($processes as $processId) {
             $clientProcess = ClientProcess::findOrFail($processId);
             if ($clientProcess->has_discount == TRUE) {
                 $invoiceItems[++$index] = [
@@ -121,13 +129,13 @@ class InvoiceController extends Controller {
             $invoiceItems[++$index] = [
                 'size' => "",
                 'total_price' => $taxesValue,
-                //'class' => 'redColor',
+                'class' => '',
                 'unit_price' => "",
                 'quantity' => "",
                 'description' => "قيمة الضريبة المضافة",
             ];
         }
-        $client = Client::findOrFail($request->client_id);
+        $client = Client::find($request->client_id);
         $pdfReport->clinetName = $client->name;
         $pdfReport->invoiceItems = $invoiceItems;
         $pdfReport->discountPrice = $request->discount_price;
@@ -138,7 +146,18 @@ class InvoiceController extends Controller {
         $pdfReport->totalPrice = $request->invoice_price;
         $pdfReport->totalTaxes = $request->taxes_price;
         $pdfReport->totalPriceAfterTaxes = $request->total_price;
+        session([
+            'pdfReport' => $pdfReport
+        ]);
+        return $pdfReport->preview();
+    }
 
+    /**
+     * Show the Index Page
+     * @Get("printPreviewPDF", as="invoice.printPreviewPDF")
+     */
+    public function printPreviewPDF(Request $request) {
+        $pdfReport = session('pdfReport');
         return $pdfReport->RenderReport();
     }
 
@@ -237,7 +256,7 @@ class InvoiceController extends Controller {
             }
             $request->invoice_number = $invoice->invoice_number;
             DB::commit();
-            $this->printPreview($request);
+            $this->preview($request, $invoice);
         } catch (\Exception $exc) {
             DB::rollBack();
             return back()->withInput()->with('error', $exc->getMessage());
@@ -250,8 +269,61 @@ class InvoiceController extends Controller {
      * @param  Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function show(Invoice  $invoice) {
-        //
+    public function show(Invoice $invoice) {
+        $pdfReport = new InvoiceReport(TRUE);
+        $index = count($invoice->items) - 1;
+        $invoiceItems = $invoice->items;
+        $sourceDiscountValue = 0;
+        $taxesValue = 0;
+        $has_source_discount = FALSE;
+        $require_invoice = FALSE;
+
+        foreach ($invoice->processes as $clientProcess) {
+            if ($clientProcess->has_discount == TRUE) {
+                $invoiceItems[++$index] = [
+                    'size' => "",
+                    'total_price' => $clientProcess->discount_value,
+                    'class' => 'redColor',
+                    'unit_price' => "",
+                    'quantity' => "",
+                    'description' => "خصم بسبب : " . $clientProcess->discount_reason,
+                ];
+            }
+        }
+        if ($has_source_discount) {
+            $invoiceItems[++$index] = [
+                'size' => "",
+                'total_price' => $invoice->source_discount_value,
+                'class' => 'redColor',
+                'unit_price' => "",
+                'quantity' => "",
+                'description' => "خصم من المنبع",
+            ];
+        }
+
+        $invoiceItems[++$index] = [
+            'size' => "",
+            'total_price' => $invoice->taxes_price,
+            'class' => '',
+            'unit_price' => "",
+            'quantity' => "",
+            'description' => "قيمة الضريبة المضافة",
+        ];
+
+        $pdfReport->clinetName = $invoice->client->name;
+        $pdfReport->invoiceItems = $invoice->items;
+        $pdfReport->discountPrice = $invoice->discount_price;
+        $pdfReport->discountReason = 'N\A';
+        $pdfReport->invoiceDate = $invoice->invoice_date;
+        $pdfReport->invoiceNo = $invoice->invoice_number;
+        $pdfReport->sourceDiscountPrice = $invoice->source_discount_value;
+        $pdfReport->totalPrice = $invoice->invoice_price;
+        $pdfReport->totalTaxes = $invoice->taxes_price;
+        $pdfReport->totalPriceAfterTaxes = $invoice->total_price;
+        session([
+            'pdfReport' => $pdfReport
+        ]);
+        return $pdfReport->preview();
     }
 
     /**
@@ -271,8 +343,8 @@ class InvoiceController extends Controller {
      * @param  Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Invoice  $invoice) {
-        //
+    public function update(Request $request, Invoice $invoice) {
+        return redirect()->back()->withInput()->with('success', 'تم تعديل بيانات الفاتورة.');
     }
 
     /**
@@ -285,7 +357,7 @@ class InvoiceController extends Controller {
         //$invoice->delete();
         return redirect()->back()->with('success', 'تم حذف الفاتورة.');
     }
-    
+
     /**
      * Pay invoice.
      *

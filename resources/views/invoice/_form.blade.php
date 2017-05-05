@@ -40,36 +40,6 @@
                                 </tr>
                             </thead>
                             <tbody id="grid_ClientProcess">
-                                <!--
-                                <tr class="gradeA odd ItemRow" role="row">
-                                    <td style="text-align:center; vertical-align: middle;">
-                                        {{ Form::checkbox("processChoice", "1", null, 
-                                                                array(
-                                                                    "class" => "",
-                                                                    "id" => "processChoice")
-                                                        )
-                                        }} 
-                                    </td>
-                                    <td>
-                                        {{ Form::text("processName", null, 
-                                                                array(
-                                                                    "class" => "form-control", 
-                                                                    "id" => "processName",
-                                                                    "disabled" => "disabled")
-                                                                )
-                                        }}
-                                    </td>
-                                    <td>
-                                        {{ Form::text("processTotal", null, 
-                                                                array(
-                                                                    "class" => "form-control", 
-                                                                    "id" => "processTotal",
-                                                                    "disabled" => "disabled")
-                                                                )
-                                        }}
-                                    </td>
-                                </tr>
-                                -->
                             </tbody>
                         </table>
                     </div>
@@ -81,42 +51,56 @@
                             <div class="panel-body">
                                 <h4>
                                     <span>مبلغ الفاتورة </span>
-                                    <span class="price invoice_price">0</span>
+                                    {{ Form::text('invoice_price', isset($model) ? null : 0, array(
+                                        "id" => "invoice_price",
+                                        'class' => 'price invoice_price',
+                                        'readonly')) }}
                                 </h4>
                                 <h4>
                                     <span>الخصم </span>
-                                    <span class="price discount_price">0</span>
+                                    {{ Form::text('discount_price', isset($model) ? null : 0, array(
+                                        "id" => "discount_price",
+                                        'class' => 'price discount_price',
+                                        'readonly')) }}
                                 </h4>
                                 <h4>
                                     <span>الضريبة المضافة </span>
-                                    <span class="price taxes_price">0</span>
+                                    {{ Form::text('taxes_price', isset($model) ? null : 0, array(
+                                        "id" => "taxes_price",
+                                        'class' => 'price taxes_price',
+                                        'readonly')) }}
                                 </h4>
                                 <h4>
                                     <span>خصم من المنبع </span>
-                                    <span class="price source_discount_value">0</span>
+                                    {{ Form::text('source_discount_value', isset($model) ? null : 0, array(
+                                        "id" => "source_discount_value",
+                                        'class' => 'price source_discount_value',
+                                        'readonly')) }}
                                 </h4>
                                 <hr>
                                 <h4>
                                     <span>القيمة اﻻجمالية </span>
-                                    <span class="price total_price">0</span>
+                                    {{ Form::text('total_price', isset($model) ? null : 0, array(
+                                        "id" => "total_price",
+                                        'class' => 'price total_price',
+                                        'readonly')) }}
                                 </h4>
                                 <h4>
                                     <span>اجمالى المدفوع </span>
-                                    <span class="price total_paid">0</span>
+                                    {{ Form::text('total_paid', isset($model) ? null : 0, array(
+                                        "id" => "total_paid",
+                                        'class' => 'price total_paid',
+                                        'readonly')) }}
                                 </h4>
                                 <h4>
                                     <span>المتبقى </span>
-                                    <span class="price total_remaining">0</span>
+                                    {{ Form::text('total_remaining', isset($model) ? null : 0, array(
+                                        "id" => "total_remaining",
+                                        'class' => 'price total_remaining',
+                                        'readonly')) }}
                                 </h4>
                             </div>
                         </div>
-                        {{ Form::hidden('invoice_price') }}
-                        {{ Form::hidden('discount_price') }}
-                        {{ Form::hidden('taxes_price') }}
-                        {{ Form::hidden('source_discount_value') }}
-                        {{ Form::hidden('total_price') }}
-                        {{ Form::hidden('total_paid') }}
-                        {{ Form::hidden('total_remaining') }}
                     </div>
                 </div>
                 <div class="row">
@@ -349,12 +333,13 @@
             }
         }
         updateInvoicePrices();
+
     });
 
     function updateInvoicePrices() {
         var invoiceItemsTotalPrice = $('.invoiceItemsTotalPrice');
         var total_price = 0;
-        $('.total_price').each(function () {
+        $('#invoiceItems .total_price').each(function () {
             if ($(this).val() !== '')
                 total_price = parseFloat($(this).val()) + total_price;
         });
@@ -400,15 +385,18 @@
     }
 
     function invoicePreview() {
-        if (parseFloat($('.invoiceItemsTotalPrice').html()) === parseFloat($('.invoice_price').html())) {
-            $('#invoiceForm').prop('action', 'preview').submit();
+        $('input[name="_method"]').remove();
+        if (parseFloat($('.invoiceItemsTotalPrice').html()) === parseFloat($('#invoice_price').val())) {
+            var invoiceForm = $('#invoiceForm');
+            invoiceForm.prop('action', invoiceForm.prop('action') + '/preview');
+            invoiceForm.submit();
         } else {
             alert('مبلغ الفاتورة لا يساوى القيمة الاجمالية لبيانات الفاتورة');
         }
     }
 
     function saveInvoice(isPayNow) {
-        if (parseFloat($('.invoiceItemsTotalPrice').html()) === parseFloat($('.invoice_price').html())) {
+        if (parseFloat($('.invoiceItemsTotalPrice').html()) === parseFloat($('#invoice_price').val())) {
             $('#invoiceForm').append('<input type="hidden" name="isPayNow" value="' + isPayNow + '" />').submit();
         } else {
             alert('مبلغ الفاتورة لا يساوى القيمة الاجمالية لبيانات الفاتورة');
@@ -477,6 +465,7 @@
             $.each(allProcesses[currentClientId][inputProcessId.val()]['items'], function (index, item) {
                 invoiceItemsCount = $("#invoiceItems").children().length;
                 var html = '<tr class="ItemRow processId_' + inputProcessId.val() + '">';
+                html += '<td hidden><div class="form-group"><input class="form-control" name="invoiceItems[' + invoiceItemsCount + '][class]" value=" " /></div></td>';
                 html += '<td><div class="form-group"><input class="form-control total_price" name="invoiceItems[' + invoiceItemsCount + '][total_price]" value="' + (item.quantity * item.unit_price) + '" /></div></td>';
                 html += '<td><div class="form-group"><input class="form-control unit_price" name="invoiceItems[' + invoiceItemsCount + '][unit_price]" value="' + item.unit_price + '" placeholder="ادخل سعر الوحدة" /></div></td>';
                 html += '<td><div class="form-group"><input class="form-control quantity" name="invoiceItems[' + invoiceItemsCount + '][quantity]" value="' + item.quantity + '" placeholder="ادخل الكمية" /></div></td>';
@@ -539,14 +528,6 @@
     }
 
     function setProcessPricesText() {
-        $('.invoice_price').html(roundDecimals(totalPrice, 2));
-        $('.discount_price').html(roundDecimals(discount, 2));
-        $('.taxes_price').html(roundDecimals(taxes, 2));
-        $('.source_discount_value').html(roundDecimals(sourceDiscount, 2));
-        $('.total_price').html(roundDecimals(totalPriceTaxes, 2));
-        $('.total_paid').html(roundDecimals(totalPaid, 2));
-        $('.total_remaining').html(roundDecimals(totalRemaining, 2));
-
         $('input[name="invoice_price"]').val(roundDecimals(totalPrice, 2));
         $('input[name="discount_price"]').val(roundDecimals(discount, 2));
         $('input[name="taxes_price"]').val(roundDecimals(taxes, 2));

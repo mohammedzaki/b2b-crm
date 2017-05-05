@@ -25,7 +25,7 @@
 
     {{ Form::model($invoice, array(
                 'route' => array('invoice.update', $invoice->id),
-                'method' => 'put')) 
+                'method' => 'put', 'id' => 'invoiceForm')) 
     }}
         @include('invoice._form', ['model' => 'edit', 'invoiceItems' => $invoice->items])
     {{ Form::close() }}
