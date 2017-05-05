@@ -906,7 +906,7 @@
         //used to determine the http verb to use [add=POST], [update=PUT]
         var type = "POST"; //for creating new resource
         var saveurl = '{{ url("/depositwithdraw") }}';
-        if (saveStatus.val() === 1 || (saveStatus.val() === 2 && canEdit === 1)) {
+        if (saveStatus.val() === '1' || (saveStatus.val() === '2' && canEdit === '1')) {
             type = "PUT"; //for updating existing resource
             saveurl += '/' + id.val();
         }
@@ -937,8 +937,8 @@
         var rowsIndexs = [];
         flag = true;
         for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
-            checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(0)').children(0).is(":checked");
-            id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(11)').children(0).val();
+            checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .checkDelete').is(":checked");
+            id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .id').val();
             if (checkDelete) {
                 rowsIds.push(id);
                 rowsIndexs.push(rowIndex);
@@ -1014,7 +1014,7 @@
                         saveStatus.val(1);
                         $.each(rowsIndexs, function (arrIndex, rowIndex) {
                             console.log(rowIndex);
-                            saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0);
+                            saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .saveStatus');
                             saveStatus.val(2);
                             SetRowReadonly(rowIndex);
                         });
@@ -1033,7 +1033,7 @@
         if ($("#canEdit").val() !== 1) {
             var rowsCount = $('#grid_GuardianshipDetails').children().length;
             for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
-                if ($('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0).val() === 2) {
+                if ($('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .saveStatus').val() === 2) {
                     SetRowReadonly(rowIndex);
                 }
             }
@@ -1069,14 +1069,14 @@
     }
 
     function DoChange(rowIndex, cellName) {
-        checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(0)').children(0);
-        depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(1)').children(0).children(0);
-        withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(2)').children(0).children(0);
-        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
-        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(5)').children(0).children(0);
-        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(6)').children(0).children(0);
-        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(7)').children(0).children(0);
-        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(8)').children(0).children(0);
+        checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .checkDelete');
+        depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .depositValue');
+        withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .withdrawValue');
+        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .cbo_processes');
+        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .client_id');
+        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .supplier_id');
+        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .employee_id');
+        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .expenses_id');
         switch (cellName) {
             case "depositValue":
                 withdrawValue.val('');
@@ -1198,19 +1198,19 @@
     }
 
     function SetRowReadonly(rowIndex) {
-        checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(0)').children(0);
-        depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(1)').children(0).children(0);
-        withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(2)').children(0).children(0);
-        recordDesc = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(3)').children(0).children(0);
-        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(4)').children(0).children(0);
-        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(5)').children(0).children(0);
-        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(6)').children(0).children(0);
-        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(7)').children(0).children(0);
-        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(8)').children(0).children(0);
-        payMethod = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(9)').children(0).children(0);
-        notes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(10)').children(0).children(0);
-        id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(11)').children(0);
-        saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') td:eq(12)').children(0);
+        checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .checkDelete');
+        depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .depositValue');
+        withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .withdrawValue');
+        recordDesc = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .recordDesc');
+        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .cbo_processes');
+        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .client_id');
+        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .supplier_id');
+        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .employee_id');
+        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .expenses_id');
+        payMethod = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .payMethod');
+        notes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .notes');
+        id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .id');
+        saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .saveStatus');
 
         checkDelete.attr("disabled", "disabled");
         depositValue.attr("disabled", "disabled");
