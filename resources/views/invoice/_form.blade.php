@@ -15,7 +15,7 @@
                                                             "class" => "form-control",
                                                             "placeholder" => "",
                                                             "id" => "client_id",
-                                                            "onchange" => "GetClientProcess(this)")
+                                                            "onchange" => "GetClientProcess()")
                                                         )
                     }}
                 </div>
@@ -117,12 +117,14 @@
                 </div>
                 <br>
                 <div class="row">
-                    <div class="col-md-6">
-                        <button type="button" class="btn btn-block btn-success center-block" onclick="saveInvoice(0)">اصدار</button>
+                    <div @if(isset($model)) class="col-md-12" @else class="col-md-6" @endif>
+                          <button type="button" class="btn btn-block btn-success center-block" onclick="saveInvoice(0)">@if(isset($model))تعديل@elseاصدار@endif</button>
                     </div>
+                    @if(!isset($model))
                     <div class="col-md-6">
                         <button type="button" class="btn btn-block btn-danger center-block" onclick="saveInvoice(1)">اصدار و تحصيل الان</button>
                     </div>
+                    @endif
                 </div>
                 <!-- /.panel-body -->
             </div>
@@ -178,7 +180,8 @@
                                     @if(isset($invoiceItems))
                                     @forelse ($invoiceItems as $index => $item)
                                     <tr class="ItemRow" >
-                                        {{ Form::hidden("invoiceItems[" . $index . "][id]") }}
+                                        {{ Form::hidden("invoiceItems[" . $index . "][id]", $item["id"]) }}
+                                        {{ Form::hidden("invoiceItems[" . $index . "][class]") }}
                                         <td>
                                             <div class="form-group{{ $errors->has("items." . $index . ".total_price") ? " has-error" : "" }}">
                                                 {{ Form::text("invoiceItems[" . $index . "][total_price]", $item["total_price"], 
@@ -279,11 +282,12 @@
         <!-- /.panel -->
     </div>
 </div>
+{{ Form::hidden('id') }}
 
 @section('scripts')
 <script>
     var allProcesses = JSON.parse(he.decode("{{ $clientProcesses }}"));
-    console.log(allProcesses);
+    //console.log(allProcesses, Object.keys(allProcesses).length);
     var currentClientId = 0;
     var totalPrice = 0;
     var totalPriceTaxes = 0;
@@ -301,10 +305,10 @@
         var unit_price = $('#invoiceItems tr:eq(' + currentRowIndex + ') .unit_price');
         var total_price = $('#invoiceItems tr:eq(' + currentRowIndex + ') .total_price');
 
-        if (quantity.val() == "") {
+        if (quantity.val() === "") {
             quantity.val(0);
         }
-        if (unit_price.val() == "") {
+        if (unit_price.val() === "") {
             unit_price.val(0);
         }
         var pr = parseFloat(unit_price.val()) * parseFloat(quantity.val());
@@ -322,8 +326,14 @@
     });
 
     $(function () {
+        if (Object.keys(allProcesses).length === 0) {
+            $('#client_id').prop('disabled', true);
+        }
+        if ($('input[name="id"]').val() !== '') {
+            GetClientProcess(false);
+        }
         invoiceItemsCount = $("#invoiceItems").children().length;
-        if (invoiceItemsCount == 0) {
+        if (invoiceItemsCount === 0) {
             AddNewRow(this);
         } else {
             for (var i = 0; i < invoiceItemsCount; i++) {
@@ -333,7 +343,6 @@
             }
         }
         updateInvoicePrices();
-
     });
 
     function updateInvoicePrices() {
@@ -361,27 +370,31 @@
     }
 
     function AddNewRow(CellChildInput) {
-        SetCurrentRowIndex(CellChildInput);
-        if ($(AfterCurrentRow).hasClass("ItemRow") == false) {
-            invoiceItemsCount = $("#invoiceItems").children().length;
-            var html = '<tr class="ItemRow ">';
-            html += '<td><div class="form-group"><input class="form-control total_price" name="invoiceItems[' + invoiceItemsCount + '][total_price]" value="" /></div></td>';
-            html += '<td><div class="form-group"><input class="form-control unit_price" name="invoiceItems[' + invoiceItemsCount + '][unit_price]" value="" placeholder="ادخل سعر الوحدة" /></div></td>';
-            html += '<td><div class="form-group"><input class="form-control quantity" name="invoiceItems[' + invoiceItemsCount + '][quantity]" value="" placeholder="ادخل الكمية" /></div></td>';
-            html += '<td><div class="form-group"><input class="form-control size" name="invoiceItems[' + invoiceItemsCount + '][size]" value="" placeholder="ادخل المقاس" /></div></td>';
-            html += '<td><div class="form-group"><input class="form-control description" name="invoiceItems[' + invoiceItemsCount + '][description]" placeholder="ادخل تفاصيل البيان" value=""/></div></td>';
-            html += '<td><div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td>';
-            html += '</tr>';
-            $('#invoiceItems').append(html);
-            updateInvoicePrices();
-        } else {
-            updateInvoicePrices();
+        if (Object.keys(allProcesses).length > 0) {
+            SetCurrentRowIndex(CellChildInput);
+            if ($(AfterCurrentRow).hasClass("ItemRow") == false) {
+                invoiceItemsCount = $("#invoiceItems").children().length;
+                var html = '<tr class="ItemRow ">';
+                html += '<td><div class="form-group"><input class="form-control total_price" name="invoiceItems[' + invoiceItemsCount + '][total_price]" value="" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control unit_price" name="invoiceItems[' + invoiceItemsCount + '][unit_price]" value="" placeholder="ادخل سعر الوحدة" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control quantity" name="invoiceItems[' + invoiceItemsCount + '][quantity]" value="" placeholder="ادخل الكمية" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control size" name="invoiceItems[' + invoiceItemsCount + '][size]" value="" placeholder="ادخل المقاس" /></div></td>';
+                html += '<td><div class="form-group"><input class="form-control description" name="invoiceItems[' + invoiceItemsCount + '][description]" placeholder="ادخل تفاصيل البيان" value=""/></div></td>';
+                html += '<td><div class="btn btn-danger btn-sm pull-left delete"><i class="fa fa-times"></i> حذف</div></td>';
+                html += '</tr>';
+                $('#invoiceItems').append(html);
+                updateInvoicePrices();
+            } else {
+                updateInvoicePrices();
+            }
         }
     }
 
     function RemoveRowAtIndex(rowIndex) {
-        $('#invoiceItems tr:eq(' + rowIndex + ')').remove();
-        reArrangeProcess();
+        if (Object.keys(allProcesses).length > 0) {
+            $('#invoiceItems tr:eq(' + rowIndex + ')').remove();
+            reArrangeProcess();
+        }
     }
 
     function invoicePreview() {
@@ -397,6 +410,7 @@
 
     function saveInvoice(isPayNow) {
         if (parseFloat($('.invoiceItemsTotalPrice').html()) === parseFloat($('#invoice_price').val())) {
+            //$('input[name="id"]').remove();
             $('#invoiceForm').append('<input type="hidden" name="isPayNow" value="' + isPayNow + '" />').submit();
         } else {
             alert('مبلغ الفاتورة لا يساوى القيمة الاجمالية لبيانات الفاتورة');
@@ -407,32 +421,47 @@
         $('#invoiceForm').prop('action', 'test/preview').submit();
     }
 
-    function GetClientProcess(client_id) {
-        currentClientId = $(client_id).val();
-        FillterProcess();
+    function GetClientProcess(isNew = true) {
+        currentClientId = $('#client_id').val();
+        if (Object.keys(allProcesses).length > 0) {
+            FillterProcess(isNew);
+        }
+        ;
     }
 
     function SelectAll(ch_all) {
         var rowsCount = $("#grid_ClientProcess").children().length;
-        resetProcessPrices();
-        $("#invoiceItems").empty();
-        for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
-            SelectProcessByIndex(rowIndex, $(ch_all).is(":checked"));
+        if (Object.keys(allProcesses).length > 0) {
+            resetProcessPrices();
+            $("#invoiceItems").empty();
+            for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
+                SelectProcessByIndex(rowIndex, $(ch_all).is(":checked"));
+            }
+            updateInvoicePrices();
         }
-        updateInvoicePrices();
     }
 
-    function FillterProcess() {
-        $("#grid_ClientProcess").empty();
-        $("#invoiceItems").empty();
-        resetProcessPrices();
+    function FillterProcess(isNew = true) {
+        console.log(isNew);
+        if (isNew) {
+            $("#grid_ClientProcess").empty();
+            $("#invoiceItems").empty();
+            resetProcessPrices();
+        }
         var index = 0;
-        if (allProcesses[currentClientId] != null) {
+        if (allProcesses[currentClientId] !== null) {
+            //console.log(allProcesses[currentClientId], allProcesses);
             $.each(allProcesses[currentClientId], function (processId, value) {
-                $("#grid_ClientProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" name="processes[' + index + ']" type="hidden" value="' + processId + '" disabled></td></tr>');
+                console.log(value.invoice_id);
+                if (value.invoice_id === 0) {
+                    $("#grid_ClientProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" name="processes[' + index + ']" type="hidden" value="' + processId + '" disabled></td></tr>');
+                } else {
+                    $("#grid_ClientProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" checked value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" name="processes[' + index + ']" type="hidden" value="' + processId + '"></td></tr>');
+                }
                 index++;
             });
         }
+        ;
     }
 
     function SelectProcess(CurrentCell) {

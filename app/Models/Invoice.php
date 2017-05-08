@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Extensions\DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -14,7 +15,6 @@ class Invoice extends Model {
      */
     protected $dates = ['deleted_at'];
     protected $table = 'invoice';
-    
     protected $fillable = ['id', 'invoice_number', 'invoice_price',
         'discount_price',
         'taxes_price',
@@ -63,6 +63,15 @@ class Invoice extends Model {
         return sprintf("%08d", ++$invoice_number);
     }
 
+    public static function getLastInvoiceDate() {
+        $invoice = Invoice::find(static::max('id') - 1);
+        if (!empty($invoice)) {
+            return $invoice->invoice_date;
+        } else {
+            return DateTime::parse('01-01-1970');
+        }
+    }
+
     public function pay() {
         $this->status = static::PAID;
         $this->save();
@@ -70,6 +79,28 @@ class Invoice extends Model {
             $process->payRemaining($this->invoice_number);
             $process->CheckProcessMustClosed();
         }
+    }
+
+    public function getPrevInvoiceDate() {
+        $invoice = Invoice::find($this->id - 1);
+        if (!empty($invoice)) {
+            return $invoice->invoice_date;
+        } else {
+            return DateTime::parse('01-01-1970');
+        }
+    }
+
+    public function getNextInvoiceDate() {
+        $invoice = Invoice::find($this->id + 1);
+        if (!empty($invoice)) {
+            return $invoice->invoice_date;
+        } else {
+            return DateTime::now();
+        }
+    }
+
+    public function isLastInvoice() {
+        return $this->invoice_number == static::max('invoice_number');
     }
 
 }

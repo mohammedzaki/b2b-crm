@@ -112,7 +112,7 @@ class ClientReportsController extends Controller {
             $clientProcess = ClientProcess::findOrFail($id);
             $proceses[$id]['processName'] = $clientProcess->name;
 
-            $proceses[$id]['processTotalPrice'] = $clientProcess->total_price_taxes;
+            $proceses[$id]['processTotalPrice'] = $clientProcess->total_price;
             $proceses[$id]['processTotalPaid'] = $clientProcess->totalDeposits() + $clientProcess->discount_value;
             $proceses[$id]['processTotalRemaining'] = $clientProcess->total_price_taxes - $clientProcess->totalDeposits();
             $proceses[$id]['processDate'] = DateTime::today()->format('Y-m-d'); //Print Date

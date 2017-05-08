@@ -103,7 +103,7 @@ class SupplierReportsController extends Controller {
         foreach ($request->processes as $id) {
             $supplierProcess = SupplierProcess::findOrFail($id);
             $proceses[$id]['processName'] = $supplierProcess->name;
-            $proceses[$id]['processTotalPrice'] = $supplierProcess->total_price_taxes;
+            $proceses[$id]['processTotalPrice'] = $supplierProcess->total_price;
             $proceses[$id]['processTotalPaid'] = $supplierProcess->totalWithdrawals() + $supplierProcess->discount_value;
             $proceses[$id]['processTotalRemaining'] = $supplierProcess->total_price_taxes - $supplierProcess->totalWithdrawals();
             $proceses[$id]['processDate'] = DateTime::today()->format('Y-m-d'); //DateTime::parse($supplierProcess->created_at)->format('Y-m-d');
