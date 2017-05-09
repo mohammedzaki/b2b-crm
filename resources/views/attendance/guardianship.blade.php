@@ -1,11 +1,11 @@
 @extends('layouts.app')
 
-@section('title', 'حضور وانصراف الموظفين')
+@section('title', 'كشف حساب العهد')
 
 @section('content')
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">حضور وانصراف الموظفين</h1>
+        <h1 class="page-header">كشف حساب العهد</h1>
     </div>
 </div>
 <form method="get" id="SearchForm" action="" >
@@ -72,32 +72,18 @@
                                         <th>رد عهدة</th>
                                         <th>بيان</th>
                                         <th>التاريخ</th>
-                                        {{--<th>#</th>--}}
+                                        <th>عهدة مرحلة</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($employeeGuardianships as $guardianship)
+                                    @forelse ($employeeGuardianships as $index => $guardianship)
                                     <tr class="odd">
-                                        <td>1</td>
-                                        <td>
-                                            @if($guardianship->withdrawValue > 0)
-                                                {{ $guardianship->withdrawValue }}
-                                            @endif
-                                        </td>
-                                        <td>
-                                            @if($guardianship->depositValue > 0)
-                                                {{ $guardianship->depositValue }}
-                                            @endif
-                                        </td>
+                                        <td>{{ $index + 1 }}</td>
+                                        <td>{{ $guardianship->withdrawValue }}</td>
+                                        <td>{{ $guardianship->depositValue }}</td>
                                         <td>{{ $guardianship->recordDesc }}</td>
-                                        <td>{{ $guardianship->created_at }}</td>
-                                        {{--<td>
-                                            
-                                            @if($guardianship->withdrawValue > 0)
-                                            {{ link_to_route('attendance.guardianshipaway', 'ترحيل العهدة', array('id' => 1), array('class' => 'btn btn-primary')) }}
-                                            @endif
-                                            
-                                        </td>--}}
+                                        <td>{{ $guardianship->due_date }}</td>
+                                        <td>{{ $guardianship->notes }}</td>
                                     </tr>
                                     @empty
                                     <tr>ﻻ يوجد بيانات.</tr>
@@ -108,7 +94,7 @@
                                         <th>{{ $totalGuardianshipReturnValue }}</th>
                                         <th></th>
                                         <th></th>
-                                        {{--<th></th>--}}
+                                        <th></th>
                                     </tr>
                                 </tbody>
                             </table>  
@@ -129,21 +115,21 @@
 @endsection
 @section('scripts')
 <script>
-var datepicker = $("#datepicker").flatpickr({
-    enableTime: false,
-    altInput: true,
-    altFormat: "l, j F, Y",
-    locale: "ar",
-    onChange: function (selectedDates, dateStr, instance) {
-        //startDate = selectedDates[0];
-        timepicker.setDate(selectedDates[0]);
-        timepicker.open();
-        //console.log(selectedDates, dateStr, instance);
+    var datepicker = $("#datepicker").flatpickr({
+        enableTime: false,
+        altInput: true,
+        altFormat: "l, j F, Y",
+        locale: "ar",
+        onChange: function (selectedDates, dateStr, instance) {
+            //startDate = selectedDates[0];
+            timepicker.setDate(selectedDates[0]);
+            timepicker.open();
+            //console.log(selectedDates, dateStr, instance);
+        }
+    });
+    function SubmitSearch() {
+        var empId = $("#id").val();
+        $('#SearchForm').prop('action', empId).submit();
     }
-});
-function SubmitSearch() {
-    var empId = $("#id").val();
-    $('#SearchForm').prop('action', empId).submit();
-}
 </script>
 @endsection

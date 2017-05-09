@@ -576,7 +576,7 @@ class AttendanceController extends Controller {
             $date = null;
         } else {
             $employee = Employee::findOrFail($employee_id);
-            $employeeGuardianships = $employee->employeeGuardianships($dt->month);
+            $employeeGuardianships = $employee->employeeGuardianships($dt);
         }
         $date = $request->date;
         $employee_id = $employee_id;
@@ -596,7 +596,7 @@ class AttendanceController extends Controller {
         $newDate = DateTime::parse($request->date);
         $newDate->addMonth(1);
         $depositWithdraw = DepositWithdraw::findOrFail($employee->lastGuardianshipId());
-        $depositWithdraw->notes = $newDate;
+        $depositWithdraw->notes = $newDate->startOfMonth();
         $depositWithdraw->save();
         return redirect()->back()->with('success', 'تم الترحيل');
     }

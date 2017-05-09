@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use App\Constants\EmployeeActions;
+use App\Extensions\DateTime;
+use App\Models\DepositWithdraw;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Models\DepositWithdraw;
-use App\Constants\EmployeeActions;
+use DB;
 
 class Employee extends Model {
 
@@ -36,29 +38,32 @@ class Employee extends Model {
     public $password = "";
 
     public function users() {
-        //return $this->belongsTo('App\Models\User', 'employee_id');
         return $this->hasMany('App\Models\User', 'employee_id');
     }
-
-    /* public function employeeBorrow() {
-      return $this->hasMany('App\Models\EmployeeBorrow', 'id');
-      } */
 
     public function employeeSmallBorrows() {
         DepositWithdraw::where([
                 ['employee_id', '=', $this->id],
                 ['expenses_id', '=', EmployeeActions::SmallBorrow],
-        ]); //->get();
+        ]);
     }
 
-    public function employeeGuardianships($month) {
-        //$startDate = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
-        //$endDate = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
-        $depositWithdraws = DepositWithdraw::where([
+    public function employeeGuardianships(DateTime $dt) {
+        /*$depositWithdraws = DepositWithdraw::where([
                                 ['employee_id', '=', $this->id]
                         ])
                         ->whereIn('expenses_id', [EmployeeActions::Guardianship, EmployeeActions::GuardianshipReturn])
-                        ->whereMonth('due_date', '=', $month)->get();
+                        ->whereMonth('due_date', '=', $month)->get();*/
+        
+        $startDate = DateTime::parse($dt)->startOfMonth();
+        $endDate = DateTime::parse($dt)->endOfMonth();
+        $depositWithdraws = DB::select("SELECT distinct dw.* from deposit_withdraws as dw
+JOIN employees emp ON dw.employee_id = emp.id
+WHERE emp.id = {$this->id}
+AND dw.expenses_id in (" . EmployeeActions::Guardianship . ", " . EmployeeActions::GuardianshipReturn . ") 
+AND 
+((dw.due_date BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayFormat()}' AND dw.notes is null)
+OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayFormat()}')");
 
         return $depositWithdraws;
     }
