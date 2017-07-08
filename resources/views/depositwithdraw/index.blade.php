@@ -571,7 +571,7 @@
                                                 <div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">
                                                     {{ Form::select("employee_id", $employees, null,
                                                         array(
-                                                            "class" => "form-control emplyee_id",
+                                                            "class" => "form-control employee_id",
                                                             "placeholder" => "",
                                                             "id" => "",
                                                             "style" => "width:85px;",
@@ -697,12 +697,15 @@
 <script>
     var expenses = JSON.parse(he.decode("{{ $expenses }}"));
     var employeeActions = JSON.parse(he.decode("{{ $employeeActions }}"));
-    console.log(employeeActions);
     var suppliers = JSON.parse(he.decode("{{ $suppliers }}"));
     var clients = JSON.parse(he.decode("{{ $clients }}"));
     var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount;
     var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
     var loadAll = false;
+    
+    console.log('expenses: ', expenses);
+    console.log('employeeActions: ', employeeActions);
+    
     LockAll();
     SetGuardianshipDetailsProcess();
     currentAmount = $("#currentAmount");
@@ -770,19 +773,20 @@
             });
         }
         if (employee_id.val() > 0) {
-            $.each(employeeActions, function (processId, process) {
-                if (processId === expenses_idVal) {
-                    expenses_id.append($("<option selected></option>").attr("value", processId).text(process.name));
+            $.each(employeeActions, function (i, employeeAction) {
+                console.log(employeeAction.id, expenses_idVal, (employeeAction.id === expenses_idVal));
+                if (employeeAction.id == expenses_idVal) {
+                    expenses_id.append('<option selected value="' + employeeAction.id + '">' + employeeAction.name + '</option>');
                 } else {
-                    expenses_id.append($("<option></option>").attr("value", processId).text(process.name));
+                    expenses_id.append('<option value="' + employeeAction.id + '">' + employeeAction.name + '</option>');
                 }
             });
         } else if (expenses_idVal > 0) {
-            $.each(expenses, function (expenseId, expense) {
-                if (expenseId === expenses_idVal) {
-                    expenses_id.append($("<option selected></option>").attr("value", expenseId).text(expense.name));
+            $.each(expenses, function (i, expense) {
+                if (expense.id == expenses_idVal) {
+                    expenses_id.append('<option selected value="' + expense.id + '">' + expense.name + '</option>');
                 } else {
-                    expenses_id.append($("<option></option>").attr("value", expenseId).text(expense.name));
+                    expenses_id.append('<option value="' + expense.id + '">' + expense.name + '</option>');
                 }
             });
         }
@@ -1133,7 +1137,7 @@
                 if (employee_id.val() > 0) {
                     if (depositValue.val() > 0) {
                         $.each(employeeActions, function (i, employeeAction) {
-                            if (employeeAction.id === 2) {
+                            if (employeeAction.id === 2 || employeeAction.id === 6) {
                                 expenses_id.append('<option value="' + employeeAction.id + '">' + employeeAction.name + '</option>');
                             }
                         });

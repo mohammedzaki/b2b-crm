@@ -63,7 +63,7 @@ window.calculate_discount = function () {
 window.calculate_taxes = function () {
     taxes = 0;
     if ($('input[name="require_invoice"]').is(':checked')) {
-        taxes = (calculate_process_price() - calculate_discount()) * parseFloat(TaxesRate);
+        taxes = (calculate_process_price()) * parseFloat(TaxesRate);
         taxes = roundDecimals(taxes, 3);
     }
     return taxes;
@@ -71,7 +71,7 @@ window.calculate_taxes = function () {
 
 window.calculate_process_price_taxes = function () {
     priceAfterTaxes = 0;
-    priceAfterTaxes = roundDecimals(((calculate_process_price() - calculate_discount()) + (calculate_taxes() - calculate_source_discount())), 3);
+    priceAfterTaxes = roundDecimals(((calculate_process_price() + calculate_taxes()) - (calculate_discount() + calculate_source_discount())), 3);
     return priceAfterTaxes;
 }
 
@@ -79,7 +79,6 @@ window.calculate_source_discount = function () {
     source_discount_value = 0;
     if ($('input[name="has_source_discount"]').is(':checked')) {
         source_discount_value = roundDecimals($("#source_discount_value").val(), 3);
-        ;
     }
     return source_discount_value;
 }
@@ -133,7 +132,7 @@ $(document).ready(function () {
             parent.addClass('skip');
         }
     });
-    
+
     $(document).delegate("#prcoess_items .delete", "click", function (e) {
         console.log('Working');
         var parent = $(this).parent().parent();

@@ -78,6 +78,7 @@
                                 <tbody>
                                     @forelse ($employeeGuardianships as $index => $guardianship)
                                     <tr class="odd">
+                                        <td hidden >{{ $guardianship->id }}</td>
                                         <td>{{ $index + 1 }}</td>
                                         <td>{{ $guardianship->withdrawValue }}</td>
                                         <td>{{ $guardianship->depositValue }}</td>

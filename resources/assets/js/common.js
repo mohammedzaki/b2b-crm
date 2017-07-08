@@ -27,7 +27,7 @@ $(document).ready(function () {
     
     $(".datepickerCommon").flatpickr({
         enableTime: false,
-        maxDate: new Date(),
+        //maxDate: new Date(),
         altInput: true,
         altFormat: "l, j F, Y",
         locale: "ar"

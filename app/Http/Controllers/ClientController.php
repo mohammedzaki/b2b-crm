@@ -68,6 +68,7 @@ class ClientController extends Controller {
     }
 
     public function store(Request $request) {
+    	
         $validator = $this->validator($request->all());
 
         if ($validator->fails()) {

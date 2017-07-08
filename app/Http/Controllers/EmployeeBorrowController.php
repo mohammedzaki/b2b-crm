@@ -46,7 +46,6 @@ class EmployeeBorrowController extends Controller {
      */
     public function index() {
         $employeeBorrows = EmployeeBorrow::all();
-
         return view('employee.borrow.index', compact('employeeBorrows'));
     }
 
@@ -59,7 +58,6 @@ class EmployeeBorrowController extends Controller {
         $employees = Employee::select('id', 'name', 'daily_salary')->where("borrow_system", 1)->get();
         $employees_tmp = [];
         $employeesSalaries = [];
-
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
             $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
@@ -81,16 +79,12 @@ class EmployeeBorrowController extends Controller {
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
-            /* get employee info  */
             $employee = Employee::find($request->employee_id);
-
-            /* Can't create new borrow if employee has payment lower than the borrow  */
-
+            if ($employee->hasUnpaidBorrow()) {
+                return redirect()->back()->withInput()->with('error', 'يجب سداد باقى الدفعات المستحقة اولا');
+            }
             $all['is_active'] = TRUE;
-
             $employeeBorrow = EmployeeBorrow::create($all);
-
-
             $depositWithdraw = new DepositWithdraw();
             $depositWithdraw->withdrawValue = $employeeBorrow->amount;
             $depositWithdraw->due_date = DateTime::now();
@@ -128,7 +122,6 @@ class EmployeeBorrowController extends Controller {
                 }
                 $stratDate->addMonth(1);
             }
-
             return redirect()->route('employeeBorrow.index')->with('success', 'تم اضافة سلفية جديدة.');
         }
     }
@@ -149,15 +142,12 @@ class EmployeeBorrowController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id) {
-        $borrow = EmployeeBorrow::findOrFail($id);
+    public function edit(EmployeeBorrow $employeeBorrow) {
+        $borrow = $employeeBorrow;
         $employee = Employee::where('id', $borrow->employee_id)->firstOrFail();
         $employees_tmp[$employee->id] = $employee->name;
         $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
-
         $employees = $employees_tmp;
-
-        //return $employees_salary;
         return view('employee.borrow.edit', compact(['borrow', 'employees', 'employeesSalaries']));
     }
 
@@ -168,22 +158,17 @@ class EmployeeBorrowController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id) {
-        $employeeBorrow = EmployeeBorrow::findOrFail($id);
+    public function update(Request $request, EmployeeBorrow $employeeBorrow) {
         $validator = $this->validator($request->all());
-
-
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
-            //$employeeBorrow->id = $request->id;
             $employeeBorrow->employee_id = $request->employee_id;
             $employeeBorrow->amount = $request->amount;
             $employeeBorrow->borrow_reason = $request->borrow_reason;
             $employeeBorrow->pay_amount = $request->pay_amount;
             $employeeBorrow->save();
-
-            return redirect()->back()->with('success', 'تم تعديل بيانات العميل.');
+            return redirect()->back()->with('success', 'تم تعديل بيانات السلفة.');
         }
     }
 
@@ -193,11 +178,8 @@ class EmployeeBorrowController extends Controller {
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id) {
-
-        $employee = EmployeeBorrow::where('id', $id)->firstOrFail();
-        $employee->delete();
-
+    public function destroy(EmployeeBorrow $borrow) {
+        $borrow->delete();
         return redirect()->back()->with('success', 'تم حذف موظف.');
     }
 

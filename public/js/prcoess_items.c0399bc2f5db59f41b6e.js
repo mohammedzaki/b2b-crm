@@ -10388,7 +10388,7 @@ window.calculate_discount = function () {
 window.calculate_taxes = function () {
     taxes = 0;
     if ($('input[name="require_invoice"]').is(':checked')) {
-        taxes = (calculate_process_price() - calculate_discount()) * parseFloat(TaxesRate);
+        taxes = calculate_process_price() * parseFloat(TaxesRate);
         taxes = roundDecimals(taxes, 3);
     }
     return taxes;
@@ -10404,7 +10404,6 @@ window.calculate_source_discount = function () {
     source_discount_value = 0;
     if ($('input[name="has_source_discount"]').is(':checked')) {
         source_discount_value = roundDecimals($("#source_discount_value").val(), 3);
-        ;
     }
     return source_discount_value;
 };

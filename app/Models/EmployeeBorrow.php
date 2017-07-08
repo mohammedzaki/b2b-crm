@@ -26,5 +26,9 @@ class EmployeeBorrow extends Model {
     public function payAmounts() {
         return $this->hasMany(EmployeeBorrowBilling::class);
     }
+    
+    public function unPaidAmounts() {
+        return $this->hasMany(EmployeeBorrowBilling::class)->where('is_paid', FALSE);
+    }
 
 }

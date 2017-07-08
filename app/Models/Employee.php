@@ -41,20 +41,30 @@ class Employee extends Model {
         return $this->hasMany('App\Models\User', 'employee_id');
     }
 
-    public function employeeSmallBorrows() {
+    public function smallBorrows() {
         DepositWithdraw::where([
                 ['employee_id', '=', $this->id],
                 ['expenses_id', '=', EmployeeActions::SmallBorrow],
         ]);
     }
+    
+    public function longBorrows() {
+        return $this->hasMany(EmployeeBorrow::class);
+    }
+    
+    public function hasUnpaidBorrow() {
+        $count = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
+                ->select('employee_borrow_billing.*')->where([
+                    ['employee_borrow_billing.is_paid', "=", FALSE],
+                    ['employee_borrows.employee_id', '=', $this->id]])->count();
+        if ($count > 0) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
 
     public function employeeGuardianships(DateTime $dt) {
-        /*$depositWithdraws = DepositWithdraw::where([
-                                ['employee_id', '=', $this->id]
-                        ])
-                        ->whereIn('expenses_id', [EmployeeActions::Guardianship, EmployeeActions::GuardianshipReturn])
-                        ->whereMonth('due_date', '=', $month)->get();*/
-        
         $startDate = DateTime::parse($dt)->startOfMonth();
         $endDate = DateTime::parse($dt)->endOfMonth();
         $depositWithdraws = DB::select("SELECT distinct dw.* from deposit_withdraws as dw

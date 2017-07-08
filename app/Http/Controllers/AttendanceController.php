@@ -633,23 +633,8 @@ class AttendanceController extends Controller {
         return redirect()->back()->with('success', 'تم الترحيل');
     }
 
-    public function printSalaryReport(Request $request, $employee_id) {
-        $employees = Employee::all();
-        $dt = DateTime::parse($request->date);
+    public function printSalaryReport(Request $request, Employee $employee) {
         $hourlyRate = 0;
-        if ($employee_id == "all") {
-            $attendances = []; //Attendance::all();
-            $employee_id = 0;
-            $date = null;
-        } else {
-            $employee = Employee::findOrFail($employee_id);
-            $hourlyRate = $employee->daily_salary / $employee->working_hours;
-            $attendances = Attendance::where([
-                        ['employee_id', '=', $employee_id]
-                    ])->whereMonth('date', '=', $dt->month)->get();
-        }
-        $date = $request->date;
-        $employees_tmp = [];
         $totalWorkingHours = 0;
         $totalSalaryDeduction = 0;
         $totalAbsentDeduction = 0;
@@ -662,6 +647,15 @@ class AttendanceController extends Controller {
         $totalBorrowValue = 0;
         $totalSmallBorrowValue = 0;
         $totalLongBorrowValue = 0;
+        
+        $date = DateTime::parse($request->date);
+        $hourlyRate = $employee->daily_salary / $employee->working_hours;
+        $attendances = Attendance::where([
+                    ['employee_id', '=', $employee->id]
+                ])->whereMonth('date', '=', $date->month)->get();
+
+        $monthNum = $date->month;
+        $employees_tmp = [];
         foreach ($attendances as $attendance) {
             $attendance->workingHours = $attendance->workingHoursToString();
             $attendance->employeeName = $attendance->employee->name;
@@ -697,16 +691,13 @@ class AttendanceController extends Controller {
         $totalHoursSalary = round($totalHoursSalary, 3);
         $totalSalary = ($totalHoursSalary + $totalBonuses);
         $totalNetSalary = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
-        foreach ($employees as $employee) {
-            $employees_tmp[$employee->id] = $employee->name;
-        }
-        $employees = $employees_tmp;
+        
         $employeeName = $employee->name;
+        
         $pdfReport = new Salary(TRUE);
 
-        $pdfReport->htmlContent = view('reports.employee.salary', compact(['employeeName', 'employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date']))->render();
+        $pdfReport->htmlContent = view('reports.employee.salary', compact(['employeeName', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date', 'monthNum']))->render();
 
-        //$pdfReport->employeeName = "Mai Gado";
         return $pdfReport->RenderReport();
     }
 
