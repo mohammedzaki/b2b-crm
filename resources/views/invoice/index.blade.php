@@ -37,6 +37,7 @@
                                 <tr>
                                     <th>رقم الفاتورة</th>
                                     <th>التاريخ</th>
+                                    <th>تاريخ التحصيل</th>
                                     <th>اسم العميل</th>
                                     <th>العمليات</th>
                                     <th>الاجمالى</th>
@@ -51,6 +52,7 @@
                                 <tr role="row">
                                     <td class="text-center">{{ $invoice->invoice_number }}</td>
                                     <td>{{ $invoice->invoice_date }}</td>
+                                    <td>{{ $invoice->invoice_due_date }}</td>
                                     <td>{{ $invoice->client->name }}</td>
                                     <td>{{ $invoice->processesNames }}</td>
                                     <td>{{ $invoice->total_price }}</td>

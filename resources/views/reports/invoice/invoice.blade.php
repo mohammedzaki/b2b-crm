@@ -10,7 +10,7 @@
             <img src="var:letrImg">
         </div>
     </htmlpageheader>
-    <sethtmlpageheader name="invoicePageheader" value="on" show-this-page="1"> </sethtmlpageheader>
+    <sethtmlpageheader name="invoicePageheader" value="{{ $showLetterHead }}" show-this-page="1"> </sethtmlpageheader>
 
     <div class="invoice">
         <div class="invoiceHeader">
@@ -86,11 +86,13 @@
     </div>
 
     <htmlpagefooter name="invoicePageFooter" class="invoicePageFooter">
-        <div class="footer">
+        <div class="footer hidden">
+            @if ($showLetterHead == 'on')
             <img src="var:footerImg">
+            @endif
         </div>
     </htmlpagefooter>
-    <sethtmlpagefooter name="invoicePageFooter" value="on" show-this-page="1"> </sethtmlpagefooter>
+    <sethtmlpagefooter name="invoicePageFooter" value="{{ $showLetterHead }}" show-this-page="1"> </sethtmlpagefooter>
 
 </body>
 </html>

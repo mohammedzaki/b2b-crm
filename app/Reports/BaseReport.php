@@ -8,7 +8,7 @@ abstract class BaseReport {
 
     protected $mpdf;
     protected $reportName = "BaseReport.pdf";
-    protected $withLetterHead;
+    public $withLetterHead;
 
     public function __construct($withLetterHead = true) {
         if ($withLetterHead) {

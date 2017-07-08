@@ -21,7 +21,7 @@ class Invoice extends Model {
         'source_discount_value',
         'total_price',
         'total_paid',
-        'total_remaining', 'client_id', 'invoice_date', 'status', 'deleted_at'];
+        'total_remaining', 'client_id', 'invoice_date', 'invoice_due_date', 'status', 'deleted_at'];
 
     const UN_PAID = 0;
     const PAID = 1;
@@ -56,11 +56,11 @@ class Invoice extends Model {
 
     public static function newInvoiceNumber() {
         $start_invoice_number = Facility::max('start_invoice_number');
-        $invoice_number = static::max('invoice_number');
+        $invoice_number = static::max('invoice_number') + 1;
         if ($start_invoice_number > $invoice_number) {
             $invoice_number = $start_invoice_number;
         }
-        return sprintf("%08d", ++$invoice_number);
+        return sprintf("%08d", $invoice_number);
     }
 
     public static function getLastInvoiceDate() {

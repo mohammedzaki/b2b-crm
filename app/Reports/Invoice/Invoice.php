@@ -48,7 +48,8 @@ class Invoice extends BaseReport {
         $invoiceNo = $this->invoiceNo;
         $this->SetPageHeader();
         $this->SetPageFooter();
-        return view('reports.invoice.invoice', compact(['clinetName', 'totalPriceAfterTaxes', 'arabicPriceAfterTaxes', 'invoiceItems', 'discountPrice', 'discountReason', 'sourceDiscountPrice', 'totalPrice', 'totalTaxes', 'invoiceDate', 'invoiceNo']))->render();
+        $showLetterHead = $this->withLetterHead ? 'on' : 'off';
+        return view('reports.invoice.invoice', compact(['clinetName', 'totalPriceAfterTaxes', 'arabicPriceAfterTaxes', 'invoiceItems', 'discountPrice', 'discountReason', 'sourceDiscountPrice', 'totalPrice', 'totalTaxes', 'invoiceDate', 'invoiceNo', 'showLetterHead']))->render();
     }
 
     function preview() {

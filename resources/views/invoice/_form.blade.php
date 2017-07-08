@@ -141,7 +141,7 @@
             <div class="panel-body operationdes">
                 <div class="row">
                     <div class="col-md-12 no-padding">
-                        <div class="col-md-6">
+                        <div class="col-md-12">
                             <div class="form-group">
                                 <label>رقم الفاتورة</label>
                                 {{ Form::text('invoice_number', isset($model) ? null : '########', array(
@@ -156,6 +156,16 @@
                                 <label>التاريخ</label>
                                 {{ Form::text('invoice_date', null, array(
                                         "id" => "invoice_date",
+                                        'class' => 'form-control',
+                                        'required',
+                                        'placeholder' => 'ادخل التاريخ')) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>تاريخ التحصيل</label>
+                                {{ Form::text('invoice_due_date', null, array(
+                                        "id" => "invoice_due_date",
                                         'class' => 'form-control',
                                         'required',
                                         'placeholder' => 'ادخل التاريخ')) }}
@@ -578,6 +588,12 @@
         maxDate: new Date(),
         @if (!isset($model)) defaultDate: new Date(), @endif
                 altInput: true,
+        altFormat: "l, j F, Y",
+        locale: "ar"
+    });
+    $("#invoice_due_date").flatpickr({
+        enableTime: false,
+        altInput: true,
         altFormat: "l, j F, Y",
         locale: "ar"
     });

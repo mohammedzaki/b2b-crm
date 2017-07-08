@@ -15,6 +15,8 @@ Route::auth();
 
 Route::get('/', 'DashboardController@index');
 Route::get('/home', 'DashboardController@index');
+Route::get('/fix/fixProcess', 'HomeController@fixProcess');
+
 
 Route::resource('dashboard', 'DashboardController');
 
@@ -66,18 +68,11 @@ Route::get('/attendance/guardianship/{employee_id}', 'AttendanceController@guard
 Route::get('/attendance/guardianshipaway/{employee_id}', 'AttendanceController@guardianshipaway')->name('attendance.guardianshipaway');
 Route::get('/attendance/guardianshipback/{employee_id}', 'AttendanceController@guardianshipback')->name('attendance.guardianshipback');
 Route::get('/attendance/longBorrowaway/{employee_id}', 'AttendanceController@longBorrowAway')->name('attendance.longBorrowAway');
-Route::get('/attendance/printSalaryReport/{employee_id}', 'AttendanceController@printSalaryReport')->name('attendance.printSalaryReport');
+Route::get('/attendance/printSalaryReport/{employee}', 'AttendanceController@printSalaryReport')->name('attendance.printSalaryReport');
 Route::post('/attendance/paySalary/{employee_id}', 'AttendanceController@payEmpolyeeSalary')->name('attendance.payEmpolyeeSalary');
 
 Route::resource('attendance', 'AttendanceController');
 
 Route::resource('feasibilityStudy', 'FeasibilityStudyController');
-
-/*Route::resource('invoice', 'InvoiceController');
-
-Route::group(['prefix' => 'invoice'], function() {
-    Route::post('preview', 'InvoiceController@printPreview')->name('invoice.printPreview');
-    Route::get('test/preview', 'InvoiceController@testPreview')->name('invoice.testPreview');
-});*/
 
 Route::get('getEmployeesCheckinDate', 'AttendanceController@getEmployeesCheckinDate');
