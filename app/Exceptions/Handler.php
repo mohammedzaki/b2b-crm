@@ -32,13 +32,13 @@ class Handler extends ExceptionHandler {
      * @return void
      */
     public function report(Exception $exception) {
-        /*if ($exception instanceof \Exception) {
-            // emails.exception is the template of your email
-            // it will have access to the $error that we are passing below
-            Mail::send('emails.exception', ['error' => $exception->getMessage()], function ($m) {
-                $m->to('mohammedzaki.dev@gmail.com', 'Mohammed Zaki')->subject('B2B POS ERROR');
-            });
-        }*/
+        /* if ($exception instanceof \Exception) {
+          // emails.exception is the template of your email
+          // it will have access to the $error that we are passing below
+          Mail::send('emails.exception', ['error' => $exception->getMessage()], function ($m) {
+          $m->to('mohammedzaki.dev@gmail.com', 'Mohammed Zaki')->subject('B2B POS ERROR');
+          });
+          } */
         parent::report($exception);
     }
 
@@ -50,6 +50,9 @@ class Handler extends ExceptionHandler {
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $exception) {
+        if ($exception instanceof ServerErrorException) {
+            return response()->jsonException($exception);
+        }
         return parent::render($request, $exception);
     }
 
