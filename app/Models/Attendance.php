@@ -120,7 +120,7 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
                 ->whereMonth('due_date', $startDate->month)
                 ->get();
         try {
-            return $employeeBorrowBilling[0]->pay_amount;
+            return $employeeBorrowBilling[0]->getRemaining();
         } catch (\Exception $exc) {
             return 0;
         }

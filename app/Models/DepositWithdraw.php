@@ -45,4 +45,8 @@ class DepositWithdraw extends Model {
     public function expenses() {
         return $this->hasOne('App\Models\Expenses', 'id');
     }
+    
+    public function employeeLogBorrowBillings() {
+        return $this->hasMany(EmployeeBorrowBilling::class, 'deposit_id', 'id');
+    }
 }

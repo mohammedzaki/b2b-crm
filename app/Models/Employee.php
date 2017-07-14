@@ -63,6 +63,24 @@ class Employee extends Model {
             return FALSE;
         }
     }
+    
+    public function totalUnpaidBorrow() {
+        $total = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
+                ->select('employee_borrow_billing.*')
+                ->where([
+                    ['employee_borrow_billing.is_paid', "=", FALSE],
+                    ['employee_borrows.employee_id', '=', $this->id]]);
+        $total = $total->sum('employee_borrow_billing.pay_amount') - $total->sum('employee_borrow_billing.paid_amount');
+        return empty($total) ? 0 : $total;
+    }
+    
+    public function unpaidBorrows() { //
+        $borrows = EmployeeBorrowBilling::join('employee_borrows', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
+                ->select('employee_borrow_billing.*')->where([
+                    ['employee_borrow_billing.is_paid', "=", FALSE],
+                    ['employee_borrows.employee_id', '=', $this->id]])->get();
+        return $borrows;
+    }
 
     public function employeeGuardianships(DateTime $dt) {
         $startDate = DateTime::parse($dt)->startOfMonth();
