@@ -4,6 +4,7 @@
 /vendor
 Homestead.yaml
 Homestead.json
+AskFtpSiteDeployer.xml
 .env
 .idea/
 /nbproject/private/
