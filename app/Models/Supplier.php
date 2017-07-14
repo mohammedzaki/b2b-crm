@@ -39,7 +39,7 @@ class Supplier extends Model {
         return $suppliers;
     }
 
-    public function hasOpenProcess(): bool {
+    public function hasOpenProcess() {
         $supplier = Supplier::join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
                 ->select('suppliers.*')->where([
                     ['supplier_processes.status', "=", SupplierProcess::statusOpened],
@@ -54,7 +54,7 @@ class Supplier extends Model {
         }
     }
 
-    public function hasClosedProcess(): bool {
+    public function hasClosedProcess() {
         $supplier = Supplier::join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
                 ->select('suppliers.*')->where([
                     ['supplier_processes.status', "=", SupplierProcess::statusClosed],

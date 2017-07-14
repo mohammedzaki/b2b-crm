@@ -16,11 +16,11 @@ class DateTime extends Carbon {
         parent::__construct($time, $tz);
     }
 
-    public function startDayFormat(): string {
+    public function startDayFormat() {
         return $this->format("Y-m-d 00:00:00");
     }
 
-    public function endDayFormat(): string {
+    public function endDayFormat() {
         return $this->format("Y-m-d 23:59:59");
     }
 }

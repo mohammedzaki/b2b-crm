@@ -48,7 +48,7 @@ class Client extends Model {
         return $this->hasMany(ClientProcess::class)->where('status', ClientProcess::statusOpened);
     }
 
-    public function hasOpenProcess(): bool {
+    public function hasOpenProcess() {
         $client = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
                 ->select('clients.*')->where([
                     ['client_processes.status', "=", ClientProcess::statusOpened],
@@ -63,7 +63,7 @@ class Client extends Model {
         }
     }
 
-    public function hasClosedProcess(): bool {
+    public function hasClosedProcess() {
         $client = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
                 ->select('clients.*')->where([
                     ['client_processes.status', "=", ClientProcess::statusClosed],
