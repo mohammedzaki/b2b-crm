@@ -137,7 +137,6 @@
                     </label>
                     @endif
                 </div>
-                //sales_tax->percentage
                 <div class="form-group{{ $errors->has('sales_tax') ? ' has-error' : '' }}">
                     {{ Form::label('sales_tax', 'ضريبة المبيعات') }} 
                     {{ Form::text('sales_tax', null, 
