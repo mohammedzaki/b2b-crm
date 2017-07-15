@@ -102,6 +102,7 @@ class ClientProcessController extends Controller {
                 $all['status'] = ClientProcess::statusOpened;
                 if (isset($request->require_invoice)) {
                     $all['require_invoice'] = TRUE;
+                    $all['taxes_percentage'] = FacilityController::TaxesRate();
                 } else {
                     $all['require_invoice'] = FALSE;
                 }
@@ -117,7 +118,6 @@ class ClientProcessController extends Controller {
                 } else {
                     $all['has_source_discount'] = FALSE;
                 }
-
                 $clientProcess = ClientProcess::create($all);
 
                 foreach ($all['items'] as $item) {
@@ -174,6 +174,7 @@ class ClientProcessController extends Controller {
             } else {
                 if (isset($request->require_invoice)) {
                     $all['require_invoice'] = TRUE;
+                    $all['taxes_percentage'] = FacilityController::TaxesRate();
                 } else {
                     $all['require_invoice'] = FALSE;
                 }

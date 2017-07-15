@@ -110,7 +110,6 @@ class InvoiceController extends Controller {
         $sourceDiscountValue = 0;
         $taxesValue = 0;
         $has_source_discount = FALSE;
-        $require_invoice = FALSE;
         $processes = $request->processes;
         foreach ($processes as $processId) {
             $clientProcess = ClientProcess::findOrFail($processId);
@@ -128,10 +127,7 @@ class InvoiceController extends Controller {
                 $sourceDiscountValue += $clientProcess->source_discount_value;
                 $has_source_discount = TRUE;
             }
-            if ($clientProcess->require_invoice == TRUE) {
-                $taxesValue += $clientProcess->taxes_value;
-                $require_invoice = TRUE;
-            }
+            $taxesValue += $clientProcess->taxes_value;
         }
         $invoiceItems[++$index] = [
             'size' => '',
@@ -149,16 +145,15 @@ class InvoiceController extends Controller {
             'quantity' => "",
             'description' => "الاجمالى قبل الضريبة",
         ];
-        if ($require_invoice) {
-            $invoiceItems[++$index] = [
-                'size' => "",
-                'total_price' => $taxesValue,
-                'class' => '',
-                'unit_price' => "",
-                'quantity' => "",
-                'description' => "قيمة الضريبة المضافة 13%",
-            ];
-        }
+        $taxes_percentage = FacilityController::TaxesRate($request->invoice_date);
+        $invoiceItems[++$index] = [
+            'size' => "",
+            'total_price' => $taxesValue,
+            'class' => '',
+            'unit_price' => "",
+            'quantity' => "",
+            'description' => "قيمة الضريبة المضافة {$taxes_percentage}%",
+        ];
         if ($has_source_discount) {
             $invoiceItems[++$index] = [
                 'size' => "",
@@ -197,7 +192,6 @@ class InvoiceController extends Controller {
         $sourceDiscountValue = 0;
         $taxesValue = 0;
         $has_source_discount = FALSE;
-        $require_invoice = FALSE;
         $processes = $invoice->processes;
         foreach ($processes as $processId) {
             $clientProcess = ClientProcess::findOrFail($processId);
@@ -215,10 +209,7 @@ class InvoiceController extends Controller {
                 $sourceDiscountValue += $clientProcess->source_discount_value;
                 $has_source_discount = TRUE;
             }
-            if ($clientProcess->require_invoice == TRUE) {
-                $taxesValue += $clientProcess->taxes_value;
-                $require_invoice = TRUE;
-            }
+            $taxesValue += $clientProcess->taxes_value;
         }
         $invoiceItems[++$index] = [
             'size' => '',
@@ -228,24 +219,23 @@ class InvoiceController extends Controller {
             'quantity' => '',
             'description' => '',
         ];
-        if ($require_invoice) {
-            $invoiceItems[++$index] = [
-                'size' => "",
-                'total_price' => $request->invoice_price,
-                'class' => '',
-                'unit_price' => "",
-                'quantity' => "",
-                'description' => "الاجمالى قبل الضريبة",
-            ];
-            $invoiceItems[++$index] = [
-                'size' => "",
-                'total_price' => $taxesValue,
-                'class' => '',
-                'unit_price' => "",
-                'quantity' => "",
-                'description' => "قيمة الضريبة المضافة 13%",
-            ];
-        }
+        $invoiceItems[++$index] = [
+            'size' => "",
+            'total_price' => $request->invoice_price,
+            'class' => '',
+            'unit_price' => "",
+            'quantity' => "",
+            'description' => "الاجمالى قبل الضريبة",
+        ];
+        $taxes_percentage = FacilityController::TaxesRate($request->invoice_date);
+        $invoiceItems[++$index] = [
+            'size' => "",
+            'total_price' => $taxesValue,
+            'class' => '',
+            'unit_price' => "",
+            'quantity' => "",
+            'description' => "قيمة الضريبة المضافة {$taxes_percentage}%",
+        ];
         if ($has_source_discount) {
             $invoiceItems[++$index] = [
                 'size' => "",
@@ -337,7 +327,6 @@ class InvoiceController extends Controller {
         $sourceDiscountValue = 0;
         $taxesValue = 0;
         $has_source_discount = FALSE;
-        $require_invoice = FALSE;
         foreach ($invoice->processes as $clientProcess) {
             if ($clientProcess->has_discount == TRUE) {
                 $invoiceItems[++$index] = [
@@ -370,13 +359,14 @@ class InvoiceController extends Controller {
             'quantity' => "",
             'description' => "الاجمالى قبل الضريبة",
         ];
+        $taxes_percentage = FacilityController::TaxesRate($invoice->invoice_date);
         $invoiceItems[++$index] = [
             'size' => "",
             'total_price' => $invoice->taxes_price,
             'class' => '',
             'unit_price' => "",
             'quantity' => "",
-            'description' => "قيمة الضريبة المضافة 13%",
+            'description' => "قيمة الضريبة المضافة {$taxes_percentage}%",
         ];
         if ($has_source_discount) {
             $invoiceItems[++$index] = [

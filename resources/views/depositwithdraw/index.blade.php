@@ -930,7 +930,7 @@
                 }
             },
             error: function (error) {
-                console.log('Error: ', error);
+                alert(error.responseJSON.message);
             }
         });
     }

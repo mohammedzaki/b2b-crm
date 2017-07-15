@@ -109,15 +109,10 @@ class FacilityController extends Controller {
         $photo->move($destinationPath, $fileName);
         return $fileName;
     }
-
-    public function getTaxesRate() {
-        $facility = Facility::findOrFail(1);
-        return $facility->getTaxesRate();
-    }
     
-    public static function TaxesRate() {
+    public static function TaxesRate($currentDate = NULL) {
         $facility = Facility::findOrFail(1);
-        return $facility->getTaxesRate();
+        return $facility->getTaxesRate($currentDate);
     }
 
 }

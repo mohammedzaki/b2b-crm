@@ -31,6 +31,7 @@ class ClientProcess extends Model {
         'total_price',
         'total_price_taxes',
         'taxes_value',
+        'taxes_percentage',
         'invoice_id'
     ];
 
