@@ -95,8 +95,7 @@ class ClientProcessController extends Controller {
             /* Can't create new process if client has exceeded the credit limit */
             // if($total_opened_processes_price >= $client->credit_limit){
             if ($client->credit_limit < ($total_opened_processes_price + $request->total_price)) {
-                return redirect()->back()->withInput()->with('error', "خطأ في انشاء عملية جديدة، العميل " . $client->name . " قد تعدى الحد اﻻئتماني المسموح له."
-                );
+                return redirect()->back()->withInput()->with('error', "خطأ في انشاء عملية جديدة، العميل " . $client->name . " قد تعدى الحد اﻻئتماني المسموح له.");
             } else {
 
                 $all['status'] = ClientProcess::statusOpened;
@@ -192,6 +191,7 @@ class ClientProcessController extends Controller {
                 }
 
                 $process->update($all);
+                $process->CheckProcessMustClosed();
                 $items_ids = [];
 
                 foreach ($all['items'] as $item) {
