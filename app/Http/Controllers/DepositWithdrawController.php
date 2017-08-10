@@ -130,6 +130,9 @@ class DepositWithdrawController extends Controller {
             case EmployeeActions::PayLongBorrow:
                 $this->payLongBorrow($employee, $request->depositValue, DateTime::parse($request->due_date), $id, $is_update);
                 break;
+            case EmployeeActions::SmallBorrow:
+                
+                break;
             default:
                 DB::rollBack();
                 throw new ServerErrorException('يجب اختيار اسم المصروف');

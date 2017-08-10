@@ -52,6 +52,12 @@ class FacilityTaxesController extends Controller {
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
+            $old = FacilityTaxes::find(FacilityTaxes::max('id'));
+            $oldDate = DateTime::parse($old->changedate);
+            $newDate = DateTime::parse($all['changedate']);
+            if ($oldDate > $newDate ) {
+                return redirect()->back()->withInput()->with('error', 'تاريخ التعديل يجب ان يكون اكبر من اخر تاريخ انتهاء لاخر ضريبة.');
+            }
             $facilityTaxes = FacilityTaxes::create($all);
             $this->updateFacilityTaxes($facilityTaxes);
             return redirect()->route('facilityTaxes.index')->with('success', 'تم اضافة ضريبة جديد.');
