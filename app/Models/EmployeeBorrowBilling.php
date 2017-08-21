@@ -17,8 +17,12 @@ class EmployeeBorrowBilling extends Model {
         'deposit_id',
         'due_date',
         'paid_date',
-        'is_paid'
+        'paying_status'
     ];
+
+    const UN_PAID = 0;
+    const PAID = 1;
+    const POSTPONED = 2;
 
     public function borrow() {
         return $this->belongsTo(EmployeeBorrow::class);

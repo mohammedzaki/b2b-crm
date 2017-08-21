@@ -611,22 +611,27 @@ class AttendanceController extends Controller {
 
     public function longBorrowAway(Request $request, $employee_id) {
         $date = DateTime::parse($request->date);
-
+        
         $employeeBorrowBilling = DB::table('employees')
                 ->join('employee_borrows', 'employee_borrows.employee_id', '=', 'employees.id')
                 ->join('employee_borrow_billing', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
                 ->distinct()
                 ->where([
-                    ['is_paid', '=', FALSE],
+                    ['paying_status', '=', EmployeeBorrowBilling::UN_PAID],
                     ['employees.id', '=', $employee_id]
                 ])
                 ->whereMonth('due_date', '>=', $date->month)
                 ->select('employee_borrow_billing.id')
                 ->get();
+        $data = collect(EmployeeBorrowBilling::findOrFail($employeeBorrowBilling->first()->id))->except(['id']);
+        $borrowBilling = EmployeeBorrowBilling::create($data->all());
+        $borrowBilling->paying_status = EmployeeBorrowBilling::POSTPONED;
+        $borrowBilling->paid_date = DateTime::now();
+        $borrowBilling->save();
+        
         foreach ($employeeBorrowBilling as $key => $emb) {
-            $date->addMonth(1);
             $borrowBilling = EmployeeBorrowBilling::findOrFail($emb->id);
-            $borrowBilling->due_date = $date;
+            $borrowBilling->due_date = DateTime::parse($borrowBilling->due_date)->addMonth(1);
             $borrowBilling->save();
         }
 
@@ -723,7 +728,7 @@ class AttendanceController extends Controller {
                     ->join('employee_borrow_billing', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
                     ->distinct()
                     ->where([
-                        ['is_paid', '=', FALSE],
+                        ['paying_status', '=', EmployeeBorrowBilling::UN_PAID],
                         ['employees.id', '=', $employee_id]
                     ])
                     ->whereMonth('due_date', $dt->month)
@@ -731,7 +736,7 @@ class AttendanceController extends Controller {
                     ->first();
             if (!empty($employeeBorrowBilling->id)) {
                 $borrowBilling = EmployeeBorrowBilling::findOrFail($employeeBorrowBilling->id);
-                $borrowBilling->is_paid = TRUE;
+                $borrowBilling->paying_status = EmployeeBorrowBilling::PAID;
                 $borrowBilling->save();
             }
 

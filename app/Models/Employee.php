@@ -55,7 +55,7 @@ class Employee extends Model {
     public function hasUnpaidBorrow() {
         $count = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
                 ->select('employee_borrow_billing.*')->where([
-                    ['employee_borrow_billing.is_paid', "=", FALSE],
+                    ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
                     ['employee_borrows.employee_id', '=', $this->id]])->count();
         if ($count > 0) {
             return TRUE;
@@ -68,7 +68,7 @@ class Employee extends Model {
         $total = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
                 ->select('employee_borrow_billing.*')
                 ->where([
-                    ['employee_borrow_billing.is_paid', "=", FALSE],
+                    ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
                     ['employee_borrows.employee_id', '=', $this->id]]);
         $total = $total->sum('employee_borrow_billing.pay_amount') - $total->sum('employee_borrow_billing.paid_amount');
         return empty($total) ? 0 : $total;
@@ -77,7 +77,7 @@ class Employee extends Model {
     public function unpaidBorrows() { //
         $borrows = EmployeeBorrowBilling::join('employee_borrows', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
                 ->select('employee_borrow_billing.*')->where([
-                    ['employee_borrow_billing.is_paid', "=", FALSE],
+                    ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
                     ['employee_borrows.employee_id', '=', $this->id]])->get();
         return $borrows;
     }

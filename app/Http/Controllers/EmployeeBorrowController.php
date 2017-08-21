@@ -108,7 +108,7 @@ class EmployeeBorrowController extends Controller {
                         $em = new EmployeeBorrowBilling;
                         $em->pay_amount = $value;
                         $em->due_date = $stratDate;
-                        $em->is_paid = FALSE;
+                        $em->paying_status = EmployeeBorrowBilling::UN_PAID;
                         $em->employee_borrow_id = $employeeBorrow->id;
                         $em->save();
                     }
@@ -116,7 +116,7 @@ class EmployeeBorrowController extends Controller {
                     $em = new EmployeeBorrowBilling;
                     $em->pay_amount = $employeeBorrow->pay_amount;
                     $em->due_date = $stratDate;
-                    $em->is_paid = FALSE;
+                    $em->paying_status = EmployeeBorrowBilling::UN_PAID;
                     $em->employee_borrow_id = $employeeBorrow->id;
                     $em->save();
                 }

@@ -114,13 +114,15 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
                 ->join('employee_borrow_billing', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
                 ->distinct()
                 ->where([
-                    ['is_paid', '=', FALSE],
+                    ['employee_borrow_billing.paying_status', '=', EmployeeBorrowBilling::UN_PAID],
                     ['employees.id', '=', $this->employee_id]
                 ])
                 ->whereMonth('due_date', $startDate->month)
                 ->get();
         try {
-            return $employeeBorrowBilling[0]->getRemaining();
+            //FIXME: getRemaining() not a function from object 
+            //return $employeeBorrowBilling[0]->getRemaining();
+            return $employeeBorrowBilling[0]->pay_amount - $employeeBorrowBilling[0]->paid_amount;
         } catch (\Exception $exc) {
             return 0;
         }

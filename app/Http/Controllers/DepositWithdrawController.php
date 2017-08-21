@@ -184,7 +184,7 @@ class DepositWithdrawController extends Controller {
         foreach ($employee->unpaidBorrows() as $borrow) {
             if ($depositValue >= $borrow->pay_amount) {
                 $depositValue -= $borrow->pay_amount;
-                $borrow->is_paid = TRUE;
+                $borrow->paying_status = EmployeeBorrowBilling::PAID;
                 $borrow->paid_amount = $borrow->pay_amount;
                 $borrow->paid_date = $due_date;
                 $borrow->deposit_id = $id;
@@ -205,7 +205,7 @@ class DepositWithdrawController extends Controller {
     function resetDiscountBorrows($id) {
         $depositWithdraw = DepositWithdraw::find($id);
         foreach ($depositWithdraw->employeeLogBorrowBillings as $borrow) {
-            $borrow->is_paid = FALSE;
+            $borrow->paying_status = EmployeeBorrowBilling::UN_PAID;
             $borrow->paid_amount = null;
             $borrow->paid_date = null;
             $borrow->deposit_id = null;
