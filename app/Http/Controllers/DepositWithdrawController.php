@@ -102,10 +102,11 @@ class DepositWithdrawController extends Controller {
             // FIXME: save with expense_id = null and value of deposit = 0
             DB::beginTransaction();
             $all['due_date'] = DateTime::parse($request->due_date);
-            $depositWithdraw = DepositWithdraw::create($all);
+            $depositWithdraw = DepositWithdraw::create();
             if (isset($request->employee_id)) {
                 $this->checkEmployeeAction($request, $depositWithdraw->id);
             }
+            $depositWithdraw->update($all);
             $this->CheckProcessClosed($depositWithdraw);
             DB::commit();
             return response()->json(array(
@@ -122,16 +123,16 @@ class DepositWithdrawController extends Controller {
         $employee = Employee::findOrFail($request->employee_id);
         switch ($request->expenses_id) {
             case EmployeeActions::Guardianship:
-                $this->checkGuardianship($employee);
+                $this->checkGuardianship($employee, $is_update);
                 break;
             case EmployeeActions::GuardianshipReturn:
-                $this->checkGuardianshipReturn($employee, $request->depositValue);
+                $this->checkGuardianshipReturn($employee, $request->depositValue, $is_update);
                 break;
             case EmployeeActions::PayLongBorrow:
                 $this->payLongBorrow($employee, $request->depositValue, DateTime::parse($request->due_date), $id, $is_update);
                 break;
             case EmployeeActions::SmallBorrow:
-                
+
                 break;
             default:
                 DB::rollBack();
@@ -140,7 +141,10 @@ class DepositWithdrawController extends Controller {
         }
     }
 
-    function checkGuardianship(Employee $employee) {
+    function checkGuardianship(Employee $employee, $is_update = FALSE) {
+        if ($is_update) {
+            return;
+        }
         $lG = $employee->lastGuardianship();
         $lGR = $employee->lastGuardianshipReturn();
         $lGId = $employee->lastGuardianshipId();
@@ -152,7 +156,7 @@ class DepositWithdrawController extends Controller {
         }
     }
 
-    function checkGuardianshipReturn(Employee $employee, $depositValue) {
+    function checkGuardianshipReturn(Employee $employee, $depositValue, $is_update = FALSE) {
         if ($employee->lastGuardianship() != $depositValue) {
             DB::rollBack();
             throw new ServerErrorException('القيمة المردودة لا تساوى قيمة العهدة السابقة');
