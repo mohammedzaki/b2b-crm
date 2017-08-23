@@ -42,14 +42,22 @@ class Employee extends Model {
     }
 
     public function smallBorrows() {
-        DepositWithdraw::where([
-                ['employee_id', '=', $this->id],
-                ['expenses_id', '=', EmployeeActions::SmallBorrow],
-        ]);
+        return $this->hasMany(DepositWithdraw::class, 'employee_id', 'id')->where('expenses_id', EmployeeActions::SmallBorrow);
+    }
+    
+    public function totalSmallBorrows() {
+        if (empty($this->smallBorrows)) {
+            return 0;
+        }
+        return $this->smallBorrows->sum('withdrawValue');
     }
     
     public function longBorrows() {
         return $this->hasMany(EmployeeBorrow::class);
+    }
+    
+    public function totalLongBorrows() {
+        return $this->longBorrows->sum('amount');
     }
     
     public function hasUnpaidBorrow() {
@@ -71,6 +79,16 @@ class Employee extends Model {
                     ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
                     ['employee_borrows.employee_id', '=', $this->id]]);
         $total = $total->sum('employee_borrow_billing.pay_amount') - $total->sum('employee_borrow_billing.paid_amount');
+        return empty($total) ? 0 : $total;
+    }
+    
+    public function totalPaidBorrow() {
+        $total = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
+                ->select('employee_borrow_billing.*')
+                ->where([
+                    ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::PAID],
+                    ['employee_borrows.employee_id', '=', $this->id]]);
+        $total = $total->sum('employee_borrow_billing.paid_amount');
         return empty($total) ? 0 : $total;
     }
     

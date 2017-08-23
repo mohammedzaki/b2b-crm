@@ -109,6 +109,7 @@
                     <li><a href="{{ URL::to('/reports/supplier/SupplierAnalyticalCenter') }}">المركز التحليلى للموردين</a></li>
                     <li><a href="{{ URL::to('/reports/expenses') }}">استعلام عن مصروف</a></li>
                     <li><a href="{{ URL::to('/reports/employees') }}">مرتبات الشهر</a></li>
+                    <li><a href="{{ route('reports.employees.borrow.index') }}">سلفيات الموظفين</a></li>
                 </ul>
 
             </li>
