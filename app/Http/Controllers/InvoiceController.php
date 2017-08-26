@@ -106,13 +106,44 @@ class InvoiceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function show(Invoice $invoice) {
+        return $this->showInvoicePreview($invoice, FALSE);
+    }
+
+    /**
+     * Show the Index Page
+     * @Post("preview", as="invoice.preview")
+     */
+    public function preview(Request $request) {
+        $all = $request->all();
+        $invoice = new Invoice;
+        $invoice->fill($all);
+        $invoice->items = $request->invoiceItems;
+        $invoice->processes = $request->processes;
+        return $this->showInvoicePreview($invoice);
+    }
+
+    /**
+     * Show the Index Page
+     * @Post("{invoice}/preview", as="invoice.editPreview")
+     */
+    public function editPreview(Request $request, Invoice $invoice) {
+        $all = $request->all();
+        $invoiceTemp = new Invoice;
+        $invoiceTemp->fill($all);
+        $invoiceTemp->items = $request->invoiceItems;
+        $invoiceTemp->processes = $request->processes;
+        return $this->showInvoicePreview($invoiceTemp);
+    }
+
+    private function showInvoicePreview(Invoice $invoice, $isPreview = TRUE) {
         $pdfReport = new InvoiceReport(TRUE);
         $index = count($invoice->items) - 1;
         $invoiceItems = $invoice->items;
-        $sourceDiscountValue = 0;
-        $taxesValue = 0;
         $has_source_discount = FALSE;
         foreach ($invoice->processes as $clientProcess) {
+            if ($isPreview) {
+                $clientProcess = ClientProcess::findOrFail($clientProcess);
+            }
             if ($clientProcess->has_discount == TRUE) {
                 $invoiceItems[++$index] = [
                     'size' => "",
@@ -124,7 +155,6 @@ class InvoiceController extends Controller {
                 ];
             }
             if ($clientProcess->has_source_discount == TRUE) {
-                $sourceDiscountValue += $clientProcess->source_discount_value;
                 $has_source_discount = TRUE;
             }
         }
@@ -164,112 +194,6 @@ class InvoiceController extends Controller {
             ];
         }
         $pdfReport->clinetName = $invoice->client->name;
-        $pdfReport->invoiceItems = $invoiceItems;
-        $pdfReport->discountPrice = $invoice->discount_price;
-        $pdfReport->discountReason = 'N\A';
-        $pdfReport->invoiceDate = $invoice->invoice_date;
-        $pdfReport->invoiceNo = $invoice->invoice_number;
-        $pdfReport->sourceDiscountPrice = $invoice->source_discount_value;
-        $pdfReport->totalPrice = $invoice->invoice_price;
-        $pdfReport->totalTaxes = $invoice->taxes_price;
-        $pdfReport->totalPriceAfterTaxes = $invoice->total_price;
-        session([
-            'pdfReport' => $pdfReport
-        ]);
-        return $pdfReport->preview();
-    }
-
-    /**
-     * Show the Index Page
-     * @Post("preview", as="invoice.preview")
-     */
-    public function preview(Request $request) {
-        $all = $request->all();
-        $invoice = new Invoice;
-        $invoice->fill($all);
-        $invoice->items = $request->invoiceItems;
-        $invoice->processes = $request->processes;
-        return $this->showInvoicePreview($invoice);
-    }
-
-    /**
-     * Show the Index Page
-     * @Post("{invoice}/preview", as="invoice.editPreview")
-     */
-    public function editPreview(Request $request, Invoice $invoice) {
-        $all = $request->all();
-        $invoiceTemp = new Invoice;
-        $invoiceTemp->fill($all);
-        $invoiceTemp->items = $request->invoiceItems;
-        $invoiceTemp->processes = $request->processes;
-        return $this->showInvoicePreview($invoiceTemp);
-    }
-
-    private function showInvoicePreview(Invoice $invoice, $isPreview = TRUE) {
-        $pdfReport = new InvoiceReport(TRUE);
-        $index = count($invoice->items) - 1;
-        $invoiceItems = $invoice->items;
-        $sourceDiscountValue = 0;
-        $taxesValue = 0;
-        $has_source_discount = FALSE;
-        $processes = $invoice->processes;
-        foreach ($processes as $clientProcess) {
-            if ($isPreview) {
-                $clientProcess = ClientProcess::findOrFail($clientProcess);
-            }
-            if ($clientProcess->has_discount == TRUE) {
-                $invoiceItems[++$index] = [
-                    'size' => "",
-                    'total_price' => $clientProcess->discount_value,
-                    'class' => 'redColor',
-                    'unit_price' => "",
-                    'quantity' => "",
-                    'description' => $clientProcess->discount_reason,
-                ];
-            }
-            if ($clientProcess->has_source_discount == TRUE) {
-                $sourceDiscountValue += $clientProcess->source_discount_value;
-                $has_source_discount = TRUE;
-            }
-            $taxesValue += $clientProcess->taxes_value;
-        }
-        $invoiceItems[++$index] = [
-            'size' => '',
-            'total_price' => '',
-            'class' => '',
-            'unit_price' => '',
-            'quantity' => '',
-            'description' => '',
-        ];
-        $invoiceItems[++$index] = [
-            'size' => "",
-            'total_price' => $invoice->invoice_price,
-            'class' => '',
-            'unit_price' => "",
-            'quantity' => "",
-            'description' => "الاجمالى قبل الضريبة",
-        ];
-        $taxes_percentage = FacilityController::TaxesRate($invoice->invoice_date);
-        $invoiceItems[++$index] = [
-            'size' => "",
-            'total_price' => $taxesValue,
-            'class' => '',
-            'unit_price' => "",
-            'quantity' => "",
-            'description' => "قيمة الضريبة المضافة {$taxes_percentage}%",
-        ];
-        if ($has_source_discount) {
-            $invoiceItems[++$index] = [
-                'size' => "",
-                'total_price' => $sourceDiscountValue,
-                'class' => 'redColor',
-                'unit_price' => "",
-                'quantity' => "",
-                'description' => "(-) خصم من المنبع",
-            ];
-        }
-        $client = Client::find($invoice->client_id);
-        $pdfReport->clinetName = $client->name;
         $pdfReport->invoiceItems = $invoiceItems;
         $pdfReport->discountPrice = $invoice->discount_price;
         $pdfReport->discountReason = 'N\A';
