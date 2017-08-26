@@ -100,221 +100,6 @@ class InvoiceController extends Controller {
     }
 
     /**
-     * Show the Index Page
-     * @Post("preview", as="invoice.preview")
-     */
-    public function preview(Request $request) {
-        $pdfReport = new InvoiceReport(TRUE);
-        $index = count($request->invoiceItems) - 1;
-        $invoiceItems = $request->invoiceItems;
-        $sourceDiscountValue = 0;
-        $taxesValue = 0;
-        $has_source_discount = FALSE;
-        $processes = $request->processes;
-        foreach ($processes as $processId) {
-            $clientProcess = ClientProcess::findOrFail($processId);
-            if ($clientProcess->has_discount == TRUE) {
-                $invoiceItems[++$index] = [
-                    'size' => "",
-                    'total_price' => $clientProcess->discount_value,
-                    'class' => 'redColor',
-                    'unit_price' => "",
-                    'quantity' => "",
-                    'description' => $clientProcess->discount_reason,
-                ];
-            }
-            if ($clientProcess->has_source_discount == TRUE) {
-                $sourceDiscountValue += $clientProcess->source_discount_value;
-                $has_source_discount = TRUE;
-            }
-            $taxesValue += $clientProcess->taxes_value;
-        }
-        $invoiceItems[++$index] = [
-            'size' => '',
-            'total_price' => '',
-            'class' => '',
-            'unit_price' => '',
-            'quantity' => '',
-            'description' => '',
-        ];
-        $invoiceItems[++$index] = [
-            'size' => "",
-            'total_price' => $request->invoice_price,
-            'class' => '',
-            'unit_price' => "",
-            'quantity' => "",
-            'description' => "الاجمالى قبل الضريبة",
-        ];
-        $taxes_percentage = FacilityController::TaxesRate($request->invoice_date);
-        $invoiceItems[++$index] = [
-            'size' => "",
-            'total_price' => $taxesValue,
-            'class' => '',
-            'unit_price' => "",
-            'quantity' => "",
-            'description' => "قيمة الضريبة المضافة {$taxes_percentage}%",
-        ];
-        if ($has_source_discount) {
-            $invoiceItems[++$index] = [
-                'size' => "",
-                'total_price' => $sourceDiscountValue,
-                'class' => 'redColor',
-                'unit_price' => "",
-                'quantity' => "",
-                'description' => "(-) خصم من المنبع",
-            ];
-        }
-        $client = Client::find($request->client_id);
-        $pdfReport->clinetName = $client->name;
-        $pdfReport->invoiceItems = $invoiceItems;
-        $pdfReport->discountPrice = $request->discount_price;
-        $pdfReport->discountReason = 'N\A';
-        $pdfReport->invoiceDate = $request->invoice_date;
-        $pdfReport->invoiceNo = $request->invoice_number;
-        $pdfReport->sourceDiscountPrice = $request->source_discount_value;
-        $pdfReport->totalPrice = $request->invoice_price;
-        $pdfReport->totalTaxes = $request->taxes_price;
-        $pdfReport->totalPriceAfterTaxes = $request->total_price;
-        session([
-            'pdfReport' => $pdfReport
-        ]);
-        return $pdfReport->preview();
-    }
-
-    /**
-     * Show the Index Page
-     * @Post("{invoice}/preview", as="invoice.editPreview")
-     */
-    public function editPreview(Request $request, Invoice $invoice = null) {
-        $pdfReport = new InvoiceReport(TRUE);
-        $index = count($request->invoiceItems) - 1;
-        $invoiceItems = $request->invoiceItems;
-        $sourceDiscountValue = 0;
-        $taxesValue = 0;
-        $has_source_discount = FALSE;
-        $processes = $invoice->processes;
-        foreach ($processes as $processId) {
-            $clientProcess = ClientProcess::findOrFail($processId);
-            if ($clientProcess->has_discount == TRUE) {
-                $invoiceItems[++$index] = [
-                    'size' => "",
-                    'total_price' => $clientProcess->discount_value,
-                    'class' => 'redColor',
-                    'unit_price' => "",
-                    'quantity' => "",
-                    'description' => $clientProcess->discount_reason,
-                ];
-            }
-            if ($clientProcess->has_source_discount == TRUE) {
-                $sourceDiscountValue += $clientProcess->source_discount_value;
-                $has_source_discount = TRUE;
-            }
-            $taxesValue += $clientProcess->taxes_value;
-        }
-        $invoiceItems[++$index] = [
-            'size' => '',
-            'total_price' => '',
-            'class' => '',
-            'unit_price' => '',
-            'quantity' => '',
-            'description' => '',
-        ];
-        $invoiceItems[++$index] = [
-            'size' => "",
-            'total_price' => $request->invoice_price,
-            'class' => '',
-            'unit_price' => "",
-            'quantity' => "",
-            'description' => "الاجمالى قبل الضريبة",
-        ];
-        $taxes_percentage = FacilityController::TaxesRate($request->invoice_date);
-        $invoiceItems[++$index] = [
-            'size' => "",
-            'total_price' => $taxesValue,
-            'class' => '',
-            'unit_price' => "",
-            'quantity' => "",
-            'description' => "قيمة الضريبة المضافة {$taxes_percentage}%",
-        ];
-        if ($has_source_discount) {
-            $invoiceItems[++$index] = [
-                'size' => "",
-                'total_price' => $sourceDiscountValue,
-                'class' => 'redColor',
-                'unit_price' => "",
-                'quantity' => "",
-                'description' => "(-) خصم من المنبع",
-            ];
-        }
-        $client = Client::find($request->client_id);
-        $pdfReport->clinetName = $client->name;
-        $pdfReport->invoiceItems = $invoiceItems;
-        $pdfReport->discountPrice = $request->discount_price;
-        $pdfReport->discountReason = 'N\A';
-        $pdfReport->invoiceDate = $request->invoice_date;
-        $pdfReport->invoiceNo = $request->invoice_number;
-        $pdfReport->sourceDiscountPrice = $request->source_discount_value;
-        $pdfReport->totalPrice = $request->invoice_price;
-        $pdfReport->totalTaxes = $request->taxes_price;
-        $pdfReport->totalPriceAfterTaxes = $request->total_price;
-        session([
-            'pdfReport' => $pdfReport
-        ]);
-        return $pdfReport->preview();
-    }
-
-    /**
-     * Show the Index Page
-     * @Get("printPreviewPDF", as="invoice.printPreviewPDF")
-     */
-    public function printPreviewPDF(Request $request) {
-        $pdfReport = session('pdfReport');
-        if (isset($request->withLetterHead)) {
-            $pdfReport->withLetterHead = TRUE;
-        } else {
-            $pdfReport->withLetterHead = FALSE;
-        }
-        return $pdfReport->RenderReport();
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request) {
-        if ($request->invoice_date < Invoice::getLastInvoiceDate()) {
-            return redirect()->back()->withInput()->with('error', 'التاريخ يجب ان يكون اكبر الفاتورة السابقة');
-        }
-        DB::beginTransaction();
-        $all = $request->all();
-        try {
-            $all['invoice_number'] = Invoice::newInvoiceNumber();
-            $invoice = Invoice::create($all);
-            foreach ($request->invoiceItems as $item) {
-                $item['invoice_id'] = $invoice->id;
-                $invoiceItem = InvoiceItem::create($item);
-            }
-            foreach ($request->processes as $processId) {
-                $clientProcess = ClientProcess::findOrFail($processId);
-                $clientProcess->invoice_billed = ClientProcess::invoiceBilled;
-                $clientProcess->invoice_id = $invoice->id;
-                $clientProcess->save();
-                if ($request->isPayNow) {
-                    $clientProcess->payRemaining($invoice->invoice_number);
-                }
-            }
-            $request->invoice_number = $invoice->invoice_number;
-            DB::commit();
-            return redirect()->route('invoice.index')->with('success', 'تم اضافة الفاتورة');
-        } catch (\Exception $exc) {
-            DB::rollBack();
-            return back()->withInput()->with('error', $exc->getMessage());
-        }
-    }
-
-    /**
      * Display the specified resource.
      *
      * @param  Invoice  $invoice
@@ -392,6 +177,163 @@ class InvoiceController extends Controller {
             'pdfReport' => $pdfReport
         ]);
         return $pdfReport->preview();
+    }
+
+    /**
+     * Show the Index Page
+     * @Post("preview", as="invoice.preview")
+     */
+    public function preview(Request $request) {
+        $all = $request->all();
+        $invoice = new Invoice;
+        $invoice->fill($all);
+        $invoice->items = $request->invoiceItems;
+        $invoice->processes = $request->processes;
+        return $this->showInvoicePreview($invoice);
+    }
+
+    /**
+     * Show the Index Page
+     * @Post("{invoice}/preview", as="invoice.editPreview")
+     */
+    public function editPreview(Request $request, Invoice $invoice) {
+        $all = $request->all();
+        $invoiceTemp = new Invoice;
+        $invoiceTemp->fill($all);
+        $invoiceTemp->items = $request->invoiceItems;
+        $invoiceTemp->processes = $request->processes;
+        return $this->showInvoicePreview($invoiceTemp);
+    }
+
+    private function showInvoicePreview(Invoice $invoice, $isPreview = TRUE) {
+        $pdfReport = new InvoiceReport(TRUE);
+        $index = count($invoice->items) - 1;
+        $invoiceItems = $invoice->items;
+        $sourceDiscountValue = 0;
+        $taxesValue = 0;
+        $has_source_discount = FALSE;
+        $processes = $invoice->processes;
+        foreach ($processes as $clientProcess) {
+            if ($isPreview) {
+                $clientProcess = ClientProcess::findOrFail($clientProcess);
+            }
+            if ($clientProcess->has_discount == TRUE) {
+                $invoiceItems[++$index] = [
+                    'size' => "",
+                    'total_price' => $clientProcess->discount_value,
+                    'class' => 'redColor',
+                    'unit_price' => "",
+                    'quantity' => "",
+                    'description' => $clientProcess->discount_reason,
+                ];
+            }
+            if ($clientProcess->has_source_discount == TRUE) {
+                $sourceDiscountValue += $clientProcess->source_discount_value;
+                $has_source_discount = TRUE;
+            }
+            $taxesValue += $clientProcess->taxes_value;
+        }
+        $invoiceItems[++$index] = [
+            'size' => '',
+            'total_price' => '',
+            'class' => '',
+            'unit_price' => '',
+            'quantity' => '',
+            'description' => '',
+        ];
+        $invoiceItems[++$index] = [
+            'size' => "",
+            'total_price' => $invoice->invoice_price,
+            'class' => '',
+            'unit_price' => "",
+            'quantity' => "",
+            'description' => "الاجمالى قبل الضريبة",
+        ];
+        $taxes_percentage = FacilityController::TaxesRate($invoice->invoice_date);
+        $invoiceItems[++$index] = [
+            'size' => "",
+            'total_price' => $taxesValue,
+            'class' => '',
+            'unit_price' => "",
+            'quantity' => "",
+            'description' => "قيمة الضريبة المضافة {$taxes_percentage}%",
+        ];
+        if ($has_source_discount) {
+            $invoiceItems[++$index] = [
+                'size' => "",
+                'total_price' => $sourceDiscountValue,
+                'class' => 'redColor',
+                'unit_price' => "",
+                'quantity' => "",
+                'description' => "(-) خصم من المنبع",
+            ];
+        }
+        $client = Client::find($invoice->client_id);
+        $pdfReport->clinetName = $client->name;
+        $pdfReport->invoiceItems = $invoiceItems;
+        $pdfReport->discountPrice = $invoice->discount_price;
+        $pdfReport->discountReason = 'N\A';
+        $pdfReport->invoiceDate = $invoice->invoice_date;
+        $pdfReport->invoiceNo = $invoice->invoice_number;
+        $pdfReport->sourceDiscountPrice = $invoice->source_discount_value;
+        $pdfReport->totalPrice = $invoice->invoice_price;
+        $pdfReport->totalTaxes = $invoice->taxes_price;
+        $pdfReport->totalPriceAfterTaxes = $invoice->total_price;
+        session([
+            'pdfReport' => $pdfReport
+        ]);
+        return $pdfReport->preview();
+    }
+
+    /**
+     * Show the Index Page
+     * @Get("printPreviewPDF", as="invoice.printPreviewPDF")
+     */
+    public function printPreviewPDF(Request $request) {
+        $pdfReport = session('pdfReport');
+        if (isset($request->withLetterHead)) {
+            $pdfReport->withLetterHead = TRUE;
+        } else {
+            $pdfReport->withLetterHead = FALSE;
+        }
+        return $pdfReport->RenderReport();
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request) {
+        if ($request->invoice_date < Invoice::getLastInvoiceDate()) {
+            return redirect()->back()->withInput()->with('error', 'التاريخ يجب ان يكون اكبر الفاتورة السابقة');
+        }
+        DB::beginTransaction();
+        $all = $request->all();
+        try {
+            $all['invoice_number'] = Invoice::newInvoiceNumber();
+            $invoice = Invoice::create($all);
+            foreach ($request->invoiceItems as $item) {
+                $item['invoice_id'] = $invoice->id;
+                $invoiceItem = InvoiceItem::create($item);
+            }
+            foreach ($request->processes as $processId) {
+                $clientProcess = ClientProcess::findOrFail($processId);
+                $clientProcess->invoice_billed = ClientProcess::invoiceBilled;
+                $clientProcess->invoice_id = $invoice->id;
+                $clientProcess->save();
+                if ($request->isPayNow) {
+                    $clientProcess->payRemaining($invoice->invoice_number);
+                }
+            }
+            $request->invoice_number = $invoice->invoice_number;
+            DB::commit();
+            return redirect()->route('invoice.index')->with('success', 'تم اضافة الفاتورة');
+        } catch (\Exception $exc) {
+            DB::rollBack();
+            return back()->withInput()->with('error', $exc->getMessage());
+        }
     }
 
     /**
