@@ -16,7 +16,7 @@
                 <table class="headerTable">
                     <tr>
                         <td class="monthLabel">مرتبات شهر :</td> 
-                        <td class="monthName">{{ $month }}</td>
+                        <td class="monthName">{{ $monthName }}</td>
                     </tr>
                 </table>
             </div>

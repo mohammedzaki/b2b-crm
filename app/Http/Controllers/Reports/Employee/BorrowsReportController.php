@@ -12,20 +12,9 @@ use Validator;
 
 /**
  * @Controller(prefix="/reports/employees/borrow")
- * @Resource("invoice")
- * @Middleware("web")
+ * @Middleware({"web", "auth"})
  */
 class BorrowsReportController extends Controller {
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct() {
-        $this->middleware('auth');
-        //$this->middleware('ability:admin,employees-permissions');
-    }
 
     protected function validator(array $data) {
         $validator = Validator::make($data, [

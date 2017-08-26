@@ -3,7 +3,7 @@
 @section("content")
 
 <div class="row">
-    <form role="form" action="printTotalPDF" method="GET">
+    {{ Form::open(["route" => "reports.employees.totalSalaries.printPDF", "method" => "GET"]) }}    
         <div class="col-lg-12" id="printcontent">
             <div class="panel panel-default">
                 <!-- /.panel-heading -->
@@ -104,7 +104,7 @@
             </p>
 
         </row>
-    </form>
+    {{ Form::close() }}
 </div>
 
 @endsection

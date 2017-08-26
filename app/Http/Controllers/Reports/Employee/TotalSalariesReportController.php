@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Reports;
+namespace App\Http\Controllers\Reports\Employee;
 
 use App\Extensions\DateTime;
 use App\Http\Controllers\Controller;
@@ -8,77 +8,31 @@ use App\Models\Attendance;
 use App\Models\Employee;
 use App\Reports\Employee\TotalSalaries;
 use Illuminate\Http\Request;
-use Validator;
-use function session;
-use function view;
+use App\Helpers\Helpers;
 
-class EmployeesReportController extends Controller {
+/**
+ * @Controller(prefix="/reports/employees/total-salaries")
+ * @Middleware({"web", "auth"})
+ */
+class TotalSalariesReportController extends Controller {
 
     /**
-     * Create a new controller instance.
-     *
-     * @return void
+     * Show the Index Page
+     * @Get("/", as="reports.employees.totalSalaries.index")
      */
-    public function __construct() {
-        $this->middleware('auth');
-        //$this->middleware('ability:admin,employees-permissions');
-    }
-
-    protected function validator(array $data) {
-        $validator = Validator::make($data, [
-                    'name' => 'required|min:6|max:255',
-                    'ssn' => 'required|digits:14',
-                    'gender' => 'required|in:m,f',
-                    'martial_status' => 'in:single,married,widowed,divorced',
-                    'birth_date' => 'required|date_format:Y-m-d',
-                    'department' => 'string',
-                    'hiring_date' => 'required|date_format:Y-m-d',
-                    'daily_salary' => 'required|numeric',
-                    'working_hours' => 'required|numeric',
-                    'job_title' => 'required|max:100',
-                    'telephone' => 'digits:8',
-                    'mobile' => 'required|digits:11',
-                    'can_not_use_program' => 'boolean',
-                    'is_active' => 'boolean',
-                    'borrow_system' => 'boolean',
-                    'username' => 'unique:users,username',
-                    'password' => 'min:4'
-        ]);
-
-        $validator->setAttributeNames([
-            'name' => 'اسم الموظف',
-            'ssn' => 'الرقم القومي',
-            'gender' => 'الجنس',
-            'martial_status' => 'الحالة اﻻجتماعية',
-            'birth_date' => 'تاريخ الميﻻد',
-            'department' => 'القسم',
-            'hiring_date' => 'تاريخ التعيين',
-            'daily_salary' => 'الراتب اليومي',
-            'working_hours' => 'ساعات العمل',
-            'job_title' => 'الوظيفة',
-            'telephone' => 'التليفون',
-            'mobile' => 'المحمول',
-            'can_not_use_program' => 'عدم استخدام البرنامج',
-            'is_active' => 'نشط',
-            'borrow_system' => 'نظام السلف',
-            'username' => 'اسم المستخدم',
-            'password' => 'كلمة المرور'
-        ]);
-
-        return $validator;
-    }
-
     public function index() {
         $employees = Employee::all(['id', 'name']);
         return view('reports.employee.index', compact("employees"));
     }
-
+    
+    /**
+     * Show the Index Page
+     * @Any("/view-report", as="reports.employees.totalSalaries.viewReport")
+     */
     public function viewReport(Request $request) {
-        //{"ch_detialed":"0","expense_id":"1","processes":["1","2"]}
-        $monthName = "يناير";
-
         $employees = [];
         $dt = DateTime::parse($request->selectMonth);
+        $monthName = $dt->getMonthName();
         $index = 0;
 
         $totalWorkingHours = 0;
@@ -138,7 +92,7 @@ class EmployeesReportController extends Controller {
 
             $employees[$index] = [
                 'name' => $employee->name,
-                'workingHours' => $this->diffInHoursMinutsToString($WorkingHours),
+                'workingHours' => Helpers::hoursMinutsToString($WorkingHours),
                 'hourRate' => $hourlyRate,
                 'salary' => $HoursSalary,
                 'absentDeduction' => $AbsentDeduction,
@@ -164,46 +118,42 @@ class EmployeesReportController extends Controller {
             $totalGuardianshipValue += $GuardianshipValue;
             $totalGuardianshipReturnValue += $GuardianshipReturnValue;
             $totalNetSalary += $NetSalary;
-            
+
             $index++;
         }
-        
-        $totalWorkingHours = $this->diffInHoursMinutsToString($totalWorkingHours);
+
+        $totalWorkingHours = Helpers::hoursMinutsToString($totalWorkingHours);
         session([
             'monthName' => $monthName,
             'employees' => $employees,
-            'totalWorkingHours' => $totalWorkingHours, 
-            'totalHourlyRate' => $totalHourlyRate, 
-            'totalSalary' => $totalSalary, 
-            'totalAbsentDeduction' => $totalAbsentDeduction, 
-            'totalLongBorrowValue' => $totalLongBorrowValue, 
-            'totalSmallBorrowValue' => $totalSmallBorrowValue, 
-            'totalBorrowValue' => $totalBorrowValue, 
-            'totalSalaryDeduction' => $totalSalaryDeduction, 
-            'totalBonuses' => $totalBonuses, 
-            'totalGuardianshipValue' => $totalGuardianshipValue, 
-            'totalGuardianshipReturnValue' => $totalGuardianshipReturnValue, 
+            'totalWorkingHours' => $totalWorkingHours,
+            'totalHourlyRate' => $totalHourlyRate,
+            'totalSalary' => $totalSalary,
+            'totalAbsentDeduction' => $totalAbsentDeduction,
+            'totalLongBorrowValue' => $totalLongBorrowValue,
+            'totalSmallBorrowValue' => $totalSmallBorrowValue,
+            'totalBorrowValue' => $totalBorrowValue,
+            'totalSalaryDeduction' => $totalSalaryDeduction,
+            'totalBonuses' => $totalBonuses,
+            'totalGuardianshipValue' => $totalGuardianshipValue,
+            'totalGuardianshipReturnValue' => $totalGuardianshipReturnValue,
             'totalNetSalary' => $totalNetSalary
         ]);
         return view("reports.employee.totalSalaries", compact('employees', 'monthName', 'totalWorkingHours', 'totalHourlyRate', 'totalSalary', 'totalAbsentDeduction', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'totalBorrowValue', 'totalSalaryDeduction', 'totalBonuses', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalNetSalary'));
     }
 
-    public function printTotalPDF(Request $request) {
-        return $this->printPDF($request->ch_detialed, $request->withLetterHead, session('employees'), session('monthName'), session('totalWorkingHours'), session('totalHourlyRate'), session('totalSalary'), session('totalAbsentDeduction'), session('totalLongBorrowValue'), session('totalSmallBorrowValue'), session('totalBorrowValue'), session('totalSalaryDeduction'), session('totalBonuses'), session('totalGuardianshipValue'), session('totalGuardianshipReturnValue'), session('totalNetSalary'));
+    /**
+     * Show the Index Page
+     * @Get("/print-pdf", as="reports.employees.totalSalaries.printPDF")
+     */
+    public function printPDF(Request $request) {
+        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('employees'), session('monthName'), session('totalWorkingHours'), session('totalHourlyRate'), session('totalSalary'), session('totalAbsentDeduction'), session('totalLongBorrowValue'), session('totalSmallBorrowValue'), session('totalBorrowValue'), session('totalSalaryDeduction'), session('totalBonuses'), session('totalGuardianshipValue'), session('totalGuardianshipReturnValue'), session('totalNetSalary'));
     }
 
-    private function printPDF($ch_detialed, $withLetterHead, $employees, $monthName, $totalWorkingHours, $totalHourlyRate, $totalSalary, $totalAbsentDeduction, $totalLongBorrowValue, $totalSmallBorrowValue, $totalBorrowValue, $totalSalaryDeduction, $totalBonuses, $totalGuardianshipValue, $totalGuardianshipReturnValue, $totalNetSalary) {
+    private function exportPDF($ch_detialed, $withLetterHead, $employees, $monthName, $totalWorkingHours, $totalHourlyRate, $totalSalary, $totalAbsentDeduction, $totalLongBorrowValue, $totalSmallBorrowValue, $totalBorrowValue, $totalSalaryDeduction, $totalBonuses, $totalGuardianshipValue, $totalGuardianshipReturnValue, $totalNetSalary) {
         $pdfReport = new TotalSalaries($withLetterHead);
         $pdfReport->htmlContent = view("reports.employee.totalSalariesPrint", compact('employees', 'monthName', 'totalWorkingHours', 'totalHourlyRate', 'totalSalary', 'totalAbsentDeduction', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'totalBorrowValue', 'totalSalaryDeduction', 'totalBonuses', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalNetSalary'))->render();
         return $pdfReport->RenderReport();
-    }
-
-    function diffInHoursMinutsToString($totalDuration) {
-        $hours = floor($totalDuration / 3600);
-        $minutes = floor(($totalDuration / 60) % 60);
-        $seconds = $totalDuration % 60;
-
-        return "$hours:$minutes:$seconds";
     }
 
 }

@@ -23,4 +23,10 @@ class DateTime extends Carbon {
     public function endDayFormat() {
         return $this->format("Y-m-d 23:59:59");
     }
+
+    function getMonthName() {
+        $this->setLocale('ar');
+        return $this->formatLocalized('%A %d %B %Y');       
+    }
+
 }
