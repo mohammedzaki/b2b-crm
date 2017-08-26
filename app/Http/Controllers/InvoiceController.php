@@ -25,10 +25,7 @@ class InvoiceController extends Controller {
     public function index() {
         $invoices = Invoice::all();
         for ($index = 0; $index < count($invoices); $index++) {
-            $invoices[$index]->processesNames = '';
-            foreach ($invoices[$index]->processes as $process) {
-                $invoices[$index]->processesNames .= "({$process->name}), ";
-            }
+            $invoices[$index]->processesNames = '(' . implode('), (', $invoices[$index]->processes()->pluck('name')->toArray()) . ')';
         }
         return view('invoice.index', compact('invoices'));
     }
@@ -255,7 +252,6 @@ class InvoiceController extends Controller {
      * @return \Illuminate\Http\Response
      */
     public function edit(Invoice $invoice) {
-
         return view('invoice.edit', $this->setData($invoice));
     }
 
