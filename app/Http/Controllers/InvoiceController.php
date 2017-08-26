@@ -112,6 +112,7 @@ class InvoiceController extends Controller {
     /**
      * Show the Index Page
      * @Post("preview", as="invoice.preview")
+     * @Post("{invoice}/preview", as="invoice.editPreview")
      */
     public function preview(Request $request) {
         $all = $request->all();
@@ -120,19 +121,6 @@ class InvoiceController extends Controller {
         $invoice->items = $request->invoiceItems;
         $invoice->processes = $request->processes;
         return $this->showInvoicePreview($invoice);
-    }
-
-    /**
-     * Show the Index Page
-     * @Post("{invoice}/preview", as="invoice.editPreview")
-     */
-    public function editPreview(Request $request, Invoice $invoice) {
-        $all = $request->all();
-        $invoiceTemp = new Invoice;
-        $invoiceTemp->fill($all);
-        $invoiceTemp->items = $request->invoiceItems;
-        $invoiceTemp->processes = $request->processes;
-        return $this->showInvoicePreview($invoiceTemp);
     }
 
     private function showInvoicePreview(Invoice $invoice, $isPreview = TRUE) {
