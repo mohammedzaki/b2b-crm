@@ -103,11 +103,11 @@
             <li style="font-size: 20px;">
                 <a href="{{ URL::to('/reports') }}"><i class="fa fa-bar-chart-o"></i>  التقارير</a>
                 <ul>
-                    <li><a href="{{ URL::to('/reports/client') }}">عميل</a></li>
-                    <li><a href="{{ URL::to('/reports/supplier') }}">مورد</a></li>
-                    <li><a href="{{ URL::to('/reports/client/ClientAnalyticalCenter') }}">المركز التحليلى للعملاء</a></li>
-                    <li><a href="{{ URL::to('/reports/supplier/SupplierAnalyticalCenter') }}">المركز التحليلى للموردين</a></li>
-                    <li><a href="{{ URL::to('/reports/expenses') }}">استعلام عن مصروف</a></li>
+                    <li><a href="{{ route('reports.client.accountStatement.index') }}">عميل</a></li>
+                    <li><a href="{{ route('reports.supplier.accountStatement.index') }}">مورد</a></li>
+                    <li><a href="{{ route('reports.client.analyticalCenter.index') }}">المركز التحليلى للعملاء</a></li>
+                    <li><a href="{{ route('reports.supplier.analyticalCenter.index') }}">المركز التحليلى للموردين</a></li>
+                    <li><a href="{{ route('reports.expenses.index') }}">استعلام عن مصروف</a></li>
                     <li><a href="{{ route('reports.employees.totalSalaries.index') }}">مرتبات الشهر</a></li>
                     <li><a href="{{ route('reports.employees.borrow.index') }}">سلفيات الموظفين</a></li>
                 </ul>

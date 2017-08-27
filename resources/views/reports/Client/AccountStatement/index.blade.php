@@ -1,11 +1,13 @@
-<?php  use App\Models\SupplierProcess; ?>
+<?php
+
+use App\Models\ClientProcess; ?>
 @extends("layouts.app") 
 @section("title", "تقرير عملية عميل - التقارير")
 @section("content")
 
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">التقارير <small>تقرير عملية مورد</small></h1>
+        <h1 class="page-header">التقارير <small>تقرير عملية عميل</small></h1>
     </div>
 </div>
 <!-- /.row -->
@@ -27,10 +29,10 @@
     <div class="col-lg-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                تقرير عملية مورد
+                تقرير عملية عميل
             </div>
             <!-- /.panel-heading -->
-            {{ Form::open(["route" => "reports.supplier.viewSupplierReport"]) }}
+            {{ Form::open(["route" => "reports.client.accountStatement.viewReport"]) }}
             <div class="panel-body">
 
                 <div class="legend">
@@ -58,7 +60,7 @@
                         array(
                             "id" => "ch_openprocess",
                             "class" => "checkbox_show_input",
-                            "onchange" => "LoadSuppliers()",
+                            "onchange" => "LoadClients()",
                             "checked" => "checked"
                         )
                     ) }} 
@@ -68,19 +70,19 @@
                         array(
                             "id" => "ch_closedprocess",
                             "class" => "checkbox_show_input",
-                            "onchange" => "LoadSuppliers()"
+                            "onchange" => "LoadClients()"
                         )
                     ) }} 
                     {{ Form::label(null, "عمليات مغلقة") }}
                 </div>
                 <div class="form-group">
-                    {{ Form::label("supplier_id", "اسم المورد") }}
-                    {{ Form::select("supplier_id", [], null,
+                    {{ Form::label("client_id", "اسم العميل") }}
+                    {{ Form::select("client_id", [], null,
                                                         array(
                                                             "class" => "form-control",
                                                             "placeholder" => "",
-                                                            "id" => "supplier_id",
-                                                            "onchange" => "GetSupplierProcess(this)")
+                                                            "id" => "client_id",
+                                                            "onchange" => "GetClientProcess(this)")
                                                         )
                     }}
                 </div>
@@ -104,7 +106,7 @@
                                     <th rowspan="1" colspan="1" >اجمالي</th>
                                 </tr>
                             </thead>
-                            <tbody id="grid_SupplierProcess">
+                            <tbody id="grid_ClientProcess">
                                 <!--
                                 <tr class="gradeA odd ItemRow" role="row">
                                     <td style="text-align:center; vertical-align: middle;">
@@ -164,58 +166,58 @@
 
 @section('scripts')
 <script>
-    var allProcesses = JSON.parse(he.decode('{{ $supplierProcesses }}'));
-    var suppliers = JSON.parse(he.decode('{{ $suppliers }}'));
-    console.log(suppliers);
-    var currentSupplierId = 0;
-    LoadSuppliers();
-    
-    function LoadSuppliers() {
-        currentSupplierId = $(supplier_id).val();
-        $("#supplier_id").empty();
-        $("#grid_SupplierProcess").empty();
-        if (suppliers != null) {
-            $("#supplier_id").append('<option></option>');
-            $.each(suppliers, function (index, supplier) {
-                if (($("#ch_closedprocess").is(":checked") && supplier.hasClosedProcess == true) || ($("#ch_openprocess").is(":checked") && supplier.hasOpenProcess == true)) {
-                    if (supplier.id == currentSupplierId) {
-                        $("#supplier_id").append('<option selected value="' + supplier.id + '">' + supplier.name + '</option>');
+    var allProcesses = JSON.parse(he.decode('{{ $clientProcesses }}'));
+    var clients = JSON.parse(he.decode('{{ $clients }}'));
+    console.log(clients);
+    var currentClientId = 0;
+    LoadClients();
+
+    function LoadClients() {
+        currentClientId = $(client_id).val();
+        $("#client_id").empty();
+        $("#grid_ClientProcess").empty();
+        if (clients != null) {
+            $("#client_id").append('<option></option>');
+            $.each(clients, function (index, client) {
+                if (($("#ch_closedprocess").is(":checked") && client.hasClosedProcess == true) || ($("#ch_openprocess").is(":checked") && client.hasOpenProcess == true)) {
+                    if (client.id == currentClientId) {
+                        $("#client_id").append('<option selected value="' + client.id + '">' + client.name + '</option>');
                         FillterProcess();
                     } else {
-                        $("#supplier_id").append('<option value="' + supplier.id + '">' + supplier.name + '</option>');
+                        $("#client_id").append('<option value="' + client.id + '">' + client.name + '</option>');
                     }
                 }
             });
         }
     }
-    
-    function GetSupplierProcess(supplier_id) {
-        currentSupplierId = $(supplier_id).val();
+
+    function GetClientProcess(client_id) {
+        currentClientId = $(client_id).val();
         FillterProcess();
     }
-    
+
     function SelectAll(ch_all) {
-        var rowsCount = $("#grid_SupplierProcess").children().length;
+        var rowsCount = $("#grid_ClientProcess").children().length;
         for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
             SelectProcessByIndex(rowIndex, $(ch_all).is(":checked"));
         }
     }
 
     function FillterProcess() {
-        $("#grid_SupplierProcess").empty();
+        $("#grid_ClientProcess").empty();
         var index = 0;
-        if (allProcesses[currentSupplierId] != null) {
-            $.each(allProcesses[currentSupplierId], function (processId, value) {
-                if (($("#ch_closedprocess").is(":checked") && value.status == '{{ SupplierProcess::statusClosed }}') || ($("#ch_openprocess").is(":checked") && value.status == '{{ SupplierProcess::statusOpened }}')) {
-                    $("#grid_SupplierProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled name="processes[' + index + ']" type="hidden" value="' + processId + '"></td></tr>');
+        if (allProcesses[currentClientId] != null) {
+            $.each(allProcesses[currentClientId], function (processId, value) {
+                if (($("#ch_closedprocess").is(":checked") && value.status == '{{ ClientProcess::statusClosed }}') || ($("#ch_openprocess").is(":checked") && value.status == '{{ ClientProcess::statusOpened }}')) {
+                    $("#grid_ClientProcess").append('<tr class="gradeA odd ItemRow" role="row"> <td style="text-align:center; vertical-align: middle;"> <input class="" type="checkbox" value="1" onchange="SelectProcess(this)"> </td><td> <input class="form-control" disabled="disabled" name="processName" type="text" value="' + value.name + '"> </td><td> <input class="form-control" disabled="disabled" name="processTotal" type="text"  value="' + value.totalPrice + '"> </td> <td hidden><input class="form-control" disabled name="processes[' + index + ']" type="hidden" value="' + processId + '"></td></tr>');
                 }
                 index++;
             });
         }
     }
-    
+
     function SelectProcess(CurrentCell) {
-        if ($("#grid_SupplierProcess").children().length > 0) {
+        if ($("#grid_ClientProcess").children().length > 0) {
             rowIndex = $(CurrentCell)
                     .closest('tr') // Get the closest tr parent element
                     .prevAll() // Find all sibling elements in front of it
@@ -225,8 +227,8 @@
     }
 
     function SelectProcessByIndex(rowIndex, flag = false) {
-        var inputProcessId = $("#grid_SupplierProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0);
-        var inputChk = $("#grid_SupplierProcess tr:eq(" + rowIndex + ") td:eq(0)").children(0);
+        var inputProcessId = $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(3)").children(0);
+        var inputChk = $("#grid_ClientProcess tr:eq(" + rowIndex + ") td:eq(0)").children(0);
         if (!flag) {
             inputProcessId.prop("disabled", !inputProcessId.is(":disabled"));
             inputChk.prop("checked", !inputProcessId.is(":disabled"));
@@ -235,5 +237,6 @@
             inputChk.prop("checked", flag);
         }
     }
+
 </script>
 @endsection

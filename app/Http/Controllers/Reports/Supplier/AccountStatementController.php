@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Reports;
+namespace App\Http\Controllers\Reports\Supplier;
 
 use App\Extensions\DateTime;
 use App\Http\Controllers\Controller;
@@ -9,64 +9,17 @@ use App\Models\SupplierProcess;
 use App\Reports\Supplier\SupplierDetailed;
 use App\Reports\Supplier\SupplierTotal;
 use Illuminate\Http\Request;
-use Validator;
 
-class SupplierReportsController extends Controller {
+/**
+ * @Controller(prefix="/reports/supplier/account-statement")
+ * @Middleware({"web", "auth"})
+ */
+class AccountStatementController extends Controller {
 
     /**
-     * Create a new controller instance.
-     *
-     * @return void
+     * Show the Index Page
+     * @Get("/", as="reports.supplier.accountStatement.index")
      */
-    public function __construct() {
-        $this->middleware('auth');
-        //$this->middleware('ability:admin,employees-permissions');
-    }
-
-    protected function validator(array $data) {
-        $validator = Validator::make($data, [
-                    'name' => 'required|min:6|max:255',
-                    'ssn' => 'required|digits:14',
-                    'gender' => 'required|in:m,f',
-                    'martial_status' => 'in:single,married,widowed,divorced',
-                    'birth_date' => 'required|date_format:Y-m-d',
-                    'department' => 'string',
-                    'hiring_date' => 'required|date_format:Y-m-d',
-                    'daily_salary' => 'required|numeric',
-                    'working_hours' => 'required|numeric',
-                    'job_title' => 'required|max:100',
-                    'telephone' => 'digits:8',
-                    'mobile' => 'required|digits:11',
-                    'can_not_use_program' => 'boolean',
-                    'is_active' => 'boolean',
-                    'borrow_system' => 'boolean',
-                    'username' => 'unique:users,username',
-                    'password' => 'min:4'
-        ]);
-
-        $validator->setAttributeNames([
-            'name' => 'اسم الموظف',
-            'ssn' => 'الرقم القومي',
-            'gender' => 'الجنس',
-            'martial_status' => 'الحالة اﻻجتماعية',
-            'birth_date' => 'تاريخ الميﻻد',
-            'department' => 'القسم',
-            'hiring_date' => 'تاريخ التعيين',
-            'daily_salary' => 'الراتب اليومي',
-            'working_hours' => 'ساعات العمل',
-            'job_title' => 'الوظيفة',
-            'telephone' => 'التليفون',
-            'mobile' => 'المحمول',
-            'can_not_use_program' => 'عدم استخدام البرنامج',
-            'is_active' => 'نشط',
-            'borrow_system' => 'نظام السلف',
-            'username' => 'اسم المستخدم',
-            'password' => 'كلمة المرور'
-        ]);
-
-        return $validator;
-    }
-    
     public function index() {
         $suppliers = Supplier::all();
         $suppliers_tmp = [];
@@ -89,9 +42,13 @@ class SupplierReportsController extends Controller {
 
         $supplierProcesses = json_encode($supplierProcesses);
 
-        return view('reports.supplier.index', compact("suppliers", "supplierProcesses"));
+        return view('reports.Supplier.AccountStatement.index', compact("suppliers", "supplierProcesses"));
     }
     
+    /**
+     * Show the Index Page
+     * @Any("/view-report", as="reports.supplier.accountStatement.viewReport")
+     */
     public function viewReport(Request $request) {
         $supplier = Supplier::findOrFail($request->supplier_id);
         $supplierName = $supplier->name;
@@ -187,13 +144,29 @@ class SupplierReportsController extends Controller {
             'allProcessTotalRemaining' => $allProcessTotalRemaining
         ]);
         if ($request->ch_detialed == FALSE) {
-            return view("reports.supplier.total", compact('supplierName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
+            return view("reports.Supplier.AccountStatement.total", compact('supplierName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
         } else {
-            return view("reports.supplier.detialed", compact('supplierName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
+            return view("reports.Supplier.AccountStatement.detialed", compact('supplierName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
         }
     }
 
-    private function printPDF($ch_detialed, $withLetterHead, $supplierName, $proceses, $allProcessesTotalPrice, $allProcessTotalPaid, $allProcessTotalRemaining) {
+    /**
+     * Show the Index Page
+     * @Get("/print-total-pdf", as="reports.supplier.accountStatement.printTotalPDF")
+     */
+    public function printTotalPDF(Request $request) {
+        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('supplierName'), session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
+    }
+
+    /**
+     * Show the Index Page
+     * @Get("/print-detailed-pdf", as="reports.supplier.accountStatement.printDetailedPDF")
+     */
+    public function printDetailedPDF(Request $request) {
+        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('supplierName'),  session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
+    }
+    
+    private function exportPDF($ch_detialed, $withLetterHead, $supplierName, $proceses, $allProcessesTotalPrice, $allProcessTotalPaid, $allProcessTotalRemaining) {
         if ($ch_detialed == FALSE) {
             $pdfReport = new SupplierTotal($withLetterHead);
         } else {
@@ -205,14 +178,6 @@ class SupplierReportsController extends Controller {
         $pdfReport->allProcessTotalPaid = $allProcessTotalPaid;
         $pdfReport->allProcessTotalRemaining = $allProcessTotalRemaining;
         return $pdfReport->RenderReport();
-    }
-
-    public function printTotalPDF(Request $request) {
-        return $this->printPDF($request->ch_detialed, $request->withLetterHead, session('supplierName'), session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
-    }
-
-    public function printDetailedPDF(Request $request) {
-        return $this->printPDF($request->ch_detialed, $request->withLetterHead, session('supplierName'),  session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
     }
 
 }

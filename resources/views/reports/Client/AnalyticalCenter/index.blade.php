@@ -29,7 +29,7 @@
                 المركز التحليلى للعملاء
             </div>
             <!-- /.panel-heading -->
-            {{ Form::open(["route" => "reports.ClientAnalyticalCenter.viewClientReport", 'id' => 'depositwithdrawForm']) }}
+            {{ Form::open(["route" => "reports.client.analyticalCenter.viewReport"]) }}
             <div class="panel-body">
 
                 <div class="legend">

@@ -1,9 +1,9 @@
 @extends("layouts.app") 
-@section("title", "تقرير المصروفات - التقارير")
+@section("title", "المركز التحليلى للعملاء - التقارير")
 @section("content")
 
 <div class="row">
-    {{ Form::open(["route" => "reports.expenses.printTotalPDF", "method" => "GET"]) }} 
+    {{ Form::open(["route" => "reports.client.analyticalCenter.printTotalPDF", "method" => "GET"]) }} 
     <div class="col-lg-12" id="printcontent">
         <div class="panel panel-default">
             <!-- /.panel-heading -->
@@ -25,21 +25,28 @@
                                     <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                                         <thead>
                                             <tr>
-                                                <th>اسم المصروف</th>
+
+                                                <th>اسم العميل</th>
+                                                <th>الاجمالى</th>
                                                 <th>المدفوع</th>
+                                                <th>المتبقى</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($expenses as $expense)
+                                            @forelse ($clients as $client)
                                             <tr class="odd">
-                                                <td>{{ $expense['expenseName'] }}</td>
-                                                <td style="color: red;">{{ $expense['expenseTotalPaid'] }}</td>
+                                                <td>{{ $client['clientName'] }}</td>
+                                                <td>{{ $client['clientTotalPrice'] }}</td>
+                                                <td style="color: red;">{{ $client['clientTotalPaid'] }}</td>
+                                                <td>{{ $client['clientTotalRemaining'] }}</td>
                                             </tr>
                                             @empty
                                             @endforelse
                                             <tr class="info">
                                                 <td style="color: red;"> الاجمالـــــــــــــــــــــــــــــــــــى</td>
-                                                <td style="color: red;">{{ $allExpensesTotalPaid }}</td>
+                                                <td style="color: red;">{{ $allClientsTotalPrice }}</td>
+                                                <td style="color: red;">{{ $allClientsTotalPaid }}</td>
+                                                <td style="color: red;">{{ $allClientsTotalRemaining }}</td>
                                             </tr>
                                         </tbody>
                                     </table>  
@@ -70,7 +77,7 @@
         </p>
 
     </row>
-    {{ Form::close() }} 
+    {{ Form::close() }}
 </div>
 
 @endsection

@@ -6,7 +6,7 @@
  * and open the template in the editor.
  */
 
-namespace App\Http\Controllers\Reports;
+namespace App\Http\Controllers\Reports\Expenses;
 
 use App\Extensions\DateTime;
 use App\Http\Controllers\Controller;
@@ -14,42 +14,26 @@ use App\Models\Expenses;
 use App\Reports\Expenses\expensesDetailed;
 use App\Reports\Expenses\expensesTotal;
 use Illuminate\Http\Request;
-use Validator;
 
 /**
- * Description of ExpensesReportController
- *
- * @author mohammedzaki
+ * @Controller(prefix="/reports/expenses")
+ * @Middleware({"web", "auth"})
  */
 class ExpensesReportController extends Controller {
 
     /**
-     * Create a new controller instance.
-     *
-     * @return void
+     * Show the Index Page
+     * @Get("/", as="reports.expenses.index")
      */
-    public function __construct() {
-        $this->middleware('auth');
-        //$this->middleware('ability:admin,employees-permissions');
-    }
-
-    protected function validator(array $data) {
-        $validator = Validator::make($data, [
-            
-        ]);
-
-        $validator->setAttributeNames([
-            
-        ]);
-
-        return $validator;
-    }
-
     public function index() {
         $expenses = Expenses::all(['id', 'name']);
         return view('reports.expenses.index', compact("expenses"));
     }
 
+    /**
+     * Show the Index Page
+     * @Any("/view-report", as="reports.expenses.viewReport")
+     */
     public function viewReport(Request $request) {
         //{"ch_detialed":"0","expense_id":"1","processes":["1","2"]}
         $expenseName = "";
@@ -62,10 +46,10 @@ class ExpensesReportController extends Controller {
             $expense = Expenses::findOrFail($id);
             $expense->startDate = DateTime::parse($request->startDate)->startOfDay();
             $expense->endDate = DateTime::parse($request->endDate)->endOfDay();
-            
+
             $expenses[$id]['expenseName'] = $expense->name;
             $expenses[$id]['expenseTotalPaid'] = $expense->getTotalPaid();
-            
+
             $allExpensesTotalPaid += $expenses[$id]['expenseTotalPaid'];
 
             if ($request->ch_detialed == TRUE) {
@@ -92,15 +76,23 @@ class ExpensesReportController extends Controller {
         }
     }
 
+    /**
+     * Show the Index Page
+     * @Get("/print-total-pdf", as="reports.expenses.printTotalPDF")
+     */
     public function printTotalPDF(Request $request) {
-        return $this->printPDF($request->ch_detialed, $request->withLetterHead, session('expenseName'), session('expenses'), session('allExpensesTotalPaid'));
+        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('expenseName'), session('expenses'), session('allExpensesTotalPaid'));
     }
 
+    /**
+     * Show the Index Page
+     * @Get("/print-detailed-pdf", as="reports.expenses.printDetailedPDF")
+     */
     public function printDetailedPDF(Request $request) {
-        return $this->printPDF($request->ch_detialed, $request->withLetterHead, session('expenseName'), session('expenses'), session('allExpensesTotalPaid'));
+        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('expenseName'), session('expenses'), session('allExpensesTotalPaid'));
     }
 
-    private function printPDF($ch_detialed, $withLetterHead, $expenseName, $expenses, $allExpensesTotalPaid) {
+    private function exportPDF($ch_detialed, $withLetterHead, $expenseName, $expenses, $allExpensesTotalPaid) {
         if ($ch_detialed == FALSE) {
             $pdfReport = new expensesTotal($withLetterHead);
         } else {

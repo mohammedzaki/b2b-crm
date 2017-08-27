@@ -29,7 +29,7 @@
                 المركز التحليلى للموردين
             </div>
             <!-- /.panel-heading -->
-            {{ Form::open(["route" => "reports.SupplierAnalyticalCenter.viewSupplierReport", 'id' => 'depositwithdrawForm']) }}
+            {{ Form::open(["route" => "reports.supplier.analyticalCenter.viewReport"]) }}
             <div class="panel-body">
 
                 <div class="legend">

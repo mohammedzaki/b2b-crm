@@ -1,9 +1,9 @@
 @extends("layouts.app") 
-@section("title", "تقرير المصروفات - التقارير")
+@section("title", "تقرير عملية عميل - التقارير")
 @section("content")
 
 <div class="row">
-    {{ Form::open(["route" => "reports.expenses.printDetailedPDF", "method" => "GET"]) }}  
+    {{ Form::open(["route" => "reports.client.accountStatement.printDetailedPDF", "method" => "GET"]) }}
     <div class="col-lg-12" id="printcontent">
         <div class="panel panel-default">
             <!-- /.panel-heading -->
@@ -11,10 +11,19 @@
                 <div class="col-lg-12 no-padding">
                     <img src="/ReportsHtml/letr.png" class="letrHead" style="width: 100%; margin-bottom: 20px;" />
                 </div>
-                @forelse ($expenses as $expense)
+                @forelse ($proceses as $process)
                 <div class="col-lg-12 no-padding">
                     <div class="col-lg-6 no-padding">
-                        <label>اسم المصروف :</label> {{ $expense['expenseName'] }}
+                        <label>اسم العميل :</label> {{ $clientName }}
+                    </div>
+                    <div class="col-lg-6 no-padding">
+                        <label>اسم العملية :</label> {{ $process['processName'] }}
+                    </div>
+                    <div class="col-lg-6 no-padding">
+                        <label>مسلسل :</label> {{ $process['processNum'] }}
+                    </div>
+                    <div class="col-lg-6 no-padding">
+                        <label>تاريخ :</label> {{ $process['processDate'] }}
                     </div>
                     <div class="col-lg-12 no-padding">
                         <div class="panel-body">
@@ -24,23 +33,33 @@
                                     <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                                         <thead>
                                             <tr>
-                                                <th width="50%">البيان</th>
-                                                <th width="20%">المدفوع</th>
-                                                <th width="30%">تاريخ</th>
+                                                <th>تاريخ</th>
+                                                <th>المتبقى</th>
+                                                <th>المدفوع</th>
+                                                <th>الاجمالى</th>
+                                                <th>سعر الوحدة</th>
+                                                <th>الكمية</th>
+                                                <th>بيان</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($expense['expenseDetails'] as $details)
+                                            @forelse ($process['processDetails'] as $details)
                                             <tr class="odd">
-                                                <td> {{ $details['desc'] }} </td>
-                                                <td style="color: red;"> {{ $details['paid'] }} </td>
                                                 <td> {{ $details['date'] }} </td>
+                                                <td> {{ $details['remaining'] }} </td>
+                                                <td style="color: red;"> {{ $details['paid'] }} </td>
+                                                <td> {{ $details['totalPrice'] }} </td>
+                                                <td> {{ $details['unitPrice'] }} </td>
+                                                <td> {{ $details['quantity'] }} </td>
+                                                <td> {{ $details['desc'] }} </td>
                                             </tr>
                                             @empty
                                             @endforelse
                                             <tr class="info">
                                                 <td></td>
-                                                <td style="color: red;">{{ $expense['expenseTotalPaid'] }}</td>
+                                                <td style="color: red;">{{ $process['processTotalRemaining'] }}</td>
+                                                <td style="color: red;">{{ $process['processTotalPaid'] }}</td>
+                                                <td style="color: red;" colspan="3">{{ $process['processTotalPrice'] }}</td>
                                                 <td style="color: red;"> الاجمالـــــــــــــــــــــــــــــــــــى</td>
                                             </tr>
                                         </tbody>
@@ -75,6 +94,9 @@
         </p>
 
     </row>
-    {{ Form::close() }}  
+    {{ Form::close() }}
 </div>
+
+
+
 @endsection

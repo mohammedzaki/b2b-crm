@@ -1,79 +1,25 @@
 <?php
 
-namespace App\Http\Controllers\Reports;
+namespace App\Http\Controllers\Reports\Client;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Http\Requests;
-use Validator;
 use App\Models\Client;
 use App\Models\ClientProcess;
-use App\Models\Supplier;
-use App\Models\SupplierProcess;
-use App\Models\DepositWithdraw;
 use App\Extensions\DateTime;
 use App\Reports\Client\ClientTotal;
 use App\Reports\Client\ClientDetailed;
-use App\Reports\Supplier\SupplierTotal;
-use App\Reports\Supplier\SupplierDetailed;
-use App\Http\Controllers\FacilityController;
 
-class ClientReportsController extends Controller {
-
+/**
+ * @Controller(prefix="/reports/client/account-statement")
+ * @Middleware({"web", "auth"})
+ */
+class AccountStatementController extends Controller {
+    
     /**
-     * Create a new controller instance.
-     *
-     * @return void
+     * Show the Index Page
+     * @Get("/", as="reports.client.accountStatement.index")
      */
-    public function __construct() {
-        $this->middleware('auth');
-        //$this->middleware('ability:admin,employees-permissions');
-    }
-
-    protected function validator(array $data) {
-        $validator = Validator::make($data, [
-                    'name' => 'required|min:6|max:255',
-                    'ssn' => 'required|digits:14',
-                    'gender' => 'required|in:m,f',
-                    'martial_status' => 'in:single,married,widowed,divorced',
-                    'birth_date' => 'required|date_format:Y-m-d',
-                    'department' => 'string',
-                    'hiring_date' => 'required|date_format:Y-m-d',
-                    'daily_salary' => 'required|numeric',
-                    'working_hours' => 'required|numeric',
-                    'job_title' => 'required|max:100',
-                    'telephone' => 'digits:8',
-                    'mobile' => 'required|digits:11',
-                    'can_not_use_program' => 'boolean',
-                    'is_active' => 'boolean',
-                    'borrow_system' => 'boolean',
-                    'username' => 'unique:users,username',
-                    'password' => 'min:4'
-        ]);
-
-        $validator->setAttributeNames([
-            'name' => 'اسم الموظف',
-            'ssn' => 'الرقم القومي',
-            'gender' => 'الجنس',
-            'martial_status' => 'الحالة اﻻجتماعية',
-            'birth_date' => 'تاريخ الميﻻد',
-            'department' => 'القسم',
-            'hiring_date' => 'تاريخ التعيين',
-            'daily_salary' => 'الراتب اليومي',
-            'working_hours' => 'ساعات العمل',
-            'job_title' => 'الوظيفة',
-            'telephone' => 'التليفون',
-            'mobile' => 'المحمول',
-            'can_not_use_program' => 'عدم استخدام البرنامج',
-            'is_active' => 'نشط',
-            'borrow_system' => 'نظام السلف',
-            'username' => 'اسم المستخدم',
-            'password' => 'كلمة المرور'
-        ]);
-
-        return $validator;
-    }
-
     public function index() {
         $clients = Client::all();
         $clients_tmp = [];
@@ -84,7 +30,7 @@ class ClientReportsController extends Controller {
             $clients_tmp[$index]['name'] = $client->name;
             $clients_tmp[$index]['hasOpenProcess'] = $client->hasOpenProcess();
             $clients_tmp[$index]['hasClosedProcess'] = $client->hasClosedProcess();
-            
+
             foreach ($client->processes as $process) {
                 $clientProcesses[$client->id][$process->id]['name'] = $process->name;
                 $clientProcesses[$client->id][$process->id]['totalPrice'] = $process->total_price;
@@ -96,9 +42,13 @@ class ClientReportsController extends Controller {
 
         $clientProcesses = json_encode($clientProcesses);
 
-        return view('reports.client.index', compact("clients", "clientProcesses"));
+        return view('reports.Client.AccountStatement.index', compact("clients", "clientProcesses"));
     }
 
+    /**
+     * Show the Index Page
+     * @Any("/view-report", as="reports.client.accountStatement.viewReport")
+     */
     public function viewReport(Request $request) {
         //{"ch_detialed":"0","client_id":"1","processes":["1","2"]}
         $client = Client::findOrFail($request->client_id);
@@ -186,21 +136,29 @@ class ClientReportsController extends Controller {
             'allProcessTotalRemaining' => $allProcessTotalRemaining
         ]);
         if ($request->ch_detialed == FALSE) {
-            return view("reports.client.total", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
+            return view("reports.Client.AccountStatement.total", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
         } else {
-            return view("reports.client.detialed", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
+            return view("reports.Client.AccountStatement.detialed", compact('clientName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
         }
     }
 
+    /**
+     * Show the Index Page
+     * @Get("/print-total-pdf", as="reports.client.accountStatement.printTotalPDF")
+     */
     public function printTotalPDF(Request $request) {
-        return $this->printClientPDF($request->ch_detialed, $request->withLetterHead, session('clientName'), session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
+        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('clientName'), session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
     }
 
+    /**
+     * Show the Index Page
+     * @Get("/print-detailed-pdf", as="reports.client.accountStatement.printDetailedPDF")
+     */
     public function printDetailedPDF(Request $request) {
-        return $this->printClientPDF($request->ch_detialed, $request->withLetterHead, session('clientName'), session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
+        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('clientName'), session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
     }
 
-    private function printClientPDF($ch_detialed, $withLetterHead, $clientName, $proceses, $allProcessesTotalPrice, $allProcessTotalPaid, $allProcessTotalRemaining) {
+    private function exportPDF($ch_detialed, $withLetterHead, $clientName, $proceses, $allProcessesTotalPrice, $allProcessTotalPaid, $allProcessTotalRemaining) {
         if ($ch_detialed == FALSE) {
             $pdfReport = new ClientTotal($withLetterHead);
         } else {

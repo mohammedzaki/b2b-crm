@@ -1,9 +1,9 @@
 @extends("layouts.app") 
-@section("title", "تقرير المصروفات - التقارير")
+@section("title", "المركز التحليلى للموردين - التقارير")
 @section("content")
 
 <div class="row">
-    {{ Form::open(["route" => "reports.expenses.printTotalPDF", "method" => "GET"]) }} 
+    {{ Form::open(["route" => "reports.supplier.analyticalCenter.printTotalPDF", "method" => "GET"]) }} 
     <div class="col-lg-12" id="printcontent">
         <div class="panel panel-default">
             <!-- /.panel-heading -->
@@ -14,7 +14,7 @@
                     </div>
                     <div class="col-lg-6 no-padding">
                         <div class="form-group">
-                            <label>المركز التحليلى للعملاء</label>
+                            <label>المركز التحليلى للموردين</label>
                         </div>
                     </div>
                     <div class="col-lg-12 no-padding">
@@ -25,21 +25,28 @@
                                     <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                                         <thead>
                                             <tr>
-                                                <th>اسم المصروف</th>
+
+                                                <th>اسم المورد</th>
+                                                <th>الاجمالى</th>
                                                 <th>المدفوع</th>
+                                                <th>المتبقى</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @forelse ($expenses as $expense)
+                                            @forelse ($suppliers as $supplier)
                                             <tr class="odd">
-                                                <td>{{ $expense['expenseName'] }}</td>
-                                                <td style="color: red;">{{ $expense['expenseTotalPaid'] }}</td>
+                                                <td>{{ $supplier['supplierName'] }}</td>
+                                                <td>{{ $supplier['supplierTotalPrice'] }}</td>
+                                                <td style="color: red;">{{ $supplier['supplierTotalPaid'] }}</td>
+                                                <td>{{ $supplier['supplierTotalRemaining'] }}</td>
                                             </tr>
                                             @empty
                                             @endforelse
                                             <tr class="info">
                                                 <td style="color: red;"> الاجمالـــــــــــــــــــــــــــــــــــى</td>
-                                                <td style="color: red;">{{ $allExpensesTotalPaid }}</td>
+                                                <td style="color: red;">{{ $allSuppliersTotalPrice }}</td>
+                                                <td style="color: red;">{{ $allSuppliersTotalPaid }}</td>
+                                                <td style="color: red;">{{ $allSuppliersTotalRemaining }}</td>
                                             </tr>
                                         </tbody>
                                     </table>  

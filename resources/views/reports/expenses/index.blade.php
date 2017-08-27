@@ -29,7 +29,7 @@
                 المصروفات
             </div>
             <!-- /.panel-heading -->
-            {{ Form::open(["route" => "reports.expenses.viewClientReport", 'id' => 'depositwithdrawForm']) }}
+            {{ Form::open(["route" => "reports.expenses.viewReport"]) }}
             <div class="panel-body">
 
                 <div class="legend">

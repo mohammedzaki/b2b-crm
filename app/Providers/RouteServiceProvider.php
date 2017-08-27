@@ -77,9 +77,10 @@ class RouteServiceProvider extends ServiceProvider {
      */
     protected function mapReportsRoutes() {
         Route::prefix('reports')
-                ->middleware('web')
-                ->namespace($this->namespace)
-                ->group(base_path('routes/reports.php'));
+                ->namespace('App\Http\Controllers\Reports');
+        //Route::namespace('Admin')->group(function () {
+        //    // Controllers Within The "App\Http\Controllers\Admin" Namespace
+        //});
     }
 
 }
