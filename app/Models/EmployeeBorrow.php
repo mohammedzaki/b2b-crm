@@ -35,7 +35,7 @@ class EmployeeBorrow extends Model {
     }
 
     public function totalPaid() {
-        return $this->paidAmounts->sum('paid_amount');
+        return $this->paidAmounts()->sum('paid_amount');
     }
 
     public function totalRemaining() {

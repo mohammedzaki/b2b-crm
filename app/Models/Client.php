@@ -55,7 +55,7 @@ class Client extends Model {
                     ['clients.id', '=', $this->id]])
                 ->distinct()
                 ->get();
-        
+
         if ($client->count() > 0) {
             return TRUE;
         } else {
@@ -70,14 +70,14 @@ class Client extends Model {
                     ['clients.id', '=', $this->id]])
                 ->distinct()
                 ->get();
-        
+
         if ($client->count() > 0) {
             return TRUE;
         } else {
             return FALSE;
         }
     }
-    
+
     public static function allHasOpenProcess() {
         $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
                 ->select('clients.*')->where('client_processes.status', ClientProcess::statusOpened)
@@ -109,16 +109,18 @@ class Client extends Model {
                 ->get();
         return $clients;
     }
-    
+
     public function getTotalPaid() {
         return DB::table('clients')
                         ->join('client_processes', 'client_processes.client_id', '=', 'clients.id')
                         ->join('deposit_withdraws', 'client_processes.id', '=', 'deposit_withdraws.cbo_processes')
                         ->join('deposit_withdraws as dw', 'clients.id', '=', 'deposit_withdraws.client_id')
                         ->distinct()
-                        ->where('client_processes.status', ClientProcess::statusOpened)
-                        ->where('clients.id', $this->id)
-                        ->sum('deposit_withdraws.depositValue');
+                        ->where([
+                            ['clients.id', '=', $this->id]
+                        ])
+                        ->select(['deposit_withdraws.depositValue', 'deposit_withdraws.cbo_processes'])
+                        ->get()->sum('depositValue');
     }
 
     public function getTotalRemaining() {
@@ -126,7 +128,7 @@ class Client extends Model {
     }
 
     public function getTotalDeal() {
-        return $this->openProcess()->sum('total_price_taxes');
+        return $this->processes()->sum('total_price_taxes');
     }
 
 }

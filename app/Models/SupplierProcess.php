@@ -10,7 +10,6 @@ class SupplierProcess extends Model {
     use SoftDeletes;
 
     protected $dates = ['deleted_at'];
-    
     protected $fillable = [
         'name',
         'client_process_id',
@@ -31,6 +30,7 @@ class SupplierProcess extends Model {
         'taxes_value'
     ];
     public $client_id = 0;
+
     const statusClosed = 'closed';
     const statusOpened = 'active';
 
@@ -49,11 +49,11 @@ class SupplierProcess extends Model {
     public function clientProcess() {
         return $this->belongsTo(ClientProcess::class);
     }
-    
+
     public function withdrawals() {
         return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
-            ['supplier_id', "=",  $this->supplier->id],
-            ['withdrawValue', ">", 0],
+                    ['supplier_id', "=", $this->supplier->id],
+                    ['withdrawValue', ">", 0],
         ]);
     }
 

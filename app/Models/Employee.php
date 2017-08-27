@@ -46,10 +46,7 @@ class Employee extends Model {
     }
     
     public function totalSmallBorrows() {
-        if (empty($this->smallBorrows)) {
-            return 0;
-        }
-        return $this->smallBorrows->sum('withdrawValue');
+        return $this->smallBorrows()->sum('withdrawValue');
     }
     
     public function longBorrows() {
@@ -57,7 +54,7 @@ class Employee extends Model {
     }
     
     public function totalLongBorrows() {
-        return $this->longBorrows->sum('amount');
+        return $this->longBorrows()->sum('amount');
     }
     
     public function hasUnpaidBorrow() {
