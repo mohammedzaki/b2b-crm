@@ -27,12 +27,12 @@
                                         <table class="table table-striped table-bordered table-hover" id="dataTables-example">
                                             <thead>
                                                 <tr>
-                                                    <th>بيان</th>
-                                                    <th>القيمة</th>
-                                                    <th>المدفوع</th>
-                                                    <th>المتبقى</th>
-                                                    <th>تاريخ</th>
-                                                    <th>ملاحظات</th>
+                                                    <th style="width: 20%">سبب السلفة</th>
+                                                    <th style="width: 15%">القيمة</th>
+                                                    <th style="width: 15%">المدفوع</th>
+                                                    <th style="width: 15%">المتبقى</th>
+                                                    <th style="width: 20%">تاريخ</th>
+                                                    <!--<th style="width: 20%">ملاحظات</th>-->
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -43,28 +43,32 @@
                                                     <td style="color: red;"> {{ $details['paid'] }} </td>
                                                     <td> {{ $details['remaining'] }} </td>
                                                     <td> {{ $details['date'] }} </td>
-                                                    <td> {{ $details['notes'] }} </td>
+                                                    <!--<td> {{ $details['notes'] }} </td>-->
                                                 </tr>
-                                                <tr class="info">
-                                                    <td>بيان</td>
-                                                    <td>المدفوع</td>
-                                                    <td style="color: red;">الحالة</td>
-                                                    <td>تاريخ الاستحقاق</td>
-                                                    <td>تاريخ الدفع</td>
-                                                    <td>ملاحظات</td>
-                                                </tr>
+                                                <thead>
+                                                    <tr class="info">
+                                                        <th>بيان</th>
+                                                        <th>الحالة</th>
+                                                        <th>المدفوع</th>
+                                                        <th>تاريخ الاستحقاق</th>
+                                                        <th>تاريخ الدفع</th>
+                                                        <!--<td>ملاحظات</td>-->
+                                                    </tr>
+                                                </thead>
                                                 @forelse ($details['amounts'] as $amount)
                                                 <tr class="odd">
                                                     <td> {{ $amount['desc'] }} </td>
-                                                    <td> {{ $amount['paid_amount'] }} </td>
-                                                    <td style="color: red;"> {{ $amount['paying_status'] }} </td>
+                                                    <td> {{ $amount['paying_status'] }} </td>
+                                                    <td style="color: red;"> {{ $amount['paid_amount'] }} </td>
                                                     <td> {{ $amount['due_date'] }} </td>
                                                     <td> {{ $amount['paid_date'] }} </td>
-                                                    <td> {{ $amount['notes'] }} </td>
+                                                    <!--<td> {{ $amount['notes'] }} </td>-->
                                                 </tr>
                                                 @empty
                                                 @endforelse
-                                                
+                                                <tr>
+                                                    <td colspan="5"  style="background-color: grey;"></td>
+                                                </tr>
                                                 @empty
                                                 @endforelse
                                                 <tr class="info">
@@ -72,7 +76,7 @@
                                                     <td style="color: red;">{{ $employee['employeeTotalPrice'] }}</td>
                                                     <td style="color: red;">{{ $employee['employeeTotalPaid'] }}</td>
                                                     <td style="color: red;">{{ $employee['employeeTotalRemaining'] }}</td>
-                                                    <td colspan="2" style="color: red;"> الاجمالـــــــــــــــــــــــــــــــــــى</td>
+                                                    <td colspan="1" style="color: red;"> الاجمالـــــــــــــــــــــــــــــــــــى</td>
                                                 </tr>
                                             </tbody>
                                         </table>  

@@ -35,5 +35,20 @@ class EmployeeBorrowBilling extends Model {
     public function getRemaining() {
         return $this->pay_amount - $this->paid_amount;
     } 
+    
+    public function getStatus() {
+        switch ($this->paying_status) {
+            case static::PAID:
+                if (empty($this->deposit_id)) {
+                    return 'تم الدفع من المرتب';
+                } else {
+                    return 'تم الدفع من الوارد و المنصرف';
+                }
+            case static::UN_PAID:
+                return 'لم يتم الدفع';
+            case static::POSTPONED:
+                return 'تم الترحيل';
+        }
+    }
 
 }

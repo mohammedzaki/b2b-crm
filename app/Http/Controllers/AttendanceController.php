@@ -737,6 +737,8 @@ class AttendanceController extends Controller {
             if (!empty($employeeBorrowBilling->id)) {
                 $borrowBilling = EmployeeBorrowBilling::findOrFail($employeeBorrowBilling->id);
                 $borrowBilling->paying_status = EmployeeBorrowBilling::PAID;
+                $borrowBilling->paid_amount += $borrowBilling->getRemaining();
+                $borrowBilling->paid_date = $all['due_date'];
                 $borrowBilling->save();
             }
 

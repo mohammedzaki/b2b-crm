@@ -88,7 +88,7 @@ class BorrowsReportController extends Controller {
                         $employees[$id]['borrowDetails'][$index]['amounts'][$x] = [
                             'desc' => '', //$amount,
                             'paid_amount' => $amount->paid_amount,
-                            'paying_status' => $amount->paying_status,
+                            'paying_status' => $amount->getStatus(),
                             'due_date' => $amount->due_date,
                             'paid_date' => $amount->paid_date,
                             'notes' => $amount->notes

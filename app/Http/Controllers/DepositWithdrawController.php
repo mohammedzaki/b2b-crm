@@ -19,6 +19,7 @@ use Illuminate\Support\Facades\Auth;
 use Validator;
 use App\Exceptions\ServerErrorException;
 use DB;
+use App\Models\EmployeeBorrowBilling;
 
 class DepositWithdrawController extends Controller {
 
