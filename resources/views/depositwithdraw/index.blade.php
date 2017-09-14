@@ -695,10 +695,10 @@
 
 @section('scripts')
 <script>
-    var expenses = JSON.parse(he.decode("{{ $expenses }}"));
-    var employeeActions = JSON.parse(he.decode("{{ $employeeActions }}"));
-    var suppliers = JSON.parse(he.decode("{{ $suppliers }}"));
-    var clients = JSON.parse(he.decode("{{ $clients }}"));
+    var expenses = {!! $expenses !!};
+    var employeeActions = {!! $employeeActions !!};
+    var suppliers = {!! $suppliers !!};
+    var clients = {!! $clients !!};
     var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount;
     var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
     var loadAll = false;

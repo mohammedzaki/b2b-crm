@@ -37,28 +37,28 @@ class InvoiceController extends Controller {
         } else {
             $clients = Client::allHasUnBilledInvoiceProcess();
         }
-        $clients_tmp = [];
-        $clientProcesses = [];
+        $clients_tmp      = [];
+        $clientProcesses  = [];
         $invoiceProcesses = [];
         foreach ($clients as $client) {
             $clients_tmp[$client->id] = $client->name;
-            $invoiceProcesses = $client->unInvoiceProcesses;
+            $invoiceProcesses         = $client->unInvoiceProcesses;
             if ($invoice && !$invoice->isLastInvoice()) {
                 $invoiceProcesses = [];
             }
             foreach ($invoiceProcesses as $process) {
                 $clientProcesses[$client->id][$process->id] = [
-                    'name' => $process->name,
-                    'totalPrice' => $process->total_price,
+                    'name'            => $process->name,
+                    'totalPrice'      => $process->total_price,
                     'totalPriceTaxes' => $process->total_price_taxes,
-                    'discount' => ($process->discount_value ? $process->discount_value : 0),
-                    'sourceDiscount' => ($process->source_discount_value ? $process->source_discount_value : 0),
-                    'taxes' => ($process->taxes_value ? $process->taxes_value : 0),
-                    'status' => $process->status,
-                    'items' => $process->items,
-                    'totalPaid' => $process->totalDeposits(),
-                    'totalRemaining' => $process->totalRemaining(),
-                    'invoice_id' => $process->invoice_id
+                    'discount'        => ($process->discount_value ? $process->discount_value : 0),
+                    'sourceDiscount'  => ($process->source_discount_value ? $process->source_discount_value : 0),
+                    'taxes'           => ($process->taxes_value ? $process->taxes_value : 0),
+                    'status'          => $process->status,
+                    'items'           => $process->items,
+                    'totalPaid'       => $process->totalDeposits(),
+                    'totalRemaining'  => $process->totalRemaining(),
+                    'invoice_id'      => $process->invoice_id
                 ];
             }
         }
@@ -66,17 +66,17 @@ class InvoiceController extends Controller {
             $invoiceProcesses = $invoice->processes;
             foreach ($invoiceProcesses as $process) {
                 $clientProcesses[$invoice->client_id][$process->id] = [
-                    'name' => $process->name,
-                    'totalPrice' => $process->total_price,
+                    'name'            => $process->name,
+                    'totalPrice'      => $process->total_price,
                     'totalPriceTaxes' => $process->total_price_taxes,
-                    'discount' => ($process->discount_value ? $process->discount_value : 0),
-                    'sourceDiscount' => ($process->source_discount_value ? $process->source_discount_value : 0),
-                    'taxes' => ($process->taxes_value ? $process->taxes_value : 0),
-                    'status' => $process->status,
-                    'items' => $process->items,
-                    'totalPaid' => $process->totalDeposits(),
-                    'totalRemaining' => $process->totalRemaining(),
-                    'invoice_id' => $process->invoice_id
+                    'discount'        => ($process->discount_value ? $process->discount_value : 0),
+                    'sourceDiscount'  => ($process->source_discount_value ? $process->source_discount_value : 0),
+                    'taxes'           => ($process->taxes_value ? $process->taxes_value : 0),
+                    'status'          => $process->status,
+                    'items'           => $process->items,
+                    'totalPaid'       => $process->totalDeposits(),
+                    'totalRemaining'  => $process->totalRemaining(),
+                    'invoice_id'      => $process->invoice_id
                 ];
             }
         }
@@ -112,18 +112,18 @@ class InvoiceController extends Controller {
      * @Post("{invoice}/preview", as="invoice.editPreview")
      */
     public function preview(Request $request) {
-        $all = $request->all();
-        $invoice = new Invoice;
+        $all                = $request->all();
+        $invoice            = new Invoice;
         $invoice->fill($all);
-        $invoice->items = $request->invoiceItems;
+        $invoice->items     = $request->invoiceItems;
         $invoice->processes = $request->processes;
         return $this->showInvoicePreview($invoice);
     }
 
     private function showInvoicePreview(Invoice $invoice, $isPreview = TRUE) {
-        $pdfReport = new InvoiceReport(TRUE);
-        $index = count($invoice->items) - 1;
-        $invoiceItems = $invoice->items;
+        $pdfReport           = new InvoiceReport(TRUE);
+        $index               = count($invoice->items) - 1;
+        $invoiceItems        = $invoice->items;
         $has_source_discount = FALSE;
         foreach ($invoice->processes as $clientProcess) {
             if ($isPreview) {
@@ -131,11 +131,11 @@ class InvoiceController extends Controller {
             }
             if ($clientProcess->has_discount == TRUE) {
                 $invoiceItems[++$index] = [
-                    'size' => "",
+                    'size'        => "",
                     'total_price' => $clientProcess->discount_value,
-                    'class' => 'redColor',
-                    'unit_price' => "",
-                    'quantity' => "",
+                    'class'       => 'redColor',
+                    'unit_price'  => "",
+                    'quantity'    => "",
                     'description' => "خصم بسبب : " . $clientProcess->discount_reason,
                 ];
             }
@@ -144,49 +144,49 @@ class InvoiceController extends Controller {
             }
         }
         $invoiceItems[++$index] = [
-            'size' => '',
+            'size'        => '',
             'total_price' => '',
-            'class' => '',
-            'unit_price' => '',
-            'quantity' => '',
+            'class'       => '',
+            'unit_price'  => '',
+            'quantity'    => '',
             'description' => '',
         ];
         $invoiceItems[++$index] = [
-            'size' => "",
+            'size'        => "",
             'total_price' => $invoice->invoice_price,
-            'class' => '',
-            'unit_price' => "",
-            'quantity' => "",
+            'class'       => '',
+            'unit_price'  => "",
+            'quantity'    => "",
             'description' => "الاجمالى قبل الضريبة",
         ];
-        $taxes_percentage = FacilityController::TaxesRate($invoice->invoice_date);
+        $taxes_percentage       = FacilityController::TaxesRate($invoice->invoice_date);
         $invoiceItems[++$index] = [
-            'size' => "",
+            'size'        => "",
             'total_price' => $invoice->taxes_price,
-            'class' => '',
-            'unit_price' => "",
-            'quantity' => "",
+            'class'       => '',
+            'unit_price'  => "",
+            'quantity'    => "",
             'description' => "قيمة الضريبة المضافة {$taxes_percentage}%",
         ];
         if ($has_source_discount) {
             $invoiceItems[++$index] = [
-                'size' => "",
+                'size'        => "",
                 'total_price' => $invoice->source_discount_value,
-                'class' => 'redColor',
-                'unit_price' => "",
-                'quantity' => "",
+                'class'       => 'redColor',
+                'unit_price'  => "",
+                'quantity'    => "",
                 'description' => "(-) خصم من المنبع",
             ];
         }
-        $pdfReport->clinetName = $invoice->client->name;
-        $pdfReport->invoiceItems = $invoiceItems;
-        $pdfReport->discountPrice = $invoice->discount_price;
-        $pdfReport->discountReason = 'N\A';
-        $pdfReport->invoiceDate = $invoice->invoice_date;
-        $pdfReport->invoiceNo = $invoice->invoice_number;
-        $pdfReport->sourceDiscountPrice = $invoice->source_discount_value;
-        $pdfReport->totalPrice = $invoice->invoice_price;
-        $pdfReport->totalTaxes = $invoice->taxes_price;
+        $pdfReport->clinetName           = $invoice->client->name;
+        $pdfReport->invoiceItems         = $invoiceItems;
+        $pdfReport->discountPrice        = $invoice->discount_price;
+        $pdfReport->discountReason       = 'N\A';
+        $pdfReport->invoiceDate          = $invoice->invoice_date;
+        $pdfReport->invoiceNo            = $invoice->invoice_number;
+        $pdfReport->sourceDiscountPrice  = $invoice->source_discount_value;
+        $pdfReport->totalPrice           = $invoice->invoice_price;
+        $pdfReport->totalTaxes           = $invoice->taxes_price;
         $pdfReport->totalPriceAfterTaxes = $invoice->total_price;
         session([
             'pdfReport' => $pdfReport
@@ -222,15 +222,15 @@ class InvoiceController extends Controller {
         $all = $request->all();
         try {
             $all['invoice_number'] = Invoice::newInvoiceNumber();
-            $invoice = Invoice::create($all);
+            $invoice               = Invoice::create($all);
             foreach ($request->invoiceItems as $item) {
                 $item['invoice_id'] = $invoice->id;
-                $invoiceItem = InvoiceItem::create($item);
+                $invoiceItem        = InvoiceItem::create($item);
             }
             foreach ($request->processes as $processId) {
-                $clientProcess = ClientProcess::findOrFail($processId);
+                $clientProcess                 = ClientProcess::findOrFail($processId);
                 $clientProcess->invoice_billed = ClientProcess::invoiceBilled;
-                $clientProcess->invoice_id = $invoice->id;
+                $clientProcess->invoice_id     = $invoice->id;
                 $clientProcess->save();
                 if ($request->isPayNow) {
                     $clientProcess->payRemaining($invoice->invoice_number);
@@ -270,11 +270,11 @@ class InvoiceController extends Controller {
             $items_ids = [];
             if ($invoice->isLastInvoice()) {
                 foreach ($request->processes as $processId) {
-                    $clientProcess = ClientProcess::findOrFail($processId);
+                    $clientProcess                 = ClientProcess::findOrFail($processId);
                     $clientProcess->invoice_billed = ClientProcess::invoiceBilled;
-                    $clientProcess->invoice_id = $invoice->id;
+                    $clientProcess->invoice_id     = $invoice->id;
                     $clientProcess->save();
-                    $items_ids[] = $clientProcess->id;
+                    $items_ids[]                   = $clientProcess->id;
                 }
                 ClientProcess::where('invoice_id', $invoice->id)
                         ->whereNotIn('id', $items_ids)
@@ -285,11 +285,11 @@ class InvoiceController extends Controller {
                 if (isset($item['id'])) {
                     $invoiceOldItem = InvoiceItem::findOrFail($item['id']);
                     $invoiceOldItem->update($item);
-                    $items_ids[] = $item['id'];
+                    $items_ids[]    = $item['id'];
                 } else {
                     $item['invoice_id'] = $invoice->id;
-                    $invoiceNewItem = InvoiceItem::create($item);
-                    $items_ids[] = $invoiceNewItem->id;
+                    $invoiceNewItem     = InvoiceItem::create($item);
+                    $items_ids[]        = $invoiceNewItem->id;
                 }
             }
             InvoiceItem::where('invoice_id', $invoice->id)

@@ -166,8 +166,8 @@ use App\Models\ClientProcess; ?>
 
 @section('scripts')
 <script>
-    var allProcesses = JSON.parse(he.decode('{{ $clientProcesses }}'));
-    var clients = JSON.parse(he.decode('{{ $clients }}'));
+    var allProcesses = {!! $clientProcesses !!};
+    var clients = {!! $clients !!};
     console.log(clients);
     var currentClientId = 0;
     LoadClients();

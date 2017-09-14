@@ -25,41 +25,41 @@ class EmployeeController extends Controller {
 
     protected function validator(array $data) {
         $validator = Validator::make($data, [
-                    'name' => 'required|min:6|max:255',
-                    'ssn' => 'required|digits:14',
-                    'gender' => 'required|in:m,f',
-                    'martial_status' => 'in:single,married,widowed,divorced',
-                    'birth_date' => 'required|date_format:Y-m-d',
-                    'department' => 'string',
-                    'hiring_date' => 'required|date_format:Y-m-d',
-                    'daily_salary' => 'required|numeric',
-                    'working_hours' => 'required|numeric',
-                    'job_title' => 'required|max:100',
-                    'telephone' => 'digits:8',
-                    'mobile' => 'required|digits:11',
+                    'name'                => 'required|min:6|max:255',
+                    'ssn'                 => 'required|digits:14',
+                    'gender'              => 'required|in:m,f',
+                    'martial_status'      => 'in:single,married,widowed,divorced',
+                    'birth_date'          => 'required|date_format:Y-m-d',
+                    'department'          => 'string',
+                    'hiring_date'         => 'required|date_format:Y-m-d',
+                    'daily_salary'        => 'required|numeric',
+                    'working_hours'       => 'required|numeric',
+                    'job_title'           => 'required|max:100',
+                    'telephone'           => 'digits:8',
+                    'mobile'              => 'required|digits:11',
                     'can_not_use_program' => 'boolean',
-                    'borrow_system' => 'boolean',
-                    'username' => 'required_without:can_not_use_program|unique:users,username',
-                    'password' => 'required_without:can_not_use_program'
+                    'borrow_system'       => 'boolean',
+                    'username'            => 'required_without:can_not_use_program|unique:users,username',
+                    'password'            => 'required_without:can_not_use_program'
         ]);
 
         $validator->setAttributeNames([
-            'name' => 'اسم الموظف',
-            'ssn' => 'الرقم القومي',
-            'gender' => 'الجنس',
-            'martial_status' => 'الحالة اﻻجتماعية',
-            'birth_date' => 'تاريخ الميﻻد',
-            'department' => 'القسم',
-            'hiring_date' => 'تاريخ التعيين',
-            'daily_salary' => 'الراتب اليومي',
-            'working_hours' => 'ساعات العمل',
-            'job_title' => 'الوظيفة',
-            'telephone' => 'التليفون',
-            'mobile' => 'المحمول',
+            'name'                => 'اسم الموظف',
+            'ssn'                 => 'الرقم القومي',
+            'gender'              => 'الجنس',
+            'martial_status'      => 'الحالة اﻻجتماعية',
+            'birth_date'          => 'تاريخ الميﻻد',
+            'department'          => 'القسم',
+            'hiring_date'         => 'تاريخ التعيين',
+            'daily_salary'        => 'الراتب اليومي',
+            'working_hours'       => 'ساعات العمل',
+            'job_title'           => 'الوظيفة',
+            'telephone'           => 'التليفون',
+            'mobile'              => 'المحمول',
             'can_not_use_program' => 'عدم استخدام البرنامج',
-            'borrow_system' => 'نظام السلف',
-            'username' => 'اسم المستخدم',
-            'password' => 'كلمة المرور'
+            'borrow_system'       => 'نظام السلف',
+            'username'            => 'اسم المستخدم',
+            'password'            => 'كلمة المرور'
         ]);
 
         return $validator;
@@ -82,23 +82,23 @@ class EmployeeController extends Controller {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
             /* Create employee object */
-            $employee = new Employee();
-            $employee->emp_id = $employee->max('emp_id') + 1;
-            $employee->name = $request->name;
-            $employee->ssn = $request->ssn;
-            $employee->gender = $request->gender;
-            $employee->martial_status = $request->martial_status;
-            $employee->birth_date = $request->birth_date;
-            $employee->department = $request->department;
-            $employee->hiring_date = $request->hiring_date;
-            $employee->daily_salary = $request->daily_salary;
-            $employee->working_hours = $request->working_hours;
-            $employee->job_title = $request->job_title;
-            $employee->telephone = $request->telephone;
-            $employee->mobile = $request->mobile;
-            $employee->facility_id = 1;
+            $employee                      = new Employee();
+            $employee->emp_id              = $employee->max('emp_id') + 1;
+            $employee->name                = $request->name;
+            $employee->ssn                 = $request->ssn;
+            $employee->gender              = $request->gender;
+            $employee->martial_status      = $request->martial_status;
+            $employee->birth_date          = $request->birth_date;
+            $employee->department          = $request->department;
+            $employee->hiring_date         = $request->hiring_date;
+            $employee->daily_salary        = $request->daily_salary;
+            $employee->working_hours       = $request->working_hours;
+            $employee->job_title           = $request->job_title;
+            $employee->telephone           = $request->telephone;
+            $employee->mobile              = $request->mobile;
+            $employee->facility_id         = 1;
             $employee->can_not_use_program = ($request->can_not_use_program) ? $request->can_not_use_program : false;
-            $employee->borrow_system = ($request->borrow_system) ? $request->borrow_system : false;
+            $employee->borrow_system       = ($request->borrow_system) ? $request->borrow_system : false;
             $employee->save();
 
             $user = new User();
@@ -116,7 +116,7 @@ class EmployeeController extends Controller {
             $user->save();
 
             /* create new user role */
-            $role = new Role();
+            $role       = new Role();
             $role->name = 'role_' . $employee->id;
             $role->save();
             /* attatch role to user */
@@ -133,20 +133,14 @@ class EmployeeController extends Controller {
     }
 
     public function destroy($id) {
-        $user = User::where('employee_id', $id)->firstOrFail();
-        $roles = $user->roles;
-        foreach ($roles as $role) {
-            $role->detachPermissions($role->permissions);
-            $user->detachRole($role);
-            $role->delete();
-        }
         $employee = Employee::where('id', $id)->firstOrFail();
+        foreach ($employee->users as $user) {
+            $user->delete();
+        }
         $employee->deleted_at_id = $employee->emp_id;
-        $employee->emp_id = NULL;
+        $employee->emp_id        = NULL;
         $employee->save();
         $employee->delete();
-        $user->delete();
-
         return redirect()->back()->with('success', 'تم حذف موظف.');
     }
 
@@ -156,15 +150,15 @@ class EmployeeController extends Controller {
     }
 
     public function restore($id) {
-        $employee = Employee::withTrashed()->find($id)->restore();
-        $employee->emp_id = $employee->deleted_at_id;
+        $employee                = Employee::withTrashed()->find($id)->restore();
+        $employee->emp_id        = $employee->deleted_at_id;
         $employee->deleted_at_id = NULL;
         $employee->save();
         return redirect()->route('employee.index')->with('success', 'تم استرجاع عميل جديد.');
     }
 
     public function edit($id) {
-        $employee = Employee::findOrFail($id);
+        $employee           = Employee::findOrFail($id);
         $employee->username = $employee->users()->first()->username;
         //$employee->password = Crypt::decrypt($employee->users()->first()->password);//bcrypt();
 
@@ -179,9 +173,9 @@ class EmployeeController extends Controller {
 
     public function update(Request $request, $id) {
         $employee = Employee::findOrFail($id);
-        $user = User::where('employee_id', $id)->firstOrFail();
+        $user     = User::where('employee_id', $id)->firstOrFail();
         /* copy request variables */
-        $all = $request->all();
+        $all      = $request->all();
 
         /**
          * If username is giving check it's value whether it has been changed or not
@@ -209,20 +203,20 @@ class EmployeeController extends Controller {
 
             $user->save();
 
-            $employee->name = $request->name;
-            $employee->ssn = $request->ssn;
-            $employee->gender = $request->gender;
-            $employee->martial_status = $request->martial_status;
-            $employee->birth_date = $request->birth_date;
-            $employee->department = $request->department;
-            $employee->hiring_date = $request->hiring_date;
-            $employee->daily_salary = $request->daily_salary;
-            $employee->working_hours = $request->working_hours;
-            $employee->job_title = $request->job_title;
-            $employee->telephone = $request->telephone;
-            $employee->mobile = $request->mobile;
+            $employee->name                = $request->name;
+            $employee->ssn                 = $request->ssn;
+            $employee->gender              = $request->gender;
+            $employee->martial_status      = $request->martial_status;
+            $employee->birth_date          = $request->birth_date;
+            $employee->department          = $request->department;
+            $employee->hiring_date         = $request->hiring_date;
+            $employee->daily_salary        = $request->daily_salary;
+            $employee->working_hours       = $request->working_hours;
+            $employee->job_title           = $request->job_title;
+            $employee->telephone           = $request->telephone;
+            $employee->mobile              = $request->mobile;
             $employee->can_not_use_program = ($request->can_not_use_program) ? $request->can_not_use_program : false;
-            $employee->borrow_system = ($request->borrow_system) ? $request->borrow_system : false;
+            $employee->borrow_system       = ($request->borrow_system) ? $request->borrow_system : false;
             $employee->save();
 
             $role = $user->roles->first();

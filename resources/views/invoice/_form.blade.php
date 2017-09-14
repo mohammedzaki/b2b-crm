@@ -296,7 +296,7 @@
 
 @section('scripts')
 <script>
-    var allProcesses = JSON.parse(he.decode("{{ $clientProcesses }}"));
+    var allProcesses = {!! $clientProcesses !!};
     //console.log(allProcesses, Object.keys(allProcesses).length);
     var currentClientId = 0;
     var totalPrice = 0;

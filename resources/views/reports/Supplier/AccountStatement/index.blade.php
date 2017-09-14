@@ -164,8 +164,8 @@
 
 @section('scripts')
 <script>
-    var allProcesses = JSON.parse(he.decode('{{ $supplierProcesses }}'));
-    var suppliers = JSON.parse(he.decode('{{ $suppliers }}'));
+    var allProcesses = {!! $supplierProcesses !!};
+    var suppliers = {!! $suppliers !!};
     console.log(suppliers);
     var currentSupplierId = 0;
     LoadSuppliers();

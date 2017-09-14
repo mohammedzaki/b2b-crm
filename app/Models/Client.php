@@ -28,15 +28,15 @@ class Client extends Model {
 
     public function unInvoiceProcesses() {
         return $this->hasMany(ClientProcess::class)->where([
-                    ['invoice_billed', "=", ClientProcess::invoiceUnBilled],
-                    ['require_invoice', "=", TRUE],
+                    ['invoice_billed', '=', ClientProcess::invoiceUnBilled],
+                    ['require_invoice', '=', TRUE],
         ]);
     }
 
     public function invoiceProcesses() {
         return $this->hasMany(ClientProcess::class)->where([
-                    //['invoice_billed', "=", ClientProcess::invoiceUnBilled],
-                    ['require_invoice', "=", TRUE],
+                    //['invoice_billed', '=', ClientProcess::invoiceUnBilled],
+                    ['require_invoice', '=', TRUE],
         ]);
     }
 
@@ -51,7 +51,7 @@ class Client extends Model {
     public function hasOpenProcess() {
         $client = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
                 ->select('clients.*')->where([
-                    ['client_processes.status', "=", ClientProcess::statusOpened],
+                    ['client_processes.status', '=', ClientProcess::statusOpened],
                     ['clients.id', '=', $this->id]])
                 ->distinct()
                 ->get();
@@ -66,7 +66,7 @@ class Client extends Model {
     public function hasClosedProcess() {
         $client = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
                 ->select('clients.*')->where([
-                    ['client_processes.status', "=", ClientProcess::statusClosed],
+                    ['client_processes.status', '=', ClientProcess::statusClosed],
                     ['clients.id', '=', $this->id]])
                 ->distinct()
                 ->get();
@@ -90,8 +90,8 @@ class Client extends Model {
         $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
                 ->select('clients.*')->where([
                     //['client_processes.status', ClientProcess::statusOpened],
-                    ['client_processes.invoice_billed', "=", ClientProcess::invoiceUnBilled],
-                    ['client_processes.require_invoice', "=", TRUE],
+                    ['client_processes.invoice_billed', '=', ClientProcess::invoiceUnBilled],
+                    ['client_processes.require_invoice', '=', TRUE],
                 ])
                 ->distinct()
                 ->get();
@@ -102,8 +102,8 @@ class Client extends Model {
         $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
                 ->select('clients.*')->where([
                     //['client_processes.status', ClientProcess::statusOpened],
-                    //['client_processes.invoice_billed', "=", ClientProcess::invoiceUnBilled],
-                    ['client_processes.require_invoice', "=", TRUE],
+                    //['client_processes.invoice_billed', '=', ClientProcess::invoiceUnBilled],
+                    ['client_processes.require_invoice', '=', TRUE],
                 ])
                 ->distinct()
                 ->get();
