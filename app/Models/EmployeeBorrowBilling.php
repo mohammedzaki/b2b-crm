@@ -4,6 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\EmployeeBorrowBilling
+ *
+ * @property int $id
+ * @property int|null $employee_borrow_id
+ * @property float|null $pay_amount
+ * @property float|null $paid_amount
+ * @property string|null $paid_date
+ * @property string|null $due_date
+ * @property int|null $deposit_id
+ * @property int|null $paying_status
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \App\Models\EmployeeBorrow $borrow
+ * @property-read \App\Models\DepositWithdraw|null $deposit
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrowBilling whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrowBilling whereDepositId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrowBilling whereDueDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrowBilling whereEmployeeBorrowId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrowBilling whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrowBilling wherePaidAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrowBilling wherePaidDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrowBilling wherePayAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrowBilling wherePayingStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrowBilling whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class EmployeeBorrowBilling extends Model {
 
     /**

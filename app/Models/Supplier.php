@@ -6,6 +6,37 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DB;
 
+/**
+ * App\Models\Supplier
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $address
+ * @property string|null $telephone
+ * @property string $mobile
+ * @property string $debit_limit
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property \Carbon\Carbon|null $deleted_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\SupplierProcess[] $closedProcess
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\SupplierProcess[] $openProcess
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\SupplierProcess[] $processes
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Supplier onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Supplier whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Supplier whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Supplier whereDebitLimit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Supplier whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Supplier whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Supplier whereMobile($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Supplier whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Supplier whereTelephone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Supplier whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Supplier withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Supplier withoutTrashed()
+ * @mixin \Eloquent
+ */
 class Supplier extends Model {
 
     use SoftDeletes;

@@ -5,6 +5,31 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use App\Events\EmployeeBorrowCreatedEvent;
 
+/**
+ * App\Models\EmployeeBorrow
+ *
+ * @property int $id
+ * @property int $employee_id
+ * @property float $amount
+ * @property string|null $borrow_reason
+ * @property string|null $pay_amount
+ * @property int $is_active
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \App\Models\Employee $employee
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EmployeeBorrowBilling[] $paidAmounts
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EmployeeBorrowBilling[] $payAmounts
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EmployeeBorrowBilling[] $unPaidAmounts
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrow whereAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrow whereBorrowReason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrow whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrow whereEmployeeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrow whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrow whereIsActive($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrow wherePayAmount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrow whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class EmployeeBorrow extends Model {
 
     protected $fillable = [

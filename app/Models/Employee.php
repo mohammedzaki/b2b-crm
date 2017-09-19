@@ -9,6 +9,61 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DB;
 
+/**
+ * App\Models\Employee
+ *
+ * @property int $id
+ * @property int|null $emp_id
+ * @property string $name
+ * @property string $ssn
+ * @property string $gender
+ * @property string $martial_status
+ * @property string $birth_date
+ * @property string $department
+ * @property string $hiring_date
+ * @property float $daily_salary
+ * @property int $working_hours
+ * @property string $job_title
+ * @property string|null $telephone
+ * @property string $mobile
+ * @property int $facility_id
+ * @property int $can_not_use_program
+ * @property int $borrow_system
+ * @property int|null $deleted_at_id
+ * @property \Carbon\Carbon|null $deleted_at
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EmployeeBorrow[] $longBorrows
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DepositWithdraw[] $smallBorrows
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\User[] $users
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Employee onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereBirthDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereBorrowSystem($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereCanNotUseProgram($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereDailySalary($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereDeletedAtId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereDepartment($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereEmpId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereFacilityId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereGender($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereHiringDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereJobTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereMartialStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereMobile($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereSsn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereTelephone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Employee whereWorkingHours($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Employee withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Employee withoutTrashed()
+ * @mixin \Eloquent
+ */
 class Employee extends Model {
 
     use SoftDeletes;

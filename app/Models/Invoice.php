@@ -6,6 +6,51 @@ use App\Extensions\DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * App\Models\Invoice
+ *
+ * @property int $id
+ * @property string $invoice_number
+ * @property float $total_price
+ * @property float $invoice_price
+ * @property float $discount_price
+ * @property float $taxes_price
+ * @property float $source_discount_value
+ * @property float $total_paid
+ * @property float $total_remaining
+ * @property string $invoice_date
+ * @property string|null $invoice_due_date
+ * @property int $client_id
+ * @property int $status
+ * @property \Carbon\Carbon|null $deleted_at
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \App\Models\Client $client
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\InvoiceItem[] $items
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ClientProcess[] $processes
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Invoice onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereClientId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereDiscountPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereInvoiceDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereInvoiceDueDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereInvoiceNumber($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereInvoicePrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereSourceDiscountValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereTaxesPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereTotalPaid($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereTotalPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereTotalRemaining($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Invoice whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Invoice withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Invoice withoutTrashed()
+ * @mixin \Eloquent
+ */
 class Invoice extends Model {
 
     use SoftDeletes;

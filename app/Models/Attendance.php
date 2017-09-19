@@ -7,6 +7,44 @@ use App\Extensions\DateTime;
 use App\Constants\EmployeeActions;
 use DB;
 
+/**
+ * App\Models\Attendance
+ *
+ * @property int $id
+ * @property string|null $date
+ * @property int|null $shift
+ * @property string|null $check_in
+ * @property string|null $check_out
+ * @property int|null $absent_check
+ * @property int|null $absent_type_id
+ * @property float|null $absent_deduction
+ * @property float|null $salary_deduction
+ * @property float|null $mokaf
+ * @property string|null $notes
+ * @property int|null $employee_id
+ * @property int|null $process_id
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \App\Models\AbsentType|null $absentType
+ * @property-read \App\Models\Employee|null $employee
+ * @property-read \App\Models\ClientProcess|null $process
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereAbsentCheck($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereAbsentDeduction($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereAbsentTypeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereCheckIn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereCheckOut($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereDate($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereEmployeeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereMokaf($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereProcessId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereSalaryDeduction($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereShift($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereUpdatedAt($value)
+ * @mixin \Eloquent
+ */
 class Attendance extends Model {
 
     protected $fillable = [

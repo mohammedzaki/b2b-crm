@@ -6,6 +6,45 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DB;
 
+/**
+ * App\Models\Client
+ *
+ * @property int $id
+ * @property string $name
+ * @property string $address
+ * @property string|null $telephone
+ * @property string $mobile
+ * @property int|null $referral_id
+ * @property float|null $referral_percentage
+ * @property string $credit_limit
+ * @property int $is_client_company
+ * @property \Carbon\Carbon|null $deleted_at
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ClientProcess[] $closedProcess
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ClientProcess[] $invoiceProcesses
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ClientProcess[] $openProcess
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ClientProcess[] $processes
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ClientProcess[] $unInvoiceProcesses
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Client onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereAddress($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereCreditLimit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereIsClientCompany($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereMobile($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereReferralId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereReferralPercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereTelephone($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Client whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Client withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Client withoutTrashed()
+ * @mixin \Eloquent
+ */
 class Client extends Model {
 
     use SoftDeletes;

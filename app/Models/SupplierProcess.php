@@ -5,6 +5,65 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * App\Models\SupplierProcess
+ *
+ * @property int $id
+ * @property string|null $name
+ * @property int $client_process_id
+ * @property int $supplier_id
+ * @property int $employee_id
+ * @property string $status
+ * @property string|null $notes
+ * @property int|null $has_discount
+ * @property float|null $discount_percentage
+ * @property float|null $discount_value
+ * @property string|null $discount_reason
+ * @property int|null $has_source_discount
+ * @property float|null $source_discount_percentage
+ * @property float|null $source_discount_value
+ * @property int $require_invoice
+ * @property float|null $taxes_value
+ * @property int|null $taxes_percentage
+ * @property float|null $total_price_taxes
+ * @property float $total_price
+ * @property \Carbon\Carbon|null $deleted_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property \Carbon\Carbon|null $created_at
+ * @property-read \App\Models\ClientProcess $clientProcess
+ * @property-read \App\Models\Employee $employee
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\SupplierProcessItem[] $items
+ * @property-read \App\Models\Supplier $supplier
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DepositWithdraw[] $withdrawals
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\SupplierProcess onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereClientProcessId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereDiscountPercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereDiscountReason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereDiscountValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereEmployeeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereHasDiscount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereHasSourceDiscount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereRequireInvoice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereSourceDiscountPercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereSourceDiscountValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereSupplierId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereTaxesPercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereTaxesValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereTotalPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereTotalPriceTaxes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\SupplierProcess whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\SupplierProcess withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\SupplierProcess withoutTrashed()
+ * @mixin \Eloquent
+ */
 class SupplierProcess extends Model {
 
     use SoftDeletes;
@@ -15,9 +74,9 @@ class SupplierProcess extends Model {
         'client_process_id',
         'supplier_id',
         'employee_id',
+        'status',
         'notes',
         'has_discount',
-        'status',
         'discount_percentage',
         'discount_value',
         'discount_reason',
@@ -25,11 +84,12 @@ class SupplierProcess extends Model {
         'source_discount_percentage',
         'source_discount_value',
         'require_invoice',
-        'total_price',
+        'taxes_value',
+        'taxes_percentage',
         'total_price_taxes',
-        'taxes_value'
+        'total_price',
     ];
-    public $client_id = 0;
+    public $client_id   = 0;
 
     const statusClosed = 'closed';
     const statusOpened = 'active';
@@ -43,7 +103,7 @@ class SupplierProcess extends Model {
     }
 
     public function employee() {
-        return $this->hasOne(Employee::class, 'id');
+        return $this->belongsTo(Employee::class);
     }
 
     public function clientProcess() {
@@ -52,7 +112,7 @@ class SupplierProcess extends Model {
 
     public function withdrawals() {
         return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
-                    ['supplier_id', "=", $this->supplier->id],
+                    ['supplier_id', "=", $this->supplier_id],
                     ['withdrawValue', ">", 0],
         ]);
     }

@@ -8,6 +8,67 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
 
+/**
+ * App\Models\ClientProcess
+ *
+ * @property int $id
+ * @property string $name
+ * @property int $client_id
+ * @property int $employee_id
+ * @property string $status
+ * @property string|null $notes
+ * @property int|null $has_discount
+ * @property float|null $discount_percentage
+ * @property float|null $discount_value
+ * @property string|null $discount_reason
+ * @property int|null $has_source_discount
+ * @property float|null $source_discount_percentage
+ * @property float|null $source_discount_value
+ * @property int $require_invoice
+ * @property int $invoice_billed
+ * @property float $taxes_value
+ * @property int|null $taxes_percentage
+ * @property float|null $total_price_taxes
+ * @property float $total_price
+ * @property int|null $invoice_id
+ * @property \Carbon\Carbon|null $deleted_at
+ * @property \Carbon\Carbon|null $created_at
+ * @property \Carbon\Carbon|null $updated_at
+ * @property-read \App\Models\Client $client
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DepositWithdraw[] $deposits
+ * @property-read \App\Models\Employee $employee
+ * @property-read \App\Models\Invoice|null $invoice
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ClientProcessItem[] $items
+ * @method static bool|null forceDelete()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ClientProcess onlyTrashed()
+ * @method static bool|null restore()
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereClientId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereDeletedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereDiscountPercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereDiscountReason($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereDiscountValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereEmployeeId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereHasDiscount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereHasSourceDiscount($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereInvoiceBilled($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereInvoiceId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereNotes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereRequireInvoice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereSourceDiscountPercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereSourceDiscountValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereStatus($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereTaxesPercentage($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereTaxesValue($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereTotalPrice($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereTotalPriceTaxes($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\ClientProcess whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ClientProcess withTrashed()
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\ClientProcess withoutTrashed()
+ * @mixin \Eloquent
+ */
 class ClientProcess extends Model {
 
     use SoftDeletes;
