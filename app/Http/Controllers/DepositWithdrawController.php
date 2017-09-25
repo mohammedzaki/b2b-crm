@@ -21,17 +21,12 @@ use App\Exceptions\ServerErrorException;
 use DB;
 use App\Models\EmployeeBorrowBilling;
 
+/**
+ * @Controller(prefix="/depositwithdraw")
+ * @Resource("depositwithdraw")
+ * @Middleware({"web", "auth", "ability:admin,deposit-withdraw"})
+ */
 class DepositWithdrawController extends Controller {
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct() {
-        $this->middleware('auth');
-        $this->middleware('ability:admin,deposit-withdraw');
-    }
 
     /**
      * Display a listing of the resource.
@@ -219,6 +214,7 @@ class DepositWithdrawController extends Controller {
      *
      * @param  Request  $request
      * @return Response
+     * @Post("/LockSaveToAll", as="depositwithdraw.LockSaveToAll")
      */
     public function LockSaveToAll(Request $request) {
         $validator = $this->validator($request->all());
@@ -244,6 +240,7 @@ class DepositWithdrawController extends Controller {
      *
      * @param  Request  $request
      * @return Response
+     * @Post("/RemoveSelected", as="depositwithdraw.RemoveSelected")
      */
     public function RemoveSelected(Request $request) {
         $validator = $this->validator($request->all());
@@ -275,12 +272,14 @@ class DepositWithdrawController extends Controller {
      *
      * @param  int  $id
      * @return Response
+     * @Post("/search", as="depositwithdraw.search")
+     * @Middleware({"ability:admin,deposit-withdraw-edit"})
      */
     public function search(Request $request) {
-        $user = Auth::user();
+        /*$user = Auth::user();
         if (!$user->ability('admin', 'deposit-withdraw-edit')) {
             return response()->view('errors.403', [], 403);
-        }
+        }*/
         $startDate = DateTime::parse($request['targetdate'])->startOfDay();
         $endDate = DateTime::parse($request['targetdate'])->endOfDay();
         return $this->getDepositWithdrawsItems($startDate, $endDate, 1, TRUE);

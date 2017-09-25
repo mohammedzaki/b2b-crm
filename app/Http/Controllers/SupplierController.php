@@ -8,6 +8,11 @@ use App\Models\Supplier;
 use App\Models\User;
 use Validator;
 
+/**
+ * @Controller(prefix="supplier")
+ * @Resource("supplier")
+ * @Middleware({"web", "auth", "ability:admin,new-supplier"})
+ */
 class SupplierController extends Controller {
 
     public function __construct() {
@@ -17,18 +22,18 @@ class SupplierController extends Controller {
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-                    'name' => 'required|unique:suppliers,name,' . $id . '|string',
-                    'address' => 'required|string',
-                    'telephone' => 'digits_between:6,14',
-                    'mobile' => 'required|numeric',
+                    'name'        => 'required|unique:suppliers,name,' . $id . '|string',
+                    'address'     => 'required|string',
+                    'telephone'   => 'digits_between:6,14',
+                    'mobile'      => 'required|numeric',
                     'debit_limit' => 'required|numeric'
         ]);
 
         $validator->setAttributeNames([
-            'name' => 'اسم المورد',
-            'address' => 'العنوان',
-            'telephone' => 'التليفون',
-            'mobile' => 'المحمول',
+            'name'        => 'اسم المورد',
+            'address'     => 'العنوان',
+            'telephone'   => 'التليفون',
+            'mobile'      => 'المحمول',
             'debit_limit' => 'حد المديونية'
         ]);
 
@@ -52,7 +57,7 @@ class SupplierController extends Controller {
         } else {
             $all = $request->all();
             Supplier::create($all);
-            
+
             return redirect()->route('supplier.index')->with('success', 'تم اضافة مورد جديد.');
         }
     }
@@ -83,16 +88,25 @@ class SupplierController extends Controller {
         return redirect()->back()->with('success', 'تم حذف مورد.');
     }
 
+    /**
+     * @return \Illuminate\Http\Response
+     * @Get("/trash", as="supplier.trash")
+     */
     public function trash() {
         $suppliers = Supplier::onlyTrashed()->get();
         return view('supplier.trash', compact('suppliers'));
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  int  $id
+     * @return Response
+     * @Get("/restore/{id}", as="supplier.restore")
+     */
     public function restore($id) {
         Supplier::withTrashed()->find($id)->restore();
         return redirect()->route('supplier.index')->with('success', 'تم استرجاع مورد جديد.');
     }
-    
-    
 
 }

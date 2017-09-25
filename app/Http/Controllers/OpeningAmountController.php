@@ -3,25 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Requests;
 use App\Models\Facility;
-use App\Models\User;
-use App\Models\Employee;
 use App\Models\OpeningAmount;
 use Validator;
 use App\Extensions\DateTime;
 
+/**
+ * @Controller(prefix="/facilityopeningamount")
+ * @Resource("facilityopeningamount")
+ * @Middleware({"web", "auth", "ability:admin,facility-info"})
+ */
 class OpeningAmountController extends Controller {
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct() {
-        $this->middleware('auth');
-        $this->middleware('ability:admin,facility-info');
-    }
 
     protected function validator(array $data) {
         $validator = Validator::make($data, [
@@ -55,7 +47,7 @@ class OpeningAmountController extends Controller {
 
             $all = $request->all();
 
-            $openingAmount = OpeningAmount::create($all);
+            $openingAmount               = OpeningAmount::create($all);
             $openingAmount->deposit_date = DateTime::parse($request['depositdate'])->format('Y-m-d');
             $openingAmount->save();
             $this->updateFacilityOpeningAmount();
@@ -71,8 +63,8 @@ class OpeningAmountController extends Controller {
 
     public function update(Request $request, $id) {
         $openingAmount = OpeningAmount::findOrFail($id);
-        $all = $request->all();
-        $validator = $this->validator($all, $openingAmount->id);
+        $all           = $request->all();
+        $validator     = $this->validator($all, $openingAmount->id);
 
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
@@ -93,8 +85,9 @@ class OpeningAmountController extends Controller {
     }
 
     function updateFacilityOpeningAmount() {
-        $facility = Facility::findOrFail(1);
+        $facility                 = Facility::findOrFail(1);
         $facility->opening_amount = OpeningAmount::sum('amount');
         $facility->save();
     }
+
 }

@@ -374,7 +374,7 @@ function SetCheckIndatetime() {
     //check_inPickr.setDate(employeesCheckinDates[$("#employee_id").val()].checkinDate);
     selecteddatepicker = $("#datepicker").val();
     check_inPickr.setDate("", true);
-    $.get("{{ url('getEmployeesCheckinDate/') }}", 
+    $.get("{{ url('attendance/getEmployeesCheckinDate/') }}", 
         {employee_id: $("#employee_id").val(), date: selecteddatepicker, is_second_shift: $("#is_second_shift").is(":checked")},
         function (data) {
             console.log(data);

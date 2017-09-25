@@ -11,17 +11,12 @@ use App\Models\Permission;
 use App\Models\Employee;
 use Crypt;
 
+/**
+ * @Controller(prefix="/employee")
+ * @Resource("employee")
+ * @Middleware({"web", "auth", "ability:admin,employees-permissions"})
+ */
 class EmployeeController extends Controller {
-
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    public function __construct() {
-        $this->middleware('auth');
-        $this->middleware('ability:admin,employees-permissions');
-    }
 
     protected function validator(array $data) {
         $validator = Validator::make($data, [
@@ -144,24 +139,9 @@ class EmployeeController extends Controller {
         return redirect()->back()->with('success', 'تم حذف موظف.');
     }
 
-    public function trash() {
-        $employees = Employee::onlyTrashed()->get();
-        return view('employee.trash', compact('employees'));
-    }
-
-    public function restore($id) {
-        $employee                = Employee::withTrashed()->find($id)->restore();
-        $employee->emp_id        = $employee->deleted_at_id;
-        $employee->deleted_at_id = NULL;
-        $employee->save();
-        return redirect()->route('employee.index')->with('success', 'تم استرجاع عميل جديد.');
-    }
-
     public function edit($id) {
         $employee           = Employee::findOrFail($id);
         $employee->username = $employee->users()->first()->username;
-        //$employee->password = Crypt::decrypt($employee->users()->first()->password);//bcrypt();
-
         $employeePermissions = $employee->users[0]->roles->first()->perms;
         $selectedPermissions = [];
         foreach ($employeePermissions as $p) {
@@ -230,6 +210,30 @@ class EmployeeController extends Controller {
             }
             return redirect()->route('employee.index')->with('success', 'تم تعديل بيانات الموظف.');
         }
+    }
+
+    /**
+     * @return \Illuminate\Http\Response
+     * @Get("/trash", as="employee.trash")
+     */
+    public function trash() {
+        $employees = Employee::onlyTrashed()->get();
+        return view('employee.trash', compact('employees'));
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  int  $id
+     * @return Response
+     * @Get("/restore/{id}", as="employee.restore")
+     */
+    public function restore($id) {
+        $employee                = Employee::withTrashed()->find($id)->restore();
+        $employee->emp_id        = $employee->deleted_at_id;
+        $employee->deleted_at_id = NULL;
+        $employee->save();
+        return redirect()->route('employee.index')->with('success', 'تم استرجاع عميل جديد.');
     }
 
 }

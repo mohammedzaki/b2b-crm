@@ -10,12 +10,12 @@ use App\Models\ClientProcess;
 use App\Models\ClientProcessItem;
 use Validator;
 
+/**                                
+ * @Controller(prefix="client-process")
+ * @Resource("client-process", names={"index"="client.process.index", "create"="client.process.create", "store"="client.process.store", "show"="client.process.", "edit"="client.process.edit", "update"="client.process.update", "destroy"="client.process.destroy"})
+ * @Middleware({"web", "auth", "ability:admin,new-process-client"})
+ */
 class ClientProcessController extends Controller {
-
-    public function __construct() {
-        $this->middleware('auth');
-        $this->middleware('ability:admin,new-process-client');
-    }
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
@@ -223,11 +223,22 @@ class ClientProcessController extends Controller {
         return redirect()->back()->with('success', 'تم حذف العملية.');
     }
 
+    /**
+     * @return \Illuminate\Http\Response
+     * @Get("/trash", as="client.process.trash")
+     */
     public function trash() {
         $processes = ClientProcess::onlyTrashed()->get();
         return view('client.process.trash', compact('processes'));
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  int  $id
+     * @return Response
+     * @Get("/restore/{id}", as="client.process.restore")
+     */
     public function restore($id) {
         ClientProcess::withTrashed()->find($id)->restore();
         ClientProcessItem::withTrashed()->where('process_id', $id)->restore();

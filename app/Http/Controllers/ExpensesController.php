@@ -3,24 +3,19 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-
-use App\Http\Requests;
-
 use App\Models\Expenses;
-use App\Models\User;
 use Validator;
 
-class ExpensesController extends Controller
-{
-
-    public function __construct() {
-        $this->middleware('auth');
-        $this->middleware('ability:admin,new-supplier');
-    }
+/**
+ * @Controller(prefix="expenses")
+ * @Resource("expenses")
+ * @Middleware({"web", "auth"})
+ */
+class ExpensesController extends Controller {
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-            'name' => 'required|unique:expenses,name,' . $id . '|min:5|max:255',
+                    'name' => 'required|unique:expenses,name,' . $id . '|min:5|max:255',
         ]);
 
         $validator->setAttributeNames([
@@ -69,7 +64,7 @@ class ExpensesController extends Controller
             return redirect()->back()->with('success', 'تم تعديل بيانات المصروف.');
         }
     }
-    
+
     // FIXME: must be softDelete
     public function destroy($id) {
         $expenses = Expenses::findOrFail($id);
@@ -77,4 +72,5 @@ class ExpensesController extends Controller
 
         return redirect()->back()->with('success', 'تم حذف مصروف.');
     }
+
 }

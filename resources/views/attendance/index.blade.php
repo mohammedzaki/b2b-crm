@@ -155,7 +155,7 @@
     function SubmitSearch() {
         var empId = $("#id").val();
         if (empId != '') {
-            $('#SearchForm').prop('action', "/attendanceSearch/" + empId).submit();
+            $('#SearchForm').prop('action', "/attendance/search/" + empId).submit();
         }
     }
 </script>

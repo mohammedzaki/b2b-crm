@@ -10,43 +10,43 @@ use App\Models\User;
 use App\Models\Employee;
 use Validator;
 
+/**
+ * @Controller(prefix="client")
+ * @Resource("client")
+ * @Middleware({"web", "auth", "ability:admin,new-client"})
+ */
 class ClientController extends Controller {
-
-    public function __construct() {
-        $this->middleware('auth');
-        $this->middleware('ability:admin,new-client');
-    }
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
-                    'name' => 'required|unique:clients,name,' . $id . '|string',
-                    'address' => 'required|string',
-                    'telephone' => 'digits_between:6,14',
-                    'mobile' => 'required|numeric',
+                    'name'                   => 'required|unique:clients,name,' . $id . '|string',
+                    'address'                => 'required|string',
+                    'telephone'              => 'digits_between:6,14',
+                    'mobile'                 => 'required|numeric',
                     //FIXME: this valdiation
                     //'referral' => 'required_without:is_client_company|exists:users,username',
                     //'referral_percentage' => 'required_without:is_client_company|required_with:referral|numeric',
-                    'credit_limit' => 'required|numeric',
-                    'is_client_company' => 'boolean',
-                    'authorized.*.name' => 'required|string',
-                    'authorized.*.jobtitle' => 'required|string',
+                    'credit_limit'           => 'required|numeric',
+                    'is_client_company'      => 'boolean',
+                    'authorized.*.name'      => 'required|string',
+                    'authorized.*.jobtitle'  => 'required|string',
                     'authorized.*.telephone' => 'required|digits_between:8,14',
-                    'authorized.*.email' => 'required|email'
+                    'authorized.*.email'     => 'required|email'
         ]);
 
         $validator->setAttributeNames([
-            'name' => 'اسم العميل',
-            'address' => 'العنوان',
-            'telephone' => 'التليفون',
-            'mobile' => 'المحمول',
+            'name'                   => 'اسم العميل',
+            'address'                => 'العنوان',
+            'telephone'              => 'التليفون',
+            'mobile'                 => 'المحمول',
             //'referral' => 'اسم المندوب',
             //'referral_percentage' => 'نسبة العمولة',
-            'credit_limit' => 'الحد اﻻئتماني',
-            'is_client_company' => 'عميل شركة',
-            'authorized.*.name' => 'اسم الشخص المفوض',
-            'authorized.*.jobtitle' => 'المسمى الوظيفي',
+            'credit_limit'           => 'الحد اﻻئتماني',
+            'is_client_company'      => 'عميل شركة',
+            'authorized.*.name'      => 'اسم الشخص المفوض',
+            'authorized.*.jobtitle'  => 'المسمى الوظيفي',
             'authorized.*.telephone' => 'التليفون',
-            'authorized.*.email' => 'البريد اﻻلكتروني'
+            'authorized.*.email'     => 'البريد اﻻلكتروني'
         ]);
 
         return $validator;
@@ -58,7 +58,7 @@ class ClientController extends Controller {
     }
 
     public function create() {
-        $employees = Employee::select('id', 'name')->get();
+        $employees         = Employee::select('id', 'name')->get();
         $employees_tmp[-1] = "اختر اسم المندوب";
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
@@ -68,7 +68,7 @@ class ClientController extends Controller {
     }
 
     public function store(Request $request) {
-    	
+
         $validator = $this->validator($request->all());
 
         if ($validator->fails()) {
@@ -78,7 +78,7 @@ class ClientController extends Controller {
             $all = $request->all();
 
             if ($request->is_client_company) {
-                $all['referral_id'] = null;
+                $all['referral_id']         = null;
                 $all['referral_percentage'] = null;
             } else {
                 $all['is_client_company'] = false;
@@ -97,9 +97,9 @@ class ClientController extends Controller {
     }
 
     public function edit($id) {
-        $client = Client::findOrFail($id);
-        $authorized = AuthorizedPerson::where('client_id', $client->id)->get()->toArray();
-        $employees = Employee::select('id', 'name')->get();
+        $client            = Client::findOrFail($id);
+        $authorized        = AuthorizedPerson::where('client_id', $client->id)->get()->toArray();
+        $employees         = Employee::select('id', 'name')->get();
         $employees_tmp[-1] = "اختر اسم المندوب";
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
@@ -109,8 +109,8 @@ class ClientController extends Controller {
     }
 
     public function update(Request $request, $id) {
-        $client = Client::findOrFail($id);
-        $all = $request->all();
+        $client    = Client::findOrFail($id);
+        $all       = $request->all();
         $validator = $this->validator($all, $client->id);
 
         if ($validator->fails()) {
@@ -119,7 +119,7 @@ class ClientController extends Controller {
 
             /*             * ****************************************** */
             if ($request->is_client_company) {
-                $all['referral_id'] = null;
+                $all['referral_id']         = null;
                 $all['referral_percentage'] = null;
             } else {
                 $all['is_client_company'] = false;
@@ -130,7 +130,7 @@ class ClientController extends Controller {
             if ($request->authorized) {
                 //recalculate array index
                 $authorized_request = array_values($all['authorized']);
-                $authorized_ids = [];
+                $authorized_ids     = [];
 
                 for ($i = 0; $i < count($authorized_request); $i++) {
                     /* if request does not have id, it means it's new one */
@@ -147,8 +147,8 @@ class ClientController extends Controller {
                         /* create new record */
                         /* add client id */
                         $authorized_request[$i]['client_id'] = $client->id;
-                        $person = AuthorizedPerson::create($authorized_request[$i]);
-                        $authorized_ids[] = $person->id;
+                        $person                              = AuthorizedPerson::create($authorized_request[$i]);
+                        $authorized_ids[]                    = $person->id;
                     }
                 }
                 /* delete others if exists */
@@ -170,11 +170,22 @@ class ClientController extends Controller {
         return redirect()->back()->with('success', 'تم حذف عميل.');
     }
 
+    /**
+     * @return \Illuminate\Http\Response
+     * @Get("/trash", as="client.trash")
+     */
     public function trash() {
         $clients = Client::onlyTrashed()->get();
         return view('client.trash', compact('clients'));
     }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  int  $id
+     * @return Response
+     * @Get("/restore/{id}", as="client.restore")
+     */
     public function restore($id) {
         Client::withTrashed()->find($id)->restore();
         return redirect()->route('client.index')->with('success', 'تم استرجاع عميل جديد.');

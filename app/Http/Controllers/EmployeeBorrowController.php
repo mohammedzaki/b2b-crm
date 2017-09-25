@@ -12,12 +12,12 @@ use App\Models\EmployeeBorrowBilling;
 use Illuminate\Http\Request;
 use Validator;
 
+/**
+ * @Controller(prefix="employeeBorrow")
+ * @Resource("employeeBorrow")
+ * @Middleware({"web", "auth", "ability:admin,employees-permissions"})
+ */
 class EmployeeBorrowController extends Controller {
-
-    public function __construct() {
-        $this->middleware('auth');
-        $this->middleware('ability:admin,employees-permissions');
-    }
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [
