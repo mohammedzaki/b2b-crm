@@ -40,7 +40,7 @@
     <body>
         <div class="container">
             <div class="content">
-                <div class="title">Something went wrong.</div>
+                <div class="title">حدث خطأ بالبرنامج</div>
 
                 @if(app()->bound('sentry') && !empty(Sentry::getLastEventID()))
                 <div class="subtitle">Error ID: {{ Sentry::getLastEventID() }}</div>
@@ -54,8 +54,8 @@
                         // use the public DSN (dont include your secret!)
                         dsn: 'https://6647cd503d304743af251ab56bb4c216@sentry.io/222368',
                         user: {
-                            'name': 'Jane Doe',
-                            'email': 'jane.doe@example.com',
+                            //'name': 'Jane Doe',
+                            //'email': 'jane.doe@example.com',
                         }
                     });
                 </script>
