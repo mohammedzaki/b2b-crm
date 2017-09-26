@@ -102,11 +102,15 @@ class ClientProcess extends Model {
     const statusOpened = 'active';
 
     public function client() {
-        return $this->belongsTo('App\Models\Client');
+        return $this->belongsTo(Client::class);
     }
 
     public function items() {
-        return $this->hasMany('App\Models\ClientProcessItem', 'process_id');
+        return $this->hasMany(ClientProcessItem::class, 'process_id');
+    }
+
+    public function suppliers() {
+        return $this->hasMany(SupplierProcess::class, 'client_process_id');
     }
 
     public function invoice() {
@@ -114,13 +118,20 @@ class ClientProcess extends Model {
     }
 
     public function employee() {
-        return $this->hasOne('App\Models\Employee', 'id');
+        return $this->hasOne(Employee::class, 'id');
     }
 
     public function deposits() {
-        return $this->hasMany('App\Models\DepositWithdraw', 'cbo_processes')->where([
+        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
                     ['client_id', "=", $this->client_id],
                     ['depositValue', ">", 0],
+        ]);
+    }
+    
+    public function expenses() {
+        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
+                    ['client_id', "=", $this->client_id],
+                    ['withdrawValue', ">", 0],
         ]);
     }
 

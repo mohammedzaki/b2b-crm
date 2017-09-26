@@ -107,6 +107,7 @@
                     <li><a href="{{ route('reports.supplier.accountStatement.index') }}">مورد</a></li>
                     <li><a href="{{ route('reports.client.analyticalCenter.index') }}">المركز التحليلى للعملاء</a></li>
                     <li><a href="{{ route('reports.supplier.analyticalCenter.index') }}">المركز التحليلى للموردين</a></li>
+                    <li><a href="{{ route('reports.process.cost-center.index') }}">مركز التكلفة</a></li>
                     <li><a href="{{ route('reports.expenses.index') }}">استعلام عن مصروف</a></li>
                     <li><a href="{{ route('reports.employees.totalSalaries.index') }}">مرتبات الشهر</a></li>
                     <li><a href="{{ route('reports.employees.borrow.index') }}">سلفيات الموظفين</a></li>
