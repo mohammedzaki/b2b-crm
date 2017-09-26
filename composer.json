@@ -17,6 +17,8 @@
         "laravelcollective/annotations": "5.5.x-dev",
         "laravelcollective/html": "^5.4",
         "mpdf/mpdf": "^6.1",
+        "sentry/sentry": "^1.7",
+        "sentry/sentry-laravel": "^0.8.0",
         "user11001/eloquent-model-generator": "^2.0",
         "zizaco/entrust": "5.2.x-dev"
     },
