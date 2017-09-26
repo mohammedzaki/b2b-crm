@@ -14,7 +14,7 @@ use App\Models\ClientProcess;
 
 /**
  * @Controller(prefix="supplier-process")
- * @Resource("supplier-process", names={"index"="supplier.process.index", "create"="supplier.process.create", "store"="supplier.process.store", "show"="supplier.process.", "edit"="supplier.process.edit", "update"="supplier.process.update", "destroy"="supplier.process.destroy"})
+ * @Resource("supplier-process", names={"index"="supplier.process.index", "create"="supplier.process.create", "store"="supplier.process.store", "show"="supplier.process.show", "edit"="supplier.process.edit", "update"="supplier.process.update", "destroy"="supplier.process.destroy"})
  * @Middleware({"web", "auth", "ability:admin,new-process-supplier"})
  */
 class SupplierProcessController extends Controller {

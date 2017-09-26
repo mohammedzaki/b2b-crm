@@ -12,7 +12,7 @@ use Validator;
 
 /**                                
  * @Controller(prefix="client-process")
- * @Resource("client-process", names={"index"="client.process.index", "create"="client.process.create", "store"="client.process.store", "show"="client.process.", "edit"="client.process.edit", "update"="client.process.update", "destroy"="client.process.destroy"})
+ * @Resource("client-process", names={"index"="client.process.index", "create"="client.process.create", "store"="client.process.store", "show"="client.process.show", "edit"="client.process.edit", "update"="client.process.update", "destroy"="client.process.destroy"})
  * @Middleware({"web", "auth", "ability:admin,new-process-client"})
  */
 class ClientProcessController extends Controller {
