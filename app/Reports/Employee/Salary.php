@@ -11,23 +11,23 @@ class Salary extends BaseReport {
     public $htmlContent = "";
     protected $reportName = "EmployeeSalaryReport.pdf";
 
-    function SetHtmlBody() {
+    function setHtmlBody() {
         $this->employeeName = "Test Test";
         $employeeName = $this->employeeName;
-        $this->SetPageHeader();
-        $this->SetPageFooter();
+        $this->setPageHeader();
+        $this->setPageFooter();
         //TODO: update this line of code to new structure 
         //return view('reports.employee.test', compact(['employeeName']))->render();
         return $this->htmlContent;
     }
 
-    function SetCSS() {
+    function setCSS() {
         $path = public_path('ReportsHtml/Empolyee/Salary.css');
         return file_get_contents($path);
     }
     
-    public function RenderReport() {
-        parent::RenderReport();
+    public function exportPDF() {
+        parent::exportPDF();
         $this->mpdf->SetMargins(.1, 11, 10);
     }
 }

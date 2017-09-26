@@ -12,15 +12,15 @@ class ExpensesTotal extends BaseReport {
     
     protected $reportName = "ExpenseTotalReport.pdf";
 
-    function SetHtmlBody() {
+    function setHtmlBody() {
         return '<!DOCTYPE html>
                 <html>
                     <head>
                     
                     </head>
                     <body>
-                        ' . $this->SetPageHeader() . '
-                        ' . $this->SetPageFooter() . '
+                        ' . $this->setPageHeader() . '
+                        ' . $this->setPageFooter() . '
                         ' . $this->SetReportHeader($this->expenseName) . '
                         <table class="tg">
                             ' . $this->AddExpense() . '
@@ -30,7 +30,7 @@ class ExpensesTotal extends BaseReport {
                 ';
     }
     
-    function SetCSS() {
+    function setCSS() {
         $path = public_path('ReportsHtml/Expense/ExpenseTotal.css');
         return file_get_contents($path);
     }

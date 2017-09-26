@@ -147,7 +147,7 @@ class BorrowsReportController extends Controller {
     private function printPDF($ch_detialed, $withLetterHead, $employees, $monthName, $totalWorkingHours, $totalHourlyRate, $totalSalary, $totalAbsentDeduction, $totalLongBorrowValue, $totalSmallBorrowValue, $totalBorrowValue, $totalSalaryDeduction, $totalBonuses, $totalGuardianshipValue, $totalGuardianshipReturnValue, $totalNetSalary) {
         $pdfReport = new TotalSalaries($withLetterHead);
         $pdfReport->htmlContent = view("reports.employee.borrow.pdf", compact('employees', 'monthName', 'totalWorkingHours', 'totalHourlyRate', 'totalSalary', 'totalAbsentDeduction', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'totalBorrowValue', 'totalSalaryDeduction', 'totalBonuses', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalNetSalary'))->render();
-        return $pdfReport->RenderReport();
+        return $pdfReport->exportPDF();
     }
 
     function diffInHoursMinutsToString($totalDuration) {

@@ -731,7 +731,7 @@ class AttendanceController extends Controller {
 
         $pdfReport->htmlContent = view('reports.employee.salary', compact(['employeeName', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date', 'monthNum']))->render();
 
-        return $pdfReport->RenderReport();
+        return $pdfReport->exportPDF();
     }
     
     /**

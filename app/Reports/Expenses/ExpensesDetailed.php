@@ -12,21 +12,21 @@ class ExpensesDetailed extends BaseReport {
     
     protected $reportName = "ExpensesDetailedReport.pdf";
 
-    function SetHtmlBody() {
+    function setHtmlBody() {
         return '<!DOCTYPE html>
                 <html>
                     <head>
                         
                     </head>
                     <body>
-                        ' . $this->SetPageHeader() . '
-                        ' . $this->SetPageFooter() . '
+                        ' . $this->setPageHeader() . '
+                        ' . $this->setPageFooter() . '
                         ' . $this->AddAllExpense() . '
                     </body>
                 </html>';
     }
 
-    function SetCSS() {
+    function setCSS() {
         $path = public_path('ReportsHtml/Expense/ExpenseDetailed.css');
         return file_get_contents($path);
     }

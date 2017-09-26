@@ -177,7 +177,7 @@ class AccountStatementController extends Controller {
         $pdfReport->allProcessesTotalPrice = $allProcessesTotalPrice;
         $pdfReport->allProcessTotalPaid = $allProcessTotalPaid;
         $pdfReport->allProcessTotalRemaining = $allProcessTotalRemaining;
-        return $pdfReport->RenderReport();
+        return $pdfReport->exportPDF();
     }
 
 }

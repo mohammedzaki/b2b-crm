@@ -46,7 +46,6 @@ class AnalyticalCenterController extends Controller {
      * @Any("/view-report", as="reports.client.analyticalCenter.viewReport")
      */
     public function viewReport(Request $request) {
-        //{"ch_detialed":"0","client_id":"1","processes":["1","2"]}
         $clientName = "";
         $allClientsTotalPrice = 0;
         $allClientsTotalPaid = 0;
@@ -121,7 +120,7 @@ class AnalyticalCenterController extends Controller {
         $pdfReport->allProcessesTotalPrice = $allProcessesTotalPrice;
         $pdfReport->allProcessTotalPaid = $allProcessTotalPaid;
         $pdfReport->allProcessTotalRemaining = $allProcessTotalRemaining;
-        return $pdfReport->RenderReport();
+        return $pdfReport->exportPDF();
     }
 
 }

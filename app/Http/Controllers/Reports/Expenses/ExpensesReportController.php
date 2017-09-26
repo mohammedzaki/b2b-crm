@@ -101,7 +101,7 @@ class ExpensesReportController extends Controller {
         $pdfReport->expenseName = $expenseName;
         $pdfReport->expenses = $expenses;
         $pdfReport->allExpensesTotalPaid = $allExpensesTotalPaid;
-        return $pdfReport->RenderReport();
+        return $pdfReport->exportPDF();
     }
 
 }

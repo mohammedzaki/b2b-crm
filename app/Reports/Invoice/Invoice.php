@@ -34,7 +34,7 @@ class Invoice extends BaseReport {
         $this->withLetterHead = $withLetterHead;
     }
 
-    function SetHtmlBody() {
+    function setHtmlBody() {
         $clinetName = $this->clinetName;
         $totalPriceAfterTaxes = $this->totalPriceAfterTaxes;
         $arabicPriceAfterTaxes = Helpers::numberToArabicWords($this->totalPriceAfterTaxes);
@@ -46,8 +46,8 @@ class Invoice extends BaseReport {
         $totalTaxes = $this->totalTaxes;
         $invoiceDate = $this->invoiceDate;
         $invoiceNo = $this->invoiceNo;
-        $this->SetPageHeader();
-        $this->SetPageFooter();
+        $this->setPageHeader();
+        $this->setPageFooter();
         $showLetterHead = $this->withLetterHead ? 'on' : 'off';
         return view('reports.invoice.invoice', compact(['clinetName', 'totalPriceAfterTaxes', 'arabicPriceAfterTaxes', 'invoiceItems', 'discountPrice', 'discountReason', 'sourceDiscountPrice', 'totalPrice', 'totalTaxes', 'invoiceDate', 'invoiceNo', 'showLetterHead']))->render();
     }
@@ -64,18 +64,18 @@ class Invoice extends BaseReport {
         $totalTaxes = $this->totalTaxes;
         $invoiceDate = $this->invoiceDate;
         $invoiceNo = $this->invoiceNo;
-        $this->SetPageHeader();
-        $this->SetPageFooter();
+        $this->setPageHeader();
+        $this->setPageFooter();
         return view('reports.invoice.preview', compact(['clinetName', 'totalPriceAfterTaxes', 'arabicPriceAfterTaxes', 'invoiceItems', 'discountPrice', 'discountReason', 'sourceDiscountPrice', 'totalPrice', 'totalTaxes', 'invoiceDate', 'invoiceNo']));
     }
 
-    function SetCSS() {
+    function setCSS() {
         $path = public_path('ReportsHtml/Invoice/Invoice.css');
         return file_get_contents($path);
     }
 
-    public function RenderReport() {
-        parent::RenderReport();
+    public function exportPDF() {
+        parent::exportPDF();
         //$this->mpdf->SetMargins(.1, 11, 10);
     }
 
