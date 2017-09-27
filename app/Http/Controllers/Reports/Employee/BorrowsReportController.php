@@ -150,12 +150,4 @@ class BorrowsReportController extends Controller {
         return $pdfReport->exportPDF();
     }
 
-    function diffInHoursMinutsToString($totalDuration) {
-        $hours = floor($totalDuration / 3600);
-        $minutes = floor(($totalDuration / 60) % 60);
-        $seconds = $totalDuration % 60;
-
-        return "$hours:$minutes:$seconds";
-    }
-
 }

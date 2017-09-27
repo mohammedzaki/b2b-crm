@@ -11,6 +11,7 @@ namespace App\Helpers;
 require('I18N_Arabic/Arabic.php');
 
 use \I18N_Arabic;
+use Carbon\Carbon;
 
 /**
  * Description of newPHPClass
@@ -30,5 +31,9 @@ class Helpers {
         $minutes = floor(($totalDuration / 60) % 60);
         $seconds = $totalDuration % 60;
         return "$hours:$minutes:$seconds";
+    }
+    
+    static function diffInHoursMinutsToSeconds(Carbon $startDate, Carbon $endDate) {
+        return $endDate->diffInSeconds($startDate);
     }
 }

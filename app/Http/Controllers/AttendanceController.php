@@ -19,6 +19,7 @@ use Validator;
 use function redirect;
 use function response;
 use function view;
+use App\Helpers\Helpers;
 
 /**
  * @Controller(prefix="attendance")
@@ -172,7 +173,7 @@ class AttendanceController extends Controller {
     public function checkin() {
         return $this->createAttendance(TRUE);
     }
-    
+
     /**
      * @return \Illuminate\Http\Response
      * @Get("checkout", as="attendance.checkout")
@@ -180,7 +181,7 @@ class AttendanceController extends Controller {
     public function checkout() {
         return $this->createAttendance(FALSE);
     }
-    
+
     /**
      * @return \Illuminate\Http\Response
      * @Get("manualadding", as="attendance.manualadding")
@@ -362,7 +363,7 @@ class AttendanceController extends Controller {
             $date        = null;
         } else {
             $employee    = Employee::findOrFail($id);
-            $hourlyRate  = $employee->daily_salary / $employee->working_hours;
+            $hourlyRate  = $employee->salaryPerHour();
             $attendances = Attendance::where([
                         ['employee_id', '=', $id]
                     ])->whereMonth('date', '=', $dt->month)->orderBy('date', 'asc')->get();
@@ -418,7 +419,7 @@ class AttendanceController extends Controller {
         $totalBorrowValue      += $totalLongBorrowValue;
         $totalHoursSalary      = $totalWorkingHours * (($hourlyRate / 60) / 60);
         $totalHoursSalary      = round($totalHoursSalary, 3);
-        $totalWorkingHours     = $this->diffInHoursMinutsToString($totalWorkingHours);
+        $totalWorkingHours     = Helpers::hoursMinutsToString($totalWorkingHours);
         $totalSalary           = ($totalHoursSalary + $totalBonuses);
         $totalNetSalary        = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
 
@@ -558,20 +559,6 @@ class AttendanceController extends Controller {
         return view('attendance.employee', compact(['employees', 'attendances']));
     }
 
-    function diffInHoursMinutsToString($totalDuration) {
-        $hours   = floor($totalDuration / 3600);
-        $minutes = floor(($totalDuration / 60) % 60);
-        $seconds = $totalDuration % 60;
-
-        return "$hours:$minutes:$seconds";
-    }
-
-    function diffInHoursMinutsToSeconds($startDate, $endDate) {
-        $totalDuration = $endDate->diffInSeconds($startDate);
-
-        return $this->diffInHoursMinutsToString($totalDuration);
-    }
-    
     /**
      * @return \Illuminate\Http\Response
      * @Get("guardianship/{employee_id}", as="attendance.guardianship")
@@ -602,7 +589,7 @@ class AttendanceController extends Controller {
         $employees = $employees_tmp;
         return view("attendance.guardianship", compact(['employees', 'employeeGuardianships', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'employee_id', 'date']));
     }
-    
+
     /**
      * @return \Illuminate\Http\Response
      * @Get("guardianshipaway/{employee_id}", as="attendance.guardianshipaway")
@@ -616,7 +603,7 @@ class AttendanceController extends Controller {
         $depositWithdraw->save();
         return redirect()->back()->with('success', 'تم الترحيل');
     }
-    
+
     /**
      * @return \Illuminate\Http\Response
      * @Get("guardianshipback/{employee_id}", as="attendance.guardianshipback")
@@ -628,7 +615,7 @@ class AttendanceController extends Controller {
         $depositWithdraw->save();
         return redirect()->back()->with('success', 'تم الغاء ترحيل العهدة');
     }
-    
+
     /**
      * @return \Illuminate\Http\Response
      * @Get("longBorrowaway/{employee_id}", as="attendance.longBorrowAway")
@@ -661,7 +648,7 @@ class AttendanceController extends Controller {
 
         return redirect()->back()->with('success', 'تم الترحيل');
     }
-    
+
     /**
      * @return \Illuminate\Http\Response
      * @Get("printSalaryReport/{employee}", as="attendance.printSalaryReport")
@@ -682,7 +669,7 @@ class AttendanceController extends Controller {
         $totalLongBorrowValue         = 0;
 
         $date        = DateTime::parse($request->date);
-        $hourlyRate  = $employee->daily_salary / $employee->working_hours;
+        $hourlyRate  = $employee->salaryPerHour();
         $attendances = Attendance::where([
                     ['employee_id', '=', $employee->id]
                 ])->whereMonth('date', '=', $date->month)->get();
@@ -733,7 +720,7 @@ class AttendanceController extends Controller {
 
         return $pdfReport->exportPDF();
     }
-    
+
     /**
      * @return \Illuminate\Http\Response
      * @Get("paySalary/{employee_id}", as="attendance.payEmpolyeeSalary")
@@ -784,7 +771,7 @@ class AttendanceController extends Controller {
             return redirect()->back()->withInput($request->all())->with('error', 'حدث حطأ في حفظ البيانات.');
         }
     }
-    
+
     /**
      * @return \Illuminate\Http\Response
      * @Get("getEmployeesCheckinDate", as="attendance.getEmployeesCheckinDate")
@@ -813,7 +800,7 @@ class AttendanceController extends Controller {
             $date        = null;
         } else {
             $employee    = Employee::findOrFail($id);
-            $hourlyRate  = $employee->daily_salary / $employee->working_hours;
+            $hourlyRate  = $employee->salaryPerHour();
             $attendances = Attendance::where([
                         ['employee_id', '=', $id]
                     ])->whereMonth('date', '=', $dt->month)->orderBy('date', 'asc')->get();
@@ -869,7 +856,7 @@ class AttendanceController extends Controller {
         $totalBorrowValue      += $totalLongBorrowValue;
         $totalHoursSalary      = $totalWorkingHours * (($hourlyRate / 60) / 60);
         $totalHoursSalary      = round($totalHoursSalary, 3);
-        $totalWorkingHours     = $this->diffInHoursMinutsToString($totalWorkingHours);
+        $totalWorkingHours     = Helpers::hoursMinutsToString($totalWorkingHours);
         $totalSalary           = ($totalHoursSalary + $totalBonuses);
         $totalNetSalary        = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
 

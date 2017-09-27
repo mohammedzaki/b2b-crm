@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use App\Extensions\DateTime;
 use App\Constants\EmployeeActions;
 use DB;
+use App\Helpers\Helpers;
 
 /**
  * App\Models\Attendance
@@ -72,15 +73,15 @@ class Attendance extends Model {
     public $is_managment_process;
 
     public function employee() {
-        return $this->belongsTo('App\Models\Employee');
+        return $this->belongsTo(Employee::class);
     }
 
     public function absentType() {
-        return $this->belongsTo('App\Models\AbsentType');
+        return $this->belongsTo(AbsentType::class);
     }
 
     public function process() {
-        return $this->belongsTo('App\Models\ClientProcess');
+        return $this->belongsTo(ClientProcess::class);
     }
 
     public function employeeGuardianship() {
@@ -165,31 +166,15 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
             return 0;
         }
     }
-
-    public function diffInHoursMinutsToString($startDate, $endDate) {
-        $totalDuration = $endDate->diffInSeconds($startDate);
-        $hours = floor($totalDuration / 3600);
-        $minutes = floor(($totalDuration / 60) % 60);
-        $seconds = $totalDuration % 60;
-
-        return "$hours:$minutes:$seconds";
-    }
-
+    
     public function workingHoursToString() {
-        $totalDuration = $this->workingHoursToSeconds();
-        $hours = floor($totalDuration / 3600);
-        $minutes = floor(($totalDuration / 60) % 60);
-        $seconds = $totalDuration % 60;
-
-        return "$hours:$minutes:$seconds";
+        return Helpers::hoursMinutsToString($this->workingHoursToSeconds());
     }
 
     public function workingHoursToSeconds() {
         $check_out = DateTime::parse($this->check_out);
         $check_in = DateTime::parse($this->check_in);
-
-        $totalDuration = $check_out->diffInSeconds($check_in);
-        return $totalDuration;
+        return Helpers::diffInHoursMinutsToSeconds($check_in, $check_out);
     }
 
 }
