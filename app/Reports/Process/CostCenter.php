@@ -50,7 +50,7 @@ class CostCenter extends BaseReport implements IReport {
             $this->resetTotals();
         }
         $data = [
-            'clinetName'     => $this->client->name,
+            'clientName'     => $this->client->name,
             'processes'      => $this->processes,
             'showLetterHead' => $this->withLetterHead ? 'on' : 'off',
         ];
