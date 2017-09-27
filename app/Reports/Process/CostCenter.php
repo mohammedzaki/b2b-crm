@@ -22,73 +22,109 @@ class CostCenter extends BaseReport implements IReport {
             $totalProcessExpenses,
             $totalCompanyExpenses;
 
-    function setReportRefs() {
+    public function setReportRefs() {
         $this->reportName  = 'CostCenter.pdf';
         $this->previewView = 'reports.process.cost-center.preview';
         $this->pdfView     = 'reports.process.cost-center.pdf';
         $this->cssPath     = 'ReportsHtml/Process/CostCenter.css';
     }
 
-    function reportData() {
+    public function reportData() {
         $this->client = Client::findOrFail($this->clientId);
         foreach ($this->processIds as $processId) {
             $process                       = ClientProcess::findOrFail($processId);
             $this->processes[$process->id] = [
-                'processExpenses'   => $this->getProcessExpences($process),
-                'processName'       => $process->name,
-                'processNum'        => $process->id,
-                'processDate'       => $process->created_at,
-                'processSuppliers'  => $this->getProcessSuppliers($process),
-                'manpowerHoursCost' => $this->getManpowerHoursCost($process),
-                'companyExpenses'   => $this->getCompanyExpenses($process)
+                'processName'            => $process->name,
+                'processNum'             => $process->id,
+                'processDate'            => $process->created_at,
+                'processExpenses'        => $this->getProcessExpences($process),
+                'processSuppliers'       => $this->getProcessSuppliers($process),
+                'manpowerHoursCost'      => $this->getManpowerHoursCost($process),
+                'companyExpenses'        => $this->getCompanyExpenses($process),
+                'totalProcessSuppliers'  => $this->totalProcessSuppliers,
+                'totalManpowerHoursCost' => $this->totalManpowerHoursCost,
+                'totalProcessExpenses'   => $this->totalProcessExpenses,
+                'totalCompanyExpenses'   => $this->totalCompanyExpenses,
+                'totalProcessCost'       => $this->getTotalProcessCost(),
             ];
+            $this->resetTotals();
         }
         $data = [
             'clinetName'     => $this->client->name,
             'processes'      => $this->processes,
             'showLetterHead' => $this->withLetterHead ? 'on' : 'off',
         ];
+        Debugbar::info($data);
         return $data;
     }
 
     private function getProcessExpences(ClientProcess $process) {
         $processExpences = $process->expenses->map(function ($item, $key) {
             return [
-                'total' => $item['withdrawValue'],
-                'desc'  => $item['recordDesc'],
-                'date'  => $item['due_date'],
+                'desc'      => $item['recordDesc'],
+                'date'      => $item['due_date'],
+                'totalCost' => $item['withdrawValue'],
             ];
         });
+        $this->totalProcessExpenses = $processExpences->sum('totalCost');
         return $processExpences;
     }
 
     private function getProcessSuppliers(ClientProcess $process) {
         $processSuppliers = $process->suppliers->map(function ($item, $key) {
             return [
-                'name'  => $item->supplier->name,
-                'total' => $item['total_price'],
-                'desc'  => $item['name'],
-                'date'  => $item['created_at'],
+                'name'      => $item->supplier->name,
+                'desc'      => $item['name'],
+                'date'      => $item['created_at'],
+                'totalCost' => $item['total_price'],
             ];
         });
+        $this->totalProcessSuppliers = $processSuppliers->sum('totalCost');
         return $processSuppliers;
     }
 
     private function getCompanyExpenses(ClientProcess $process) {
-        
+        $companyExpenses            = collect([
+            [
+                "name"      => "كهرباء",
+                "totalDays" => "2",
+                "totalCost" => 20.45],
+            [
+                "name"      => "sample",
+                "totalDays" => "3",
+                "totalCost" => 20.45],
+            [
+                "name"      => "مثال",
+                "totalDays" => "2",
+                "totalCost" => 20.45]
+        ]);
+        $this->totalCompanyExpenses = $companyExpenses->sum('totalCost');
+        return $companyExpenses;
     }
 
     private function getManpowerHoursCost(ClientProcess $process) {
         $manpowerCost = $process->manpowerCost->map(function ($item, $key) {
             return [
-                'name'        => $item->employee->name,
-                'totalHours'  => Helpers::hoursMinutsToString($item->working_hours_in_seconds),
-                'totalDays'   => $item->totalDays,
-                'hourRate'    => $item->employee->salaryPerHour(),
-                'totalSalary' => round($item->employee->salaryPerSecond() * $item->working_hours_in_seconds, 2),
+                'name'       => $item->employee->name,
+                'totalHours' => Helpers::hoursMinutsToString($item->working_hours_in_seconds),
+                'totalDays'  => $item->totalDays,
+                'hourRate'   => $item->employee->salaryPerHour(),
+                'totalCost'  => round($item->employee->salaryPerSecond() * $item->working_hours_in_seconds, 2),
             ];
         });
+        $this->totalManpowerHoursCost = $manpowerCost->sum('totalCost');
         return $manpowerCost;
+    }
+
+    private function getTotalProcessCost() {
+        return ($this->totalProcessSuppliers + $this->totalManpowerHoursCost + $this->totalProcessExpenses + $this->totalCompanyExpenses);
+    }
+
+    private function resetTotals() {
+        $this->totalProcessSuppliers  = 0;
+        $this->totalManpowerHoursCost = 0;
+        $this->totalProcessExpenses   = 0;
+        $this->totalCompanyExpenses   = 0;
     }
 
 }

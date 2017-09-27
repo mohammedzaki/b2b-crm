@@ -47,10 +47,14 @@
                                                 <tr class="odd">
                                                     <td> {{ $expense['desc'] }} </td>
                                                     <td> {{ $expense['date'] }} </td>
-                                                    <td style="color: red;"> {{ $expense['total'] }} </td>
+                                                    <td style="color: red;"> {{ $expense['totalCost'] }} </td>
                                                 </tr>
                                                 @empty
                                                 @endforelse
+                                                <tr class="info">
+                                                    <td colspan="2">الاجمالـــــــــــــــــــــــــــــــــــى</td>
+                                                    <td style="color: red;"> {{ $process['totalProcessExpenses'] }} </td>
+                                                </tr>
                                             </tbody>
                                         </table>  
                                     </div>
@@ -82,10 +86,14 @@
                                                     <td> {{ $supplier['name'] }} </td>
                                                     <td> {{ $supplier['desc'] }} </td>
                                                     <td> {{ $supplier['date'] }} </td>
-                                                    <td style="color: red;"> {{ $supplier['total'] }} </td>
+                                                    <td style="color: red;"> {{ $supplier['totalCost'] }} </td>
                                                 </tr>
                                                 @empty
                                                 @endforelse
+                                                <tr class="info">
+                                                    <td colspan="3">الاجمالـــــــــــــــــــــــــــــــــــى</td>
+                                                    <td style="color: red;"> {{ $process['totalProcessSuppliers'] }} </td>
+                                                </tr>
                                             </tbody>
                                         </table>  
                                     </div>
@@ -119,10 +127,51 @@
                                                     <td> {{ $manpower['totalHours'] }} </td>
                                                     <td> {{ $manpower['totalDays'] }} </td>
                                                     <td> {{ $manpower['hourRate'] }} </td>
-                                                    <td style="color: red;"> {{ $manpower['totalSalary'] }} </td>
+                                                    <td style="color: red;"> {{ $manpower['totalCost'] }} </td>
                                                 </tr>
                                                 @empty
                                                 @endforelse
+                                                <tr class="info">
+                                                    <td  colspan="4">الاجمالـــــــــــــــــــــــــــــــــــى</td>
+                                                    <td style="color: red;"> {{ $process['totalManpowerHoursCost'] }} </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>  
+                                    </div>
+                                    <!-- /.table-responsive -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 no-padding">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                مصروفات الشركة
+                            </div>
+                            <div class="panel-body">
+                                <div class="dataTable_wrapper">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                            <thead>
+                                                <tr>
+                                                    <th>اسم المصروف</th>
+                                                    <th>عدد الايام</th>
+                                                    <th>الاجمالى</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($process['companyExpenses'] as $companyExpense)
+                                                <tr class="odd">
+                                                    <td> {{ $companyExpense['name'] }} </td>
+                                                    <td> {{ $companyExpense['totalDays'] }} </td>
+                                                    <td style="color: red;"> {{ $companyExpense['totalCost'] }} </td>
+                                                </tr>
+                                                @empty
+                                                @endforelse
+                                                <tr class="info">
+                                                    <td colspan="2">الاجمالـــــــــــــــــــــــــــــــــــى</td>
+                                                    <td style="color: red;"> {{ $process['totalCompanyExpenses'] }} </td>
+                                                </tr>
                                             </tbody>
                                         </table>  
                                     </div>
