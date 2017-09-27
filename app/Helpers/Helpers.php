@@ -33,7 +33,10 @@ class Helpers {
         return "$hours:$minutes:$seconds";
     }
     
-    static function diffInHoursMinutsToSeconds(Carbon $startDate, Carbon $endDate) {
+    static function diffInHoursMinutsToSeconds(Carbon $startDate = null, Carbon $endDate = null) {
+        if ($startDate == null || $endDate == null) {
+            return 0;
+        }
         return $endDate->diffInSeconds($startDate);
     }
 }

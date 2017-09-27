@@ -6,7 +6,7 @@ use App\Constants\PaymentMethods;
 use App\Extensions\DateTime;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\DB;
+use DB;
 
 /**
  * App\Models\ClientProcess
@@ -68,12 +68,15 @@ use Illuminate\Support\Facades\DB;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\ClientProcess withTrashed()
  * @method static \Illuminate\Database\Query\Builder|\App\Models\ClientProcess withoutTrashed()
  * @mixin \Eloquent
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DepositWithdraw[] $expenses
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Attendance[] $manpowerCost
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\SupplierProcess[] $suppliers
  */
 class ClientProcess extends Model {
 
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
+    protected $dates    = ['deleted_at'];
     protected $fillable = [
         'name',
         'client_id',
@@ -97,9 +100,9 @@ class ClientProcess extends Model {
     ];
 
     const invoiceUnBilled = 0;
-    const invoiceBilled = 1;
-    const statusClosed = 'closed';
-    const statusOpened = 'active';
+    const invoiceBilled   = 1;
+    const statusClosed    = 'closed';
+    const statusOpened    = 'active';
 
     public function client() {
         return $this->belongsTo(Client::class);
@@ -118,7 +121,7 @@ class ClientProcess extends Model {
     }
 
     public function employee() {
-        return $this->hasOne(Employee::class, 'id');
+        return $this->belongsTo(Employee::class);
     }
 
     public function deposits() {
@@ -135,6 +138,19 @@ class ClientProcess extends Model {
         ]);
     }
 
+    public function manpowerCost() {
+        return $this->hasMany(Attendance::class, 'process_id')
+                ->select(
+                        'employee_id', 
+                        DB::raw('count(employee_id) as totalDays'), 
+                        DB::raw('SUM(working_hours_in_seconds) as working_hours_in_seconds'))
+                ->groupBy('employee_id');
+    }
+
+    public function companyExpences() {
+        
+    }
+
     public function totalDeposits() {
         return $this->deposits()->sum('depositValue');
     }
@@ -146,20 +162,20 @@ class ClientProcess extends Model {
     public function payRemaining($invoice_no) {
         if ($this->totalRemaining() > 0) {
             $all = [
-                'due_date' => DateTime::now(),
-                'depositValue' => $this->totalRemaining(),
+                'due_date'      => DateTime::now(),
+                'depositValue'  => $this->totalRemaining(),
                 'cbo_processes' => $this->id,
-                'client_id' => $this->client_id,
-                'recordDesc' => "تحصيل فاتورة رقم {$invoice_no}",
-                'payMethod' => PaymentMethods::CASH,
-                'notes' => ""
+                'client_id'     => $this->client_id,
+                'recordDesc'    => "تحصيل فاتورة رقم {$invoice_no}",
+                'payMethod'     => PaymentMethods::CASH,
+                'notes'         => ""
             ];
             DepositWithdraw::create($all);
         }
-        $this->CheckProcessMustClosed();
+        $this->checkProcessMustClosed();
     }
 
-    public function CheckProcessMustClosed() {
+    public function checkProcessMustClosed() {
         if ($this->totalRemaining() == 0) {
             $this->status = static::statusClosed;
             $this->save();

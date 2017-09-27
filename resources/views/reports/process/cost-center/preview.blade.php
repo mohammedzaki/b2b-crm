@@ -77,12 +77,49 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                @forelse ($process['suppliers'] as $supplier)
+                                                @forelse ($process['processSuppliers'] as $supplier)
                                                 <tr class="odd">
                                                     <td> {{ $supplier['name'] }} </td>
                                                     <td> {{ $supplier['desc'] }} </td>
                                                     <td> {{ $supplier['date'] }} </td>
                                                     <td style="color: red;"> {{ $supplier['total'] }} </td>
+                                                </tr>
+                                                @empty
+                                                @endforelse
+                                            </tbody>
+                                        </table>  
+                                    </div>
+                                    <!-- /.table-responsive -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 no-padding">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                الموظفين
+                            </div>
+                            <div class="panel-body">
+                                <div class="dataTable_wrapper">
+                                    <div class="table-responsive">
+                                        <table class="table table-striped table-bordered table-hover" id="dataTables-example">
+                                            <thead>
+                                                <tr>
+                                                    <th>اسم الموظف</th>
+                                                    <th>عدد الساعات</th>
+                                                    <th>عدد الايام</th>
+                                                    <th>سعر الساعة</th>
+                                                    <th>الاجمالى</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @forelse ($process['manpowerHoursCost'] as $manpower)
+                                                <tr class="odd">
+                                                    <td> {{ $manpower['name'] }} </td>
+                                                    <td> {{ $manpower['totalHours'] }} </td>
+                                                    <td> {{ $manpower['totalDays'] }} </td>
+                                                    <td> {{ $manpower['hourRate'] }} </td>
+                                                    <td style="color: red;"> {{ $manpower['totalSalary'] }} </td>
                                                 </tr>
                                                 @empty
                                                 @endforelse

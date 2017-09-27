@@ -122,7 +122,7 @@ class Invoice extends Model {
         $this->save();
         foreach ($this->processes as $process) {
             $process->payRemaining($this->invoice_number);
-            $process->CheckProcessMustClosed();
+            $process->checkProcessMustClosed();
         }
     }
 

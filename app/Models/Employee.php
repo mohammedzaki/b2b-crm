@@ -93,7 +93,7 @@ class Employee extends Model {
     public $password = "";
 
     public function users() {
-        return $this->hasMany('App\Models\User', 'employee_id');
+        return $this->hasMany(User::class, 'employee_id');
     }
 
     public function smallBorrows() {
@@ -152,6 +152,18 @@ class Employee extends Model {
         return $borrows;
     }
 
+    public function salaryPerHour() {
+        return $this->daily_salary / $this->working_hours;
+    }
+    
+    public function salaryPerMinute() {
+        return $this->salaryPerHour() / 60;
+    }
+    
+    public function salaryPerSecond() {
+        return $this->salaryPerMinute() / 60;
+    }
+    
     public function employeeGuardianships(DateTime $dt) {
         $startDate = DateTime::parse($dt)->startOfMonth();
         $endDate = DateTime::parse($dt)->endOfMonth();

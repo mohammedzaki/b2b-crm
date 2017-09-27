@@ -225,7 +225,7 @@ class SupplierProcessController extends Controller {
 
             $all['name'] = \App\Models\ClientProcess::findOrFail($all['client_process_id'])->name;
             $process->update($all);
-            $process->CheckProcessMustClosed();
+            $process->checkProcessMustClosed();
             $items_ids   = [];
 
             foreach ($all['items'] as $item) {

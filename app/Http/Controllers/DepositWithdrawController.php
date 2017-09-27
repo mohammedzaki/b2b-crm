@@ -442,10 +442,10 @@ class DepositWithdrawController extends Controller {
         if (!empty($depositWithdraw->cbo_processes)) {
             if (!empty($depositWithdraw->client_id)) {
                 $process = ClientProcess::findOrFail($depositWithdraw->cbo_processes);
-                $process->CheckProcessMustClosed();
+                $process->checkProcessMustClosed();
             } else if (!empty($depositWithdraw->supplier_id)) {
                 $process = SupplierProcess::findOrFail($depositWithdraw->cbo_processes);
-                $process->CheckProcessMustClosed();
+                $process->checkProcessMustClosed();
             }
         }
     }

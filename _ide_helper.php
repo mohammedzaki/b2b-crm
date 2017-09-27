@@ -1,7 +1,7 @@
 <?php
 /**
  * A helper file for Laravel 5, to provide autocomplete information to your IDE
- * Generated for Laravel 5.5.4 on 2017-09-16.
+ * Generated for Laravel 5.5.13 on 2017-09-27.
  *
  * @author Barry vd. Heuvel <barryvdh@gmail.com>
  * @see https://github.com/barryvdh/laravel-ide-helper
@@ -8895,6 +8895,18 @@ namespace Illuminate\Support\Facades {
         }
         
         /**
+         * Register a new Fallback route with the router.
+         *
+         * @param \Closure|array|string|null $action
+         * @return \Illuminate\Routing\Route 
+         * @static 
+         */ 
+        public static function fallback($action)
+        {
+            return \Illuminate\Routing\Router::fallback($action);
+        }
+        
+        /**
          * Create a redirect from one URI to another.
          *
          * @param string $uri
@@ -9010,6 +9022,18 @@ namespace Illuminate\Support\Facades {
         public static function getLastGroupPrefix()
         {
             return \Illuminate\Routing\Router::getLastGroupPrefix();
+        }
+        
+        /**
+         * Return the response returned by the given route.
+         *
+         * @param string $name
+         * @return mixed 
+         * @static 
+         */ 
+        public static function respondWithRoute($name)
+        {
+            return \Illuminate\Routing\Router::respondWithRoute($name);
         }
         
         /**
@@ -13786,6 +13810,571 @@ namespace Barryvdh\Debugbar {
  
 }
 
+namespace Sentry\SentryLaravel { 
+
+    class SentryFacade {
+        
+        /**
+         * Destruct all objects contain link to this object
+         * 
+         * This method can not delete shutdown handler
+         *
+         * @static 
+         */ 
+        public static function close_all_children_link()
+        {
+            return \Raven_Client::close_all_children_link();
+        }
+        
+        /**
+         * Installs any available automated hooks (such as error_reporting).
+         *
+         * @static 
+         */ 
+        public static function install()
+        {
+            return \Raven_Client::install();
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function getRelease()
+        {
+            return \Raven_Client::getRelease();
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function setRelease($value)
+        {
+            return \Raven_Client::setRelease($value);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function getEnvironment()
+        {
+            return \Raven_Client::getEnvironment();
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function setEnvironment($value)
+        {
+            return \Raven_Client::setEnvironment($value);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function getAppPath()
+        {
+            return \Raven_Client::getAppPath();
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function setAppPath($value)
+        {
+            return \Raven_Client::setAppPath($value);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function getExcludedAppPaths()
+        {
+            return \Raven_Client::getExcludedAppPaths();
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function setExcludedAppPaths($value)
+        {
+            return \Raven_Client::setExcludedAppPaths($value);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function getPrefixes()
+        {
+            return \Raven_Client::getPrefixes();
+        }
+        
+        /**
+         * 
+         *
+         * @param array $value
+         * @return \Raven_Client 
+         * @static 
+         */ 
+        public static function setPrefixes($value)
+        {
+            return \Raven_Client::setPrefixes($value);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function getSendCallback()
+        {
+            return \Raven_Client::getSendCallback();
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function setSendCallback($value)
+        {
+            return \Raven_Client::setSendCallback($value);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function getTransport()
+        {
+            return \Raven_Client::getTransport();
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function getServerEndpoint($value = '')
+        {
+            return \Raven_Client::getServerEndpoint($value);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function getUserAgent()
+        {
+            return \Raven_Client::getUserAgent();
+        }
+        
+        /**
+         * Set a custom transport to override how Sentry events are sent upstream.
+         * 
+         * The bound function will be called with ``$client`` and ``$data`` arguments
+         * and is responsible for encoding the data, authenticating, and sending
+         * the data to the upstream Sentry server.
+         *
+         * @param Callable $value Function to be called
+         * @return \Raven_Client 
+         * @static 
+         */ 
+        public static function setTransport($value)
+        {
+            return \Raven_Client::setTransport($value);
+        }
+        
+        /**
+         * 
+         *
+         * @return string[]|\Raven_Processor[] 
+         * @static 
+         */ 
+        public static function getDefaultProcessors()
+        {
+            return \Raven_Client::getDefaultProcessors();
+        }
+        
+        /**
+         * Sets the Raven_Processor sub-classes to be used when data is processed before being
+         * sent to Sentry.
+         *
+         * @param $options
+         * @return \Raven_Processor[] 
+         * @static 
+         */ 
+        public static function setProcessorsFromOptions($options)
+        {
+            return \Raven_Client::setProcessorsFromOptions($options);
+        }
+        
+        /**
+         * Parses a Raven-compatible DSN and returns an array of its values.
+         *
+         * @param string $dsn Raven compatible DSN
+         * @return array parsed DSN
+         * @doc http://raven.readthedocs.org/en/latest/config/#the-sentry-dsn
+         * @static 
+         */ 
+        public static function parseDSN($dsn)
+        {
+            return \Raven_Client::parseDSN($dsn);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function getLastError()
+        {
+            return \Raven_Client::getLastError();
+        }
+        
+        /**
+         * Given an identifier, returns a Sentry searchable string.
+         *
+         * @param mixed $ident
+         * @return mixed 
+         * @codeCoverageIgnore 
+         * @static 
+         */ 
+        public static function getIdent($ident)
+        {
+            return \Raven_Client::getIdent($ident);
+        }
+        
+        /**
+         * 
+         *
+         * @param string $message The message (primary description) for the event.
+         * @param array $params params to use when formatting the message.
+         * @param string $level Log level group
+         * @param bool|array $stack
+         * @param mixed $vars
+         * @return string|null 
+         * @deprecated 
+         * @codeCoverageIgnore 
+         * @static 
+         */ 
+        public static function message($message, $params = array(), $level = 'info', $stack = false, $vars = null)
+        {
+            return \Raven_Client::message($message, $params, $level, $stack, $vars);
+        }
+        
+        /**
+         * 
+         *
+         * @param \Exception $exception
+         * @return string|null 
+         * @deprecated 
+         * @codeCoverageIgnore 
+         * @static 
+         */ 
+        public static function exception($exception)
+        {
+            return \Raven_Client::exception($exception);
+        }
+        
+        /**
+         * Log a message to sentry
+         *
+         * @param string $message The message (primary description) for the event.
+         * @param array $params params to use when formatting the message.
+         * @param array $data Additional attributes to pass with this event (see Sentry docs).
+         * @param bool|array $stack
+         * @param mixed $vars
+         * @return string|null 
+         * @static 
+         */ 
+        public static function captureMessage($message, $params = array(), $data = array(), $stack = false, $vars = null)
+        {
+            return \Raven_Client::captureMessage($message, $params, $data, $stack, $vars);
+        }
+        
+        /**
+         * Log an exception to sentry
+         *
+         * @param \Exception $exception The Exception object.
+         * @param array $data Additional attributes to pass with this event (see Sentry docs).
+         * @param mixed $logger
+         * @param mixed $vars
+         * @return string|null 
+         * @static 
+         */ 
+        public static function captureException($exception, $data = null, $logger = null, $vars = null)
+        {
+            return \Raven_Client::captureException($exception, $data, $logger, $vars);
+        }
+        
+        /**
+         * Capture the most recent error (obtained with ``error_get_last``).
+         *
+         * @return string|null 
+         * @static 
+         */ 
+        public static function captureLastError()
+        {
+            return \Raven_Client::captureLastError();
+        }
+        
+        /**
+         * Log an query to sentry
+         *
+         * @param string|null $query
+         * @param string $level
+         * @param string $engine
+         * @static 
+         */ 
+        public static function captureQuery($query, $level = 'info', $engine = '')
+        {
+            return \Raven_Client::captureQuery($query, $level, $engine);
+        }
+        
+        /**
+         * Return the last captured event's ID or null if none available.
+         *
+         * @static 
+         */ 
+        public static function getLastEventID()
+        {
+            return \Raven_Client::getLastEventID();
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function get_default_data()
+        {
+            return \Raven_Client::get_default_data();
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function capture($data, $stack = null, $vars = null)
+        {
+            return \Raven_Client::capture($data, $stack, $vars);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function sanitize($data)
+        {
+            return \Raven_Client::sanitize($data);
+        }
+        
+        /**
+         * Process data through all defined Raven_Processor sub-classes
+         *
+         * @param array $data Associative array of data to log
+         * @static 
+         */ 
+        public static function process($data)
+        {
+            return \Raven_Client::process($data);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function sendUnsentErrors()
+        {
+            return \Raven_Client::sendUnsentErrors();
+        }
+        
+        /**
+         * 
+         *
+         * @param array $data
+         * @return string|bool 
+         * @static 
+         */ 
+        public static function encode($data)
+        {
+            return \Raven_Client::encode($data);
+        }
+        
+        /**
+         * Wrapper to handle encoding and sending data to the Sentry API server.
+         *
+         * @param array $data Associative array of data to log
+         * @static 
+         */ 
+        public static function send($data)
+        {
+            return \Raven_Client::send($data);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function getAuthHeader()
+        {
+            return \Raven_Client::getAuthHeader();
+        }
+        
+        /**
+         * Translate a PHP Error constant into a Sentry log level group
+         *
+         * @param string $severity PHP E_$x error constant
+         * @return string Sentry log level group
+         * @static 
+         */ 
+        public static function translateSeverity($severity)
+        {
+            return \Raven_Client::translateSeverity($severity);
+        }
+        
+        /**
+         * Provide a map of PHP Error constants to Sentry logging groups to use instead
+         * of the defaults in translateSeverity()
+         *
+         * @param array $map
+         * @static 
+         */ 
+        public static function registerSeverityMap($map)
+        {
+            return \Raven_Client::registerSeverityMap($map);
+        }
+        
+        /**
+         * Convenience function for setting a user's ID and Email
+         *
+         * @deprecated 
+         * @param string $id User's ID
+         * @param string|null $email User's email
+         * @param array $data Additional user data
+         * @codeCoverageIgnore 
+         * @static 
+         */ 
+        public static function set_user_data($id, $email = null, $data = array())
+        {
+            return \Raven_Client::set_user_data($id, $email, $data);
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function onShutdown()
+        {
+            return \Raven_Client::onShutdown();
+        }
+        
+        /**
+         * Sets user context.
+         *
+         * @param array $data Associative array of user data
+         * @param bool $merge Merge existing context with new context
+         * @static 
+         */ 
+        public static function user_context($data, $merge = true)
+        {
+            return \Raven_Client::user_context($data, $merge);
+        }
+        
+        /**
+         * Appends tags context.
+         *
+         * @param array $data Associative array of tags
+         * @static 
+         */ 
+        public static function tags_context($data)
+        {
+            return \Raven_Client::tags_context($data);
+        }
+        
+        /**
+         * Appends additional context.
+         *
+         * @param array $data Associative array of extra data
+         * @static 
+         */ 
+        public static function extra_context($data)
+        {
+            return \Raven_Client::extra_context($data);
+        }
+        
+        /**
+         * 
+         *
+         * @param array $processors
+         * @static 
+         */ 
+        public static function setProcessors($processors)
+        {
+            return \Raven_Client::setProcessors($processors);
+        }
+        
+        /**
+         * 
+         *
+         * @return object|null 
+         * @static 
+         */ 
+        public static function getLastSentryError()
+        {
+            return \Raven_Client::getLastSentryError();
+        }
+        
+        /**
+         * 
+         *
+         * @return bool 
+         * @static 
+         */ 
+        public static function getShutdownFunctionHasBeenSet()
+        {
+            return \Raven_Client::getShutdownFunctionHasBeenSet();
+        }
+        
+        /**
+         * 
+         *
+         * @static 
+         */ 
+        public static function close_curl_resource()
+        {
+            return \Raven_Client::close_curl_resource();
+        }
+         
+    }
+ 
+}
+
 
 namespace  { 
 
@@ -15906,8 +16495,33 @@ namespace  {
     class Html extends \Collective\Html\HtmlFacade {}
 
     class Debugbar extends \Barryvdh\Debugbar\Facade {}
+
+    class Sentry extends \Sentry\SentryLaravel\SentryFacade {}
  
 }
 
 
 
+namespace Illuminate\Support {
+    /**
+     * Methods commonly used in migrations
+     *
+     * @method Fluent after(string $column) Add the after modifier
+     * @method Fluent charset(string $charset) Add the character set modifier
+     * @method Fluent collation(string $collation) Add the collation modifier
+     * @method Fluent comment(string $comment) Add comment
+     * @method Fluent default(mixed $value) Add the default modifier
+     * @method Fluent first() Select first row
+     * @method Fluent index(string $name = null) Add the in dex clause
+     * @method Fluent on(string $table) `on` of a foreign key
+     * @method Fluent onDelete(string $action) `on delete` of a foreign key
+     * @method Fluent onUpdate(string $action) `on update` of a foreign key
+     * @method Fluent primary() Add the primary key modifier
+     * @method Fluent references(string $column) `references` of a foreign key
+     * @method Fluent nullable() Add the nullable modifier
+     * @method Fluent unique(string $name = null) Add unique index clause
+     * @method Fluent unsigned() Add the unsigned modifier
+     * @method Fluent useCurrent() Add the default timestamp value
+     */
+    class Fluent {}
+}

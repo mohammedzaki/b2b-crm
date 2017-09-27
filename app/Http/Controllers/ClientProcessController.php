@@ -191,7 +191,7 @@ class ClientProcessController extends Controller {
                 }
 
                 $process->update($all);
-                $process->CheckProcessMustClosed();
+                $process->checkProcessMustClosed();
                 $items_ids = [];
 
                 foreach ($all['items'] as $item) {

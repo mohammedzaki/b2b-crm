@@ -53,7 +53,7 @@ class Attendance extends Model {
         'shift',
         'check_in',
         'check_out',
-        'working_hours',
+        'working_hours_in_seconds',
         'absent_check',
         'absent_type_id',
         'salary_deduction',
@@ -63,6 +63,19 @@ class Attendance extends Model {
         'employee_id',
         'process_id'
     ];
+    
+    /**
+     * The attributes that should be mutated to dates.
+     *
+     * @var array
+     */
+    protected $dates = [
+        'check_in',
+        'check_out',
+        'created_at',
+        'updated_at'
+    ];
+    
     public $workingHours;
     public $employeeName;
     public $processName;
@@ -172,9 +185,11 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
     }
 
     public function workingHoursToSeconds() {
-        $check_out = DateTime::parse($this->check_out);
-        $check_in = DateTime::parse($this->check_in);
-        return Helpers::diffInHoursMinutsToSeconds($check_in, $check_out);
+        return Helpers::diffInHoursMinutsToSeconds($this->check_in, $this->check_out);
+    }
+    
+    public function daySalary() {
+        return $this->workingHoursToSeconds() * $this->employee->salaryPerSecond();
     }
 
 }
