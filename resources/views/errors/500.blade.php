@@ -50,6 +50,7 @@
 
                 <script>
                     Raven.showReportDialog({
+                        locale: 'ar-eg',
                         eventId: '{{ Sentry::getLastEventID() }}',
                         // use the public DSN (dont include your secret!)
                         dsn: 'https://6647cd503d304743af251ab56bb4c216@sentry.io/222368',

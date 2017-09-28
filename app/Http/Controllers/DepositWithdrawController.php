@@ -272,14 +272,10 @@ class DepositWithdrawController extends Controller {
      *
      * @param  int  $id
      * @return Response
-     * @Post("/search", as="depositwithdraw.search")
+     * @Get("/search", as="depositwithdraw.search")
      * @Middleware({"ability:admin,deposit-withdraw-edit"})
      */
     public function search(Request $request) {
-        /*$user = Auth::user();
-        if (!$user->ability('admin', 'deposit-withdraw-edit')) {
-            return response()->view('errors.403', [], 403);
-        }*/
         $startDate = DateTime::parse($request['targetdate'])->startOfDay();
         $endDate = DateTime::parse($request['targetdate'])->endOfDay();
         return $this->getDepositWithdrawsItems($startDate, $endDate, 1, TRUE);
