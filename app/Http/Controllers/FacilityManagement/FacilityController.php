@@ -1,13 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\FacilityManagement;
 
-use Illuminate\Http\Request;
-use App\Http\Requests;
-use App\Models\Facility;
-use App\Models\User;
+use App\Http\Controllers\Controller;
 use App\Models\Employee;
-use Validator;
+use App\Models\Facility;
 
 /**
  * @Controller(prefix="/facility")

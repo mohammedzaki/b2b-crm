@@ -1,16 +1,16 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\ProjectManagement;
 
-use Illuminate\Http\Request;
-use App\Http\Requests;
-use Validator;
-use App\Models\Supplier;
-use App\Models\Employee;
-use App\Models\SupplierProcess;
-use App\Models\SupplierProcessItem;
+use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\ClientProcess;
+use App\Models\Employee;
+use App\Models\Supplier;
+use App\Models\SupplierProcess;
+use App\Models\SupplierProcessItem;
+use Illuminate\Http\Request;
+use Validator;
 
 /**
  * @Controller(prefix="supplier-process")
@@ -132,7 +132,7 @@ class SupplierProcessController extends Controller {
                 $all['has_source_discount'] = FALSE;
             }
 
-            $all['name']     = \App\Models\ClientProcess::findOrFail($all['client_process_id'])->name;
+            $all['name']     = ClientProcess::findOrFail($all['client_process_id'])->name;
             $supplierProcess = SupplierProcess::create($all);
 
             foreach ($all['items'] as $item) {
@@ -223,7 +223,7 @@ class SupplierProcessController extends Controller {
                 $all['has_source_discount'] = FALSE;
             }
 
-            $all['name'] = \App\Models\ClientProcess::findOrFail($all['client_process_id'])->name;
+            $all['name'] = ClientProcess::findOrFail($all['client_process_id'])->name;
             $process->update($all);
             $process->checkProcessMustClosed();
             $items_ids   = [];
@@ -270,7 +270,7 @@ class SupplierProcessController extends Controller {
      * Store a newly created resource in storage.
      *
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      * @Get("/restore/{id}", as="supplier.process.restore")
      */
     public function restore($id) {

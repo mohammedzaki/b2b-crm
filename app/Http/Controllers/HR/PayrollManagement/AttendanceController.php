@@ -1,10 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HR\PayrollManagement;
 
 use App\Constants\EmployeeActions;
 use App\Constants\PaymentMethods;
 use App\Extensions\DateTime;
+use App\Helpers\Helpers;
+use App\Http\Controllers\Controller;
 use App\Models\AbsentType;
 use App\Models\Attendance;
 use App\Models\ClientProcess;
@@ -13,13 +15,10 @@ use App\Models\Employee;
 use App\Models\EmployeeBorrowBilling;
 use App\Reports\Employee\Salary;
 use DB;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Exception;
+use Request;
+use Auth;
 use Validator;
-use function redirect;
-use function response;
-use function view;
-use App\Helpers\Helpers;
 
 /**
  * @Controller(prefix="attendance")
@@ -412,7 +411,7 @@ class AttendanceController extends Controller {
         try {
             $attendances[0]->borrowValue = $attendances[0]->employeeLongBorrow();
             $totalLongBorrowValue        = $attendances[0]->employeeLongBorrow();
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             
         }
         $totalSmallBorrowValue = $totalBorrowValue;
@@ -702,7 +701,7 @@ class AttendanceController extends Controller {
         try {
             $attendances[0]->borrowValue = $attendances[0]->employeeLongBorrow();
             $totalLongBorrowValue        = $attendances[0]->employeeLongBorrow();
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             
         }
         $totalSmallBorrowValue = $totalBorrowValue;
@@ -767,7 +766,7 @@ class AttendanceController extends Controller {
             } else {
                 return redirect()->back()->withInput($request->all())->with('error', 'لقد تم دفع المرتب من قبل');
             }
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             return redirect()->back()->withInput($request->all())->with('error', 'حدث حطأ في حفظ البيانات.');
         }
     }

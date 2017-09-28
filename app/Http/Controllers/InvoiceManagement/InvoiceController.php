@@ -1,14 +1,17 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\InvoiceManagement;
 
+use App\Http\Controllers\Controller;
+use App\Http\Controllers\FacilityManagement\FacilityController;
 use App\Models\Client;
 use App\Models\ClientProcess;
-use App\Reports\Invoice\Invoice as InvoiceReport;
 use App\Models\Invoice;
 use App\Models\InvoiceItem;
+use App\Reports\Invoice\Invoice as InvoiceReport;
 use Illuminate\Http\Request;
 use DB;
+use Exception;
 
 /**
  * @Controller(prefix="invoice")
@@ -211,7 +214,7 @@ class InvoiceController extends Controller {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request) {
@@ -239,7 +242,7 @@ class InvoiceController extends Controller {
             $request->invoice_number = $invoice->invoice_number;
             DB::commit();
             return redirect()->route('invoice.index')->with('success', 'تم اضافة الفاتورة');
-        } catch (\Exception $exc) {
+        } catch (Exception $exc) {
             DB::rollBack();
             return back()->withInput()->with('error', $exc->getMessage());
         }
@@ -258,7 +261,7 @@ class InvoiceController extends Controller {
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  Request  $request
      * @param  Invoice  $invoice
      * @return \Illuminate\Http\Response
      */

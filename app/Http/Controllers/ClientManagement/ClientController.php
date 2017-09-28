@@ -1,13 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\ClientManagement;
 
-use Illuminate\Http\Request;
-use App\Http\Requests;
-use App\Models\Client;
+use App\Http\Controllers\Controller;
 use App\Models\AuthorizedPerson;
-use App\Models\User;
+use App\Models\Client;
 use App\Models\Employee;
+use Illuminate\Http\Request;
 use Validator;
 
 /**
@@ -183,7 +182,7 @@ class ClientController extends Controller {
      * Store a newly created resource in storage.
      *
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      * @Get("/restore/{id}", as="client.restore")
      */
     public function restore($id) {

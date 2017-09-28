@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\FacilityManagement;
 
-use Illuminate\Http\Request;
+use App\Extensions\DateTime;
+use App\Http\Controllers\Controller;
 use App\Models\Facility;
 use App\Models\OpeningAmount;
+use Illuminate\Http\Request;
 use Validator;
-use App\Extensions\DateTime;
 
 /**
  * @Controller(prefix="/facilityopeningamount")

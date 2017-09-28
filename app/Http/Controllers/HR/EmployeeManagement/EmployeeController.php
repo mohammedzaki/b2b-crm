@@ -1,15 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\HR\EmployeeManagement;
 
-use Illuminate\Http\Request;
-use App\Http\Requests;
-use Validator;
-use App\Models\User;
-use App\Models\Role;
-use App\Models\Permission;
+use App\Http\Controllers\Controller;
 use App\Models\Employee;
-use Crypt;
+use App\Models\Permission;
+use App\Models\Role;
+use App\Models\User;
 
 /**
  * @Controller(prefix="/employee")
@@ -140,8 +137,8 @@ class EmployeeController extends Controller {
     }
 
     public function edit($id) {
-        $employee           = Employee::findOrFail($id);
-        $employee->username = $employee->users()->first()->username;
+        $employee            = Employee::findOrFail($id);
+        $employee->username  = $employee->users()->first()->username;
         $employeePermissions = $employee->users[0]->roles->first()->perms;
         $selectedPermissions = [];
         foreach ($employeePermissions as $p) {

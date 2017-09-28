@@ -1,12 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\FacilityManagement;
 
-use Illuminate\Http\Request;
+use App\Extensions\DateTime;
+use App\Http\Controllers\Controller;
 use App\Models\Facility;
 use App\Models\FacilityTaxes;
-use Validator;
-use App\Extensions\DateTime;
 
 /**
  * @Controller(prefix="facility-taxes")
@@ -27,7 +26,6 @@ class FacilityTaxesController extends Controller {
 
     protected function validator(array $data) {
         $validator = Validator::make($data, [
-                    
         ]);
 
         $validator->setAttributeNames([
@@ -46,16 +44,16 @@ class FacilityTaxesController extends Controller {
     }
 
     public function store(Request $request) {
-        $all = $request->all();
+        $all       = $request->all();
         $validator = $this->validator($all);
 
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
-            $old = FacilityTaxes::find(FacilityTaxes::max('id'));
+            $old     = FacilityTaxes::find(FacilityTaxes::max('id'));
             $oldDate = DateTime::parse($old->changedate);
             $newDate = DateTime::parse($all['changedate']);
-            if ($oldDate > $newDate ) {
+            if ($oldDate > $newDate) {
                 return redirect()->back()->withInput()->with('error', 'تاريخ التعديل يجب ان يكون اكبر من اخر تاريخ انتهاء لاخر ضريبة.');
             }
             $facilityTaxes = FacilityTaxes::create($all);
@@ -72,8 +70,8 @@ class FacilityTaxesController extends Controller {
 
     public function update(Request $request, $id) {
         $facilityTaxes = FacilityTaxes::findOrFail($id);
-        $all = $request->all();
-        $validator = $this->validator($all, $facilityTaxes->id);
+        $all           = $request->all();
+        $validator     = $this->validator($all, $facilityTaxes->id);
 
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
@@ -91,9 +89,9 @@ class FacilityTaxesController extends Controller {
     }
 
     function updateFacilityTaxes(FacilityTaxes $facilityTaxes) {
-        $facility = Facility::findOrFail(1);
-        $facility->sales_tax = $facilityTaxes->percentage;
-        $prevFacilityTaxes = $facilityTaxes->getLast();
+        $facility                   = Facility::findOrFail(1);
+        $facility->sales_tax        = $facilityTaxes->percentage;
+        $prevFacilityTaxes          = $facilityTaxes->getLast();
         $prevFacilityTaxes->enddate = DateTime::parse($facilityTaxes->changedate)->addDay(-1);
         $prevFacilityTaxes->save();
         $facility->save();

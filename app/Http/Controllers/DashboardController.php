@@ -19,22 +19,6 @@ use Validator;
  * @Middleware({"web"})
  */
 class DashboardController extends Controller {
-
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
-     * @Get("/addWorkingHoursInSeconds", as="addWorkingHoursInSeconds")
-     * @Middleware({"web"})
-     */
-    public function addWorkingHoursInSeconds() {
-        $attendances = \App\Models\Attendance::all();
-        foreach ($attendances as $attendance) {
-            $attendance->working_hours_in_seconds = $attendance->workingHoursToSeconds();
-            $attendance->save();
-        }
-        return "true";
-    }
     
     /**
      * Show the application dashboard.

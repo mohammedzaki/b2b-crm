@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\SupplierManagement;
 
-use Illuminate\Http\Request;
-use App\Http\Requests;
+use App\Http\Controllers\Controller;
 use App\Models\Supplier;
-use App\Models\User;
+use Illuminate\Http\Request;
 use Validator;
 
 /**
@@ -101,7 +100,7 @@ class SupplierController extends Controller {
      * Store a newly created resource in storage.
      *
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      * @Get("/restore/{id}", as="supplier.restore")
      */
     public function restore($id) {
