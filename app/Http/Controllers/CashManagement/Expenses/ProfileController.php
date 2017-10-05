@@ -1,6 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\CashManagement;
+/*
+ * B2B CRM Software License
+ *
+ * Copyright (C) ZakiSoft ltd - All Rights Reserved.
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Mohammed Zaki mohammedzaki.dev@gmail.com, September 2017
+ */
+
+namespace App\Http\Controllers\CashManagement\Expenses;
 
 use App\Http\Controllers\Controller;
 use App\Models\Expenses;
@@ -12,7 +22,7 @@ use Validator;
  * @Resource("expenses")
  * @Middleware({"web", "auth"})
  */
-class ExpensesController extends Controller {
+class ProfileController extends Controller {
 
     protected function validator(array $data, $id = null) {
         $validator = Validator::make($data, [

@@ -1,6 +1,16 @@
 <?php
 
-namespace App\Http\Controllers\CashManagement;
+/*
+ * B2B CRM Software License
+ *
+ * Copyright (C) ZakiSoft ltd - All Rights Reserved.
+ *
+ * Unauthorized copying of this file, via any medium is strictly prohibited
+ * Proprietary and confidential
+ * Written by Mohammed Zaki mohammedzaki.dev@gmail.com, September 2017
+ */
+
+namespace App\Http\Controllers\CashManagement\Journal;
 
 use App\Constants\EmployeeActions;
 use App\Constants\PaymentMethods;
@@ -22,11 +32,15 @@ use Illuminate\Http\Response;
 use Validator;
 
 /**
+ * Description of DailyCashController
+ *
+ * @author Mohammed Zaki mohammedzaki.dev@gmail.com
+ * 
  * @Controller(prefix="/depositwithdraw")
  * @Resource("depositwithdraw")
  * @Middleware({"web", "auth", "ability:admin,deposit-withdraw"})
  */
-class DepositWithdrawController extends Controller {
+class DailyCashController extends Controller {
 
     /**
      * Display a listing of the resource.
@@ -348,7 +362,7 @@ class DepositWithdrawController extends Controller {
 
         $employees = $employees_tmp;
         $canEdit   = $canEdit;
-        return view('depositwithdraw.index', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit', 'employeeActions', 'isSearch']));
+        return view('cash.journal.daily-cash', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses', 'depositWithdraws', 'payMethods', 'canEdit', 'employeeActions', 'isSearch']));
     }
 
     /**
