@@ -211,14 +211,14 @@
 
                     <div class="form-group col-lg-3">
                         <label>المكافأت</label>
-                        {{ Form::text('HourlyRate', $totalBonuses, array(
-                                        "id" => "HourlyRate",
+                        {{ Form::text('hourlyRate', $totalBonuses, array(
+                                        "id" => "hourlyRate",
                                         'class' => 'form-control')) }}
                     </div>
                     <div class="form-group col-lg-3">
                         <label>المرتب</label>
-                        {{ Form::text('TotalSalary', $totalSalary, array(
-                                        "id" => "TotalSalary",
+                        {{ Form::text('totalSalary', $totalSalary, array(
+                                        "id" => "totalSalary",
                                         'class' => 'form-control')) }}
                     </div>
                     <div class="col-lg-3">
@@ -231,7 +231,7 @@
                     <div class="col-lg-3 ">
                         <div class="form-group">
                             <label>اجمالى العهدة</label>
-                            {{ Form::text('TotalSalary', $totalGuardianshipValue, array(
+                            {{ Form::text('totalSalary', $totalGuardianshipValue, array(
                                         "id" => "totalGuardianshipValue",
                                         'class' => 'form-control')) }}
                         </div>
@@ -239,15 +239,15 @@
                     <div class="col-lg-3 ">
                         <div class="form-group">
                             <label>اجمالى رد العهدة</label>
-                            {{ Form::text('TotalSalary', $totalGuardianshipReturnValue, array(
+                            {{ Form::text('totalSalary', $totalGuardianshipReturnValue, array(
                                         "id" => "totalGuardianshipReturnValue",
                                         'class' => 'form-control')) }}
                         </div>
                     </div>
                     <div class="form-group col-lg-3">
                         <label>الصافى المستحق</label>
-                        {{ Form::text('TotalNetSalary', $totalNetSalary, array(
-                                        "id" => "TotalNetSalary",
+                        {{ Form::text('totalNetSalary', $totalNetSalary, array(
+                                        "id" => "totalNetSalary",
                                         'class' => 'form-control')) }}
                     </div>
                     @if ($salaryIsPaid)
@@ -323,7 +323,7 @@
          }*/
         if (ConfirmPay()) {
 
-            $('#SearchForm').append('<input type="hidden" name="totalNetSalary" value="' + $('#TotalNetSalary').val() + '" />');
+            $('#SearchForm').append('<input type="hidden" name="totalNetSalary" value="' + $('#totalNetSalary').val() + '" />');
             $('#SearchForm').prop('method', 'post').prop('action', 'paySalary/' + empId).submit();
         }
     }

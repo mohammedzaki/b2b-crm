@@ -208,7 +208,7 @@ class InvoiceController extends Controller {
         } else {
             $pdfReport->withLetterHead = FALSE;
         }
-        return $pdfReport->RenderReport();
+        return $pdfReport->exportPDF();
     }
 
     /**

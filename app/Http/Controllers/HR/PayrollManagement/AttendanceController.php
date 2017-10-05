@@ -14,9 +14,9 @@ use App\Models\DepositWithdraw;
 use App\Models\Employee;
 use App\Models\EmployeeBorrowBilling;
 use App\Reports\Employee\Salary;
+use Illuminate\Http\Request;
 use DB;
 use Exception;
-use Request;
 use Auth;
 use Validator;
 
@@ -44,7 +44,7 @@ class AttendanceController extends Controller {
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
-     * @Get("attendanceSearch/{employee_id}", as="attendance.search")
+     * @Get("search/{employee_id}", as="attendance.search")
      */
     public function search($employee_id, Request $request) {
         $user = Auth::user();
@@ -722,10 +722,10 @@ class AttendanceController extends Controller {
 
     /**
      * @return \Illuminate\Http\Response
-     * @Get("paySalary/{employee_id}", as="attendance.payEmpolyeeSalary")
+     * @Post("paySalary/{employee_id}", as="attendance.payEmpolyeeSalary")
      */
     public function payEmpolyeeSalary(Request $request, $employee_id) {
-        try {
+        //try {
             $employee             = Employee::findOrFail($employee_id);
             $dt                   = DateTime::parse($request->date);
             $all['due_date']      = DateTime::today();
@@ -766,9 +766,9 @@ class AttendanceController extends Controller {
             } else {
                 return redirect()->back()->withInput($request->all())->with('error', 'لقد تم دفع المرتب من قبل');
             }
-        } catch (Exception $exc) {
-            return redirect()->back()->withInput($request->all())->with('error', 'حدث حطأ في حفظ البيانات.');
-        }
+        //} catch (Exception $exc) {
+        //    return redirect()->back()->withInput($request->all())->with('error', 'حدث حطأ في حفظ البيانات.');
+        //}
     }
 
     /**

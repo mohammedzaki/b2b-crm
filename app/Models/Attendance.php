@@ -45,6 +45,8 @@ use App\Helpers\Helpers;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereShift($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereUpdatedAt($value)
  * @mixin \Eloquent
+ * @property int|null $working_hours_in_seconds
+ * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereWorkingHoursInSeconds($value)
  */
 class Attendance extends Model {
 
@@ -70,8 +72,8 @@ class Attendance extends Model {
      * @var array
      */
     protected $dates = [
-        'check_in',
-        'check_out',
+        //'check_in',
+        //'check_out',
         'created_at',
         'updated_at'
     ];
@@ -185,7 +187,7 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
     }
 
     public function workingHoursToSeconds() {
-        return Helpers::diffInHoursMinutsToSeconds($this->check_in, $this->check_out);
+        return Helpers::diffInHoursMinutsToSeconds(DateTime::parse($this->check_in), DateTime::parse($this->check_out));
     }
     
     public function daySalary() {
