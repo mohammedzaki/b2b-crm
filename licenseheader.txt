@@ -1,0 +1,13 @@
+<#if licenseFirst??>
+${licenseFirst}
+</#if>
+${licensePrefix}B2B CRM Software License
+${licensePrefix?replace(" +$", "", "r")}
+${licensePrefix}Copyright (C) ZakiSoft ltd - All Rights Reserved.
+${licensePrefix?replace(" +$", "", "r")}
+${licensePrefix}Unauthorized copying of this file, via any medium is strictly prohibited
+${licensePrefix}Proprietary and confidential
+${licensePrefix}Written by ${project.organization!user}, ${date?date?string("MMMM yyyy")}
+<#if licenseLast??>
+${licenseLast}
+</#if>
