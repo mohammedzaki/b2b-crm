@@ -311,7 +311,6 @@
     $(document).delegate(".unit_price, .quantity, .total_price, .description, .size", "change", function (e) {
         SetCurrentRowIndex(this);
         var quantity = $('#invoiceItems tr:eq(' + currentRowIndex + ') .quantity');
-        ;
         var unit_price = $('#invoiceItems tr:eq(' + currentRowIndex + ') .unit_price');
         var total_price = $('#invoiceItems tr:eq(' + currentRowIndex + ') .total_price');
 
@@ -567,7 +566,7 @@
     }
 
     function setProcessPricesText() {
-        $('input[name="invoice_price"]').val(roundDecimals(totalPrice, 2));
+        $('input[name="invoice_price"]').val(roundDecimals(totalPrice, 3));
         $('input[name="discount_price"]').val(roundDecimals(discount, 2));
         $('input[name="taxes_price"]').val(roundDecimals(taxes, 2));
         $('input[name="source_discount_value"]').val(roundDecimals(sourceDiscount, 2));

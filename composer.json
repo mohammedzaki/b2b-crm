@@ -14,7 +14,7 @@
         "fideloper/proxy": "~3.3",
         "laravel/framework": "5.5.*",
         "laravel/tinker": "~1.0",
-        "laravelcollective/annotations": "5.5.x-dev",
+        "laravelcollective/annotations": "5.5.0",
         "laravelcollective/html": "^5.4",
         "mpdf/mpdf": "^6.1",
         "sentry/sentry": "^1.7",
@@ -71,6 +71,10 @@
         "repo-name": {
             "type": "vcs",
             "url": "https://github.com/jamisonvalenta/Laravel-4-Generators.git"
+        },
+        "my-annotation-repo": {
+            "type": "git",
+            "url": "https://github.com/mohammedzaki/annotations.git"
         }
     }
 }

@@ -1,7 +1,7 @@
 
 @section('script_taxes')
 <script>
-    var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() / 100 }};
+    var TaxesRate = {{ \App\Http\Controllers\FacilityManagement\FacilityController::TaxesRate() / 100 }};</script>
 </script>
 @endsection
 

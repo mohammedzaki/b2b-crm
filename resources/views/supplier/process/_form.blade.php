@@ -1,6 +1,6 @@
 @section('script_taxes')
 <script>
-    var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() / 100 }};</script>
+    var TaxesRate = {{ \App\Http\Controllers\FacilityManagement\FacilityController::TaxesRate() / 100 }};</script>
 @endsection
 <div class="row">
     <div class="col-lg-4">

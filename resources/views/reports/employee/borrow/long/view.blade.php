@@ -11,7 +11,7 @@
                     <div class="col-lg-12 no-padding">
                         <img src="/ReportsHtml/letr.png" class="letrHead" style="width: 100%; margin-bottom: 20px;" />
                     </div>
-                    @forelse ($employees as $employee)
+
                     <div class="col-lg-12 no-padding">
                         <div class="col-lg-6 no-padding">
                             <label>اسم الموظف :</label> {{ $employee['employeeName'] }}
@@ -45,39 +45,39 @@
                                                     <td> {{ $details['date'] }} </td>
                                                     <!--<td> {{ $details['notes'] }} </td>-->
                                                 </tr>
-                                                <thead>
-                                                    <tr class="info">
-                                                        <th>بيان</th>
-                                                        <th>الحالة</th>
-                                                        <th>المدفوع</th>
-                                                        <th>تاريخ الاستحقاق</th>
-                                                        <th>تاريخ الدفع</th>
-                                                        <!--<td>ملاحظات</td>-->
-                                                    </tr>
-                                                </thead>
-                                                @forelse ($details['amounts'] as $amount)
-                                                <tr class="odd">
-                                                    <td> {{ $amount['desc'] }} </td>
-                                                    <td> {{ $amount['paying_status'] }} </td>
-                                                    <td style="color: red;"> {{ $amount['paid_amount'] }} </td>
-                                                    <td> {{ $amount['due_date'] }} </td>
-                                                    <td> {{ $amount['paid_date'] }} </td>
-                                                    <!--<td> {{ $amount['notes'] }} </td>-->
-                                                </tr>
-                                                @empty
-                                                @endforelse
-                                                <tr>
-                                                    <td colspan="5"  style="background-color: grey;"></td>
-                                                </tr>
-                                                @empty
-                                                @endforelse
+                                            <thead>
                                                 <tr class="info">
-                                                    <td></td>
-                                                    <td style="color: red;">{{ $employee['employeeTotalPrice'] }}</td>
-                                                    <td style="color: red;">{{ $employee['employeeTotalPaid'] }}</td>
-                                                    <td style="color: red;">{{ $employee['employeeTotalRemaining'] }}</td>
-                                                    <td colspan="1" style="color: red;"> الاجمالـــــــــــــــــــــــــــــــــــى</td>
+                                                    <th>بيان</th>
+                                                    <th>الحالة</th>
+                                                    <th>المدفوع</th>
+                                                    <th>تاريخ الاستحقاق</th>
+                                                    <th>تاريخ الدفع</th>
+                                                    <!--<td>ملاحظات</td>-->
                                                 </tr>
+                                            </thead>
+                                            @forelse ($details['amounts'] as $amount)
+                                            <tr class="odd">
+                                                <td> {{ $amount['desc'] }} </td>
+                                                <td> {{ $amount['paying_status'] }} </td>
+                                                <td style="color: red;"> {{ $amount['paid_amount'] }} </td>
+                                                <td> {{ $amount['due_date'] }} </td>
+                                                <td> {{ $amount['paid_date'] }} </td>
+                                                <!--<td> {{ $amount['notes'] }} </td>-->
+                                            </tr>
+                                            @empty
+                                            @endforelse
+                                            <tr>
+                                                <td colspan="5"  style="background-color: grey;"></td>
+                                            </tr>
+                                            @empty
+                                            @endforelse
+                                            <tr class="info">
+                                                <td></td>
+                                                <td style="color: red;">{{ $employee['employeeTotalPrice'] }}</td>
+                                                <td style="color: red;">{{ $employee['employeeTotalPaid'] }}</td>
+                                                <td style="color: red;">{{ $employee['employeeTotalRemaining'] }}</td>
+                                                <td colspan="1" style="color: red;"> الاجمالـــــــــــــــــــــــــــــــــــى</td>
+                                            </tr>
                                             </tbody>
                                         </table>  
                                     </div>
@@ -86,8 +86,6 @@
                             </div>
                         </div>
                     </div>
-                    @empty
-                    @endforelse
 
                 </div>
                 <!-- /.panel-body -->

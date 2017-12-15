@@ -65,7 +65,7 @@ class Attendance extends Model {
         'employee_id',
         'process_id'
     ];
-    
+
     /**
      * The attributes that should be mutated to dates.
      *
@@ -77,7 +77,6 @@ class Attendance extends Model {
         'created_at',
         'updated_at'
     ];
-    
     public $workingHours;
     public $employeeName;
     public $processName;
@@ -87,21 +86,25 @@ class Attendance extends Model {
     public $borrowValue;
     public $is_managment_process;
 
-    public function employee() {
+    public function employee()
+    {
         return $this->belongsTo(Employee::class);
     }
 
-    public function absentType() {
+    public function absentType()
+    {
         return $this->belongsTo(AbsentType::class);
     }
 
-    public function process() {
+    public function process()
+    {
         return $this->belongsTo(ClientProcess::class);
     }
 
-    public function employeeGuardianship() {
-        $startDate = DateTime::parse($this->date)->startOfDay(); //->format('Y-m-d 00:00:00');
-        $endDate = DateTime::parse($this->date)->endOfDay(); //->format('Y-m-d 23:59:59');
+    public function employeeGuardianship()
+    {
+        $startDate        = DateTime::parse($this->date)->startOfDay(); //->format('Y-m-d 00:00:00');
+        $endDate          = DateTime::parse($this->date)->endOfDay(); //->format('Y-m-d 23:59:59');
         $depositWithdraws = DB::select("SELECT distinct dw.* from deposit_withdraws as dw
 JOIN employees emp ON dw.employee_id = emp.id
 WHERE emp.id = {$this->employee_id}
@@ -125,9 +128,10 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         }
     }
 
-    public function employeeGuardianshipReturn() {
-        $startDate = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
-        $endDate = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
+    public function employeeGuardianshipReturn()
+    {
+        $startDate        = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
+        $endDate          = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
                     ['employee_id', '=', $this->employee_id],
                     ['expenses_id', '=', EmployeeActions::GuardianshipReturn],
@@ -145,15 +149,16 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         }
     }
 
-    public function employeeSmallBorrow() {
-        $startDate = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
-        $endDate = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
+    public function employeeSmallBorrow()
+    {
+        $startDate        = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
+        $endDate          = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
                     ['employee_id', '=', $this->employee_id],
                     ['expenses_id', '=', EmployeeActions::SmallBorrow],
                     ['due_date', '>=', $startDate],
                     ['due_date', '<=', $endDate]
-                ]);
+        ]);
         try {
             return $depositWithdraws->sum('withdrawValue');
         } catch (\Exception $exc) {
@@ -161,36 +166,40 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         }
     }
 
-    public function employeeLongBorrow() {
+    public function employeeLongBorrow()
+    {
         $startDate = DateTime::parse($this->date);
-        $employeeBorrowBilling = DB::table('employees')
-                ->join('employee_borrows', 'employee_borrows.employee_id', '=', 'employees.id')
-                ->join('employee_borrow_billing', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
+
+        $employeeBorrowBilling = EmployeeBorrowBilling::select('*')
+                ->join('employee_borrows', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
+                ->join('employees', 'employee_borrows.employee_id', '=', 'employees.id')
                 ->distinct()
                 ->where([
-                    ['employee_borrow_billing.paying_status', '=', EmployeeBorrowBilling::UN_PAID],
+                    ['employee_borrow_billing.paying_status', '!=', EmployeeBorrowBilling::POSTPONED],
+                    ['employee_borrow_billing.deposit_id', '=', NULL],
                     ['employees.id', '=', $this->employee_id]
                 ])
+                ->whereYear('due_date', $startDate->year)
                 ->whereMonth('due_date', $startDate->month)
-                ->get();
-        try {
-            //FIXME: getRemaining() not a function from object 
-            //return $employeeBorrowBilling[0]->getRemaining();
-            return $employeeBorrowBilling[0]->pay_amount - $employeeBorrowBilling[0]->paid_amount;
-        } catch (\Exception $exc) {
+                ->first();
+        if (empty($employeeBorrowBilling)) {
             return 0;
         }
+        return $employeeBorrowBilling->getRemaining();
     }
-    
-    public function workingHoursToString() {
+
+    public function workingHoursToString()
+    {
         return Helpers::hoursMinutsToString($this->workingHoursToSeconds());
     }
 
-    public function workingHoursToSeconds() {
+    public function workingHoursToSeconds()
+    {
         return Helpers::diffInHoursMinutsToSeconds(DateTime::parse($this->check_in), DateTime::parse($this->check_out));
     }
-    
-    public function daySalary() {
+
+    public function daySalary()
+    {
         return $this->workingHoursToSeconds() * $this->employee->salaryPerSecond();
     }
 

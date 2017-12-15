@@ -41,8 +41,8 @@
                     <li><a href="{{ route('attendance.checkin') }}">تسجيل حضور</a></li>
                     <li><a href="{{ route('attendance.checkout') }}">تسجيل انصراف</a></li>
                     <li><a href="{{ route('attendance.manualadding') }}">تسجيل جديد</a></li>
-                    <li><a href="{{ route('attendance.guardianship', 'all') }}">سجل العهد</a>
-                    <li><a href="{{ route('attendance.show', 'all') }}">مرتبات</a>
+                    <li><a href="{{ route('salary.guardianship', 'all') }}">سجل العهد</a></li>
+                    <li><a href="{{ route('salary.show', 'all') }}">مرتبات</a></li>
                 </ul>
             </li>
             <li>
@@ -110,7 +110,8 @@
                     <li><a href="{{ route('reports.process.cost-center.index') }}">مركز التكلفة</a></li>
                     <li><a href="{{ route('reports.expenses.index') }}">استعلام عن مصروف</a></li>
                     <li><a href="{{ route('reports.employees.totalSalaries.index') }}">مرتبات الشهر</a></li>
-                    <li><a href="{{ route('reports.employees.borrow.index') }}">سلفيات الموظفين</a></li>
+                    <li><a href="{{ route('reports.employees.borrow.long.index') }}">سلفيات الموظفين المستديمة</a></li>
+                    <li><a href="{{ route('reports.employees.borrow.small.index') }}">سلفيات الموظفين الصغرى</a></li>
                 </ul>
 
             </li>

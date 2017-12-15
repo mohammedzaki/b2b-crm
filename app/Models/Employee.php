@@ -124,6 +124,18 @@ class Employee extends Model {
         }
     }
     
+    public function hasPaidBorrow() {
+        $count = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
+                ->select('employee_borrow_billing.*')->where([
+                    ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::PAID],
+                    ['employee_borrows.employee_id', '=', $this->id]])->count();
+        if ($count > 0) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+    
     public function totalUnpaidBorrow() {
         $total = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
                 ->select('employee_borrow_billing.*')

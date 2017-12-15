@@ -27,9 +27,9 @@ class Invoice extends BaseReport {
     //public function __construct($mode = '', $format = 'A4', $default_font_size = 0, $default_font = '', $mgl = 15, $mgr = 15, $mgt = 16, $mgb = 16, $mgh = 9, $mgf = 9, $orientation = 'P')
     public function __construct($withLetterHead = true) {
         if ($withLetterHead) {
-            $this->mpdf = new \mPDF('', 'A4', 0, '', 5, 5, 24, 8, 8, 8);
+            $this->mpdf = new \mPDF('', [240, 280], 0, '', 5, 5, 24, 8, 8, 8);
         } else {
-            $this->mpdf = new \mPDF('', 'A4', '', 0, '', 5, 5, 8, 8, 10, 10);
+            $this->mpdf = new \mPDF('', [240, 280], '', 0, '', 5, 5, 8, 8, 10, 10);
         }
         $this->withLetterHead = $withLetterHead;
     }

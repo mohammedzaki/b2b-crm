@@ -7,6 +7,8 @@ use App\Models\Employee;
 use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Validator;
 
 /**
  * @Controller(prefix="/employee")
@@ -15,7 +17,8 @@ use App\Models\User;
  */
 class EmployeeController extends Controller {
 
-    protected function validator(array $data) {
+    protected function validator(array $data)
+    {
         $validator = Validator::make($data, [
                     'name'                => 'required|min:6|max:255',
                     'ssn'                 => 'required|digits:14',
@@ -57,17 +60,20 @@ class EmployeeController extends Controller {
         return $validator;
     }
 
-    public function index() {
+    public function index()
+    {
         $employees = Employee::all();
         return view('employee.index', compact('employees'));
     }
 
-    public function create() {
+    public function create()
+    {
         $permissions = Permission::all();
         return view('employee.create', compact('permissions'));
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validator = $this->validator($request->all());
 
         if ($validator->fails()) {
@@ -124,7 +130,8 @@ class EmployeeController extends Controller {
         }
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $employee = Employee::where('id', $id)->firstOrFail();
         foreach ($employee->users as $user) {
             $user->delete();
@@ -136,19 +143,23 @@ class EmployeeController extends Controller {
         return redirect()->back()->with('success', 'تم حذف موظف.');
     }
 
-    public function edit($id) {
+    public function edit($id)
+    {
         $employee            = Employee::findOrFail($id);
-        $employee->username  = $employee->users()->first()->username;
-        $employeePermissions = $employee->users[0]->roles->first()->perms;
         $selectedPermissions = [];
-        foreach ($employeePermissions as $p) {
-            array_push($selectedPermissions, $p->id);
+        if (!$employee->can_not_use_program) {
+            $employee->username  = $employee->users()->first()->username;
+            $employeePermissions = $employee->users[0]->roles->first()->perms;
+            foreach ($employeePermissions as $p) {
+                array_push($selectedPermissions, $p->id);
+            }
         }
         $permissions = Permission::all();
         return view('employee.edit', compact('employee', 'permissions', 'selectedPermissions', 'username'));
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         $employee = Employee::findOrFail($id);
         $user     = User::where('employee_id', $id)->firstOrFail();
         /* copy request variables */
@@ -213,7 +224,8 @@ class EmployeeController extends Controller {
      * @return \Illuminate\Http\Response
      * @Get("/trash", as="employee.trash")
      */
-    public function trash() {
+    public function trash()
+    {
         $employees = Employee::onlyTrashed()->get();
         return view('employee.trash', compact('employees'));
     }
@@ -225,7 +237,8 @@ class EmployeeController extends Controller {
      * @return Response
      * @Get("/restore/{id}", as="employee.restore")
      */
-    public function restore($id) {
+    public function restore($id)
+    {
         $employee                = Employee::withTrashed()->find($id)->restore();
         $employee->emp_id        = $employee->deleted_at_id;
         $employee->deleted_at_id = NULL;

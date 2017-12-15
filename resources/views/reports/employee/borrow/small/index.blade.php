@@ -29,29 +29,8 @@
                 سلفيات الموظفين
             </div>
             <!-- /.panel-heading -->
-            {{ Form::open(["route" => "reports.employees.borrow.viewReport"]) }}
+            {{ Form::open(["route" => "reports.employees.borrow.small.viewReport"]) }}
             <div class="panel-body">
-
-                <div class="legend">
-
-                    {{ Form::radio("ch_longBorrow", "1", null, 
-                        array(
-                            "id" => "ch_longBorrow",
-                            "class" => "checkbox_show_input",
-                            "required" => "required"
-                        )
-                    ) }} 
-                    {{ Form::label("ch_longBorrow", "سلفة مستديمة") }}
-                    &ensp;
-                    {{ Form::radio("ch_longBorrow", "0", null, 
-                        array(
-                            "id" => "ch_smallBorrow",
-                            "class" => "checkbox_show_input",
-                            "required" => "required"
-                        )
-                    ) }} 
-                    {{ Form::label("ch_smallBorrow", "سلف يومية") }}
-                </div>
                 <div class="legend">
                     {{ Form::checkbox(null, "1", null, 
                         array(
@@ -69,20 +48,14 @@
                                 <tr role="row">
                                     <th rowspan="1" colspan="1" style="padding: 8px;">اختيار</th>
                                     <th rowspan="1" colspan="1" >اسم الموظف</th>
-                                    <th rowspan="1" colspan="1" >اجمالى السلف المستديمة</th>
-                                    <th rowspan="1" colspan="1" >اجمالي المدفوع</th>
-                                    <th rowspan="1" colspan="1" >اجمالي المستحق</th>
                                     <th rowspan="1" colspan="1" >اجمالى السلف اليومية</th>
                                 </tr>
                             </thead>
                             <tbody id="grid_SelectedIds">
                                 @forelse ($employees as $index => $employee)
                                 <tr class="odd">
-                                    <td> <input class="" type="checkbox" value="1" onchange="SelectId(this)"> </td>
+                                    <td> <input class="employeeCheck" type="checkbox" value="1" onchange="SelectId(this)"> </td>
                                     <td> {{ $employee['name'] }} </td>
-                                    <td> {{ $employee['totalLongBorrows'] }} </td>
-                                    <td> {{ $employee['totalPaid'] }} </td>
-                                    <td> {{ $employee['totalRemaining'] }} </td>
                                     <td> {{ $employee['totalSmallBorrows'] }} </td>
                                     <td hidden>
                                         <input class="form-control employeeId" disabled="disabled" name="selectedIds[{{ $index }}]" type="hidden" value="{{ $employee['id'] }}">
@@ -119,17 +92,18 @@
 
 @section('scripts')
 <script>
+    
     function SelectAll(ch_all) {
         var rowsCount = $("#grid_SelectedIds").children().length;
         if ($(ch_all).is(":checked")) {
             for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
-                $("#grid_SelectedIds tr:eq(" + rowIndex + ") td:eq(0)").children(0).prop("checked", true);
-                $("#grid_SelectedIds tr:eq(" + rowIndex + ") td:eq(6)").children(0).prop("disabled", false);
+                $("#grid_SelectedIds tr:eq(" + rowIndex + ") .employeeCheck").prop("checked", true);
+                $("#grid_SelectedIds tr:eq(" + rowIndex + ") .employeeId").prop("disabled", false);
             }
         } else {
             for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
-                $("#grid_SelectedIds tr:eq(" + rowIndex + ") td:eq(0)").children(0).prop("checked", false);
-                $("#grid_SelectedIds tr:eq(" + rowIndex + ") td:eq(6)").children(0).prop("disabled", true);
+                $("#grid_SelectedIds tr:eq(" + rowIndex + ") .employeeCheck").prop("checked", false);
+                $("#grid_SelectedIds tr:eq(" + rowIndex + ") .employeeId").prop("disabled", true);
             }
         }
     }
@@ -141,13 +115,14 @@
                     .prevAll() // Find all sibling elements in front of it
                     .length; // Get their count
 
-            var inputSelectedId = $("#grid_SelectedIds tr:eq(" + rowIndex + ") td:eq(6)").children(0);
+            var inputSelectedId = $("#grid_SelectedIds tr:eq(" + rowIndex + ") .employeeId");
             if (inputSelectedId.is(":disabled")) {
-                $("#grid_SelectedIds tr:eq(" + rowIndex + ") td:eq(6)").children(0).prop("disabled", false);
+                $("#grid_SelectedIds tr:eq(" + rowIndex + ") .employeeId").prop("disabled", false);
             } else {
-                $("#grid_SelectedIds tr:eq(" + rowIndex + ") td:eq(6)").children(0).prop("disabled", true);
+                $("#grid_SelectedIds tr:eq(" + rowIndex + ") .employeeId").prop("disabled", true);
             }
         }
     }
+    
 </script>
 @endsection

@@ -36,7 +36,7 @@ class EmployeeBorrowBilling extends Model {
     /**
      * Generated
      */
-    protected $table = 'employee_borrow_billing';
+    protected $table    = 'employee_borrow_billing';
     protected $fillable = [
         'employee_borrow_id',
         'pay_amount',
@@ -47,23 +47,30 @@ class EmployeeBorrowBilling extends Model {
         'paying_status'
     ];
 
-    const UN_PAID = 0;
-    const PAID = 1;
+    const UN_PAID   = 0;
+    const PAID      = 1;
     const POSTPONED = 2;
 
-    public function borrow() {
+    public function borrow()
+    {
         return $this->belongsTo(EmployeeBorrow::class);
     }
-    
-    public function deposit() {
+
+    public function deposit()
+    {
         return $this->belongsTo(DepositWithdraw::class, 'deposit_id', 'id');
     }
-    
-    public function getRemaining() {
+
+    public function getRemaining()
+    {
+        if ($this->paying_status == static::PAID) {
+            return $this->paid_amount;
+        }
         return $this->pay_amount - $this->paid_amount;
-    } 
-    
-    public function getStatus() {
+    }
+
+    public function getStatus()
+    {
         switch ($this->paying_status) {
             case static::PAID:
                 if (empty($this->deposit_id)) {
@@ -78,4 +85,7 @@ class EmployeeBorrowBilling extends Model {
         }
     }
 
+    public function checkIsClosed() {
+        //$this->
+    }
 }
