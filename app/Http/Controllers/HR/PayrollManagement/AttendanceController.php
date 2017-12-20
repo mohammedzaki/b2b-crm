@@ -2,21 +2,13 @@
 
 namespace App\Http\Controllers\HR\PayrollManagement;
 
-use App\Constants\EmployeeActions;
-use App\Constants\PaymentMethods;
 use App\Extensions\DateTime;
-use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\AbsentType;
 use App\Models\Attendance;
 use App\Models\ClientProcess;
-use App\Models\DepositWithdraw;
 use App\Models\Employee;
-use App\Models\EmployeeBorrowBilling;
-use App\Reports\Employee\Salary;
 use Illuminate\Http\Request;
-use DB;
-use Exception;
 use Auth;
 use Validator;
 
@@ -59,7 +51,9 @@ class AttendanceController extends Controller {
 
     private function getAttendanceItems($id, $startDate, $endDate, $canEdit, $isToday = FALSE)
     {
-        $employees = Employee::all();
+        $employees = Employee::all()->mapWithKeys(function ($employee) {
+            return [$employee->id => $employee->name];
+        });
         $dt        = DateTime::parse($startDate);
         $hasData   = FALSE;
         if ($id == "all") {
@@ -82,11 +76,6 @@ class AttendanceController extends Controller {
         $date        = $startDate;
         $employee_id = $id;
 
-        foreach ($employees as $employee) {
-            $employees_tmp[$employee->id] = $employee->name;
-        }
-        $employees = $employees_tmp;
-
         foreach ($attendances as $attendance) {
             $attendance->workingHours = $attendance->workingHoursToString();
             $attendance->employeeName = $attendance->employee->name;
@@ -100,6 +89,7 @@ class AttendanceController extends Controller {
                 $attendance->absentTypeName = $attendance->absentType->name;
             }
         }
+        
         return view('attendance.index', compact(['employees', 'attendances', 'date', 'employee_id', 'hasData']));
     }
 
@@ -137,6 +127,37 @@ class AttendanceController extends Controller {
         return $validator;
     }
 
+    public function getBasicData($checkin = true, $attendance = null)
+    {
+        $employees = Employee::all()->mapWithKeys(function ($employee) {
+            return [$employee->id => $employee->name];
+        });
+        $processes = ClientProcess::allOpened()->get()->mapWithKeys(function ($process) {
+            return [$process->id => $process->name];
+        });
+        $absentTypes = AbsentType::all()->mapWithKeys(function ($type) {
+            return [$type->id => $type->name];
+        });
+        $absentTypesInfo = AbsentType::all()->mapWithKeys(function ($type) {
+            return [
+                $type->id => [
+                    'salaryDeduction' => $type->salary_deduction,
+                    'editable'        => $type->editable_deduction
+                ]
+            ];
+        });
+        $employeesSalaries = Employee::all()->mapWithKeys(function ($employee) {
+            return [
+                $employee['id'] => [
+                    'dailySalary' => $employee->daily_salary
+                ]
+            ];
+        });
+        $employeesCheckinDates = [];
+        $checkinbtn            = FALSE;
+        return compact('attendance', 'employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn', 'employeesCheckinDates');
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -144,31 +165,7 @@ class AttendanceController extends Controller {
      */
     public function create()
     {
-        $employees         = Employee::all();
-        $processes         = ClientProcess::allOpened()->get();
-        $absentTypes       = AbsentType::all();
-        $employees_tmp     = [];
-        $employeesSalaries = [];
-        $processes_tmp     = [];
-        $absentTypes_tmp   = [];
-        $absentTypesInfo   = [];
-        foreach ($employees as $employee) {
-            $employees_tmp[$employee->id]                    = $employee->name;
-            $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
-        }
-        foreach ($processes as $process) {
-            $processes_tmp[$process->id] = $process->name;
-        }
-        foreach ($absentTypes as $type) {
-            $absentTypes_tmp[$type->id]                    = $type->name;
-            $absentTypesInfo[$type->id]['salaryDeduction'] = $type->salary_deduction;
-            $absentTypesInfo[$type->id]['editable']        = $type->editable_deduction;
-        }
-        $processes   = $processes_tmp;
-        $employees   = $employees_tmp;
-        $absentTypes = $absentTypes_tmp;
-        $checkin     = TRUE;
-        return view('attendance.create', compact(['employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin']));
+        return view('attendance.create', $this->getBasicData());
     }
 
     /**
@@ -200,34 +197,7 @@ class AttendanceController extends Controller {
 
     function createAttendance($checkType = -1)
     {
-        $employees = Employee::all()->mapWithKeys(function ($item) {
-            return [$item['id'] => $item['name']];
-        });
-        $processes = ClientProcess::allOpened()->get()->mapWithKeys(function ($item) {
-            return [$item['id'] => $item['name']];
-        });
-        $absentTypes = AbsentType::all()->mapWithKeys(function ($item) {
-            return [$item['id'] => $item['name']];
-        });
-        $absentTypesInfo = AbsentType::all()->mapWithKeys(function ($item) {
-            return [
-                $item['id'] => [
-                    'salaryDeduction' => $item['salary_deduction'],
-                    'editable'        => $item['editable_deduction']
-                ]
-            ];
-        });
-        $employeesSalaries = Employee::all()->mapWithKeys(function ($item) {
-            return [
-                $item['id'] => [
-                    'dailySalary' => $item['daily_salary']
-                ]
-            ];
-        });
-        $employeesCheckinDates = [];
-        $checkin               = $checkType;
-        $checkinbtn            = FALSE;
-        return view('attendance.create', compact('employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn', 'employeesCheckinDates'));
+        return view('attendance.create', $this->getBasicData($checkType));
     }
 
     /**
@@ -390,31 +360,7 @@ class AttendanceController extends Controller {
         if ($attendance->absentType) {
             $attendance->absentTypeName = $attendance->absentType->name;
         }
-        $employees         = Employee::all();
-        $processes         = ClientProcess::allOpened()->get();
-        $absentTypes       = AbsentType::all();
-        $employees_tmp     = [];
-        $employeesSalaries = [];
-        $processes_tmp     = [];
-        $absentTypes_tmp   = [];
-        $absentTypesInfo   = [];
-        foreach ($employees as $employee) {
-            $employees_tmp[$employee->id]                    = $employee->name;
-            $employeesSalaries[$employee->id]['dailySalary'] = $employee->daily_salary;
-        }
-        foreach ($processes as $process) {
-            $processes_tmp[$process->id] = $process->name;
-        }
-        foreach ($absentTypes as $type) {
-            $absentTypes_tmp[$type->id]                    = $type->name;
-            $absentTypesInfo[$type->id]['salaryDeduction'] = $type->salary_deduction;
-            $absentTypesInfo[$type->id]['editable']        = $type->editable_deduction;
-        }
-        $processes   = $processes_tmp;
-        $employees   = $employees_tmp;
-        $absentTypes = $absentTypes_tmp;
-        $checkin     = TRUE;
-        return view('attendance.edit', compact(['attendance', 'employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin']));
+        return view('attendance.edit', $this->getBasicData(true, $attendance));
     }
 
     /**
