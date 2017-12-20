@@ -16,10 +16,7 @@ use App\Constants\EmployeeActions;
 use App\Constants\PaymentMethods;
 use App\Extensions\DateTime;
 use App\Helpers\Helpers;
-use App\Http\Controllers\Controller;
-use App\Models\AbsentType;
 use App\Models\Attendance;
-use App\Models\ClientProcess;
 use App\Models\DepositWithdraw;
 use App\Models\Employee;
 use App\Models\EmployeeBorrowBilling;
@@ -27,8 +24,7 @@ use App\Reports\Employee\Salary;
 use Illuminate\Http\Request;
 use DB;
 use Exception;
-use Auth;
-use Validator;
+use Debugbar;
 
 /**
  * Description of SalaryController
@@ -43,92 +39,131 @@ class SalaryController {
     /**
      * Display the specified resource.
      *
-     * @param  int  $employee_id
      * @return \Illuminate\Http\Response
-     * @Get("{employee_id}", as="salary.show")
+     * @Get("/", as="salary.index")
      */
-    public function show(Request $request, $employee_id)
+    public function index(Request $request)
+    {
+        return view('salary.index')->with($this->getBasicData());
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  Employee  $employee
+     * @return \Illuminate\Http\Response
+     * @Get("/{employee}", as="salary.show")
+     */
+    public function show(Request $request, Employee $employee)
+    {
+        $data = array_merge($this->getBasicData($employee->id, $request->date), $this->getData($employee, DateTime::parse($request->date)));
+        return view('salary.show')->with($data);
+    }
+
+    private function getBasicData($employee_id = 0, $date = '')
     {
         $employees = Employee::all()->mapWithKeys(function ($item) {
             return [$item['id'] => $item['name']];
         });
-        $dt         = DateTime::parse($request->date);
-        $hourlyRate = 0;
-        $hasData    = FALSE;
-        if ($employee_id == "all") {
-            $attendances = []; //Attendance::all();
-            $employee_id = 0;
-            $date        = null;
-        } else {
-            $employee    = Employee::findOrFail($employee_id);
-            $hourlyRate  = $employee->salaryPerHour();
-            $attendances = Attendance::where([
-                        ['employee_id', '=', $employee_id]
-                    ])->whereMonth('date', '=', $dt->month)->orderBy('date', 'asc')->get();
-            $hasData     = TRUE;
-        }
-        $date                         = $request->date;
-        $totalWorkingHours            = 0;
-        $totalSalaryDeduction         = 0;
-        $totalAbsentDeduction         = 0;
-        $totalBonuses                 = 0;
-        $totalHoursSalary             = 0;
-        $totalSalary                  = 0;
-        $totalNetSalary               = 0;
-        $totalGuardianshipValue       = 0;
-        $totalGuardianshipReturnValue = 0;
-        $totalBorrowValue             = 0;
-        $totalSmallBorrowValue        = 0;
-        $totalLongBorrowValue         = 0;
-        foreach ($attendances as $attendance) {
-            $attendance->workingHours = $attendance->workingHoursToString();
-            $attendance->employeeName = $attendance->employee->name;
-            $attendance->date         = DateTime::parse($attendance->date)->format('l, d-m-Y');
-
-            $attendance->GuardianshipValue       = $attendance->employeeGuardianship();
-            $attendance->GuardianshipReturnValue = $attendance->employeeGuardianshipReturn();
-            $attendance->borrowValue             = $attendance->employeeSmallBorrow();
-
-            if ($attendance->process) {
-                $attendance->processName = $attendance->process->name;
-            } else {
-                $attendance->processName = "عمليات ادارية";
-            }
-            if ($attendance->absentType) {
-                $attendance->absentTypeName = $attendance->absentType->name;
-            }
-            $totalWorkingHours            += $attendance->workingHoursToSeconds();
-            $totalSalaryDeduction         += $attendance->salary_deduction;
-            $totalAbsentDeduction         += $attendance->absent_deduction;
-            $totalBonuses                 += $attendance->mokaf;
-            $totalGuardianshipValue       += $attendance->GuardianshipValue;
-            $totalGuardianshipReturnValue += $attendance->GuardianshipReturnValue;
-            $totalBorrowValue             += $attendance->borrowValue;
-        }
+        return [
+            'employees'   => $employees,
+            'employee_id' => $employee_id,
+            'date'        => $date
+        ];
+    }
+    
+    private function getData(Employee $employee, DateTime $date)
+    {
+        $employeeName = $employee->name;
+        $monthNum     = $date->month;
+        $hourlyRate   = $employee->salaryPerHour();
+        $attendances  = Attendance::where([
+                    ['employee_id', '=', $employee->id]
+                ])
+                ->whereMonth('date', '=', $date->month)
+                ->orderBy('date', 'asc')->get()
+                ->mapWithKeys(function ($attendance) {
+            return [
+                $attendance->id => [
+                    'id'                      => $attendance->id,
+                    'processName'             => $attendance->process ? $attendance->process->name : 'عمليات ادارية',
+                    'employeeName'            => $attendance->employee->name,
+                    'workingHours'            => $attendance->workingHoursToString(),
+                    'date'                    => DateTime::parse($attendance->date)->format('l, d-m-Y'),
+                    'GuardianshipValue'       => $attendance->employeeGuardianship(),
+                    'GuardianshipReturnValue' => $attendance->employeeGuardianshipReturn(),
+                    'borrowValue'             => $attendance->employeeSmallBorrow(),
+                    'absentTypeName'          => $attendance->absentType ? $attendance->absentType->name : null,
+                    'totalWorkingHours'       => $attendance->workingHoursToSeconds(),
+                    'salary_deduction'        => $attendance->salary_deduction,
+                    'absent_deduction'        => $attendance->absent_deduction,
+                    'mokaf'                   => $attendance->mokaf,
+                    'date'                    => $attendance->date,
+                    'shift'                   => $attendance->shift,
+                    'check_in'                => $attendance->check_in,
+                    'check_out'               => $attendance->check_out,
+                    'notes'                   => $attendance->notes,
+                    'employee_id'             => $attendance->employee_id,
+                    'process_id'              => $attendance->process_id
+                ]
+            ];
+        });
+        $attendances instanceof \Illuminate\Support\Collection;
+        $totalWorkingHours            = $attendances->sum('totalWorkingHours');
+        $totalSalaryDeduction         = $attendances->sum('salary_deduction');
+        $totalAbsentDeduction         = $attendances->sum('absent_deduction');
+        $totalBonuses                 = $attendances->sum('mokaf');
+        $totalGuardianshipValue       = $attendances->sum('GuardianshipValue');
+        $totalGuardianshipReturnValue = $attendances->sum('GuardianshipReturnValue');
+        $totalSmallBorrowValue        = $attendances->sum('borrowValue');
+        $totalHoursSalary             = round(($totalWorkingHours * (($hourlyRate / 60) / 60)), 3);
+        $totalWorkingHours            = Helpers::hoursMinutsToString($totalWorkingHours);
         try {
-            $attendances[0]->borrowValue += $attendances[0]->employeeLongBorrow();
-            $totalLongBorrowValue        = $attendances[0]->employeeLongBorrow();
+            $attendance = $attendances->first();
+            $att        = new Attendance($attendance);
+            $longBorrow = $att->employeeLongBorrow();
+            if ($longBorrow > 0) {
+                $attendance['borrowValue'] += $longBorrow;
+                $attendance['notes']       = "{$longBorrow} دفعة من السلفة المستديمة";
+                $attendances->put($attendances->first()['id'], $attendance);
+            }
         } catch (Exception $exc) {
             
         }
-        $totalSmallBorrowValue = $totalBorrowValue;
-        $totalBorrowValue      += $totalLongBorrowValue;
-        $totalHoursSalary      = $totalWorkingHours * (($hourlyRate / 60) / 60);
-        $totalHoursSalary      = round($totalHoursSalary, 3);
-        $totalWorkingHours     = Helpers::hoursMinutsToString($totalWorkingHours);
-        $totalSalary           = ($totalHoursSalary + $totalBonuses);
-        $totalNetSalary        = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
+        $totalLongBorrowValue = 0; //$attendances->sum('');
+        $totalBorrowValue     = $totalSmallBorrowValue + $totalLongBorrowValue;
+        $totalSalary          = ($totalHoursSalary + $totalBonuses);
+        $totalNetSalary       = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
+
         $salaryIsPaid    = FALSE;
         $depositWithdraw = DepositWithdraw::where([
-                    ['employee_id', '=', $employee_id],
+                    ['employee_id', '=', $employee->id],
                     ['expenses_id', '=', EmployeeActions::TakeSalary]
-                ])->whereMonth('notes', '=', $dt->month)->first();
+                ])->whereMonth('notes', '=', $date->month)->first();
         if (empty($depositWithdraw)) {
             $salaryIsPaid = TRUE;
         } else {
             $salaryIsPaid = FALSE;
         }
-        return view('salary.index', compact(['employees', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date', 'hasData', 'salaryIsPaid']));
+        return [
+            'employeeName'                 => $employeeName,
+            'monthNum'                     => $monthNum,
+            'attendances'                  => $attendances,
+            'hourlyRate'                   => $hourlyRate,
+            'totalWorkingHours'            => $totalWorkingHours,
+            'totalSalaryDeduction'         => $totalSalaryDeduction,
+            'totalAbsentDeduction'         => $totalAbsentDeduction,
+            'totalBonuses'                 => $totalBonuses,
+            'totalSalary'                  => $totalSalary,
+            'totalHoursSalary'             => $totalHoursSalary,
+            'totalNetSalary'               => $totalNetSalary,
+            'totalGuardianshipValue'       => $totalGuardianshipValue,
+            'totalGuardianshipReturnValue' => $totalGuardianshipReturnValue,
+            'totalBorrowValue'             => $totalBorrowValue,
+            'totalLongBorrowValue'         => $totalLongBorrowValue,
+            'totalSmallBorrowValue'        => $totalSmallBorrowValue,
+            'salaryIsPaid'                 => $salaryIsPaid
+        ];
     }
 
     /**
@@ -232,70 +267,8 @@ class SalaryController {
      */
     public function printSalaryReport(Request $request, Employee $employee)
     {
-        $hourlyRate                   = 0;
-        $totalWorkingHours            = 0;
-        $totalSalaryDeduction         = 0;
-        $totalAbsentDeduction         = 0;
-        $totalBonuses                 = 0;
-        $totalHoursSalary             = 0;
-        $totalSalary                  = 0;
-        $totalNetSalary               = 0;
-        $totalGuardianshipValue       = 0;
-        $totalGuardianshipReturnValue = 0;
-        $totalBorrowValue             = 0;
-        $totalSmallBorrowValue        = 0;
-        $totalLongBorrowValue         = 0;
-
-        $date        = DateTime::parse($request->date);
-        $hourlyRate  = $employee->salaryPerHour();
-        $attendances = Attendance::where([
-                    ['employee_id', '=', $employee->id]
-                ])->whereMonth('date', '=', $date->month)->get();
-
-        $monthNum      = $date->month;
-        $employees_tmp = [];
-        foreach ($attendances as $attendance) {
-            $attendance->workingHours            = $attendance->workingHoursToString();
-            $attendance->employeeName            = $attendance->employee->name;
-            $attendance->GuardianshipValue       = $attendance->employeeGuardianship();
-            $attendance->GuardianshipReturnValue = $attendance->employeeGuardianshipReturn();
-            $attendance->borrowValue             = $attendance->employeeSmallBorrow();
-
-            if ($attendance->process) {
-                $attendance->processName = $attendance->process->name;
-            } else {
-                $attendance->processName = "عمليات ادارية";
-            }
-            if ($attendance->absentType) {
-                $attendance->absentTypeName = $attendance->absentType->name;
-            }
-            $totalWorkingHours            += $attendance->workingHoursToSeconds();
-            $totalSalaryDeduction         += $attendance->salary_deduction;
-            $totalAbsentDeduction         += $attendance->absent_deduction;
-            $totalBonuses                 += $attendance->mokaf;
-            $totalGuardianshipValue       += $attendance->GuardianshipValue;
-            $totalGuardianshipReturnValue += $attendance->GuardianshipReturnValue;
-            $totalBorrowValue             += $attendance->borrowValue;
-        }
-        try {
-            $attendances[0]->borrowValue = $attendances[0]->employeeLongBorrow();
-            $totalLongBorrowValue        = $attendances[0]->employeeLongBorrow();
-        } catch (Exception $exc) {
-            
-        }
-        $totalSmallBorrowValue = $totalBorrowValue;
-        $totalBorrowValue      += $totalLongBorrowValue;
-        $totalHoursSalary      = $totalWorkingHours * (($hourlyRate / 60) / 60);
-        $totalHoursSalary      = round($totalHoursSalary, 3);
-        $totalSalary           = ($totalHoursSalary + $totalBonuses);
-        $totalNetSalary        = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
-
-        $employeeName = $employee->name;
-
-        $pdfReport = new Salary(TRUE);
-
-        $pdfReport->htmlContent = view('reports.employee.salary', compact(['employeeName', 'attendances', "hourlyRate", "totalWorkingHours", "totalSalaryDeduction", "totalAbsentDeduction", "totalBonuses", "totalSalary", 'totalHoursSalary', 'totalNetSalary', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalBorrowValue', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'employee_id', 'date', 'monthNum']))->render();
-
+        $pdfReport              = new Salary(TRUE);
+        $pdfReport->htmlContent = view('reports.employee.salary')->with($this->getData($employee, $request->date))->render();
         return $pdfReport->exportPDF();
     }
 
@@ -349,24 +322,6 @@ class SalaryController {
         //} catch (Exception $exc) {
         //    return redirect()->back()->withInput($request->all())->with('error', 'حدث حطأ في حفظ البيانات.');
         //}
-    }
-
-    /**
-     * @return \Illuminate\Http\Response
-     * @Get("getEmployeesCheckinDate", as="salary.getEmployeesCheckinDate")
-     */
-    public function getEmployeesCheckinDate(Request $request)
-    {
-        $shift      = ($request->is_second_shift == "true" ? 2 : 1);
-        $attendance = Attendance::where([
-                    ["date", "=", $request->date],
-                    ["employee_id", "=", $request->employee_id],
-                    ["shift", "=", $shift]
-                ])->first();
-        if (empty($attendance))
-            return "";
-        else
-            return $attendance->check_in;
     }
 
 }

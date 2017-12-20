@@ -42,7 +42,7 @@
                     <li><a href="{{ route('attendance.checkout') }}">تسجيل انصراف</a></li>
                     <li><a href="{{ route('attendance.manualadding') }}">تسجيل جديد</a></li>
                     <li><a href="{{ route('salary.guardianship', 'all') }}">سجل العهد</a></li>
-                    <li><a href="{{ route('salary.show', 'all') }}">مرتبات</a></li>
+                    <li><a href="{{ route('salary.index') }}">مرتبات</a></li>
                 </ul>
             </li>
             <li>
