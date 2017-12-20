@@ -71,7 +71,7 @@ class SalaryController {
             'date'        => $date
         ];
     }
-    
+
     private function getData(Employee $employee, DateTime $date)
     {
         $employeeName = $employee->name;
@@ -85,52 +85,51 @@ class SalaryController {
                 ->mapWithKeys(function ($attendance) {
             return [
                 $attendance->id => [
-                    'id'                      => $attendance->id,
-                    'processName'             => $attendance->process ? $attendance->process->name : 'عمليات ادارية',
-                    'employeeName'            => $attendance->employee->name,
-                    'workingHours'            => $attendance->workingHoursToString(),
-                    'date'                    => DateTime::parse($attendance->date)->format('l, d-m-Y'),
-                    'GuardianshipValue'       => $attendance->employeeGuardianship(),
-                    'GuardianshipReturnValue' => $attendance->employeeGuardianshipReturn(),
-                    'borrowValue'             => $attendance->employeeSmallBorrow(),
-                    'absentTypeName'          => $attendance->absentType ? $attendance->absentType->name : null,
-                    'totalWorkingHours'       => $attendance->workingHoursToSeconds(),
-                    'salary_deduction'        => $attendance->salary_deduction,
-                    'absent_deduction'        => $attendance->absent_deduction,
-                    'mokaf'                   => $attendance->mokaf,
-                    'date'                    => $attendance->date,
-                    'shift'                   => $attendance->shift,
-                    'check_in'                => $attendance->check_in,
-                    'check_out'               => $attendance->check_out,
-                    'notes'                   => $attendance->notes,
-                    'employee_id'             => $attendance->employee_id,
-                    'process_id'              => $attendance->process_id
+                    'id'                         => $attendance->id,
+                    'processName'                => $attendance->process ? $attendance->process->name : 'عمليات ادارية',
+                    'employeeName'               => $attendance->employee->name,
+                    'workingHours'               => $attendance->workingHoursToString(),
+                    'date'                       => DateTime::parse($attendance->date)->format('l, d-m-Y'),
+                    'GuardianshipValue'          => $attendance->employeeGuardianship(),
+                    'GuardianshipReturnValue'    => $attendance->employeeGuardianshipReturn(),
+                    'borrowValue'                => $attendance->employeeSmallBorrow(),
+                    'absentTypeName'             => $attendance->absentType ? $attendance->absentType->name : null,
+                    'totalWorkingHoursInSeconds' => $attendance->workingHoursToSeconds(),
+                    'salary_deduction'           => $attendance->salary_deduction,
+                    'absent_deduction'           => $attendance->absent_deduction,
+                    'mokaf'                      => $attendance->mokaf,
+                    'date'                       => $attendance->date,
+                    'shift'                      => $attendance->shift,
+                    'check_in'                   => $attendance->check_in,
+                    'check_out'                  => $attendance->check_out,
+                    'notes'                      => $attendance->notes,
+                    'employee_id'                => $attendance->employee_id,
+                    'process_id'                 => $attendance->process_id
                 ]
             ];
         });
         $attendances instanceof \Illuminate\Support\Collection;
-        $totalWorkingHours            = $attendances->sum('totalWorkingHours');
         $totalSalaryDeduction         = $attendances->sum('salary_deduction');
         $totalAbsentDeduction         = $attendances->sum('absent_deduction');
         $totalBonuses                 = $attendances->sum('mokaf');
         $totalGuardianshipValue       = $attendances->sum('GuardianshipValue');
         $totalGuardianshipReturnValue = $attendances->sum('GuardianshipReturnValue');
         $totalSmallBorrowValue        = $attendances->sum('borrowValue');
-        $totalHoursSalary             = round(($totalWorkingHours * (($hourlyRate / 60) / 60)), 3);
-        $totalWorkingHours            = Helpers::hoursMinutsToString($totalWorkingHours);
-        try {
-            $attendance = $attendances->first();
-            $att        = new Attendance($attendance);
-            $longBorrow = $att->employeeLongBorrow();
-            if ($longBorrow > 0) {
-                $attendance['borrowValue'] += $longBorrow;
-                $attendance['notes']       = "{$longBorrow} دفعة من السلفة المستديمة";
+        $totalWorkingHoursInSeconds   = $attendances->sum('totalWorkingHoursInSeconds');
+        $totalHoursSalary             = round(($totalWorkingHoursInSeconds * (($hourlyRate / 60) / 60)), 3);
+        $totalWorkingHours            = Helpers::hoursMinutsToString($totalWorkingHoursInSeconds);
+        $LongBorrowValue              = 0;
+        if (count($attendances) > 0) {
+            $attendance      = $attendances->first();
+            $att             = new Attendance($attendance);
+            $LongBorrowValue = $att->employeeLongBorrow();
+            if ($LongBorrowValue > 0) {
+                $attendance['borrowValue'] += $LongBorrowValue;
+                $attendance['notes']       = "{$LongBorrowValue} دفعة من السلفة المستديمة";
                 $attendances->put($attendances->first()['id'], $attendance);
             }
-        } catch (Exception $exc) {
-            
         }
-        $totalLongBorrowValue = 0; //$attendances->sum('');
+        $totalLongBorrowValue = $LongBorrowValue;
         $totalBorrowValue     = $totalSmallBorrowValue + $totalLongBorrowValue;
         $totalSalary          = ($totalHoursSalary + $totalBonuses);
         $totalNetSalary       = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
