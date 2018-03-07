@@ -8,6 +8,7 @@ use App\Models\DepositWithdraw;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use DB;
+use App\Helpers\Helpers;
 
 /**
  * App\Models\Employee
@@ -165,15 +166,15 @@ class Employee extends Model {
     }
 
     public function salaryPerHour() {
-        return $this->daily_salary / $this->working_hours;
+        return round(($this->daily_salary / $this->working_hours), Helpers::getDecimalPointCount());
     }
     
     public function salaryPerMinute() {
-        return $this->salaryPerHour() / 60;
+        return round(($this->salaryPerHour() / 60), Helpers::getDecimalPointCount());
     }
     
     public function salaryPerSecond() {
-        return $this->salaryPerMinute() / 60;
+        return round(($this->salaryPerMinute() / 60), Helpers::getDecimalPointCount());
     }
     
     public function employeeGuardianships(DateTime $dt) {

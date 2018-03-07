@@ -11,7 +11,7 @@ return [
       | any other location as required by the application or its packages.
      */
 
-    'name' => 'برنامج حسابات',
+    'name'              => 'برنامج حسابات',
     /*
       |--------------------------------------------------------------------------
       | Application Environment
@@ -22,7 +22,7 @@ return [
       | services your application utilizes. Set this in your ".env" file.
       |
      */
-    'env' => env('APP_ENV', 'production'),
+    'env'               => env('APP_ENV', 'production'),
     /*
       |--------------------------------------------------------------------------
       | Application Debug Mode
@@ -33,7 +33,7 @@ return [
       | application. If disabled, a simple generic error page is shown.
       |
      */
-    'debug' => env('APP_DEBUG', false),
+    'debug'             => env('APP_DEBUG', false),
     /*
       |--------------------------------------------------------------------------
       | Application URL
@@ -44,7 +44,7 @@ return [
       | your application so that it is used when running Artisan tasks.
       |
      */
-    'url' => env('APP_URL', 'http://localhost'),
+    'url'               => env('APP_URL', 'http://localhost'),
     /*
       |--------------------------------------------------------------------------
       | Application Timezone
@@ -55,7 +55,7 @@ return [
       | ahead and set this to a sensible default for you out of the box.
       |
      */
-    'timezone' => 'Africa/Cairo',
+    'timezone'          => 'Africa/Cairo',
     /*
       |--------------------------------------------------------------------------
       | Application Locale Configuration
@@ -66,7 +66,7 @@ return [
       | to any of the locales which will be supported by the application.
       |
      */
-    'locale' => 'ar',
+    'locale'            => 'ar',
     /*
       |--------------------------------------------------------------------------
       | Application Fallback Locale
@@ -77,7 +77,7 @@ return [
       | the language folders that are provided through your application.
       |
      */
-    'fallback_locale' => 'en',
+    'fallback_locale'   => 'en',
     /*
       |--------------------------------------------------------------------------
       | Encryption Key
@@ -88,8 +88,8 @@ return [
       | will not be safe. Please do this before deploying an application!
       |
      */
-    'key' => env('APP_KEY'),
-    'cipher' => 'AES-256-CBC',
+    'key'               => env('APP_KEY'),
+    'cipher'            => 'AES-256-CBC',
     /*
       |--------------------------------------------------------------------------
       | Logging Configuration
@@ -102,8 +102,9 @@ return [
       | Available Settings: "single", "daily", "syslog", "errorlog"
       |
      */
-    'log' => env('APP_LOG', 'single'),
-    'log_level' => env('APP_LOG_LEVEL', 'debug'),
+    'log'               => env('APP_LOG', 'single'),
+    'log_level'         => env('APP_LOG_LEVEL', 'debug'),
+    'decimalPointCount' => 3,
     /*
       |--------------------------------------------------------------------------
       | Autoloaded Service Providers
@@ -114,7 +115,7 @@ return [
       | this array to grant expanded functionality to your applications.
       |
      */
-    'providers' => [
+    'providers'         => [
         /*
          * Laravel Framework Service Providers...
          */
@@ -170,42 +171,42 @@ return [
       | the aliases are "lazy" loaded so they don't hinder performance.
       |
      */
-    'aliases' => [
-        'App' => Illuminate\Support\Facades\App::class,
-        'Artisan' => Illuminate\Support\Facades\Artisan::class,
-        'Auth' => Illuminate\Support\Facades\Auth::class,
-        'Blade' => Illuminate\Support\Facades\Blade::class,
-        'Broadcast' => Illuminate\Support\Facades\Broadcast::class,
-        'Bus' => Illuminate\Support\Facades\Bus::class,
-        'Cache' => Illuminate\Support\Facades\Cache::class,
-        'Config' => Illuminate\Support\Facades\Config::class,
-        'Cookie' => Illuminate\Support\Facades\Cookie::class,
-        'Crypt' => Illuminate\Support\Facades\Crypt::class,
-        'DB' => Illuminate\Support\Facades\DB::class,
-        'Eloquent' => Illuminate\Database\Eloquent\Model::class,
-        'Event' => Illuminate\Support\Facades\Event::class,
-        'File' => Illuminate\Support\Facades\File::class,
-        'Gate' => Illuminate\Support\Facades\Gate::class,
-        'Hash' => Illuminate\Support\Facades\Hash::class,
-        'Lang' => Illuminate\Support\Facades\Lang::class,
-        'Log' => Illuminate\Support\Facades\Log::class,
-        'Mail' => Illuminate\Support\Facades\Mail::class,
+    'aliases'           => [
+        'App'          => Illuminate\Support\Facades\App::class,
+        'Artisan'      => Illuminate\Support\Facades\Artisan::class,
+        'Auth'         => Illuminate\Support\Facades\Auth::class,
+        'Blade'        => Illuminate\Support\Facades\Blade::class,
+        'Broadcast'    => Illuminate\Support\Facades\Broadcast::class,
+        'Bus'          => Illuminate\Support\Facades\Bus::class,
+        'Cache'        => Illuminate\Support\Facades\Cache::class,
+        'Config'       => Illuminate\Support\Facades\Config::class,
+        'Cookie'       => Illuminate\Support\Facades\Cookie::class,
+        'Crypt'        => Illuminate\Support\Facades\Crypt::class,
+        'DB'           => Illuminate\Support\Facades\DB::class,
+        'Eloquent'     => Illuminate\Database\Eloquent\Model::class,
+        'Event'        => Illuminate\Support\Facades\Event::class,
+        'File'         => Illuminate\Support\Facades\File::class,
+        'Gate'         => Illuminate\Support\Facades\Gate::class,
+        'Hash'         => Illuminate\Support\Facades\Hash::class,
+        'Lang'         => Illuminate\Support\Facades\Lang::class,
+        'Log'          => Illuminate\Support\Facades\Log::class,
+        'Mail'         => Illuminate\Support\Facades\Mail::class,
         'Notification' => Illuminate\Support\Facades\Notification::class,
-        'Password' => Illuminate\Support\Facades\Password::class,
-        'Queue' => Illuminate\Support\Facades\Queue::class,
-        'Redirect' => Illuminate\Support\Facades\Redirect::class,
-        'Redis' => Illuminate\Support\Facades\Redis::class,
-        'Request' => Illuminate\Support\Facades\Request::class,
-        'Response' => Illuminate\Support\Facades\Response::class,
-        'Route' => Illuminate\Support\Facades\Route::class,
-        'Schema' => Illuminate\Support\Facades\Schema::class,
-        'Session' => Illuminate\Support\Facades\Session::class,
-        'Storage' => Illuminate\Support\Facades\Storage::class,
-        'URL' => Illuminate\Support\Facades\URL::class,
-        'Validator' => Illuminate\Support\Facades\Validator::class,
-        'View' => Illuminate\Support\Facades\View::class,
-        'Entrust' => Zizaco\Entrust\EntrustFacade::class,
-        'Form' => Collective\Html\FormFacade::class,
-        'Html' => Collective\Html\HtmlFacade::class,
+        'Password'     => Illuminate\Support\Facades\Password::class,
+        'Queue'        => Illuminate\Support\Facades\Queue::class,
+        'Redirect'     => Illuminate\Support\Facades\Redirect::class,
+        'Redis'        => Illuminate\Support\Facades\Redis::class,
+        'Request'      => Illuminate\Support\Facades\Request::class,
+        'Response'     => Illuminate\Support\Facades\Response::class,
+        'Route'        => Illuminate\Support\Facades\Route::class,
+        'Schema'       => Illuminate\Support\Facades\Schema::class,
+        'Session'      => Illuminate\Support\Facades\Session::class,
+        'Storage'      => Illuminate\Support\Facades\Storage::class,
+        'URL'          => Illuminate\Support\Facades\URL::class,
+        'Validator'    => Illuminate\Support\Facades\Validator::class,
+        'View'         => Illuminate\Support\Facades\View::class,
+        'Entrust'      => Zizaco\Entrust\EntrustFacade::class,
+        'Form'         => Collective\Html\FormFacade::class,
+        'Html'         => Collective\Html\HtmlFacade::class,
     ],
 ];

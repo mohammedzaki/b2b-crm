@@ -233,25 +233,22 @@
         <!-- /.panel -->
     </div>
 </row>
-@endsection
-@section('scripts')
 <script>
-    
     function SubmitSearchGuardianship() {
-        var empId = $("#employee_id").val();
+        var empId = $("#employee").val();
+        //$('#SearchForm').prop('method', 'get').prop('action', 'guardianship/' + empId).submit();
         $('#SearchForm').prop('action', 'guardianship/' + empId).submit();
     }
     function SubmitSearchPrintReport() {
-        var empId = $("#employee_id").val();
+        var empId = $("#employee").val();
         $('#SearchForm').prop('action', 'printSalaryReport/' + empId).submit();
     }
     function SubmitPaySalary() {
-        var empId = $("#employee_id").val();
+        var empId = $("#employee").val();
         /*if (empId == '') {
          return alert('يجب اختيار موظف اولا.');
          }*/
         if (ConfirmPay()) {
-
             $('#SearchForm').append('<input type="hidden" name="totalNetSalary" value="' + $('#totalNetSalary').val() + '" />');
             $('#SearchForm').prop('method', 'post').prop('action', 'paySalary/' + empId).submit();
         }
@@ -260,4 +257,6 @@
         return confirm("هل انت متأكد من دفع المرتب ؟");
     }
 </script>
+@endsection
+@section('scripts')
 @endsection

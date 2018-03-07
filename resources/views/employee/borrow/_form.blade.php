@@ -169,7 +169,7 @@
     var employeeID, pay_percentage, pay_amount, after_pay, employeeSalary, borrowamount, salary;
 
     function calcAfterSalary() {
-        $("#after_salary").text(roundDecimals((salary - pay_amount), 3));
+        $("#after_salary").text(roundDecimals((salary - pay_amount), decimalPointCount));
     }
 
     $('#has_discount').on('change', function () {
@@ -196,7 +196,7 @@
             borrowamount = $('#amount').val();
             pay_amount = (pay_percentage / 100) * salary;
         }
-        pay_amount = roundDecimals(pay_amount, 3);
+        pay_amount = roundDecimals(pay_amount, decimalPointCount);
         $('#pay_amount').val(pay_amount);
 
         calcAfterSalary();
@@ -210,7 +210,7 @@
             borrowamount = $('#amount').val();
             pay_percentage = (pay_amount / borrowamount) * 100;
         }
-        pay_percentage = roundDecimals(pay_percentage, 3);
+        pay_percentage = roundDecimals(pay_percentage, decimalPointCount);
         $('#pay_percentage').val(pay_percentage);
 
         calcAfterSalary();

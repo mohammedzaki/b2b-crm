@@ -28,7 +28,7 @@ window.calculate_process_price = function () {
     total_price = 0;
     $('.total_price').each(function () {
         total_price = parseFloat($(this).val()) + total_price;
-        total_price = roundDecimals(total_price, 3);
+        total_price = roundDecimals(total_price, decimalPointCount);
     });
     return total_price;
 }
@@ -37,7 +37,7 @@ window.calculate_percentage = function () {
     discount_percentage = 0;
     if ($('input[name="has_discount"]').is(':checked')) {
         discount_percentage = (calculate_discount() / calculate_process_price()) * 100;
-        discount_percentage = roundDecimals(discount_percentage, 3);
+        discount_percentage = roundDecimals(discount_percentage, decimalPointCount);
     }
     return discount_percentage;
 }
@@ -47,7 +47,7 @@ window.calculate_discount_from_percentage = function () {
     if ($('input[name="has_discount"]').is(':checked')) {
         discount_percentage = $("#discount_percentage").val();
         discount_value = (calculate_process_price() / 100) * discount_percentage;
-        discount_value = roundDecimals(discount_value, 3);
+        discount_value = roundDecimals(discount_value, decimalPointCount);
     }
     return discount_value;
 }
@@ -55,7 +55,7 @@ window.calculate_discount_from_percentage = function () {
 window.calculate_discount = function () {
     discount_value = 0;
     if ($('input[name="has_discount"]').is(':checked')) {
-        discount_value = roundDecimals($("#discount_value").val(), 3);
+        discount_value = roundDecimals($("#discount_value").val(), decimalPointCount);
     }
     return discount_value;
 }
@@ -64,21 +64,21 @@ window.calculate_taxes = function () {
     taxes = 0;
     if ($('input[name="require_invoice"]').is(':checked')) {
         taxes = (calculate_process_price()) * parseFloat(TaxesRate);
-        taxes = roundDecimals(taxes, 3);
+        taxes = roundDecimals(taxes, decimalPointCount);
     }
     return taxes;
 }
 
 window.calculate_process_price_taxes = function () {
     priceAfterTaxes = 0;
-    priceAfterTaxes = roundDecimals(((calculate_process_price() + calculate_taxes()) - (calculate_discount() + calculate_source_discount())), 3);
+    priceAfterTaxes = roundDecimals(((calculate_process_price() + calculate_taxes()) - (calculate_discount() + calculate_source_discount())), decimalPointCount);
     return priceAfterTaxes;
 }
 
 window.calculate_source_discount = function () {
     source_discount_value = 0;
     if ($('input[name="has_source_discount"]').is(':checked')) {
-        source_discount_value = roundDecimals($("#source_discount_value").val(), 3);
+        source_discount_value = roundDecimals($("#source_discount_value").val(), decimalPointCount);
     }
     return source_discount_value;
 }
@@ -87,7 +87,7 @@ window.calculate_source_percentage = function () {
     source_discount_percentage = 0;
     if ($('input[name="has_source_discount"]').is(':checked')) {
         source_discount_percentage = (calculate_source_discount() / calculate_process_price()) * 100;
-        source_discount_percentage = roundDecimals(source_discount_percentage, 3);
+        source_discount_percentage = roundDecimals(source_discount_percentage, decimalPointCount);
     }
     return source_discount_percentage;
 }
@@ -97,7 +97,7 @@ window.calculate_source_discount_from_percentage = function () {
     if ($('input[name="has_source_discount"]').is(':checked')) {
         source_discount_percentage = $("#source_discount_percentage").val();
         source_discount_value = (calculate_process_price() / 100) * source_discount_percentage;
-        source_discount_value = roundDecimals(source_discount_value, 3);
+        source_discount_value = roundDecimals(source_discount_value, decimalPointCount);
     }
     return source_discount_value;
 }
@@ -120,6 +120,11 @@ window.update_prices = function () {
     $('input[name="taxes_value"]').val(calculate_taxes());
     $('input[name="source_discount_value"]').val(calculate_source_discount());
 
+}
+
+window.changeTaxesRate = function() {
+  TaxesRate = $('#taxesRate').val() / 100;
+  update_prices();
 }
 
 $(document).ready(function () {
@@ -157,7 +162,7 @@ $(document).ready(function () {
             quantity.val(0);
         }
         var pr = parseFloat(unit_price.val()) * parseFloat(quantity.val());
-        pr = roundDecimals(pr, 3);
+        pr = roundDecimals(pr, decimalPointCount);
         total_price.val(pr);
 
         update_prices();
@@ -172,7 +177,7 @@ $(document).ready(function () {
             unit_price.val(0);
         }
         var pr = parseFloat(unit_price.val()) * parseFloat(quantity.val());
-        pr = roundDecimals(pr, 3);
+        pr = roundDecimals(pr, decimalPointCount);
         total_price.val(pr);
         update_prices();
     });
@@ -208,7 +213,7 @@ $(document).ready(function () {
         for (var i = 0; i < processItemsCount; i++) {
             var qty = parseFloat($('input[name="items[' + i + '][quantity]"]').val());
             var unit = parseFloat($('input[name="items[' + i + '][unit_price]"]').val());
-            $('input[name="items[' + i + '][total_price]"]').val(roundDecimals((qty * unit), 3));
+            $('input[name="items[' + i + '][total_price]"]').val(roundDecimals((qty * unit), decimalPointCount));
         }
     }
     update_prices();

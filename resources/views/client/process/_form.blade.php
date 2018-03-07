@@ -214,7 +214,25 @@
                         {{ Form::label('require_invoice', 'فاتورة') }}
                     </div>
                 </div>
-
+                
+                @if(isset($model))
+                <div class="form-group{{ $errors->has('taxesRate') ? ' has-error' : '' }}">
+                    {{ Form::label('taxesRate', 'اختر الضريبة') }} 
+                    {{ Form::select('taxesRate', $taxesRates, null,
+                        array(
+                            'class' => 'form-control',
+                            'onchange' => 'changeTaxesRate()',
+                            'placeholder' => 'اختر الضريبة')
+                        )
+                    }}
+                    @if ($errors->has('taxesRate'))
+                    <label for="inputError" class="control-label">
+                        {{ $errors->first('taxesRate') }}
+                    </label>
+                    @endif
+                </div>
+                @endif
+                
                 {{ Form::hidden('total_price') }}
                 {{ Form::hidden('total_price_taxes') }}
                 {{ Form::hidden('taxes_value') }}

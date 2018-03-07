@@ -8,6 +8,7 @@ use App\Models\Client;
 use App\Models\ClientProcess;
 use App\Models\ClientProcessItem;
 use App\Models\Employee;
+use App\Models\FacilityTaxes;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -18,7 +19,8 @@ use Validator;
  */
 class ClientProcessController extends Controller {
 
-    protected function validator(array $data, $id = null) {
+    protected function validator(array $data, $id = null)
+    {
         $validator = Validator::make($data, [
                     'name'                => 'required|unique:client_processes,name,' . $id . '|min:5|max:255',
                     'client_id'           => 'required|exists:clients,id',
@@ -54,12 +56,14 @@ class ClientProcessController extends Controller {
         return $validator;
     }
 
-    public function index() {
+    public function index()
+    {
         $processes = ClientProcess::all();
         return view('client.process.index', compact('processes'));
     }
 
-    public function create() {
+    public function create()
+    {
         $clients       = Client::select('id', 'name')->get();
         $employees     = Employee::select('id', 'name')->get();
         $clients_tmp   = [];
@@ -70,12 +74,14 @@ class ClientProcessController extends Controller {
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
         }
-        $clients   = $clients_tmp;
-        $employees = $employees_tmp;
-        return view('client.process.create', compact(['clients', 'employees']));
+        $clients    = $clients_tmp;
+        $employees  = $employees_tmp;
+        $taxesRates = null;
+        return view('client.process.create', compact('clients', 'employees', 'taxesRates'));
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validator = $this->validator($request->all());
         $all       = $request->all();
 
@@ -129,7 +135,8 @@ class ClientProcessController extends Controller {
         }
     }
 
-    public function edit($id) {
+    public function edit($id)
+    {
         $process       = ClientProcess::findOrFail($id);
         $clients       = Client::select('id', 'name')->get();
         $employees     = Employee::select('id', 'name')->get();
@@ -141,12 +148,16 @@ class ClientProcessController extends Controller {
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
         }
-        $clients   = $clients_tmp;
-        $employees = $employees_tmp;
-        return view('client.process.edit', compact(['process', 'clients', 'employees']));
+        $clients    = $clients_tmp;
+        $employees  = $employees_tmp;
+        $taxesRates = FacilityTaxes::all()->mapWithKeys(function ($item) {
+            return [$item['percentage'] => $item['percentage']];
+        });
+        return view('client.process.edit', compact('process', 'clients', 'employees', 'taxesRates'));
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         $process      = ClientProcess::findOrFail($id);
         $all          = $request->all();
         $validator    = $this->validator($all, $process->id);
@@ -215,7 +226,8 @@ class ClientProcessController extends Controller {
         }
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $process = ClientProcess::findOrFail($id);
         foreach ($process->items as $item) {
             $item->delete();
@@ -228,7 +240,8 @@ class ClientProcessController extends Controller {
      * @return \Illuminate\Http\Response
      * @Get("/trash", as="client.process.trash")
      */
-    public function trash() {
+    public function trash()
+    {
         $processes = ClientProcess::onlyTrashed()->get();
         return view('client.process.trash', compact('processes'));
     }
@@ -240,7 +253,8 @@ class ClientProcessController extends Controller {
      * @return \Illuminate\Http\Response
      * @Get("/restore/{id}", as="client.process.restore")
      */
-    public function restore($id) {
+    public function restore($id)
+    {
         ClientProcess::withTrashed()->find($id)->restore();
         ClientProcessItem::withTrashed()->where('process_id', $id)->restore();
         return redirect()->route('client.process.index')->with('success', 'تم استرجاع العملية.');

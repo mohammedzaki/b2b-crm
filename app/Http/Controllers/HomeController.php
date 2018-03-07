@@ -48,9 +48,9 @@ class HomeController extends Controller {
         $cProcess = \App\Models\ClientProcess::all();
         foreach ($cProcess as $cp) {
             if ($cp->require_invoice) {
-                $taxes_value = round($cp->total_price * 0.13, 3);
+                $taxes_value = round($cp->total_price * 0.13, Helpers::getDecimalPointCount());
                 $cp->taxes_value = $taxes_value;
-                $cp->total_price_taxes = round(($cp->total_price + $taxes_value) - ($cp->source_discount_value + $cp->discount_value), 3);
+                $cp->total_price_taxes = round(($cp->total_price + $taxes_value) - ($cp->source_discount_value + $cp->discount_value), Helpers::getDecimalPointCount());
                 $cp->save();
                 echo "client: {$cp->id} <br/>";
             }
@@ -59,9 +59,9 @@ class HomeController extends Controller {
         $sProcess = \App\Models\SupplierProcess::all();
         foreach ($sProcess as $sp) {
             if ($sp->require_invoice) {
-                $taxes_value = round($sp->total_price * 0.13, 3);
+                $taxes_value = round($sp->total_price * 0.13, Helpers::getDecimalPointCount());
                 $sp->taxes_value = $taxes_value;
-                $sp->total_price_taxes = round(($sp->total_price + $taxes_value) - ($sp->source_discount_value + $sp->discount_value), 3);
+                $sp->total_price_taxes = round(($sp->total_price + $taxes_value) - ($sp->source_discount_value + $sp->discount_value), Helpers::getDecimalPointCount());
                 $sp->save();
                 echo "supplier: {$sp->id} <br/>";
             }

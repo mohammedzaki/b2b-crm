@@ -84,7 +84,7 @@ class TotalSalariesReportController extends Controller {
             } catch (\Exception $exc) {
                 
             }
-            $HoursSalary = round(($WorkingHours * (($hourlyRate / 60) / 60)), 3);
+            $HoursSalary = round(($WorkingHours * (($hourlyRate / 60) / 60)), Helpers::getDecimalPointCount());
             $Salary      = ($HoursSalary + $Bonuses);
             $NetSalary   = $Salary - ($SalaryDeduction + $AbsentDeduction + ($GuardianshipValue - $GuardianshipReturnValue) + $SmallBorrowValue + $LongBorrowValue);
 
@@ -185,7 +185,7 @@ class TotalSalariesReportController extends Controller {
             $GuardianshipReturnValue = $attendances->sum('GuardianshipReturnValue');
             $SmallBorrowValue        = $attendances->sum('borrowValue');
             $WorkingHoursInSeconds   = $attendances->sum('WorkingHoursInSeconds');
-            $HoursSalary             = round(($WorkingHoursInSeconds * (($hourlyRate / 60) / 60)), 3);
+            $HoursSalary             = round(($WorkingHoursInSeconds * (($hourlyRate / 60) / 60)), Helpers::getDecimalPointCount());
             $LongBorrowValue         = 0;
             if (count($attendances) > 0) {
                 $attendance      = Attendance::find($attendances->first()['id']);

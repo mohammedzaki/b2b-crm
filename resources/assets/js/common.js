@@ -1,3 +1,5 @@
+window.decimalPointCount = 3;
+
 window.roundDecimals = function (value, decimals) {
     decimals = decimals || 0;
     return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);

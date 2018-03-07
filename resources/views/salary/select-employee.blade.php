@@ -1,5 +1,6 @@
 
 {{ Form::open(['method' => 'GET', 'route' => ['salary.show', ''], 'id' => 'SearchForm']) }}
+    {{ csrf_field() }}
     <row>
         @if (session('success'))
         <div class="alert alert-success">

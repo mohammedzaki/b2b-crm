@@ -80,7 +80,8 @@ class SalaryController {
         $attendances  = Attendance::where([
                     ['employee_id', '=', $employee->id]
                 ])
-                ->whereMonth('date', '=', $date->month)
+                ->whereYear('date', $date->year)
+                ->whereMonth('date', $date->month)
                 ->orderBy('date', 'asc')->get()
                 ->mapWithKeys(function ($attendance) {
             return [
@@ -116,7 +117,7 @@ class SalaryController {
         $totalGuardianshipReturnValue = $attendances->sum('GuardianshipReturnValue');
         $totalSmallBorrowValue        = $attendances->sum('borrowValue');
         $totalWorkingHoursInSeconds   = $attendances->sum('totalWorkingHoursInSeconds');
-        $totalHoursSalary             = round(($totalWorkingHoursInSeconds * (($hourlyRate / 60) / 60)), 3);
+        $totalHoursSalary             = round(($totalWorkingHoursInSeconds * (($hourlyRate / 60) / 60)), Helpers::getDecimalPointCount());
         $totalWorkingHours            = Helpers::hoursMinutsToString($totalWorkingHoursInSeconds);
         $LongBorrowValue              = 0;
         if (count($attendances) > 0) {
@@ -220,7 +221,7 @@ class SalaryController {
     {
         $employee               = Employee::findOrFail($employee_id);
         $depositWithdraw        = DepositWithdraw::findOrFail($employee->lastGuardianshipId());
-        $depositWithdraw->notes = $depositWithdraw->due_date;
+        $depositWithdraw->notes = null;
         $depositWithdraw->save();
         return redirect()->back()->with('success', 'تم الغاء ترحيل العهدة');
     }

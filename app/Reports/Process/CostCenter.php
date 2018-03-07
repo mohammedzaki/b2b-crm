@@ -109,7 +109,7 @@ class CostCenter extends BaseReport implements IReport {
                 'totalHours' => Helpers::hoursMinutsToString($item->working_hours_in_seconds),
                 'totalDays'  => $item->totalDays,
                 'hourRate'   => $item->employee->salaryPerHour(),
-                'totalCost'  => round($item->employee->salaryPerSecond() * $item->working_hours_in_seconds, 2),
+                'totalCost'  => round($item->employee->salaryPerSecond() * $item->working_hours_in_seconds, Helpers::getDecimalPointCount()),
             ];
         });
         $this->totalManpowerHoursCost = $manpowerCost->sum('totalCost');

@@ -321,7 +321,7 @@
             unit_price.val(0);
         }
         var pr = parseFloat(unit_price.val()) * parseFloat(quantity.val());
-        pr = roundDecimals(pr, 3);
+        pr = roundDecimals(pr, decimalPointCount);
         total_price.val(pr);
         updateInvoicePrices();
 
@@ -348,7 +348,7 @@
             for (var i = 0; i < invoiceItemsCount; i++) {
                 var qty = parseFloat($('input[name="items[' + i + '][quantity]"]').val());
                 var unit = parseFloat($('input[name="items[' + i + '][unit_price]"]').val());
-                $('input[name="items[' + i + '][total_price]"]').val(roundDecimals((qty * unit), 3));
+                $('input[name="items[' + i + '][total_price]"]').val(roundDecimals((qty * unit), decimalPointCount));
             }
         }
         updateInvoicePrices();
@@ -361,7 +361,7 @@
             if ($(this).val() !== '')
                 total_price = parseFloat($(this).val()) + total_price;
         });
-        total_price = roundDecimals(total_price, 3);
+        total_price = roundDecimals(total_price, decimalPointCount);
         invoiceItemsTotalPrice.text(total_price);
     }
 
@@ -566,13 +566,13 @@
     }
 
     function setProcessPricesText() {
-        $('input[name="invoice_price"]').val(roundDecimals(totalPrice, 3));
-        $('input[name="discount_price"]').val(roundDecimals(discount, 2));
-        $('input[name="taxes_price"]').val(roundDecimals(taxes, 2));
-        $('input[name="source_discount_value"]').val(roundDecimals(sourceDiscount, 2));
-        $('input[name="total_price"]').val(roundDecimals(totalPriceTaxes, 2));
-        $('input[name="total_paid"]').val(roundDecimals(totalPaid, 2));
-        $('input[name="total_remaining"]').val(roundDecimals(totalRemaining, 2));
+        $('input[name="invoice_price"]').val(roundDecimals(totalPrice, decimalPointCount));
+        $('input[name="discount_price"]').val(roundDecimals(discount, decimalPointCount));
+        $('input[name="taxes_price"]').val(roundDecimals(taxes, decimalPointCount));
+        $('input[name="source_discount_value"]').val(roundDecimals(sourceDiscount, decimalPointCount));
+        $('input[name="total_price"]').val(roundDecimals(totalPriceTaxes, decimalPointCount));
+        $('input[name="total_paid"]').val(roundDecimals(totalPaid, decimalPointCount));
+        $('input[name="total_remaining"]').val(roundDecimals(totalRemaining, decimalPointCount));
     }
 
     function removeProcessItems(processId) {

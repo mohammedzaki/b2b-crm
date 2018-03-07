@@ -30,6 +30,7 @@ use DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Validator;
+use App\Helpers\Helpers;
 
 /**
  * Description of DailyCashController
@@ -433,11 +434,11 @@ class DailyCashController extends Controller {
 
     private function CalculateCurrentAmount() {
         $startDate     = DateTime::today()->format('2017-01-01 00:00:00');
-        $endDate       = DateTime::today()->format('2017-12-31 00:00:00');
+        $endDate       = DateTime::today()->format('2018-12-31 00:00:00');
         $depositValue  = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
         $withdrawValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
         $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
-        return round(($depositValue + $openingAmount) - $withdrawValue, 3);
+        return round(($depositValue + $openingAmount) - $withdrawValue, Helpers::getDecimalPointCount());
     }
 
     private function CalculateCurrentAmountOff($startDate, $endDate) {
@@ -445,7 +446,7 @@ class DailyCashController extends Controller {
         $depositValue  = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
         $withdrawValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
         $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
-        return round(($depositValue + $openingAmount) - $withdrawValue, 3);
+        return round(($depositValue + $openingAmount) - $withdrawValue, Helpers::getDecimalPointCount());
     }
 
     private function CheckProcessClosed(DepositWithdraw $depositWithdraw) {

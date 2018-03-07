@@ -19,24 +19,33 @@ use Carbon\Carbon;
  * @author mohammedzaki
  */
 class Helpers {
-    
-    static function numberToArabicWords($total) {
+
+    static function numberToArabicWords($total)
+    {
         $Arabic = new I18N_Arabic('Numbers');
-        $text = $Arabic->money2str($total, 'EGP', 'ar');
+        $text   = $Arabic->money2str($total, 'EGP', 'ar');
         return $text;
     }
-    
-    static function hoursMinutsToString($totalDuration) {
-        $hours = floor($totalDuration / 3600);
+
+    static function hoursMinutsToString($totalDuration)
+    {
+        $hours   = floor($totalDuration / 3600);
         $minutes = floor(($totalDuration / 60) % 60);
         $seconds = $totalDuration % 60;
         return "$hours:$minutes:$seconds";
     }
-    
-    static function diffInHoursMinutsToSeconds(Carbon $startDate = null, Carbon $endDate = null) {
+
+    static function diffInHoursMinutsToSeconds(Carbon $startDate = null, Carbon $endDate = null)
+    {
         if ($startDate == null || $endDate == null) {
             return 0;
         }
         return $endDate->diffInSeconds($startDate);
     }
+
+    static function getDecimalPointCount()
+    {
+        return config('app.decimalPointCount');
+    }
+
 }

@@ -9,6 +9,7 @@ use App\Models\Employee;
 use App\Models\Supplier;
 use App\Models\SupplierProcess;
 use App\Models\SupplierProcessItem;
+use App\Models\FacilityTaxes;
 use Illuminate\Http\Request;
 use Validator;
 
@@ -19,7 +20,8 @@ use Validator;
  */
 class SupplierProcessController extends Controller {
 
-    protected function validator(array $data, $id = null) {
+    protected function validator(array $data, $id = null)
+    {
         $validator = Validator::make($data, [
                     //'name' => 'required|unique:client_processes,name,' . $id . '|min:5|max:255',
                     'client_id'           => 'required|exists:clients,id',
@@ -59,12 +61,14 @@ class SupplierProcessController extends Controller {
         return $validator;
     }
 
-    public function index() {
+    public function index()
+    {
         $processes = SupplierProcess::all();
         return view('supplier.process.index', compact('processes'));
     }
 
-    public function create() {
+    public function create()
+    {
         $suppliers           = Supplier::select('id', 'name')->get();
         $clients             = Client::allHasOpenProcess();
         $employees           = Employee::select('id', 'name')->get();
@@ -90,10 +94,12 @@ class SupplierProcessController extends Controller {
         $employees       = $employees_tmp;
         $clients         = $clients_tmp;
         $clientProcesses = $clientProcesses_tmp;
-        return view('supplier.process.create', compact(['suppliers', 'employees', 'clients', 'clientProcesses']));
+        $taxesRates      = null;
+        return view('supplier.process.create', compact('suppliers', 'employees', 'clients', 'clientProcesses', 'taxesRates'));
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $validator = $this->validator($request->all());
         $all       = $request->all();
 
@@ -144,7 +150,8 @@ class SupplierProcessController extends Controller {
         }
     }
 
-    public function edit($id) {
+    public function edit($id)
+    {
         $process             = SupplierProcess::findOrFail($id);
         $suppliers           = Supplier::select('id', 'name')->get();
         $clients             = Client::select('id', 'name')->get();
@@ -172,10 +179,14 @@ class SupplierProcessController extends Controller {
         $clients            = $clients_tmp;
         $clientProcesses    = $clientProcesses_tmp;
         $process->client_id = $process->clientProcess->client_id;
-        return view('supplier.process.edit', compact(['process', 'suppliers', 'employees', 'clients', 'clientProcesses']));
+        $taxesRates         = FacilityTaxes::all()->mapWithKeys(function ($item) {
+            return [$item['percentage'] => $item['percentage']];
+        });
+        return view('supplier.process.edit', compact('process', 'suppliers', 'employees', 'clients', 'clientProcesses', 'taxesRates'));
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         $process      = SupplierProcess::findOrFail($id);
         $all          = $request->all();
         $validator    = $this->validator($all, $process->id);
@@ -248,7 +259,8 @@ class SupplierProcessController extends Controller {
         }
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         $process = SupplierProcess::findOrFail($id);
         foreach ($process->items as $item) {
             $item->delete();
@@ -261,7 +273,8 @@ class SupplierProcessController extends Controller {
      * @return \Illuminate\Http\Response
      * @Get("/trash", as="supplier.process.trash")
      */
-    public function trash() {
+    public function trash()
+    {
         $processes = SupplierProcess::onlyTrashed()->get();
         return view('supplier.process.trash', compact('processes'));
     }
@@ -273,7 +286,8 @@ class SupplierProcessController extends Controller {
      * @return \Illuminate\Http\Response
      * @Get("/restore/{id}", as="supplier.process.restore")
      */
-    public function restore($id) {
+    public function restore($id)
+    {
         SupplierProcess::withTrashed()->find($id)->restore();
         SupplierProcessItem::withTrashed()->where('process_id', $id)->restore();
         return redirect()->route('supplier.process.index')->with('success', 'تم استرجاع العملية.');
