@@ -5,6 +5,8 @@ namespace App\Http\Controllers\FacilityManagement;
 use App\Http\Controllers\Controller;
 use App\Models\Employee;
 use App\Models\Facility;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 /**
  * @Controller(prefix="/facility")
@@ -50,7 +52,7 @@ class FacilityController extends Controller {
     /**
      * Show the facility information.
      *
-     * @return \Illuminate\Http\Response
+     * @return Response
      */
     public function edit($id) {
         $facility          = Facility::findOrFail($id);
