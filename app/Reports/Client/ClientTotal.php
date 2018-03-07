@@ -14,15 +14,15 @@ class ClientTotal extends BaseReport {
     
     protected $reportName = "ClientTotalReport.pdf";
 
-    function SetHtmlBody() {
+    function setHtmlBody() {
         return '<!DOCTYPE html>
                 <html>
                     <head>
                     
                     </head>
                     <body>
-                        ' . $this->SetPageHeader() . '
-                        ' . $this->SetPageFooter() . '
+                        ' . $this->setPageHeader() . '
+                        ' . $this->setPageFooter() . '
                         ' . $this->SetReportHeader($this->clientName) . '
                         <table class="tg">
                             ' . $this->AddProcess() . '
@@ -32,7 +32,7 @@ class ClientTotal extends BaseReport {
                 ';
     }
     
-    function SetCSS() {
+    function setCSS() {
         $path = public_path('ReportsHtml/Client/ClientTotal.css');
         return file_get_contents($path);
     }

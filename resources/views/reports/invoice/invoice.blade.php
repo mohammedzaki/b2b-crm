@@ -1,230 +1,98 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <link href="{{ url('ReportsHtml/employee/salary.css') }}" rel="stylesheet">
+        <link href="{{ url('ReportsHtml/Invoice/Invoice.css') }}" rel="stylesheet">
     </head>
     <body>
-        <!--mpdf
-                    <htmlpageheader name="myheader">
-                    <img src="var:letrImg" class="letrHead">
-                    </htmlpageheader>
 
-                    <sethtmlpageheader name="myheader" value="on" show-this-page="1" />
-                    mpdf-->
-        <div class="clientProcess">
-            <div class="processHeader">
-                <table class="headerTable">
-                    <tr>
-                        <td class="employeeLabel">اسم الموظف :</td>
-                        <td class="employeeName"> {{ $employeeName }} </td>
-                        <td class="monthLabel">مرتب شهر :</td> 
-                        <td class="monthName">يناير</td>
-                    </tr>
-                </table>
-            </div>
-            <table class="tg">
-                <thead>
-                    <tr>
-                        <th>اسم الموظف</th>
-                        <th>اسم العملية</th>
-                        <th>من</th>
-                        <th>الى</th>
-                        <th>ساعات العمل</th>
-                        <th>المكافأت</th>
-                        <th>الخصومات</th>
-                        <th>الملاحظات</th>
-                        <th>السلف</th>
-                        <th>العهد</th>
-                        <th>العهد المردودة</th>
-                        <th>نوع الغياب</th>
-                        <th>خصم الغياب</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($attendances as $attendance)
-                    <tr class="odd">
-                        <td>{{ $attendance->employeeName }}</td>
-                        <td>{{ $attendance->processName }}</td>
-                        <td>{{ $attendance->check_in }}</td>
-                        <td>{{ $attendance->check_out }}</td>
-                        <td>{{ $attendance->workingHours }}</td>
-                        <td>{{ $attendance->mokaf }}</td>
-                        <td>{{ $attendance->salary_deduction }}</td>
-                        <td>{{ $attendance->notes }}</td>
-                        <td>{{ $attendance->borrowValue }}</td>
-                        <td>{{ $attendance->GuardianshipValue }}</td>
-                        <td>{{ $attendance->GuardianshipReturnValue }}</td>
-                        <td>{{ $attendance->absentTypeName }}</td>
-                        <td>{{ $attendance->absent_deduction }}</td>
-                    </tr>
-                    @empty
-                    <tr>ﻻ يوجد بيانات.</tr>
-                    @endforelse
-                    <tr class="last">
-                        <th></th>
-                        <th></th>
-                        <th></th>
-                        <th>اجمالى</th>
-                        <th>{{ $totalWorkingHours }}</th>
-                        <th>{{ $totalBonuses }}</th>
-                        <th>{{ $totalSalaryDeduction }}</th>
-                        <th></th>
-                        <th>{{ $totalBorrowValue }}</th>
-                        <th>{{ $totalGuardianshipValue }}</th>
-                        <th>{{ $totalGuardianshipReturnValue }}</th>
-                        <th></th>
-                        <th>{{ $totalAbsentDeduction }}</th>
-                    </tr>
-                </tbody>
+    <htmlpageheader name="invoicePageheader" class="invoicePageheader">
+        <div class="header">
+            <img src="var:letrImg">
+        </div>
+    </htmlpageheader>
+    <sethtmlpageheader name="invoicePageheader" value="{{ $showLetterHead }}" show-this-page="1"> </sethtmlpageheader>
+
+    <div class="invoice">
+        <div class="invoiceHeader">
+            <span class="invoiceNoLabel">فاتورة <span class="invoiceNo">{{ $invoiceNo }}</span></span>
+        </div>
+        <div class="clientDetails">
+            <table class="headerTable">
+                <tr>
+                    <td class="clientLabel">مطلوب من /</td>
+                    <td class="clientName"> {{ $clinetName }} </td>
+                    <td class="invoice-date-sep"></td>
+                    <td class="invoice-date-lbl" >بتاريخ /</td>
+                    <td class="invoice-date">{{ $invoiceDate }}</td>
+                </tr>
             </table>
-            <div class="lineBreak"></div>
         </div>
-        
-        <div class="col-lg-12">
-            <div class="panel panel-default">
-                <div class="panel-heading">
-                    بيانات الاجر
-                </div>
-                <!-- /.panel-heading -->
-                <div class="panel-body">
-                    <table>
-                        <tr>
-                            <td>
-                                <label>عدد الساعات الفعلى</label>
-                            </td>
-                            <td>
-                                <label>سعر الساعة</label>
-                            </td>
-                            <td>
-                                <label>الاجمالى</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                {{ Form::text('HourlyRate', $totalWorkingHours, array(
-                                        "id" => "HourlyRate",
-                                        'class' => 'form-control')) }}
-                            </td>
-                            <td>
-                                {{ Form::text('HourlyRate', $hourlyRate, array(
-                                        "id" => "HourlyRate",
-                                        'class' => 'form-control')) }}
-                            </td>
-                            <td>
-                                {{ Form::text('HourlyRate', $totalHoursSalary, array(
-                                        "id" => "HourlyRate",
-                                        'class' => 'form-control')) }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label>خصومات الغياب</label>
-                            </td>
-                            <td>
-                                <label>السلف المستديمة</label>
-                            </td>
-                            <td>
-                                <label>سلف يومية</label>
-                            </td>
-                            <td>
-                                <label>خصم مسبب</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                {{ Form::text('HourlyRate', $totalAbsentDeduction, array(
-                                        "id" => "HourlyRate",
-                                        'class' => 'form-control')) }}
-                            </td>
-                            <td>
-                                {{ Form::text('HourlyRate', $totalLongBorrowValue, array(
-                                        "id" => "HourlyRate",
-                                        'class' => 'form-control')) }}
-                            </td>
-                            <td>
-                                {{ Form::text('HourlyRate', $totalSmallBorrowValue, array(
-                                        "id" => "HourlyRate",
-                                        'class' => 'form-control')) }}
-                            </td>
-                            <td>
-                                {{ Form::text('HourlyRate', $totalSalaryDeduction, array(
-                                        "id" => "HourlyRate",
-                                        'class' => 'form-control')) }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label>اجمالى السلف</label>
-                            </td>
-                            <td>
-                                <label>المكافأت</label>
-                            </td>
-                            <td>
-                                <label>المرتب</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                {{ Form::text('HourlyRate', $totalBorrowValue, array(
-                                        "id" => "HourlyRate",
-                                        'class' => 'form-control')) }}
-                            </td>
-                            <td>
-                                {{ Form::text('HourlyRate', $totalBonuses, array(
-                                        "id" => "HourlyRate",
-                                        'class' => 'form-control')) }}
-                            </td>
-                            <td>
-                                {{ Form::text('TotalSalary', $totalSalary, array(
-                                        "id" => "TotalSalary",
-                                        'class' => 'form-control')) }}
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <label>اجمالى العهدة</label>
-                            </td>
-                            <td>
-                                <label>اجمالى رد العهدة</label>
-                            </td>
-                            <td>
-                                <label>الصافى المستحق</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>
-                                {{ Form::text('TotalSalary', $totalGuardianshipValue, array(
-                                        "id" => "totalGuardianshipValue",
-                                        'class' => 'form-control')) }}
-                            </td>
-                            <td>
-                                {{ Form::text('TotalSalary', $totalGuardianshipReturnValue, array(
-                                        "id" => "totalGuardianshipReturnValue",
-                                        'class' => 'form-control')) }}
-                            </td>
-                            <td>
-                                {{ Form::text('HourlyRate', $totalNetSalary, array(
-                                        "id" => "HourlyRate",
-                                        'class' => 'form-control')) }}
-                            </td>
-                        </tr>
-                    </table>
-                    
-                </div>
-                <!-- /.panel-body -->
-            </div>
-            <!-- /.panel -->
+        <div class="itemsTbl">
+            <table>
+                <tr class="first-child">
+                    <td class="first-child total-price">Total Price <br> السعر الاجمالي</td>
+                    <td class="unit-price" >Unit Price <br> سعر الوحدة</td>
+                    <td class="qty">Qty <br> الكمية</td>
+                    <td class="size">Size <br> المقاس</td>
+                    <td class="desc">Description <br> البيان</td>
+                </tr>
+                @for ($i = 0; $i < count($invoiceItems); $i++)
+                @if ($i < 19)
+                <tr>
+                    <td class="first-child {{ $invoiceItems[$i]["class"] }}">{{ $invoiceItems[$i]["total_price"] }}</td>
+                    <td>{{ $invoiceItems[$i]["unit_price"] }}</td>
+                    <td>{{ $invoiceItems[$i]["quantity"] }}</td>
+                    <td>{{ $invoiceItems[$i]["size"] }}</td>
+                    <td class="{{ $invoiceItems[$i]["class"] }}">{{ $invoiceItems[$i]["description"] }}</td>
+                </tr>
+                @else
+                <tr class="last-child">
+                    <td class="first-child {{ $invoiceItems[$i]["class"] }}">{{ $invoiceItems[$i]["total_price"] }}</td>
+                    <td>{{ $invoiceItems[$i]["unit_price"] }}</td>
+                    <td>{{ $invoiceItems[$i]["quantity"] }}</td>
+                    <td>{{ $invoiceItems[$i]["size"] }}</td>
+                    <td class="{{ $invoiceItems[$i]["class"] }}">{{ $invoiceItems[$i]["description"] }}</td>
+                </tr>
+                @endif
+                @endfor
+                
+                @for ($i = 0; $i <= (19 - count($invoiceItems)); $i++)
+                @if ($i < (19 - count($invoiceItems)))
+                <tr>
+                    <td class="first-child"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                @else
+                <tr class="last-child">
+                    <td class="first-child"></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+                @endif
+                @endfor
+            </table>
+        </div>
+        <div class="items-footerTbl">
+            <div class="total-price">{{ $totalPriceAfterTaxes }}</div>
+            <div class="arabic-price"><span class="lbl">فقط وقدره : <div class="text">{{ $arabicPriceAfterTaxes }}</div></span></div>
+
         </div>
 
-        <!--mpdf
-                <htmlpagefooter name="myfooter">
-                <div class="reportPageFooterLine" ></div>
-                <div class="reportPageFooterText">
-                صفحة {PAGENO} من {nb}
-                </div>
-                </htmlpagefooter>
-    
-                <sethtmlpagefooter name="myfooter" value="on" />
-                mpdf-->
-    </body>
+    </div>
+
+    <htmlpagefooter name="invoicePageFooter" class="invoicePageFooter">
+        <div class="footer hidden">
+            @if ($showLetterHead == 'on')
+            <img src="var:footerImg">
+            @endif
+        </div>
+    </htmlpagefooter>
+    <sethtmlpagefooter name="invoicePageFooter" value="{{ $showLetterHead }}" show-this-page="1"> </sethtmlpagefooter>
+
+</body>
 </html>

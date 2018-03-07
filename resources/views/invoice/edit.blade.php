@@ -1,10 +1,10 @@
 @extends('layouts.app') 
-@section('title', 'تعديل بيانات عملية - عمليه جديدة مورد') 
+@section('title', 'تعديل بيانات فاتورة - الفاتورة') 
 @section('content')
 
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">عمليه جديدة مورد <small>تعديل بيانات عملية</small></h1>
+        <h1 class="page-header">الفاتورة <small>تعديل بيانات فاتورة</small></h1>
     </div>
 </div>
 <!-- /.row -->
@@ -12,38 +12,23 @@
 <div class="row">
 
     @if (session('success'))
-        <div class="alert alert-success">
-            {{ session('success') }}
-        </div>
+    <div class="alert alert-success">
+        {{ session('success') }}
+    </div>
     @endif
 
     @if (session('error'))
-        <div class="alert alert-danger">
-            {{ session('error') }}
-        </div>
+    <div class="alert alert-danger">
+        {{ session('error') }}
+    </div>
     @endif
 
-    {{ Form::model($process, 
-            array(
-                'route' => array('supplier.process.update', $process->id),
-                'method' => 'put'
-            )
-        ) 
+    {{ Form::model($invoice, array(
+                'route' => array('invoice.update', $invoice->id),
+                'method' => 'put', 'id' => 'invoiceForm')) 
     }}
-        @if (session('error'))
-            @include('supplier.process._form', ['model' => 'edit', 'items' => old('items')])
-        @else
-            @include('supplier.process._form', ['model' => 'edit', 'items' => $process->items])
-        @endif
+        @include('invoice._form', ['model' => 'edit', 'invoiceItems' => $invoice->items])
     {{ Form::close() }}
-
-    <script type="text/javascript">
-        @if (session('error'))
-            var processItemsCount = {{ count(old('items')) }};
-        @else
-            var processItemsCount = {{ count($process->items) }};
-        @endif
-    </script>
 
 </div>
 @endsection

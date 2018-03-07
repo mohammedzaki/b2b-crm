@@ -14,15 +14,15 @@ class SupplierAnalyticalCenterTotal extends BaseReport {
     
     protected $reportName = "SupplierTotalReport.pdf";
 
-    function SetHtmlBody() {
+    function setHtmlBody() {
         return '<!DOCTYPE html>
                 <html>
                     <head>
                     
                     </head>
                     <body>
-                        ' . $this->SetPageHeader() . '
-                        ' . $this->SetPageFooter() . '
+                        ' . $this->setPageHeader() . '
+                        ' . $this->setPageFooter() . '
                         ' . $this->SetReportHeader($this->supplierName) . '
                         <table class="tg">
                             ' . $this->AddProcess() . '
@@ -32,7 +32,7 @@ class SupplierAnalyticalCenterTotal extends BaseReport {
                 ';
     }
     
-    function SetCSS() {
+    function setCSS() {
         $path = public_path('ReportsHtml/Supplier/SupplierTotal.css');
         return file_get_contents($path);
     }
@@ -87,4 +87,5 @@ class SupplierAnalyticalCenterTotal extends BaseReport {
                 </tr>
                 ';
     }
+
 }

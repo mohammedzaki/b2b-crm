@@ -18,7 +18,7 @@
                         <td class="employeeLabel">اسم الموظف :</td>
                         <td class="employeeName"> {{ $employeeName }} </td>
                         <td class="monthLabel">مرتب شهر :</td> 
-                        <td class="monthName">يناير</td>
+                        <td class="monthName"> {{ $monthNum }}</td>
                     </tr>
                 </table>
             </div>

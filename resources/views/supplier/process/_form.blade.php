@@ -1,6 +1,6 @@
 @section('script_taxes')
 <script>
-    var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};</script>
+    var TaxesRate = {{ \App\Http\Controllers\FacilityManagement\FacilityController::TaxesRate() / 100 }};</script>
 @endsection
 <div class="row">
     <div class="col-lg-4">
@@ -227,6 +227,24 @@
                         {{ Form::label('require_invoice', 'فاتورة') }}
                     </div>
                 </div>
+                
+                @if(isset($model))
+                <div class="form-group{{ $errors->has('taxesRate') ? ' has-error' : '' }}">
+                    {{ Form::label('taxesRate', 'اختر الضريبة') }} 
+                    {{ Form::select('taxesRate', $taxesRates, null,
+                        array(
+                            'class' => 'form-control',
+                            'onchange' => 'changeTaxesRate()',
+                            'placeholder' => 'اختر الضريبة')
+                        )
+                    }}
+                    @if ($errors->has('taxesRate'))
+                    <label for="inputError" class="control-label">
+                        {{ $errors->first('taxesRate') }}
+                    </label>
+                    @endif
+                </div>
+                @endif
             
                 {{ Form::hidden('total_price') }}
                 {{ Form::hidden('total_price_taxes') }}
@@ -373,6 +391,7 @@
 </div>
 
 @section('scripts')
+<script src="{{ mix('js/prcoess_items.js') }}"></script>
 <script>
     var clientProcesses = [@foreach($clientProcesses as $k => $info) { id: '{{ $k }}', name: '{{ $info["name"] }}', client_id: '{{ $info["client_id"] }}'}, @endforeach];
     var cbo_processes = $('#client_process_id');

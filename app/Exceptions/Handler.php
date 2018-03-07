@@ -5,7 +5,6 @@ namespace App\Exceptions;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Mail;
 
 class Handler extends ExceptionHandler {
 
@@ -32,13 +31,9 @@ class Handler extends ExceptionHandler {
      * @return void
      */
     public function report(Exception $exception) {
-        /*if ($exception instanceof \Exception) {
-            // emails.exception is the template of your email
-            // it will have access to the $error that we are passing below
-            Mail::send('emails.exception', ['error' => $exception->getMessage()], function ($m) {
-                $m->to('mohammedzaki.dev@gmail.com', 'Mohammed Zaki')->subject('B2B POS ERROR');
-            });
-        }*/
+        if (app()->bound('sentry') && $this->shouldReport($exception)) {
+            app('sentry')->captureException($exception);
+        }
         parent::report($exception);
     }
 
@@ -50,6 +45,12 @@ class Handler extends ExceptionHandler {
      * @return \Illuminate\Http\Response
      */
     public function render($request, Exception $exception) {
+        // Convert all non-http exceptions to a proper 500 http exception
+        // if we don't do this exceptions are shown as a default template
+        // instead of our own view in resources/views/errors/500.blade.php
+        if ($this->shouldReport($exception) && !$this->isHttpException($exception) && !config('app.debug')) {
+            $exception = new ServerErrorException('Whoops!', 500);
+        }
         return parent::render($request, $exception);
     }
 
@@ -64,7 +65,6 @@ class Handler extends ExceptionHandler {
         if ($request->expectsJson()) {
             return response()->json(['error' => 'Unauthenticated.'], 401);
         }
-
         return redirect()->guest('login');
     }
 

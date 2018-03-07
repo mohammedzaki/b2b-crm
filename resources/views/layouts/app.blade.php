@@ -7,7 +7,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>@yield('title') - {{ config('app.name', 'Laravel') }}</title>
         <link href="{{ mix('css/app.css') }}" rel="stylesheet">
-        @yield('css_scripts')
+        @yield('styles')
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>
@@ -22,7 +22,7 @@
         <div id="wrapper" class="index">
             @include('layouts.header')
             <!-- content -->
-            <div id="page-wrapper">
+            <div id="page-wrapper" class="row">
                 @yield('content')
             </div>
             <!-- /#page-wrapper -->

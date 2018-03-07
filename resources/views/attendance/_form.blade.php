@@ -43,6 +43,7 @@
                             <div class="input-group">
                                 {{ Form::select('process_id', $processes, null, array(
                                         'class' => 'form-control',
+                                        'placeholder' => '',
                                         'onchange' => 'ResetManagmentProcess()')) }}
                                 <span class="input-group-addon">
                                     {{ Form::checkbox('is_managment_process', '1', null, array('id' => 'is_managment_process', 'onchange' => 'ResetProcess()')) }} 
@@ -225,14 +226,8 @@
 
 @section('scripts')
 <script>
-var employeesSalaries = {
-    @foreach($employeesSalaries as $k => $info) 
-    {{ $k }}: { dailySalary: '{{ $info["dailySalary"] }}'},
-    @endforeach};
-var absentTypesInfo = {
-    @foreach($absentTypesInfo as $k => $info) 
-    {{ $k }}: {salaryDeduction: '{{ $info["salaryDeduction"] }}', editable: '{{ $info["editable"] }}'}, 
-    @endforeach};
+var employeesSalaries = {!! $employeesSalaries !!};
+var absentTypesInfo = {!! $absentTypesInfo !!};
 var startDate = new Date();
 var endDate = new Date();
 var check_inPickr;
@@ -374,7 +369,7 @@ function SetCheckIndatetime() {
     //check_inPickr.setDate(employeesCheckinDates[$("#employee_id").val()].checkinDate);
     selecteddatepicker = $("#datepicker").val();
     check_inPickr.setDate("", true);
-    $.get("{{ url('getEmployeesCheckinDate/') }}", 
+    $.get("{{ url('attendance/getEmployeesCheckinDate/') }}", 
         {employee_id: $("#employee_id").val(), date: selecteddatepicker, is_second_shift: $("#is_second_shift").is(":checked")},
         function (data) {
             console.log(data);

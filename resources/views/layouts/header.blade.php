@@ -18,6 +18,7 @@
             <ul class="dropdown-menu dropdown-user">
                 <li><a href="{{ URL::to('/facility/1/edit') }}"><i class="fa fa-gear fa-fw"></i> بيانات المنشاه</a></li>
                 <li><a href="{{ URL::to('/facilityopeningamount') }}"><i class="fa fa-gear fa-fw"></i> الرصيد الافتتاحى</a></li>
+                <li><a href="{{ route('facilityTaxes.index') }}"><i class="fa fa-gear fa-fw"></i> الضريبة المضافة</a></li>
                 <li class="divider"></li>
                 <li>
                 <li>

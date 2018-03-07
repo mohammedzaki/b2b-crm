@@ -137,13 +137,13 @@
                     </label>
                     @endif
                 </div>
-
                 <div class="form-group{{ $errors->has('sales_tax') ? ' has-error' : '' }}">
                     {{ Form::label('sales_tax', 'ضريبة المبيعات') }} 
                     {{ Form::text('sales_tax', null, 
                         array(
                             'class' => 'form-control', 
-                            'placeholder' => 'ادخل رقم ضريبة المبيعات')
+                            'placeholder' => '',
+                            'readonly' => 'readonly')
                         )
                     }}
                     @if ($errors->has('sales_tax'))
@@ -165,6 +165,21 @@
                     @if ($errors->has('opening_amount'))
                     <label for="inputError" class="control-label">
                         {{ $errors->first('opening_amount') }}
+                    </label>
+                    @endif
+                </div>
+                
+                <div class="form-group{{ $errors->has('start_invoice_number') ? ' has-error' : '' }}">
+                    {{ Form::label('start_invoice_number', 'بداية الفاتورة') }} 
+                    {{ Form::text('start_invoice_number', null, 
+                        array(
+                            'class' => 'form-control', 
+                            'placeholder' => '########')
+                        )
+                    }}
+                    @if ($errors->has('start_invoice_number'))
+                    <label for="inputError" class="control-label">
+                        {{ $errors->first('start_invoice_number') }}
                     </label>
                     @endif
                 </div>

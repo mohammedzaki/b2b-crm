@@ -14,21 +14,21 @@ class SupplierAnalyticalCenterDetailed extends BaseReport {
     
     protected $reportName = "SupplierTotalReport.pdf";
 
-    function SetHtmlBody() {
+    function setHtmlBody() {
         return '<!DOCTYPE html>
                 <html>
                     <head>
                         
                     </head>
                     <body>
-                        ' . $this->SetPageHeader() . '
-                        ' . $this->SetPageFooter() . '
+                        ' . $this->setPageHeader() . '
+                        ' . $this->setPageFooter() . '
                         ' . $this->AddAllProcess() . '
                     </body>
                 </html>';
     }
 
-    function SetCSS() {
+    function setCSS() {
         $path = public_path('ReportsHtml/Supplier/SupplierDetailed.css');
         return file_get_contents($path);
     }

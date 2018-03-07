@@ -1,7 +1,7 @@
 
 @section('script_taxes')
 <script>
-    var TaxesRate = {{ \App\Http\Controllers\FacilityController::TaxesRate() }};
+    var TaxesRate = {{ \App\Http\Controllers\FacilityManagement\FacilityController::TaxesRate() / 100 }};</script>
 </script>
 @endsection
 
@@ -214,7 +214,25 @@
                         {{ Form::label('require_invoice', 'فاتورة') }}
                     </div>
                 </div>
-
+                
+                @if(isset($model))
+                <div class="form-group{{ $errors->has('taxesRate') ? ' has-error' : '' }}">
+                    {{ Form::label('taxesRate', 'اختر الضريبة') }} 
+                    {{ Form::select('taxesRate', $taxesRates, null,
+                        array(
+                            'class' => 'form-control',
+                            'onchange' => 'changeTaxesRate()',
+                            'placeholder' => 'اختر الضريبة')
+                        )
+                    }}
+                    @if ($errors->has('taxesRate'))
+                    <label for="inputError" class="control-label">
+                        {{ $errors->first('taxesRate') }}
+                    </label>
+                    @endif
+                </div>
+                @endif
+                
                 {{ Form::hidden('total_price') }}
                 {{ Form::hidden('total_price_taxes') }}
                 {{ Form::hidden('taxes_value') }}
@@ -357,3 +375,6 @@
         <!-- /.panel -->
     </div>
 </div>
+@section('scripts')
+<script src="{{ mix('js/prcoess_items.js') }}"></script>
+@endsection
