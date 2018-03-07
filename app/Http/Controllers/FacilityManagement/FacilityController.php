@@ -7,6 +7,7 @@ use App\Models\Employee;
 use App\Models\Facility;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Validator;
 
 /**
  * @Controller(prefix="/facility")
