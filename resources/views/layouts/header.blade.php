@@ -2,7 +2,7 @@
 <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
         <a class="navbar-brand" href="{{ URL::to('/') }}">
-            <img width="90" src="{{ asset('images/most.png') }}" />
+            <img width="90" src="{{ asset('uploads/' . \App\Models\Facility::findOrFail(1)->logo ) }}" />
         </a>
     </div>
     <!-- /.navbar-header -->
