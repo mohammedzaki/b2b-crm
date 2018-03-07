@@ -56,6 +56,7 @@ class Facility extends Model {
         'name',
         'manager_id',
         'type',
+        'logo'
     ];
 
     public function getTaxesRate($currentDate = NULL) {

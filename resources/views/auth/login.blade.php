@@ -3,7 +3,7 @@
 @section('content')
 <div class="row">
     <div class="col-md-4 col-md-offset-4">
-        <p class="login-panel text-center"><img src="{{ asset('images/most.png') }}" /></p>
+        <p class="login-panel text-center"><img src="{{ asset('uploads/' . $img) }}" style="width: 100%;"/></p>
         <div class=" panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">تسجيل الدخول</h3>

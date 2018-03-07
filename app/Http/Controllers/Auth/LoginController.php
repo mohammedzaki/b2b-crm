@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use App\Models\Facility;
 
 class LoginController extends Controller {
     /*
@@ -31,7 +32,8 @@ use AuthenticatesUsers;
      *
      * @return void
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->middleware('guest', ['except' => 'logout']);
     }
 
@@ -40,8 +42,21 @@ use AuthenticatesUsers;
      *
      * @return string
      */
-    public function username() {
+    public function username()
+    {
         return 'username';
+    }
+
+    /**
+     * Show the application's login form.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function showLoginForm()
+    {
+        $facility = Facility::findOrFail(1);
+        $img      = $facility->logo;
+        return view('auth.login')->with('img', $img);
     }
 
 }
