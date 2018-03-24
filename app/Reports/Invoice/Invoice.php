@@ -7,7 +7,8 @@ use App\Helpers\Helpers;
 
 class Invoice extends BaseReport {
 
-    public $clientName,
+    public $invoiceId,
+            $clientName,
             $proceses,
             $allProcessesTotalPrice,
             $allProcessTotalPaid,
@@ -24,12 +25,31 @@ class Invoice extends BaseReport {
     public $invoiceNo;
     protected $reportName = "Invoice.pdf";
 
-    //public function __construct($mode = '', $format = 'A4', $default_font_size = 0, $default_font = '', $mgl = 15, $mgr = 15, $mgt = 16, $mgb = 16, $mgh = 9, $mgf = 9, $orientation = 'P')
     public function __construct($withLetterHead = true) {
         if ($withLetterHead) {
-            $this->mpdf = new \mPDF('', [240, 280], 0, '', 5, 5, 24, 8, 8, 8);
+            $this->mpdf = new \Mpdf\Mpdf([
+                'mode'          => '',
+                'format'        => 'A4',
+                'orientation'   => 'P',
+                'margin_left'   => 5,
+                'margin_right'  => 5,
+                'margin_top'    => 20,
+                'margin_bottom' => 5,
+                'margin_header' => 5,
+                'margin_footer' => 5
+            ]);
         } else {
-            $this->mpdf = new \mPDF('', [240, 280], '', 0, '', 5, 5, 8, 8, 10, 10);
+            $this->mpdf = new \Mpdf\Mpdf([
+                'mode'          => '',
+                'format'        => 'A4',
+                'orientation'   => 'P',
+                'margin_left'   => 5,
+                'margin_right'  => 5,
+                'margin_top'    => 24,
+                'margin_bottom' => 8,
+                'margin_header' => 10,
+                'margin_footer' => 10
+            ]);
         }
         $this->withLetterHead = $withLetterHead;
     }
@@ -53,6 +73,7 @@ class Invoice extends BaseReport {
     }
 
     function preview() {
+        $invoiceId = $this->invoiceId;
         $clinetName = $this->clinetName;
         $totalPriceAfterTaxes = $this->totalPriceAfterTaxes;
         $arabicPriceAfterTaxes = Helpers::numberToArabicWords($this->totalPriceAfterTaxes);
@@ -66,7 +87,7 @@ class Invoice extends BaseReport {
         $invoiceNo = $this->invoiceNo;
         $this->setPageHeader();
         $this->setPageFooter();
-        return view('reports.invoice.preview', compact(['clinetName', 'totalPriceAfterTaxes', 'arabicPriceAfterTaxes', 'invoiceItems', 'discountPrice', 'discountReason', 'sourceDiscountPrice', 'totalPrice', 'totalTaxes', 'invoiceDate', 'invoiceNo']));
+        return view('reports.invoice.preview', compact(['invoiceId', 'clinetName', 'totalPriceAfterTaxes', 'arabicPriceAfterTaxes', 'invoiceItems', 'discountPrice', 'discountReason', 'sourceDiscountPrice', 'totalPrice', 'totalTaxes', 'invoiceDate', 'invoiceNo']));
     }
 
     function setCSS() {

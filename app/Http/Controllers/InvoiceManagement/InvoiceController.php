@@ -18,14 +18,16 @@ use Exception;
  * @Resource("invoice")
  * @Middleware("web")
  */
-class InvoiceController extends Controller {
+class InvoiceController extends Controller
+{
 
     /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index() {
+    public function index()
+    {
         $invoices = Invoice::all();
         for ($index = 0; $index < count($invoices); $index++) {
             $invoices[$index]->processesNames = '(' . implode('), (', $invoices[$index]->processes()->pluck('name')->toArray()) . ')';
@@ -33,7 +35,8 @@ class InvoiceController extends Controller {
         return view('invoice.index', compact('invoices'));
     }
 
-    private function setData(Invoice $invoice = NULL) {
+    private function setData(Invoice $invoice = NULL)
+    {
         $clients = [];
         if ($invoice) {
             $clients = Client::allHasInvoiceProcess();
@@ -95,7 +98,8 @@ class InvoiceController extends Controller {
      *
      * @return \Illuminate\Http\Response
      */
-    public function create() {
+    public function create()
+    {
         return view('invoice.create', $this->setData());
     }
 
@@ -105,7 +109,8 @@ class InvoiceController extends Controller {
      * @param  Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function show(Invoice $invoice) {
+    public function show(Invoice $invoice)
+    {
         return $this->showInvoicePreview($invoice, FALSE);
     }
 
@@ -114,16 +119,27 @@ class InvoiceController extends Controller {
      * @Post("preview", as="invoice.preview")
      * @Post("{invoice}/preview", as="invoice.editPreview")
      */
-    public function preview(Request $request) {
+    public function preview(Request $request)
+    {
         $all                = $request->all();
         $invoice            = new Invoice;
         $invoice->fill($all);
         $invoice->items     = $request->invoiceItems;
         $invoice->processes = $request->processes;
+        session([
+            'invoiceObj' => $invoice
+        ]);
         return $this->showInvoicePreview($invoice);
     }
 
-    private function showInvoicePreview(Invoice $invoice, $isPreview = TRUE) {
+    private function showInvoicePreview(Invoice $invoice, $isPreview = TRUE)
+    {
+        $pdfReport = $this->getReport($invoice, $isPreview);
+        return $pdfReport->preview();
+    }
+
+    private function getReport(Invoice $invoice, $isPreview = TRUE)
+    {
         $pdfReport           = new InvoiceReport(TRUE);
         $index               = count($invoice->items) - 1;
         $invoiceItems        = $invoice->items;
@@ -181,6 +197,11 @@ class InvoiceController extends Controller {
                 'description' => "(-) خصم من المنبع",
             ];
         }
+        if ($isPreview) {
+            $pdfReport->invoiceId = 'preview';
+        } else {
+            $pdfReport->invoiceId = $invoice->id;
+        }
         $pdfReport->clinetName           = $invoice->client->name;
         $pdfReport->invoiceItems         = $invoiceItems;
         $pdfReport->discountPrice        = $invoice->discount_price;
@@ -191,18 +212,22 @@ class InvoiceController extends Controller {
         $pdfReport->totalPrice           = $invoice->invoice_price;
         $pdfReport->totalTaxes           = $invoice->taxes_price;
         $pdfReport->totalPriceAfterTaxes = $invoice->total_price;
-        session([
-            'pdfReport' => $pdfReport
-        ]);
-        return $pdfReport->preview();
+        return $pdfReport;
     }
 
     /**
      * Show the Index Page
-     * @Get("printPreviewPDF", as="invoice.printPreviewPDF")
+     * @Get("{invoice}/printPreviewPDF", as="invoice.printPreviewPDF")
      */
-    public function printPreviewPDF(Request $request) {
-        $pdfReport = session('pdfReport');
+    public function printPreviewPDF($invoice, Request $request)
+    {
+        if($invoice == 'preview') {
+            $invoice = session('invoiceObj');
+        $pdfReport = $this->getReport($invoice);
+        } else {
+            $invoice = Invoice::findOrFail($invoice);
+        $pdfReport = $this->getReport($invoice, FALSE);
+        }
         if (isset($request->withLetterHead)) {
             $pdfReport->withLetterHead = TRUE;
         } else {
@@ -217,7 +242,8 @@ class InvoiceController extends Controller {
      * @param  Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         if ($request->invoice_date < Invoice::getLastInvoiceDate()) {
             return redirect()->back()->withInput()->with('error', 'التاريخ يجب ان يكون اكبر الفاتورة السابقة');
         }
@@ -254,7 +280,8 @@ class InvoiceController extends Controller {
      * @param  Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function edit(Invoice $invoice) {
+    public function edit(Invoice $invoice)
+    {
         return view('invoice.edit', $this->setData($invoice));
     }
 
@@ -265,7 +292,8 @@ class InvoiceController extends Controller {
      * @param  Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Invoice $invoice) {
+    public function update(Request $request, Invoice $invoice)
+    {
         //echo "{$invoice->getPrevInvoiceDate()}, {$invoice->getNextInvoiceDate()}, {$request->invoice_date}";
         $all = $request->all();
         if ($request->invoice_date >= $invoice->getPrevInvoiceDate() && $request->invoice_date <= $invoice->getNextInvoiceDate()) {
@@ -309,7 +337,8 @@ class InvoiceController extends Controller {
      * @param  Invoice  $invoice
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Invoice $invoice) {
+    public function destroy(Invoice $invoice)
+    {
         ClientProcess::where('invoice_id', $invoice->id)
                 ->update(['invoice_id' => nullValue(), 'invoice_billed' => ClientProcess::invoiceUnBilled]);
         InvoiceItem::where('invoice_id', $invoice->id)->forceDelete();
@@ -324,7 +353,8 @@ class InvoiceController extends Controller {
      * @return \Illuminate\Http\Response
      * @Get("{invoice}/pay", as="invoice.pay")
      */
-    public function payInvoice(Invoice $invoice) {
+    public function payInvoice(Invoice $invoice)
+    {
         $invoice->pay();
         return redirect()->back()->with('success', 'تم تحصيل الفاتورة.');
     }

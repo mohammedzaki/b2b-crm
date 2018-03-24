@@ -3,7 +3,7 @@
 @section("content")
 <div class="row">
 
-    {{ Form::open(['method' => 'GET', 'route' => 'invoice.printPreviewPDF', 'style' => 'display: inline-block;']) }}
+    {{ Form::open(['method' => 'GET', 'route' => ['invoice.printPreviewPDF', $invoiceId], 'style' => 'display: inline-block;']) }}
     <div class="col-lg-12" id="printcontent">
         <div class="panel panel-default">
             <!-- /.panel-heading -->
