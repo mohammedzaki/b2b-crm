@@ -16,7 +16,7 @@
         "laravel/tinker": "~1.0",
         "laravelcollective/annotations": "5.5.0",
         "laravelcollective/html": "^5.4",
-        "mpdf/mpdf": "^6.1",
+        "mpdf/mpdf": "^7.0",
         "sentry/sentry": "^1.7",
         "sentry/sentry-laravel": "^0.8.0",
         "user11001/eloquent-model-generator": "^2.0",

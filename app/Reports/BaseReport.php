@@ -3,8 +3,10 @@
 namespace App\Reports;
 
 use App\Http\Controllers\Controller;
+use Debugbar;
 
-class BaseReport implements IReport {
+class BaseReport implements IReport
+{
 
     protected
             $mpdf,
@@ -14,35 +16,65 @@ class BaseReport implements IReport {
             $cssPath;
     public $withLetterHead;
 
-    public function __construct($withLetterHead = true) {
+    public function __construct($withLetterHead = true)
+    {
         $this->setReportRefs();
         if ($withLetterHead) {
-            $this->mpdf = new \mPDF('', 'A4', '', '', 8, 8, 28, 10, 10, 10);
+            $this->mpdf = new \Mpdf\Mpdf([
+                'mode'          => '',
+                'format'        => 'A4',
+                'orientation'   => 'P',
+                'margin_left'   => 8,
+                'margin_right'  => 8,
+                'margin_top'    => 28,
+                'margin_bottom' => 10,
+                'margin_header' => 10,
+                'margin_footer' => 10
+            ]);
         } else {
-            $this->mpdf = new \mPDF('', 'A4', '', '', 8, 8, 8, 10, 10, 10);
+            $this->mpdf = new \Mpdf\Mpdf([
+                'mode'          => '',
+                'format'        => 'A4',
+                'orientation'   => 'P',
+                'margin_left'   => 8,
+                'margin_right'  => 8,
+                'margin_top'    => 8,
+                'margin_bottom' => 10,
+                'margin_header' => 10,
+                'margin_footer' => 10
+            ]);
         }
         $this->withLetterHead = $withLetterHead;
     }
 
-    public function setReportRefs() { }
+    public function setReportRefs()
+    {
+        
+    }
 
-    public function reportData() { }
+    public function reportData()
+    {
+        
+    }
 
-    protected function setHtmlBody() {
+    protected function setHtmlBody()
+    {
         $this->setPageHeader();
         $this->setPageFooter();
         return view($this->pdfView)->with($this->reportData())->render();
     }
 
-    protected function setCSS() {
+    protected function setCSS()
+    {
         $path = public_path($this->cssPath);
         return file_get_contents($path);
     }
 
-    protected function setPageHeader() {
+    protected function setPageHeader()
+    {
         if ($this->withLetterHead) {
-            $path                = public_path('ReportsHtml/letr.png');
-            $this->mpdf->letrImg = file_get_contents($path);
+            $path                             = public_path('ReportsHtml/letr.jpg');
+            $this->mpdf->imageVars['letrImg'] = file_get_contents($path);
             return '<!--mpdf
                     <htmlpageheader name="myheader">
                     <img src="var:letrImg" class="letrHead">
@@ -60,9 +92,10 @@ class BaseReport implements IReport {
         }
     }
 
-    protected function setPageFooter() {
-        $path                  = public_path('ReportsHtml/footer.png');
-        $this->mpdf->footerImg = file_get_contents($path);
+    protected function setPageFooter()
+    {
+        $path                               = public_path('ReportsHtml/footer.jpg');
+        $this->mpdf->imageVars['footerImg'] = file_get_contents($path);
         return '<!--mpdf
                 <htmlpagefooter name="myfooter">
                 <div class="reportPageFooterLine" ></div>
@@ -75,13 +108,15 @@ class BaseReport implements IReport {
                 mpdf-->';
     }
 
-    public function preview() {
+    public function preview()
+    {
         $this->setPageHeader();
         $this->setPageFooter();
         return view($this->previewView)->with($this->reportData());
     }
 
-    public function exportPDF() {
+    public function exportPDF()
+    {
         $this->mpdf->autoScriptToLang        = true;
         $this->mpdf->autoVietnamese          = true;
         $this->mpdf->autoArabic              = true;
