@@ -69,7 +69,9 @@ class AttendanceController extends Controller {
             } else {
                 $attendances = Attendance::where([
                             ['employee_id', '=', $id]
-                        ])->whereMonth('date', '=', $dt->month)->get();
+                        ]) 
+                        ->whereYear('date', $dt->year)
+                        ->whereMonth('date', $dt->month)->get();
             }
             $hasData = TRUE;
         }

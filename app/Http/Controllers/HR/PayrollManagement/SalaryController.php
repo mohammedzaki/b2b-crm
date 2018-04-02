@@ -139,7 +139,9 @@ class SalaryController {
         $depositWithdraw = DepositWithdraw::where([
                     ['employee_id', '=', $employee->id],
                     ['expenses_id', '=', EmployeeActions::TakeSalary]
-                ])->whereMonth('notes', '=', $date->month)->first();
+                ])
+                ->whereYear('notes', $date->year)
+                ->whereMonth('notes', $date->month)->first();
         if (empty($depositWithdraw)) {
             $salaryIsPaid = TRUE;
         } else {
