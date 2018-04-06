@@ -141,7 +141,8 @@ class SalaryController {
                     ['expenses_id', '=', EmployeeActions::TakeSalary]
                 ])
                 ->whereYear('notes', $date->year)
-                ->whereMonth('notes', $date->month)->first();
+                ->whereMonth('notes', $date->month)
+                ->first();
         if (empty($depositWithdraw)) {
             $salaryIsPaid = TRUE;
         } else {
@@ -244,8 +245,8 @@ class SalaryController {
                     ['paying_status', '=', EmployeeBorrowBilling::UN_PAID],
                     ['employees.id', '=', $employee_id]
                 ])
-                ->whereYear('dueـdate', '=', $date->year)
-                ->whereMonth('due_date', '>=', $date->month)
+                ->whereYear('due_date', $date->year)
+                ->whereMonth('due_date', $date->month)
                 ->select('employee_borrow_billing.id')
                 ->get();
         $data                         = collect(EmployeeBorrowBilling::findOrFail($employeeBorrowBilling->first()->id))->except(['id']);
@@ -296,8 +297,9 @@ class SalaryController {
                     ['employee_id', '=', $employee_id],
                     ['expenses_id', '=', EmployeeActions::TakeSalary]
                 ])
-                ->whereYear('notes', '=', $dt->year)
-                ->whereMonth('notes', '=', $dt->month)->first();
+                ->whereYear('notes', $dt->year)
+                ->whereMonth('notes', $dt->month)
+                ->first();
 
         $employeeBorrowBilling = DB::table('employees')
                 ->join('employee_borrows', 'employee_borrows.employee_id', '=', 'employees.id')
@@ -307,7 +309,7 @@ class SalaryController {
                     ['paying_status', '=', EmployeeBorrowBilling::UN_PAID],
                     ['employees.id', '=', $employee_id]
                 ])
-                ->whereYear('dueـdate', '=', $dt->year)
+                ->whereYear('due_date', $dt->year)
                 ->whereMonth('due_date', $dt->month)
                 ->select('employee_borrow_billing.id')
                 ->first();
