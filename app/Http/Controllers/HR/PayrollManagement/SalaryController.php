@@ -244,6 +244,7 @@ class SalaryController {
                     ['paying_status', '=', EmployeeBorrowBilling::UN_PAID],
                     ['employees.id', '=', $employee_id]
                 ])
+                ->whereYear('dueـdate', '=', $date->year)
                 ->whereMonth('due_date', '>=', $date->month)
                 ->select('employee_borrow_billing.id')
                 ->get();
@@ -294,7 +295,9 @@ class SalaryController {
         $depositWithdraw = DepositWithdraw::where([
                     ['employee_id', '=', $employee_id],
                     ['expenses_id', '=', EmployeeActions::TakeSalary]
-                ])->whereMonth('notes', '=', $dt->month)->first();
+                ])
+                ->whereYear('notes', '=', $dt->year)
+                ->whereMonth('notes', '=', $dt->month)->first();
 
         $employeeBorrowBilling = DB::table('employees')
                 ->join('employee_borrows', 'employee_borrows.employee_id', '=', 'employees.id')
@@ -304,6 +307,7 @@ class SalaryController {
                     ['paying_status', '=', EmployeeBorrowBilling::UN_PAID],
                     ['employees.id', '=', $employee_id]
                 ])
+                ->whereYear('dueـdate', '=', $dt->year)
                 ->whereMonth('due_date', $dt->month)
                 ->select('employee_borrow_billing.id')
                 ->first();
