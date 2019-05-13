@@ -45,10 +45,6 @@ $(document).ready(function () {
     $('.checkbox_source_show_input').click(function () {
         $(".source_hidden_input").slideToggle(this.checked);
     });
-
-    $('#can_not_use_program').click(function () {
-        $(".hidden_input02").slideToggle(this.checked);
-    });
     
     if ($('.checkbox_show_input').length) {
         if ($('.checkbox_show_input').is(':checked')) {

@@ -15,46 +15,47 @@ use Validator;
  * @Resource("employee")
  * @Middleware({"web", "auth", "ability:admin,employees-permissions"})
  */
-class EmployeeController extends Controller {
+class EmployeeController extends Controller
+{
 
     protected function validator(array $data)
     {
         $validator = Validator::make($data, [
-                    'name'                => 'required|min:6|max:255',
-                    'ssn'                 => 'required|digits:14',
-                    'gender'              => 'required|in:m,f',
-                    'martial_status'      => 'in:single,married,widowed,divorced',
-                    'birth_date'          => 'required|date_format:Y-m-d',
-                    'department'          => 'string',
-                    'hiring_date'         => 'required|date_format:Y-m-d',
-                    'daily_salary'        => 'required|numeric',
-                    'working_hours'       => 'required|numeric',
-                    'job_title'           => 'required|max:100',
-                    'telephone'           => 'digits:8',
-                    'mobile'              => 'required|digits:11',
-                    'can_not_use_program' => 'boolean',
-                    'borrow_system'       => 'boolean',
-                    'username'            => 'required_without:can_not_use_program|unique:users,username',
-                    'password'            => 'required_without:can_not_use_program'
+                    'name'                            => 'required|min:6|max:255',
+                    'ssn'                             => 'required|digits:14',
+                    'gender'                          => 'required|in:m,f',
+                    'martial_status'                  => 'in:single,married,widowed,divorced',
+                    'birth_date'                      => 'required|date_format:Y-m-d',
+                    'department'                      => 'string',
+                    'hiring_date'                     => 'required|date_format:Y-m-d',
+                    'currentJobProfile.daily_salary'  => 'required|numeric',
+                    'currentJobProfile.working_hours' => 'required|numeric',
+                    'currentJobProfile.job_title'     => 'required|max:100',
+                    'telephone'                       => 'digits:8',
+                    'mobile'                          => 'required|digits:11',
+                    'can_not_use_program'             => 'boolean',
+                    'borrow_system'                   => 'boolean',
+                    'username'                        => 'required_without:can_not_use_program|unique:users,username',
+                    'password'                        => 'required_without:can_not_use_program'
         ]);
 
         $validator->setAttributeNames([
-            'name'                => 'اسم الموظف',
-            'ssn'                 => 'الرقم القومي',
-            'gender'              => 'الجنس',
-            'martial_status'      => 'الحالة اﻻجتماعية',
-            'birth_date'          => 'تاريخ الميﻻد',
-            'department'          => 'القسم',
-            'hiring_date'         => 'تاريخ التعيين',
-            'daily_salary'        => 'الراتب اليومي',
-            'working_hours'       => 'ساعات العمل',
-            'job_title'           => 'الوظيفة',
-            'telephone'           => 'التليفون',
-            'mobile'              => 'المحمول',
-            'can_not_use_program' => 'عدم استخدام البرنامج',
-            'borrow_system'       => 'نظام السلف',
-            'username'            => 'اسم المستخدم',
-            'password'            => 'كلمة المرور'
+            'name'                            => 'اسم الموظف',
+            'ssn'                             => 'الرقم القومي',
+            'gender'                          => 'الجنس',
+            'martial_status'                  => 'الحالة اﻻجتماعية',
+            'birth_date'                      => 'تاريخ الميﻻد',
+            'department'                      => 'القسم',
+            'hiring_date'                     => 'تاريخ التعيين',
+            'currentJobProfile.daily_salary'  => 'الراتب اليومي',
+            'currentJobProfile.working_hours' => 'ساعات العمل',
+            'currentJobProfile.job_title'     => 'الوظيفة',
+            'telephone'                       => 'التليفون',
+            'mobile'                          => 'المحمول',
+            'can_not_use_program'             => 'عدم استخدام البرنامج',
+            'borrow_system'                   => 'نظام السلف',
+            'username'                        => 'اسم المستخدم',
+            'password'                        => 'كلمة المرور'
         ]);
 
         return $validator;
@@ -80,23 +81,28 @@ class EmployeeController extends Controller {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
             /* Create employee object */
-            $employee                      = new Employee();
-            $employee->emp_id              = $employee->max('emp_id') + 1;
-            $employee->name                = $request->name;
-            $employee->ssn                 = $request->ssn;
-            $employee->gender              = $request->gender;
-            $employee->martial_status      = $request->martial_status;
-            $employee->birth_date          = $request->birth_date;
-            $employee->department          = $request->department;
-            $employee->hiring_date         = $request->hiring_date;
-            $employee->daily_salary        = $request->daily_salary;
-            $employee->working_hours       = $request->working_hours;
-            $employee->job_title           = $request->job_title;
-            $employee->telephone           = $request->telephone;
-            $employee->mobile              = $request->mobile;
-            $employee->facility_id         = 1;
-            $employee->can_not_use_program = ($request->can_not_use_program) ? $request->can_not_use_program : false;
-            $employee->borrow_system       = ($request->borrow_system) ? $request->borrow_system : false;
+            $employee                        = new Employee();
+            $employee->emp_id                = $employee->max('emp_id') + 1;
+            $employee->name                  = $request->name;
+            $employee->ssn                   = $request->ssn;
+            $employee->gender                = $request->gender;
+            $employee->martial_status        = $request->martial_status;
+            $employee->birth_date            = $request->birth_date;
+            $employee->department            = $request->department;
+            $employee->hiring_date           = $request->hiring_date;
+            //$employee->daily_salary        = $request->daily_salary;
+            //$employee->working_hours       = $request->working_hours;
+            //$employee->job_title           = $request->job_title;
+            $employee->telephone             = $request->telephone;
+            $employee->mobile                = $request->mobile;
+            $employee->facility_id           = 1;
+            $employee->can_not_use_program   = ($request->can_not_use_program) ? $request->can_not_use_program : false;
+            $employee->borrow_system         = ($request->borrow_system) ? $request->borrow_system : false;
+            $employee->save();
+            $currentJobProfile               = $request->currentJobProfile;
+            $currentJobProfile['start_date'] = $request->hiring_date;
+            $jobProfile                      = $employee->jobProfiles()->create($currentJobProfile);
+            $employee->current_job_id        = $jobProfile->id;
             $employee->save();
 
             $user = new User();
@@ -146,6 +152,7 @@ class EmployeeController extends Controller {
     public function edit($id)
     {
         $employee            = Employee::findOrFail($id);
+        $currentJobProfile   = $employee->currentJobProfile;
         $selectedPermissions = [];
         if (!$employee->can_not_use_program) {
             $employee->username  = $employee->users()->first()->username;
@@ -155,7 +162,7 @@ class EmployeeController extends Controller {
             }
         }
         $permissions = Permission::all();
-        return view('employee.edit', compact('employee', 'permissions', 'selectedPermissions', 'username'));
+        return view('employee.edit', compact('employee', 'permissions', 'selectedPermissions', 'username', 'currentJobProfile'));
     }
 
     public function update(Request $request, $id)

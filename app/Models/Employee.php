@@ -65,11 +65,12 @@ use App\Helpers\Helpers;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Employee withoutTrashed()
  * @mixin \Eloquent
  */
-class Employee extends Model {
+class Employee extends Model
+{
 
     use SoftDeletes;
 
-    protected $dates = ['deleted_at'];
+    protected $dates    = ['deleted_at'];
     protected $fillable = [
         'name',
         'emp_id',
@@ -87,35 +88,51 @@ class Employee extends Model {
         'facility_id',
         'can_not_use_program',
         'borrow_system',
+        'current_job_id',
         'deleted_at_id'
     ];
-    
     public $username = "";
     public $password = "";
 
-    public function users() {
+    public function users()
+    {
         return $this->hasMany(User::class, 'employee_id');
     }
 
-    public function smallBorrows() {
+    public function jobProfiles()
+    {
+        return $this->hasMany(EmployeeJobProfile::class, 'employee_id');
+    }
+
+    public function currentJobProfile()
+    {
+        return $this->belongsTo(EmployeeJobProfile::class, 'current_job_id');
+    }
+
+    public function smallBorrows()
+    {
         return $this->hasMany(DepositWithdraw::class, 'employee_id', 'id')->where('expenses_id', EmployeeActions::SmallBorrow);
     }
-    
-    public function totalSmallBorrows() {
+
+    public function totalSmallBorrows()
+    {
         return $this->smallBorrows()->sum('withdrawValue');
     }
-    
-    public function longBorrows() {
+
+    public function longBorrows()
+    {
         return $this->hasMany(EmployeeBorrow::class);
     }
-    
-    public function totalLongBorrows() {
+
+    public function totalLongBorrows()
+    {
         return $this->longBorrows()->sum('amount');
     }
-    
-    public function hasUnpaidBorrow() {
+
+    public function hasUnpaidBorrow()
+    {
         $count = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
-                ->select('employee_borrow_billing.*')->where([
+                        ->select('employee_borrow_billing.*')->where([
                     ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
                     ['employee_borrows.employee_id', '=', $this->id]])->count();
         if ($count > 0) {
@@ -124,10 +141,11 @@ class Employee extends Model {
             return FALSE;
         }
     }
-    
-    public function hasPaidBorrow() {
+
+    public function hasPaidBorrow()
+    {
         $count = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
-                ->select('employee_borrow_billing.*')->where([
+                        ->select('employee_borrow_billing.*')->where([
                     ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::PAID],
                     ['employee_borrows.employee_id', '=', $this->id]])->count();
         if ($count > 0) {
@@ -136,50 +154,57 @@ class Employee extends Model {
             return FALSE;
         }
     }
-    
-    public function totalUnpaidBorrow() {
+
+    public function totalUnpaidBorrow()
+    {
         $total = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
                 ->select('employee_borrow_billing.*')
                 ->where([
-                    ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
-                    ['employee_borrows.employee_id', '=', $this->id]]);
+            ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
+            ['employee_borrows.employee_id', '=', $this->id]]);
         $total = $total->sum('employee_borrow_billing.pay_amount') - $total->sum('employee_borrow_billing.paid_amount');
         return empty($total) ? 0 : $total;
     }
-    
-    public function totalPaidBorrow() {
+
+    public function totalPaidBorrow()
+    {
         $total = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
                 ->select('employee_borrow_billing.*')
                 ->where([
-                    ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::PAID],
-                    ['employee_borrows.employee_id', '=', $this->id]]);
+            ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::PAID],
+            ['employee_borrows.employee_id', '=', $this->id]]);
         $total = $total->sum('employee_borrow_billing.paid_amount');
         return empty($total) ? 0 : $total;
     }
-    
-    public function unpaidBorrows() { //
+
+    public function unpaidBorrows()
+    { //
         $borrows = EmployeeBorrowBilling::join('employee_borrows', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
-                ->select('employee_borrow_billing.*')->where([
+                        ->select('employee_borrow_billing.*')->where([
                     ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
                     ['employee_borrows.employee_id', '=', $this->id]])->get();
         return $borrows;
     }
 
-    public function salaryPerHour() {
+    public function salaryPerHour()
+    {
         return round(($this->daily_salary / $this->working_hours), Helpers::getDecimalPointCount());
     }
-    
-    public function salaryPerMinute() {
+
+    public function salaryPerMinute()
+    {
         return round(($this->salaryPerHour() / 60), Helpers::getDecimalPointCount());
     }
-    
-    public function salaryPerSecond() {
+
+    public function salaryPerSecond()
+    {
         return round(($this->salaryPerMinute() / 60), Helpers::getDecimalPointCount());
     }
-    
-    public function employeeGuardianships(DateTime $dt) {
-        $startDate = DateTime::parse($dt)->startOfMonth();
-        $endDate = DateTime::parse($dt)->endOfMonth();
+
+    public function employeeGuardianships(DateTime $dt)
+    {
+        $startDate        = DateTime::parse($dt)->startOfMonth();
+        $endDate          = DateTime::parse($dt)->endOfMonth();
         $depositWithdraws = DB::select("SELECT distinct dw.* from deposit_withdraws as dw
 JOIN employees emp ON dw.employee_id = emp.id
 WHERE emp.id = {$this->id}
@@ -191,11 +216,12 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         return $depositWithdraws;
     }
 
-    public function lastGuardianship() {
+    public function lastGuardianship()
+    {
         try {
             $depositWithdraws = DepositWithdraw::where([
-                            ['employee_id', '=', $this->id],
-                            ['expenses_id', '=', EmployeeActions::Guardianship]
+                        ['employee_id', '=', $this->id],
+                        ['expenses_id', '=', EmployeeActions::Guardianship]
                     ])->orderBy('id', 'desc')
                     ->first();
             return $depositWithdraws->withdrawValue;
@@ -204,11 +230,12 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         }
     }
 
-    public function lastGuardianshipReturn() {
+    public function lastGuardianshipReturn()
+    {
         try {
             $depositWithdraws = DepositWithdraw::where([
-                            ['employee_id', '=', $this->id],
-                            ['expenses_id', '=', EmployeeActions::GuardianshipReturn]
+                        ['employee_id', '=', $this->id],
+                        ['expenses_id', '=', EmployeeActions::GuardianshipReturn]
                     ])->orderBy('id', 'desc')
                     ->first();
             return $depositWithdraws->depositValue;
@@ -217,11 +244,12 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         }
     }
 
-    public function lastGuardianshipId() {
+    public function lastGuardianshipId()
+    {
         try {
             $depositWithdraws = DepositWithdraw::where([
-                            ['employee_id', '=', $this->id],
-                            ['expenses_id', '=', EmployeeActions::Guardianship]
+                        ['employee_id', '=', $this->id],
+                        ['expenses_id', '=', EmployeeActions::Guardianship]
                     ])->orderBy('id', 'desc')
                     ->first();
             return $depositWithdraws->id;
@@ -230,11 +258,12 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         }
     }
 
-    public function lastGuardianshipReturnId() {
+    public function lastGuardianshipReturnId()
+    {
         try {
             $depositWithdraws = DepositWithdraw::where([
-                            ['employee_id', '=', $this->id],
-                            ['expenses_id', '=', EmployeeActions::GuardianshipReturn]
+                        ['employee_id', '=', $this->id],
+                        ['expenses_id', '=', EmployeeActions::GuardianshipReturn]
                     ])->orderBy('id', 'desc')
                     ->first();
             return $depositWithdraws->id;
