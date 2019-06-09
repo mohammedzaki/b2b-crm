@@ -184,7 +184,7 @@
                             <div class="col-sm-6 text-left">
                                 <div id="dataTables-example_filter" class="dataTables_filter">
                                     <button type="button" class="btn btn-primary disabled"> 
-                                        <label>الرصيد الحالى : <span id="currentAmount">{{ $numbers['current_amount'] }}</span> جنيه</label>
+                                        <label>الرصيد الحالى : <span id="currentAmount">{{ $numbers['currentAmount'] }}</span> جنيه</label>
                                     </button>
                                 </div>
                             </div>
@@ -193,21 +193,21 @@
                             <div class="col-sm-4 text-left">
                                 <div id="dataTables-example_filter" class="dataTables_filter">
                                     <button type="button" class="btn btn-primary disabled"> 
-                                        <label>الرصيد السابق : <span id="currentAmount">{{ $numbers['currentDay_amountOff'] }}</span> جنيه</label>
+                                        <label>الرصيد السابق : <span id="previousDayAmount">{{ $numbers['previousDayAmount'] }}</span> جنيه</label>
                                     </button>
                                 </div>
                             </div>
                             <div class="col-sm-4 text-left">
                                 <div id="dataTables-example_filter" class="dataTables_filter">
                                     <button type="button" class="btn btn-primary disabled"> 
-                                        <label>الوارد : <span id="currentAmount">{{ $numbers['deposits_amount'] }}</span> جنيه</label>
+                                        <label>الوارد : <span id="depositsAmount">{{ $numbers['depositsAmount'] }}</span> جنيه</label>
                                     </button>
                                 </div>
                             </div>
                             <div class="col-sm-4 text-left">
                                 <div id="dataTables-example_filter" class="dataTables_filter">
                                     <button type="button" class="btn btn-primary disabled"> 
-                                        <label>المنصرف : <span id="currentAmount">{{ $numbers['withdraws_amount'] }}</span> جنيه</label>
+                                        <label>المنصرف : <span id="withdrawsAmount">{{ $numbers['withdrawsAmount'] }}</span> جنيه</label>
                                     </button>
                                 </div>
                             </div>
@@ -663,7 +663,7 @@
                         <div class="col-md-6">
                             <a href="{{ url("/depositwithdraw") }}" class="btn btn-success">جديد</a>
                             <button type="button" class="btn btn-danger" onclick="RemoveSelected()">حذف</button>
-                            <button type="button" class="btn btn-primary" onclick="LockSaveToAll()">حفظ</button>
+                            <button type="button" class="btn btn-primary" onclick="lockSaveAll()">حفظ</button>
                         </div>
                         @if(Entrust::ability('admin', 'deposit-withdraw-edit'))
                         <!--<div class="col-md-5 text-left">
@@ -699,7 +699,7 @@
     var employeeActions = {!! $employeeActions !!};
     var suppliers = {!! $suppliers !!};
     var clients = {!! $clients !!};
-    var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount;
+    var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id, recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount, withdrawsAmount, depositsAmount;
     var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
     var loadAll = false;
     
@@ -709,6 +709,8 @@
     LockAll();
     SetGuardianshipDetailsProcess();
     currentAmount = $("#currentAmount");
+    withdrawsAmount = $("#withdrawsAmount");
+    depositsAmount = $("#depositsAmount");
 
     function loadAllProcessAndClients() {
         loadAll = $("#loadAllProcessAndClients").prop("checked");
@@ -925,7 +927,8 @@
                     saveStatus.val(1);
                     checkDelete.parent().parent().removeClass('InSave');
                     id.val(data.id);
-                    currentAmount.html(data.current_amount);
+                    currentAmount.html(data.currentAmount);
+                    calculateCurrentAmounts();
                     console.log("message: " + data.message);
                 }
             },
@@ -970,7 +973,8 @@
                         $.each(rowsIndexs, function (arrIndex, rowIndex) {
                             RemoveRowAtIndex(rowIndex);
                         });
-                        currentAmount.html(data.current_amount);
+                        currentAmount.html(data.currentAmount);
+                        calculateCurrentAmounts();
                         console.log("message: " + data.message);
                     }
                 },
@@ -983,7 +987,7 @@
         }
     }
 
-    function LockSaveToAll() {
+    function lockSaveAll() {
         var rowsCount = $('#grid_GuardianshipDetails').children().length;
         var rowsIds = [];
         var rowsIndexs = [];
@@ -1007,7 +1011,7 @@
             };
             //used to determine the http verb to use [add=POST], [update=PUT]
             var type = "POST"; //for creating new resource
-            var saveurl = '{{ url("/depositwithdraw/LockSaveToAll") }}';
+            var saveurl = '{{ url("/depositwithdraw/lockSaveAll") }}';
             $.ajax({
                 type: type,
                 url: saveurl,
@@ -1022,7 +1026,8 @@
                             saveStatus.val(2);
                             SetRowReadonly(rowIndex);
                         });
-                        currentAmount.html(data.current_amount);
+                        currentAmount.html(data.currentAmount);
+                        calculateCurrentAmounts();
                         console.log("message: " + data.message);
                     }
                 },
@@ -1228,5 +1233,23 @@
         payMethod.attr("disabled", "disabled");
         notes.attr("disabled", "disabled");
     }
+    
+    function calculateCurrentAmounts() {
+        var rowsCount = $('#grid_GuardianshipDetails').children().length;
+        var depositAmount = 0;
+        var withdrawAmount = 0;
+        for (var i = 0; i < rowsCount - 1; i++) {
+            depositAmount += parseStringInt($('#grid_GuardianshipDetails tr:eq(' + i + ') .depositValue').val());
+            withdrawAmount += parseStringInt($('#grid_GuardianshipDetails tr:eq(' + i + ') .withdrawValue').val());
+        }
+        depositsAmount.html(depositAmount.toString());
+        withdrawsAmount.html(withdrawAmount.toString());
+    }
+    
+    function parseStringInt(val) {
+        var parsedVal = parseInt(val);
+        return isNaN(parsedVal) ? 0 : parsedVal;
+    }
+    
 </script>
 @endsection
