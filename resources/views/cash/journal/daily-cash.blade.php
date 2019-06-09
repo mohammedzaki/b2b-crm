@@ -662,7 +662,7 @@
                         </div>
                         <div class="col-md-6">
                             <a href="{{ url("/depositwithdraw") }}" class="btn btn-success">جديد</a>
-                            <button type="button" class="btn btn-danger" onclick="RemoveSelected()">حذف</button>
+                            <button type="button" class="btn btn-danger" onclick="removeSelected()">حذف</button>
                             <button type="button" class="btn btn-primary" onclick="lockSaveAll()">حفظ</button>
                         </div>
                         @if(Entrust::ability('admin', 'deposit-withdraw-edit'))
@@ -938,7 +938,7 @@
         });
     }
 
-    function RemoveSelected() {
+    function removeSelected() {
         var rowsCount = $('#grid_GuardianshipDetails').children().length;
         var rowsIds = [];
         var rowsIndexs = [];
@@ -962,7 +962,7 @@
             };
             //used to determine the http verb to use [add=POST], [update=PUT]
             var type = "POST"; //for creating new resource
-            var saveurl = '{{ url("/depositwithdraw/RemoveSelected") }}';
+            var saveurl = '{{ url("/depositwithdraw/removeSelected") }}';
             $.ajax({
                 type: type,
                 url: saveurl,

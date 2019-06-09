@@ -264,9 +264,9 @@ class DailyCashController extends Controller
      *
      * @param  Request  $request
      * @return Response
-     * @Post("/RemoveSelected", as="depositwithdraw.RemoveSelected")
+     * @Post("/removeSelected", as="depositwithdraw.removeSelected")
      */
-    public function RemoveSelected(Request $request)
+    public function removeSelected(Request $request)
     {
         $validator = $this->validator($request->all());
         $all       = $request->all();

@@ -662,7 +662,7 @@
                         </div>
                         <div class="col-md-6">
                             <a href="{{ url("/depositwithdraw") }}" class="btn btn-success">جديد</a>
-                            <button type="button" class="btn btn-danger" onclick="RemoveSelected()">حذف</button>
+                            <button type="button" class="btn btn-danger" onclick="removeSelected()">حذف</button>
                             <button type="button" class="btn btn-primary" onclick="LockSaveToAll()">حفظ</button>
                         </div>
                         @if(Entrust::ability('admin', 'deposit-withdraw-edit'))
