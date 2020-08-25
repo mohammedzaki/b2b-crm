@@ -17,14 +17,14 @@
                 <a href="{{ route('home') }}"><i class="fa fa-dashboard fa-fw"></i> لوحة التحكم</a>
             </li>
             <li>
-                <a href="#"><i class="fa fa fa-eye fa-fw"></i> صلاحيات الموظف</a>
-                <ul>
+                <a href="#"><i class="fa fa fa-eye fa-fw"></i> صلاحيات الموظف<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
                     <li><a href="{{ route('employee.index') }}">الكل</a></li>
                     <li><a href="{{ route('employee.create') }}">أضف جديد</a></li>
                     <li><a href="{{ route('employee.trash') }}">المحذوفات</a></li>
                     <li>
-                        <a href="#"><i class="fa fa-money fa-fw"></i> السلفيات </a>
-                        <ul>
+                        <a href="#"><i class="fa fa-money fa-fw"></i> السلفيات <span class="fa arrow"></span></a>
+                        <ul class="nav nav-third-level collapse">
                             <li><a href="{{ route('employeeBorrow.index') }}">الكل</a> </li>
                             <li><a href="{{ route('employeeBorrow.create') }}">أضف جديد</a> </li>
                         </ul>
@@ -32,11 +32,11 @@
                 </ul>
             </li>
             <li>
-                <a href="{{ route('depositwithdraw.index') }}"><i class="fa fa-briefcase fa-fw"></i>وارد / منصرف</a>
+                <a href="{{ route('depositwithdraw.index') }}"><i class="fa fa-briefcase fa-fw"></i> وارد / منصرف</a>
             </li>
             <li>
-                <a href="#"><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف</a>
-                <ul>
+                <a href="#"><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
                     <li><a href="{{ route('attendance.index') }}">الكل</a></li>
                     <li><a href="{{ route('attendance.checkin') }}">تسجيل حضور</a></li>
                     <li><a href="{{ route('attendance.checkout') }}">تسجيل انصراف</a></li>
@@ -46,47 +46,47 @@
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-edit fa-fw"></i> عملية جديدة عميل</a>
-                <ul>
+                <a href="#"><i class="fa fa-edit fa-fw"></i> عملية جديدة عميل<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
                     <li><a href="{{ route('client.process.index') }}">الكل</a></li>
                     <li><a href="{{ route('client.process.create') }}">أضف جديد</a></li>
                     <li><a href="{{ route('client.process.trash') }}">المحذوفات</a></li>
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-share-square-o  fa-fw"></i> عملية جديدة مورد</a>
-                <ul>
+                <a href="#"><i class="fa fa-share-square-o  fa-fw"></i> عملية جديدة مورد<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
                     <li><a href="{{ route('supplier.process.index') }}">الكل</a></li>
                     <li><a href="{{ route('supplier.process.create') }}">أضف جديد</a></li>
                     <li><a href="{{ route('supplier.process.trash') }}">المحذوفات</a></li>
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-user fa-fw"></i> عميل جديد</a>
-                <ul>
+                <a href="#"><i class="fa fa-user fa-fw"></i> عميل جديد<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
                     <li><a href="{{ route('client.index') }}">الكل</a></li>
                     <li><a href="{{ route('client.create') }}">أضف جديد</a></li>
                     <li><a href="{{ route('client.trash') }}">المحذوفات</a></li>
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-share fa-fw"></i> مورد جديد</a>
-                <ul>
+                <a href="#"><i class="fa fa-share fa-fw"></i> مورد جديد<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
                     <li><a href="{{ route('supplier.index') }}">الكل</a></li>
                     <li><a href="{{ route('supplier.create') }}">أضف جديد</a></li>
                     <li><a href="{{ route('supplier.trash') }}">المحذوفات</a></li>
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-share-square-o  fa-fw"></i>إصدار فاتورة</a>
-                <ul>
+                <a href="#"><i class="fa fa-share-square-o  fa-fw"></i> إصدار فاتورة<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
                     <li><a href="{{ route('invoice.index') }}">الكل</a></li>
                     <li><a href="{{ route('invoice.create') }}">أضف جديد</a></li>
                 </ul>
             </li>
             <li>
-                <a href="#"><i class="fa fa-files-o fa-fw"></i> مصروف جديد</a>
-                <ul>
+                <a href="#"><i class="fa fa-files-o fa-fw"></i> مصروف جديد<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
                     <li><a href="{{ route('expenses.index') }}">الكل</a></li>
                     <li><a href="{{ route('expenses.create') }}">أضف جديد</a></li>
                 </ul>
@@ -101,8 +101,8 @@
                 <a href="#"><i class="fa fa-list-alt fa-fw"></i> دراسة جدوى العملية</a>
             </li>
             <li style="font-size: 20px;">
-                <a href="#"><i class="fa fa-bar-chart-o"></i>  التقارير</a>
-                <ul>
+                <a href="#"><i class="fa fa-bar-chart-o"></i> التقارير<span class="fa arrow"></span></a>
+                <ul class="nav nav-second-level collapse">
                     <li><a href="{{ route('reports.client.accountStatement.index') }}">عميل</a></li>
                     <li><a href="{{ route('reports.supplier.accountStatement.index') }}">مورد</a></li>
                     <li><a href="{{ route('reports.client.analyticalCenter.index') }}">المركز التحليلى للعملاء</a></li>
@@ -113,7 +113,6 @@
                     <li><a href="{{ route('reports.employees.borrow.long.index') }}">سلفيات الموظفين المستديمة</a></li>
                     <li><a href="{{ route('reports.employees.borrow.small.index') }}">سلفيات الموظفين الصغرى</a></li>
                 </ul>
-
             </li>
         </ul>
     </div>
