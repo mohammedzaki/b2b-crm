@@ -5,4 +5,20 @@
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-require('./bootstrap');
+
+/**
+ * We'll load jQuery and the Bootstrap jQuery plugin which provides support
+ * for JavaScript based Bootstrap features such as modals and tabs. This
+ * code may be modified to fit the specific needs of your application.
+ */
+
+window.$ = window.jQuery = require('jquery');
+
+window.flatpickr = require('flatpickr');
+
+window.he = require('he');
+
+const Arabic = require('flatpickr/dist/l10n/ar.js').ar;
+
+flatpickr.localize(Arabic);
+

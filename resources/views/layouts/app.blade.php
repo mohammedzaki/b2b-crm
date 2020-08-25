@@ -22,7 +22,7 @@
         <div id="wrapper" class="index">
             @include('layouts.header')
             <!-- content -->
-            <div id="page-wrapper" class="row">
+            <div id="page-wrapper">
                 @yield('content')
             </div>
             <!-- /#page-wrapper -->

@@ -1,6 +1,6 @@
 <!-- /.navbar-top-links -->
 <div class="navbar-default sidebar" role="navigation">
-    <div class="sidebar-nav ">
+    <div class="sidebar-nav navbar-collapse collapse" style="height: 1px;">
         <ul class="nav" id="side-menu">
             <li class="sidebar-search">
                 <div class="input-group custom-search-form">

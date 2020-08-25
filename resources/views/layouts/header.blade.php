@@ -1,6 +1,12 @@
 <!-- Navigation -->
 <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
     <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target=".navbar-collapse">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
         <a class="navbar-brand" href="{{ URL::to('/') }}">
             <img width="90" src="{{ asset('uploads/' . \App\Models\Facility::findOrFail(1)->logo ) }}" />
         </a>
@@ -21,21 +27,21 @@
                 <li><a href="{{ route('facilityTaxes.index') }}"><i class="fa fa-gear fa-fw"></i> الضريبة المضافة</a></li>
                 <li class="divider"></li>
                 <li>
-                <li>
-                    <a href="{{ url('/logout') }}" 
+                    <a href="{{ url('/logout') }}"
                        onclick="event.preventDefault();
                                document.getElementById('logout-form').submit();">
                         <i class="fa fa-sign-out fa-fw"></i> خروج
                     </a>
-                    <form id="logout-form" 
-                          action="{{ url('/logout') }}" 
-                          method="POST" 
+                    <form id="logout-form"
+                          action="{{ url('/logout') }}"
+                          method="POST"
                           style="display: none;">
                         {{ csrf_field() }}
                     </form>
                 </li>
             </ul>
         </li>
+        <!-- /.dropdown-user -->
     </ul>
     @include('layouts.sidebar')
 </nav>
