@@ -4,7 +4,10 @@
 @section("title", "تقرير عملية عميل - التقارير")
 @section("content")
     <style>
-        .pdfobject-container { height: 30rem; border: 1rem solid rgba(0,0,0,.1); }
+        .pdfobject-container {
+            height: 30rem;
+            border: 1rem solid rgba(0, 0, 0, .1);
+        }
     </style>
 
     <div class="row">
@@ -169,12 +172,10 @@
         <!-- /.col-lg-12 -->
     </div>
     <!-- /.row -->
-    <div id="example1"></div>
 
 @endsection
 
 @section('scripts')
-    <script> pdfobject.embed("/pdf/Instructor-FEEDBACK.pdf", "#example1");</script>
     <script>
         var allProcesses = {!! $clientProcesses !!};
         var clients = {!! $clients !!};

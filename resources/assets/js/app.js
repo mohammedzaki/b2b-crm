@@ -22,3 +22,4 @@ const Arabic = require('flatpickr/dist/l10n/ar.js').ar;
 
 flatpickr.localize(Arabic);
 
+window.pdfobject = require('pdfobject');

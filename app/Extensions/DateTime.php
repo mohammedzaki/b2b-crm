@@ -10,23 +10,38 @@ namespace App\Extensions;
 
 use Carbon\Carbon;
 
-class DateTime extends Carbon {
+class DateTime extends Carbon
+{
 
-    public function __construct($time = null, $tz = null) {
+    public function __construct($time = null, $tz = null)
+    {
         parent::__construct($time, $tz);
     }
 
-    public function startDayFormat() {
+    public function startDayFormat()
+    {
         return $this->format("Y-m-d 00:00:00");
     }
 
-    public function endDayFormat() {
+    public function endDayFormat()
+    {
         return $this->format("Y-m-d 23:59:59");
     }
 
-    function getMonthName() {
+    function getMonthName()
+    {
         $this->setLocale('ar');
-        return $this->formatLocalized('%A %d %B %Y');       
+        return $this->formatLocalized('%A %d %B %Y');
+    }
+
+    public static function todayDateformat()
+    {
+        return static::today()->format('Y-m-d');
+    }
+
+    public static function parseToDateFormat($time)
+    {
+        return static::parse($time)->format('Y-m-d');
     }
 
 }

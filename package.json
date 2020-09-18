@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "datatables": "^1.10.18",
-    "flatpickr": "^2.4.4"
+    "flatpickr": "^2.4.4",
+    "pdfobject": "^2.1.1"
   }
 }
