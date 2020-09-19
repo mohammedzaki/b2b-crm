@@ -6,17 +6,17 @@
 <body>
 
 <pageheader name="pageHeader">
-    @include('reports.header')
+    @include('reports.layouts.header')
 </pageheader>
 <setpageheader name="pageHeader"></setpageheader>
 
 <htmlpageheader name="pageHtmlHeader">
-    @include('reports.header')
+    @include('reports.layouts.header')
 </htmlpageheader>
 <sethtmlpageheader name="pageHtmlHeader"></sethtmlpageheader>
 
 <htmlpagefooter name="pageFooter">
-    @include('reports.footer')
+    @include('reports.layouts.footer')
 </htmlpagefooter>
 <sethtmlpagefooter name="pageFooter"></sethtmlpagefooter>
 

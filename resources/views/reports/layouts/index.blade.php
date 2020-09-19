@@ -1,4 +1,4 @@
-@extends('layouts.app') 
+@extends('source-code.b2b-crm.resources.views.layouts.app')
 @section('title', 'تقرير عملية عميل - التقارير')
 @section('content')
 

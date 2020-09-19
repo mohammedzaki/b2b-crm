@@ -20,20 +20,20 @@ abstract class BaseReport implements IReport
     public function __construct($withLetterHead = true)
     {
         $this->setReportRefs();
-        $this->reportPreviewView = 'reports.preview';
-        $this->reportPDFView = 'reports.pdf';
+        $this->reportPreviewView = 'reports.layouts.preview';
+        $this->reportPDFView = 'reports.layouts.pdf';
         $this->mpdf = new \Mpdf\Mpdf([
                                          'mode'                => '',
                                          'format'              => 'A4',
                                          'orientation'         => 'P',
                                          'margin_left'         => 8,
                                          'margin_right'        => 8,
-                                         'margin_top'          => 8,
+                                         'margin_top'          => $withLetterHead ? 8 : 28,
                                          'margin_bottom'       => 8,
                                          'setAutoTopMargin'    => 'stretch',
                                          'setAutoBottomMargin' => 'stretch',
                                          'autoMarginPadding'   => 2,
-                                         //'margin_header'        => 10,
+                                         'margin_header'       => $withLetterHead ? 8 : 28,
                                          'margin_footer'       => 5
                                      ]);
         $this->withLetterHead = $withLetterHead;
@@ -55,7 +55,7 @@ abstract class BaseReport implements IReport
     {
         return [
             'printRouteAction' => $this->printRouteAction,
-            'showLetterHead'   => $this->withLetterHead ? 'on' : 'off'
+            'withLetterHead'   => $this->withLetterHead
         ];
     }
 
