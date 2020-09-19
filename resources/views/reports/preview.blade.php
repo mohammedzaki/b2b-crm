@@ -8,7 +8,8 @@
                 <div class="col-lg-12 no-padding">
                     <img src="/ReportsHtml/letr.png" class="letrHead" style="width: 100%; margin-bottom: 20px;" />
                 </div>
-                {!! $reportHTML !!}
+                @yield('reportHeader')
+                @yield('reportHTML')
             </div>
             <!-- /.panel-body -->
         </div>

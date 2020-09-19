@@ -19,7 +19,7 @@ class ClientDetailed extends BaseReport
     {
         $this->reportName = "Client_Statement_Detailed_Report";
         $this->reportView = 'reports.client.account-statement.detailed';
-        $this->cssPath = 'css/app.css';
+        $this->cssPath = 'reports/css/client/detailed.css';
         $this->printRouteAction = 'reports.client.accountStatement.printDetailedPDF';
     }
 

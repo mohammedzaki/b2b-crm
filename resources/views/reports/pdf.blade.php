@@ -5,12 +5,22 @@
 </head>
 <body>
 
-<htmlpageheader name="pageHeader">
-    <img src="var:letrImg">
-</htmlpageheader>
-<sethtmlpageheader name="pageHeader" value="{{ $showLetterHead }}" show-this-page="1"></sethtmlpageheader>
+<pageheader name="pageHeader">
+    @include('reports.header')
+</pageheader>
+<setpageheader name="pageHeader"></setpageheader>
 
-{!! $reportHTML !!}
+<htmlpageheader name="pageHtmlHeader">
+    @include('reports.header')
+</htmlpageheader>
+<sethtmlpageheader name="pageHtmlHeader"></sethtmlpageheader>
+
+<htmlpagefooter name="pageFooter">
+    @include('reports.footer')
+</htmlpagefooter>
+<sethtmlpagefooter name="pageFooter"></sethtmlpagefooter>
+
+@yield('reportHTML')
 
 </body>
 </html>
