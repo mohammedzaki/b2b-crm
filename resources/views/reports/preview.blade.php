@@ -1,25 +1,18 @@
 @extends("layouts.app")
 @section("title", "تقرير عملية عميل - التقارير")
 @section("content")
-
-    <div class="row">
-        {{ Form::open(["route" => $printRouteAction, "method" => "GET"]) }}
-        <row class="col-lg-12 clearboth">
-            <p class="text-center">
-                {{ Form::hidden("ch_detialed", "1", null) }}
-                {{ Form::checkbox("withLetterHead", "1", 1,
-                            array(
-                                "id" => "withLetterHead",
-                                "class" => "checkbox_show_input"
-                            )
-                        ) }}
-                {{ Form::label("withLetterHead", "طباعة الليتر هد") }}
-                <br>
-                <button class="btn btn-primary" type="submit">طباعة</button>
-            </p>
-
-        </row>
-        {!! $reportHTML !!}
-        {{ Form::close() }}
+    <div class="col-lg-12" id="printcontent">
+        <div class="panel panel-default">
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+                <div class="col-lg-12 no-padding">
+                    <img src="/ReportsHtml/letr.png" class="letrHead" style="width: 100%; margin-bottom: 20px;" />
+                </div>
+                {!! $reportHTML !!}
+            </div>
+            <!-- /.panel-body -->
+        </div>
+        <!-- /.panel -->
     </div>
 @endsection
+

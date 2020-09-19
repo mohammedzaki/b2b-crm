@@ -8,13 +8,14 @@
             <span class="icon-bar"></span>
         </button>
         <a class="navbar-brand" href="{{ URL::to('/') }}">
-            <img width="90" src="{{ asset('uploads/' . \App\Models\Facility::findOrFail(1)->logo ) }}" />
+            <img width="90" src="{{ asset('uploads/' . \App\Models\Facility::findOrFail(1)->logo ) }}"/>
         </a>
     </div>
     <!-- /.navbar-header -->
     <ul class="nav navbar-top-links navbar-left">
+        <!-- /.dropdown-pdf -->
         @if (Auth::check())
-        <li> {{ Auth::user()->username }} </li>
+            <li> {{ Auth::user()->username }} </li>
         @endif
         <!-- /.dropdown -->
         <li class="dropdown">
@@ -23,8 +24,10 @@
             </a>
             <ul class="dropdown-menu dropdown-user">
                 <li><a href="{{ URL::to('/facility/1/edit') }}"><i class="fa fa-gear fa-fw"></i> بيانات المنشاه</a></li>
-                <li><a href="{{ URL::to('/facilityopeningamount') }}"><i class="fa fa-gear fa-fw"></i> الرصيد الافتتاحى</a></li>
-                <li><a href="{{ route('facilityTaxes.index') }}"><i class="fa fa-gear fa-fw"></i> الضريبة المضافة</a></li>
+                <li><a href="{{ URL::to('/facilityopeningamount') }}"><i class="fa fa-gear fa-fw"></i> الرصيد الافتتاحى</a>
+                </li>
+                <li><a href="{{ route('facilityTaxes.index') }}"><i class="fa fa-gear fa-fw"></i> الضريبة المضافة</a>
+                </li>
                 <li class="divider"></li>
                 <li>
                     <a href="{{ url('/logout') }}"
@@ -41,6 +44,41 @@
                 </li>
             </ul>
         </li>
+        @if (isset($printRouteAction))
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                <i class="fa fa-file-pdf-o fa-fw"></i> <i class="fa fa-caret-down"></i>
+            </a>
+            <ul class="dropdown-menu dropdown-user">
+                <li>
+                    <a href="{{ url('/logout') }}"
+                       onclick="event.preventDefault();
+                               document.getElementById('pdf-form').submit();">
+                        <i class="fa fa-sign-out fa-fw"></i> طباعة
+                    </a>
+                    {{ Form::open(["route" => $printRouteAction, "method" => "GET", "style" => "display: none;", "id" => 'pdf-form']) }}
+                        {{ Form::hidden("ch_detialed", "1", null) }}
+                    {{ Form::close() }}
+                </li>
+                <li>
+                    <a href="{{ url('/logout') }}"
+                       onclick="event.preventDefault();
+                               document.getElementById('pdf-form-withLetterHead').submit();">
+                        <i class="fa fa-sign-out fa-fw"></i> طباعة بالليتر هد
+                    </a>
+                    {{ Form::open(["route" => $printRouteAction, "method" => "GET", "style" => "display: none;", "id" => 'pdf-form-withLetterHead']) }}
+                    {{ Form::hidden("ch_detialed", "1", null) }}
+                    {{ Form::checkbox("withLetterHead", "1", 1,
+                                array(
+                                    "id" => "withLetterHead",
+                                    "class" => "checkbox_show_input"
+                                )
+                            ) }}
+                    {{ Form::close() }}
+                </li>
+            </ul>
+        </li>
+        @endif
         <!-- /.dropdown-user -->
     </ul>
     @include('layouts.sidebar')

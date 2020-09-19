@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\ClientProcess;
 use App\Extensions\DateTime;
-use App\Reports\Client\ClientTotal;
+use App\Reports\V2\Client\ClientTotal;
 use App\Reports\V2\Client\ClientDetailed;
 
 /**
