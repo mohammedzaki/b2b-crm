@@ -20,7 +20,9 @@
 </htmlpagefooter>
 <sethtmlpagefooter name="pageFooter"></sethtmlpagefooter>
 
-@yield('reportHTML')
+<div class="reportHTML">
+    @yield('reportHTML')
+</div>
 
 </body>
 </html>

@@ -1,53 +1,60 @@
 @extends($reportLayout)
 @section('reportTitle', 'كشف حساب عميل مفصل')
+@section('styles')
+    <link href="/{{$reportStyle}}" rel="stylesheet">
+@endsection
 @section('reportHeader')
     <div class="col-lg-12 no-padding">
-        <table align="center" width="90%">
+        <table align="center">
             <tr>
-                <td width="15%" align="right">اسم العميل :</td>
-                <td width="50%" align="right">{{ $clientName }}</td>
-                <td width="10%" align="right">تاريخ :</td>
-                <td width="25%" align="right">{{ $date }}</td>
+                <td width="30%">
+                    <div>
+                        <label> اسم العميل :</label> {{ $clientName }}
+                    </div>
+                </td>
+                <td width="40%">
+                    <div>
+                        <label> تاريخ :</label> {{ $date }}
+                    </div>
+                </td>
             </tr>
         </table>
-        <br />
     </div>
 @endsection
 @section('reportHTML')
     <div class="col-lg-12 no-padding">
-
         <div class="table-responsive">
-            <table class="table table-striped table-bordered table-hover">
-                <thead>
-                <tr>
-                    <th width="15%" align="right">تاريخ</th>
-                    <th width="10%" align="right">المتبقى</th>
-                    <th width="10%" align="right">المدفوع</th>
-                    <th width="15%" align="right">الاجمالى</th>
-                    <th width="10%" align="right">سعر الوحدة</th>
-                    <th width="10%" align="right">الكمية</th>
-                    <th width="30%" align="right">بيان</th>
-                </tr>
-                </thead>
-                <tbody>
-                @forelse ($processes as $process)
-                    <tr class="odd">
-                        <th colspan="2" style="background-color: #716e6eeb; color: white;">
-                            <div class="no-padding">
-                                <label>رقم العملية :</label> {{ $process['processNum'] }}
+            @forelse ($processes as $process)
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                    <tr class="processHeader">
+                        <th>
+                            <div>
+                                <label> مسلسل :</label> {{ $process['processNum'] }}
                             </div>
                         </th>
-                        <th colspan="5" style="background-color: #716e6eeb; color: white;">
-                            <div class="no-padding">
-                                <label>اسم العملية :</label> {{ $process['processName'] }}
+                        <th colspan="6">
+                            <div>
+                                <label> اسم العملية :</label> {{ $process['processName'] }}
                             </div>
                         </th>
                     </tr>
+                    <tr>
+                        <th>تاريخ</th>
+                        <th>المتبقى</th>
+                        <th>المدفوع</th>
+                        <th>الاجمالى</th>
+                        <th>سعر الوحدة</th>
+                        <th>الكمية</th>
+                        <th>بيان</th>
+                    </tr>
+                    </thead>
+                    <tbody>
                     @forelse ($process['processDetails'] as $details)
                         <tr class="odd">
                             <td> {{ $details['date'] }} </td>
                             <td> {{ $details['remaining'] }} </td>
-                            <td style="color: red;"> {{ $details['paid'] }} </td>
+                            <td class="redColor"> {{ $details['paid'] }} </td>
                             <td> {{ $details['totalPrice'] }} </td>
                             <td> {{ $details['unitPrice'] }} </td>
                             <td> {{ $details['quantity'] }} </td>
@@ -57,26 +64,55 @@
                     @endforelse
                     <tr class="info">
                         <td></td>
-                        <td style="color: red;">{{ $process['processTotalRemaining'] }}</td>
-                        <td style="color: red;">{{ $process['processTotalPaid'] }}</td>
-                        <td style="color: red;">{{ $process['processTotalPrice'] }}</td>
-                        <td colspan="3" style="color: red;">
+                        <td class="redColor">{{ $process['processTotalRemaining'] }}</td>
+                        <td class="redColor">{{ $process['processTotalPaid'] }}</td>
+                        <td colspan="3" class="redColor">{{ $process['processTotalPrice'] }}</td>
+                        <td class="redColor">
                             الاجمالـــــــــــــــــــــــــــــــــــى
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <pagebreak></pagebreak>
+            @empty
+            @endforelse
+            <table class="table table-striped table-bordered table-hover">
+                <thead>
+                <tr>
+                    <th style="text-align: center;" colspan="7">
+                        <div>
+                            <label> اجمالي العمليات</label>
+                        </div>
+                    </th>
+                </tr>
+                <tr class="totalProcess">
+                    <th></th>
+                    <th>المتبقى</th>
+                    <th>المدفوع</th>
+                    <th colspan="3">الاجمالى</th>
+                    <th>اسم العملية</th>
+                </tr>
+                </thead>
+                <tbody>
+                @forelse ($processes as $process)
+                    <tr class="odd">
+                        <td></td>
+                        <td>{{ $process['processTotalRemaining'] }}</td>
+                        <td>{{ $process['processTotalPaid'] }}</td>
+                        <td colspan="3">{{ $process['processTotalPrice'] }}</td>
+                        <td>
+                            {{ $process['processName'] }}
                         </td>
                     </tr>
                 @empty
                 @endforelse
-                <tr style="background-color: black; color: white;">
-                    <td align="center" colspan="7" style="background-color: black; color: white;">
-                        الاجمالـــــــــــــــــــــــــــــــــــى
-                    </td>
-                </tr>
                 <tr class="info">
                     <td></td>
-                    <td style="color: red;">{{ $allProcessTotalRemaining }}</td>
-                    <td style="color: red;">{{ $allProcessTotalPaid }}</td>
-                    <td colspan="3" style="color: red;">{{ $allProcessesTotalPrice }}</td>
-                    <td style="color: red;"> الاجمالـــــــــــــــــــــــــــــــــــى
+                    <td class="redColor">{{ $allProcessTotalRemaining }}</td>
+                    <td class="redColor">{{ $allProcessTotalPaid }}</td>
+                    <td colspan="3" class="redColor">{{ $allProcessesTotalPrice }}</td>
+                    <td class="redColor">
+                        الاجمالـــــــــــــــــــــــــــــــــــى
                     </td>
                 </tr>
                 </tbody>

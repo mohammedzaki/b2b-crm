@@ -37,11 +37,12 @@ class ClientDetailed extends BaseReport
             $clientProcess = ClientProcess::findOrFail($id);
             $processes[$id]['processName'] = $clientProcess->name;
 
-            $processes[$id]['processTotalPrice'] = $clientProcess->total_price;
+            $processes[$id]['processTotalPrice'] = ($clientProcess->total_price + $clientProcess->taxesValue()) - $clientProcess->source_discount_value;
             $processes[$id]['processTotalPaid'] = $clientProcess->totalDeposits() + $clientProcess->discount_value;
             $processes[$id]['processTotalRemaining'] = $clientProcess->total_price_taxes - $clientProcess->totalDeposits();
             $processes[$id]['processDate'] = DateTime::todayDateformat(); //Print Date
             $processes[$id]['processNum'] = $id;
+
             $allProcessesTotalPrice += $processes[$id]['processTotalPrice'];
             $allProcessTotalPaid += $processes[$id]['processTotalPaid'];
             $allProcessTotalRemaining += $processes[$id]['processTotalRemaining'];

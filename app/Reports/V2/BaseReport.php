@@ -54,6 +54,7 @@ abstract class BaseReport implements IReport
     private function getReportBaseData()
     {
         return [
+            'reportStyle'      => $this->cssPath,
             'printRouteAction' => $this->printRouteAction,
             'withLetterHead'   => $this->withLetterHead
         ];
