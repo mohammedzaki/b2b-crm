@@ -37,7 +37,7 @@
 .reportHTML .processHeader th, .processHeader th {
     text-align: right;
     background-color: #fff;
-    border: none;
+    /*border: none;*/
     padding-right: 4px;
 }
 

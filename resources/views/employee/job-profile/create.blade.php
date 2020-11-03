@@ -24,7 +24,7 @@
     @endif
 
     {{ Form::open(['route' => ['employee.employeeJobProfile.store', $employee->id]]) }}
-        @include('employee.jobProfile._form')
+        @include('employee.job-profile._form')
     {{ Form::close() }}
 
 </div>

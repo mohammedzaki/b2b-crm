@@ -76,7 +76,7 @@ abstract class BaseReport implements IReport
         $this->mpdf->WriteHTML($this->getCSS(), 1); // The parameter 1 tells that this is css/style only and no body/html/text
         $this->mpdf->WriteHTML($this->generatePDFHTML(), 2);
         $this->mpdf->SetHTMLHeaderByName('pageHeader');
-        $this->mpdf->Output($this->reportName, 'I');
+        $this->mpdf->Output($this->getReportName(), 'I');
     }
 
     protected function setPageHeader()

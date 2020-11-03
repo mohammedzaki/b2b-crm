@@ -31,9 +31,9 @@
         ) 
     }}
         @if (session('error'))
-            @include('employee.jobProfile._form', ['model' => 'edit'])
+            @include('employee.job-profile._form', ['model' => 'edit'])
         @else
-            @include('employee.jobProfile._form', ['model' => 'edit'])
+            @include('employee.job-profile._form', ['model' => 'edit'])
         @endif
     {{ Form::close() }}
 

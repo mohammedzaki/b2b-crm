@@ -161,6 +161,7 @@ class EmployeeController extends Controller
                 array_push($selectedPermissions, $p->id);
             }
         }
+        $username = $employee->username;
         $permissions = Permission::all();
         return view('employee.edit', compact('employee', 'permissions', 'selectedPermissions', 'username', 'currentJobProfile'));
     }

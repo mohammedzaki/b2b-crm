@@ -16,7 +16,6 @@ class EmployeeJobProfile extends Model
 
     protected $dates    = ['deleted_at'];
     protected $fillable = [
-        'id',
         'start_date',
         'end_date',
         'job_title',

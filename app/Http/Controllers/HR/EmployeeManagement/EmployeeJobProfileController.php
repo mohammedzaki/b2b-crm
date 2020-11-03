@@ -32,12 +32,12 @@ class EmployeeJobProfileController extends Controller
     public function index(Employee $employee)
     {
         $employeeJobProfiles = $employee->jobProfiles;
-        return view('employee.jobProfile.index', compact('employeeJobProfiles'));
+        return view('employee.job-profile.index', compact('employeeJobProfiles'));
     }
 
     public function create(Employee $employee)
     {
-        return view('employee.jobProfile.create', compact('employee'));
+        return view('employee.job-profile.create', compact('employee'));
     }
 
     public function store(Request $request, Employee $employee)
@@ -48,15 +48,18 @@ class EmployeeJobProfileController extends Controller
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
-            $oldJob     = $employee->currentJobProfile;
-            $oldDate = DateTime::parse($oldJob->end_date);
-            $newDate = DateTime::parse($all['start_date']);
-            if ($oldDate > $newDate) {
-                return redirect()->back()->withInput()->with('error', 'تاريخ التعديل يجب ان يكون اكبر من اخر تاريخ انتهاء لاخر راتب.');
+            // end last job
+            if ($employee->currentJobProfile != null && !empty($employee->currentJobProfile)) {
+                $oldJob = $employee->currentJobProfile;
+                $oldDate = DateTime::parse($oldJob->end_date);
+                $newDate = DateTime::parse($all['start_date']);
+                if ($oldDate > $newDate) {
+                    return redirect()->back()->withInput()->with('error', 'تاريخ التعديل يجب ان يكون اكبر من اخر تاريخ انتهاء لاخر راتب.');
+                }
+                $oldJob->end_date = DateTime::parse($all['start_date'])->addDay(-1);
+                $oldJob->save();
             }
-            $oldJob->end_date            = DateTime::parse($all['start_date'])->addDay(-1);
-            $oldJob->save();
-            $employeeJobProfile       = $employee->jobProfiles()->create($all); //EmployeeJobProfile::create($all);
+            $employeeJobProfile       = $employee->jobProfiles()->create($all);
             $employee->current_job_id = $employeeJobProfile->id;
             $employee->save();
             return redirect()->route('employee.edit', compact('employee'))->with('success', 'تم تعدبل راتب الموظف.');
@@ -70,7 +73,7 @@ class EmployeeJobProfileController extends Controller
 
     public function edit(Employee $employee, EmployeeJobProfile $employeeJobProfile)
     {
-        return view('employee.jobProfile.edit', compact('employee', 'employeeJobProfile'));
+        return view('employee.job-profile.edit', compact('employee', 'employeeJobProfile'));
     }
 
     public function update(Request $request, Employee $employee, $id)
