@@ -36,14 +36,5 @@
             @include('employee.borrow._form', ['model' => 'edit', 'items' => $borrow->items])
         @endif
     {{ Form::close() }}
-
-    <script type="text/javascript">
-        @if (session('error'))
-            var processItemsCount = {{ count(old('items')) }};
-        @else
-            var processItemsCount = {{ count($borrow->items) }};
-        @endif
-    </script>
-
 </div>
 @endsection

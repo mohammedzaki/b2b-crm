@@ -73,50 +73,54 @@
                     </tr>
                     </tbody>
                 </table>
-                <pagebreak></pagebreak>
+                @if(count($processes) > 1)
+                    <pagebreak></pagebreak>
+                @endif
             @empty
             @endforelse
-            <table class="table table-striped table-bordered table-hover">
-                <thead>
-                <tr>
-                    <th style="text-align: center;" colspan="7">
-                        <div>
-                            <label> اجمالي العمليات</label>
-                        </div>
-                    </th>
-                </tr>
-                <tr class="totalProcess">
-                    <th></th>
-                    <th>المتبقى</th>
-                    <th>المدفوع</th>
-                    <th colspan="3">الاجمالى</th>
-                    <th>اسم العملية</th>
-                </tr>
-                </thead>
-                <tbody>
-                @forelse ($processes as $process)
-                    <tr class="odd">
+            @if(count($processes) > 1)
+                <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                    <tr>
+                        <th style="text-align: center;" colspan="7">
+                            <div>
+                                <label> اجمالي العمليات</label>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr class="totalProcess">
+                        <th></th>
+                        <th>المتبقى</th>
+                        <th>المدفوع</th>
+                        <th colspan="3">الاجمالى</th>
+                        <th>اسم العملية</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @forelse ($processes as $process)
+                        <tr class="odd">
+                            <td></td>
+                            <td>{{ $process['processTotalRemaining'] }}</td>
+                            <td>{{ $process['processTotalPaid'] }}</td>
+                            <td colspan="3">{{ $process['processTotalPrice'] }}</td>
+                            <td>
+                                {{ $process['processName'] }}
+                            </td>
+                        </tr>
+                    @empty
+                    @endforelse
+                    <tr class="info">
                         <td></td>
-                        <td>{{ $process['processTotalRemaining'] }}</td>
-                        <td>{{ $process['processTotalPaid'] }}</td>
-                        <td colspan="3">{{ $process['processTotalPrice'] }}</td>
-                        <td>
-                            {{ $process['processName'] }}
+                        <td class="redColor">{{ $allProcessTotalRemaining }}</td>
+                        <td class="redColor">{{ $allProcessTotalPaid }}</td>
+                        <td colspan="3" class="redColor">{{ $allProcessesTotalPrice }}</td>
+                        <td class="redColor">
+                            الاجمالـــــــــــــــــــــــــــــــــــى
                         </td>
                     </tr>
-                @empty
-                @endforelse
-                <tr class="info">
-                    <td></td>
-                    <td class="redColor">{{ $allProcessTotalRemaining }}</td>
-                    <td class="redColor">{{ $allProcessTotalPaid }}</td>
-                    <td colspan="3" class="redColor">{{ $allProcessesTotalPrice }}</td>
-                    <td class="redColor">
-                        الاجمالـــــــــــــــــــــــــــــــــــى
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            @endif
         </div>
         <!-- /.table-responsive -->
     </div>

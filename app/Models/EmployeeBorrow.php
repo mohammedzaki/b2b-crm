@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use App\Events\EmployeeBorrowCreatedEvent;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * App\Models\EmployeeBorrow
@@ -30,7 +31,12 @@ use App\Events\EmployeeBorrowCreatedEvent;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\EmployeeBorrow whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class EmployeeBorrow extends Model {
+class EmployeeBorrow extends Model
+{
+
+    use SoftDeletes;
+
+    protected $dates = ['deleted_at'];
 
     protected $fillable = [
         'employee_id',
@@ -75,8 +81,8 @@ class EmployeeBorrow extends Model {
     public function totalRemaining()
     {
         return $this->payAmounts()->where([
-                    ['paying_status', '!=', EmployeeBorrowBilling::POSTPONED]
-                ])->sum('pay_amount') - $this->totalPaid();
+                                              ['paying_status', '!=', EmployeeBorrowBilling::POSTPONED]
+                                          ])->sum('pay_amount') - $this->totalPaid();
     }
 
 }
