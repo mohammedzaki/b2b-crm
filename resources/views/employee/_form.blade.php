@@ -254,6 +254,7 @@
                     {{ Form::label('currentJobProfile[job_title]', 'الوظيفة') }}
                     {{ Form::text('currentJobProfile[job_title]', null, 
                         array(
+                            'disabled' => 'disabled',
                             'class' => 'form-control', 
                             'placeholder' => 'ادخل الوظيفة')
                         )
@@ -271,6 +272,7 @@
                     {{ Form::label('currentJobProfile[daily_salary]', 'الراتب اليومى') }}
                     {{ Form::text('currentJobProfile[daily_salary]', null, 
                         array(
+                            'disabled' => 'disabled',
                             'class' => 'form-control', 
                             'placeholder' => 'ادخل الراتب اليومى')
                         )
@@ -288,6 +290,7 @@
                     {{ Form::label('currentJobProfile[working_hours]', 'ساعات العمل') }}
                     {{ Form::text('currentJobProfile[working_hours]', null, 
                         array(
+                            'disabled' => 'disabled',
                             'class' => 'form-control', 
                             'placeholder' => 'ادخل ساعات العمل')
                         )

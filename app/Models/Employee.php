@@ -188,7 +188,11 @@ class Employee extends Model
 
     public function salaryPerHour()
     {
-        return round(($this->daily_salary / $this->working_hours), Helpers::getDecimalPointCount());
+        if ($this->daily_salary > 0) {
+            return round(($this->daily_salary / $this->working_hours), Helpers::getDecimalPointCount());
+        } else {
+            return round(($this->currentJobProfile->daily_salary / $this->currentJobProfile->working_hours), Helpers::getDecimalPointCount());
+        }
     }
 
     public function salaryPerMinute()

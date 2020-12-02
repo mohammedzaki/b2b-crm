@@ -8,6 +8,7 @@ use App\Models\Permission;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 use Validator;
 
 /**
@@ -18,7 +19,7 @@ use Validator;
 class EmployeeController extends Controller
 {
 
-    protected function validator(array $data)
+    protected function validator(array $data, $user = null)
     {
         $validator = Validator::make($data, [
                     'name'                            => 'required|min:6|max:255',
@@ -28,14 +29,11 @@ class EmployeeController extends Controller
                     'birth_date'                      => 'required|date_format:Y-m-d',
                     'department'                      => 'string',
                     'hiring_date'                     => 'required|date_format:Y-m-d',
-                    'currentJobProfile.daily_salary'  => 'required|numeric',
-                    'currentJobProfile.working_hours' => 'required|numeric',
-                    'currentJobProfile.job_title'     => 'required|max:100',
                     'telephone'                       => 'digits:8',
                     'mobile'                          => 'required|digits:11',
                     'can_not_use_program'             => 'boolean',
                     'borrow_system'                   => 'boolean',
-                    'username'                        => 'required_without:can_not_use_program|unique:users,username',
+                    'username'                        => 'required_without:can_not_use_program|unique:users,username,' . $user->id,
                     'password'                        => 'required_without:can_not_use_program'
         ]);
 
@@ -47,9 +45,6 @@ class EmployeeController extends Controller
             'birth_date'                      => 'تاريخ الميﻻد',
             'department'                      => 'القسم',
             'hiring_date'                     => 'تاريخ التعيين',
-            'currentJobProfile.daily_salary'  => 'الراتب اليومي',
-            'currentJobProfile.working_hours' => 'ساعات العمل',
-            'currentJobProfile.job_title'     => 'الوظيفة',
             'telephone'                       => 'التليفون',
             'mobile'                          => 'المحمول',
             'can_not_use_program'             => 'عدم استخدام البرنامج',
@@ -178,16 +173,10 @@ class EmployeeController extends Controller
          * If it was not changed then remove it from validation, because of unique
          * option causes error.
          */
-        if ($request->username) {
-            $user->username = $request->username;
-            if (!$user->isDirty('username')) {
-                $all['username'] = "isDirtyAndUpdated";
-            }
-        }
         if (empty($request->password)) {
             $all['password'] = "noChange";
         }
-        $validator = $this->validator($all);
+        $validator = $this->validator($all, $user);
 
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
@@ -195,6 +184,9 @@ class EmployeeController extends Controller
 
             if ($all['password'] != "noChange") {
                 $user->password = bcrypt($request->password);
+            }
+            if (!empty($request->username)) {
+                $user->username = $request->username;
             }
 
             $user->save();

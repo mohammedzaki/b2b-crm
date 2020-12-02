@@ -51,7 +51,7 @@ class EmployeeJobProfileController extends Controller
             // end last job
             if ($employee->currentJobProfile != null && !empty($employee->currentJobProfile)) {
                 $oldJob = $employee->currentJobProfile;
-                $oldDate = DateTime::parse($oldJob->end_date);
+                $oldDate = DateTime::parse($oldJob->start_date);
                 $newDate = DateTime::parse($all['start_date']);
                 if ($oldDate > $newDate) {
                     return redirect()->back()->withInput()->with('error', 'تاريخ التعديل يجب ان يكون اكبر من اخر تاريخ انتهاء لاخر راتب.');

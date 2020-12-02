@@ -153,7 +153,7 @@ class TotalSalariesReportController extends Controller {
 
         foreach ($request->selectedIds as $employee_id) {
             $employee   = Employee::findOrFail($employee_id);
-            $hourlyRate = $employee->daily_salary / $employee->working_hours;
+            $hourlyRate = $employee->salaryPerHour();
 
             $attendances = Attendance::where([
                         ['employee_id', '=', $employee->id]

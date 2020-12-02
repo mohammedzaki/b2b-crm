@@ -85,7 +85,7 @@
         enableTime: false,
         //maxDate: new Date(),
         altInput: true,
-        altFormat: "F, Y",
+        altFormat: "l, j F, Y",
         locale: "ar"
       });
     });
