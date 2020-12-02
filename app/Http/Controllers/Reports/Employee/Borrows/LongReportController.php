@@ -58,8 +58,6 @@ class LongReportController extends Controller
         $employee['employeeName'] = $emp->name;
         $employee['employeeNum']  = $emp->id;
 
-        dd($request->employee_id, $employee);
-
         $employee['borrowDetails']          = EmployeeBorrow::whereIn('id', $request->selectedIds)->get()->mapWithKeys(function ($borrow) {
             return [
                 $borrow->id => [
