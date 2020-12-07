@@ -232,7 +232,7 @@
                                             <th rowspan="1" colspan="1" >ملاحظات</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="grid_GuardianshipDetails">
+                                    <tbody id="grid_FinancialCustodyDetails">
                                         @forelse ($depositWithdraws as $depositWithdraw)
                                         <tr class="gradeA odd ItemRow Saved" role="row">
                                             <td>

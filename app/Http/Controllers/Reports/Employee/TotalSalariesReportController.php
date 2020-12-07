@@ -41,8 +41,8 @@ class TotalSalariesReportController extends Controller {
         $totalBonuses                 = 0;
         $totalSalary                  = 0;
         $totalNetSalary               = 0;
-        $totalGuardianshipValue       = 0;
-        $totalGuardianshipReturnValue = 0;
+        $totalFinancialCustodyValue       = 0;
+        $totalFinancialCustodyRefundValue = 0;
         $totalBorrowValue             = 0;
         $totalSmallBorrowValue        = 0;
         $totalLongBorrowValue         = 0;
@@ -56,8 +56,8 @@ class TotalSalariesReportController extends Controller {
             $HoursSalary             = 0;
             $Salary                  = 0;
             $NetSalary               = 0;
-            $GuardianshipValue       = 0;
-            $GuardianshipReturnValue = 0;
+            $FinancialCustodyValue       = 0;
+            $FinancialCustodyRefundValue = 0;
             $BorrowValue             = 0;
             $SmallBorrowValue        = 0;
             $LongBorrowValue         = 0;
@@ -74,8 +74,8 @@ class TotalSalariesReportController extends Controller {
                 $SalaryDeduction         += $attendance->salary_deduction;
                 $AbsentDeduction         += $attendance->absent_deduction;
                 $Bonuses                 += $attendance->mokaf;
-                $GuardianshipValue       += $attendance->GuardianshipValue;
-                $GuardianshipReturnValue += $attendance->GuardianshipReturnValue;
+                $FinancialCustodyValue       += $attendance->FinancialCustodyValue;
+                $FinancialCustodyRefundValue += $attendance->FinancialCustodyRefundValue;
                 $BorrowValue             += $attendance->borrowValue;
             }
             try {
@@ -86,7 +86,7 @@ class TotalSalariesReportController extends Controller {
             }
             $HoursSalary = round(($WorkingHours * (($hourlyRate / 60) / 60)), Helpers::getDecimalPointCount());
             $Salary      = ($HoursSalary + $Bonuses);
-            $NetSalary   = $Salary - ($SalaryDeduction + $AbsentDeduction + ($GuardianshipValue - $GuardianshipReturnValue) + $SmallBorrowValue + $LongBorrowValue);
+            $NetSalary   = $Salary - ($SalaryDeduction + $AbsentDeduction + ($FinancialCustodyValue - $FinancialCustodyRefundValue) + $SmallBorrowValue + $LongBorrowValue);
 
             $employees[$index] = [
                 'name'                    => $employee->name,
@@ -99,8 +99,8 @@ class TotalSalariesReportController extends Controller {
                 'totalBorrow'             => ($LongBorrowValue + $SmallBorrowValue),
                 'salaryDeduction'         => $SalaryDeduction,
                 'bonuses'                 => $Bonuses,
-                'guardianshipValue'       => $GuardianshipValue,
-                'guardianshipReturnValue' => $GuardianshipReturnValue,
+                'financialCustodyValue'       => $FinancialCustodyValue,
+                'financialCustodyRefundValue' => $FinancialCustodyRefundValue,
                 'netSalary'               => $NetSalary,
             ];
 
@@ -113,8 +113,8 @@ class TotalSalariesReportController extends Controller {
             $totalBorrowValue             += ($LongBorrowValue + $SmallBorrowValue);
             $totalSalaryDeduction         += $SalaryDeduction;
             $totalBonuses                 += $Bonuses;
-            $totalGuardianshipValue       += $GuardianshipValue;
-            $totalGuardianshipReturnValue += $GuardianshipReturnValue;
+            $totalFinancialCustodyValue       += $FinancialCustodyValue;
+            $totalFinancialCustodyRefundValue += $FinancialCustodyRefundValue;
             $totalNetSalary               += $NetSalary;
 
             $index++;
@@ -133,11 +133,11 @@ class TotalSalariesReportController extends Controller {
             'totalBorrowValue'             => $totalBorrowValue,
             'totalSalaryDeduction'         => $totalSalaryDeduction,
             'totalBonuses'                 => $totalBonuses,
-            'totalGuardianshipValue'       => $totalGuardianshipValue,
-            'totalGuardianshipReturnValue' => $totalGuardianshipReturnValue,
+            'totalFinancialCustodyValue'       => $totalFinancialCustodyValue,
+            'totalFinancialCustodyRefundValue' => $totalFinancialCustodyRefundValue,
             'totalNetSalary'               => $totalNetSalary
         ]);
-        return view("reports.employee.totalSalaries", compact('employees', 'monthName', 'totalWorkingHours', 'totalHourlyRate', 'totalSalary', 'totalAbsentDeduction', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'totalBorrowValue', 'totalSalaryDeduction', 'totalBonuses', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalNetSalary'));
+        return view("reports.employee.totalSalaries", compact('employees', 'monthName', 'totalWorkingHours', 'totalHourlyRate', 'totalSalary', 'totalAbsentDeduction', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'totalBorrowValue', 'totalSalaryDeduction', 'totalBonuses', 'totalFinancialCustodyValue', 'totalFinancialCustodyRefundValue', 'totalNetSalary'));
     }
 
     /**
@@ -169,8 +169,8 @@ class TotalSalariesReportController extends Controller {
                         'salary_deduction'        => $attendance->salary_deduction,
                         'absent_deduction'        => $attendance->absent_deduction,
                         'bonuses'                 => $attendance->mokaf,
-                        'GuardianshipValue'       => $attendance->employeeGuardianship(),
-                        'GuardianshipReturnValue' => $attendance->employeeGuardianshipReturn(),
+                        'FinancialCustodyValue'       => $attendance->employeeFinancialCustody(),
+                        'FinancialCustodyRefundValue' => $attendance->employeeFinancialCustodyRefund(),
                         'borrowValue'             => $attendance->employeeSmallBorrow(),
                     //'workingHours'               => $attendance->workingHoursToString(),
                     ]
@@ -181,8 +181,8 @@ class TotalSalariesReportController extends Controller {
             $SalaryDeduction         = $attendances->sum('salary_deduction');
             $AbsentDeduction         = $attendances->sum('absent_deduction');
             $Bonuses                 = $attendances->sum('bonuses');
-            $GuardianshipValue       = $attendances->sum('GuardianshipValue');
-            $GuardianshipReturnValue = $attendances->sum('GuardianshipReturnValue');
+            $FinancialCustodyValue       = $attendances->sum('FinancialCustodyValue');
+            $FinancialCustodyRefundValue = $attendances->sum('FinancialCustodyRefundValue');
             $SmallBorrowValue        = $attendances->sum('borrowValue');
             $WorkingHoursInSeconds   = $attendances->sum('WorkingHoursInSeconds');
             $HoursSalary             = round(($WorkingHoursInSeconds * (($hourlyRate / 60) / 60)), Helpers::getDecimalPointCount());
@@ -192,7 +192,7 @@ class TotalSalariesReportController extends Controller {
                 $LongBorrowValue = $attendance->employeeLongBorrow();
             }
             $Salary            = ($HoursSalary + $Bonuses);
-            $NetSalary         = $Salary - ($SalaryDeduction + $AbsentDeduction + ($GuardianshipValue - $GuardianshipReturnValue) + $SmallBorrowValue + $LongBorrowValue);
+            $NetSalary         = $Salary - ($SalaryDeduction + $AbsentDeduction + ($FinancialCustodyValue - $FinancialCustodyRefundValue) + $SmallBorrowValue + $LongBorrowValue);
             $employees[$index] = [
                 'name'                    => $employee->name,
                 'workingHours'            => Helpers::hoursMinutsToString($WorkingHoursInSeconds),
@@ -205,8 +205,8 @@ class TotalSalariesReportController extends Controller {
                 'totalBorrow'             => ($LongBorrowValue + $SmallBorrowValue),
                 'salaryDeduction'         => $SalaryDeduction,
                 'bonuses'                 => $Bonuses,
-                'guardianshipValue'       => $GuardianshipValue,
-                'guardianshipReturnValue' => $GuardianshipReturnValue,
+                'financialCustodyValue'       => $FinancialCustodyValue,
+                'financialCustodyRefundValue' => $FinancialCustodyRefundValue,
                 'netSalary'               => $NetSalary,
             ];
             
@@ -222,8 +222,8 @@ class TotalSalariesReportController extends Controller {
         $totalBorrowValue             = ($totalLongBorrowValue + $totalSmallBorrowValue);
         $totalSalaryDeduction         = $employees->sum('salaryDeduction');
         $totalBonuses                 = $employees->sum('bonuses');
-        $totalGuardianshipValue       = $employees->sum('guardianshipValue');
-        $totalGuardianshipReturnValue = $employees->sum('guardianshipReturnValue');
+        $totalFinancialCustodyValue       = $employees->sum('financialCustodyValue');
+        $totalFinancialCustodyRefundValue = $employees->sum('financialCustodyRefundValue');
         $totalNetSalary               = $employees->sum('netSalary');
 
         $totalWorkingHours = Helpers::hoursMinutsToString($totalWorkingHoursInSeconds);
@@ -239,11 +239,11 @@ class TotalSalariesReportController extends Controller {
             'totalBorrowValue'             => $totalBorrowValue,
             'totalSalaryDeduction'         => $totalSalaryDeduction,
             'totalBonuses'                 => $totalBonuses,
-            'totalGuardianshipValue'       => $totalGuardianshipValue,
-            'totalGuardianshipReturnValue' => $totalGuardianshipReturnValue,
+            'totalFinancialCustodyValue'       => $totalFinancialCustodyValue,
+            'totalFinancialCustodyRefundValue' => $totalFinancialCustodyRefundValue,
             'totalNetSalary'               => $totalNetSalary
         ]);
-        return view("reports.employee.totalSalaries", compact('employees', 'monthName', 'totalWorkingHours', 'totalHourlyRate', 'totalSalary', 'totalAbsentDeduction', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'totalBorrowValue', 'totalSalaryDeduction', 'totalBonuses', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalNetSalary'));
+        return view("reports.employee.totalSalaries", compact('employees', 'monthName', 'totalWorkingHours', 'totalHourlyRate', 'totalSalary', 'totalAbsentDeduction', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'totalBorrowValue', 'totalSalaryDeduction', 'totalBonuses', 'totalFinancialCustodyValue', 'totalFinancialCustodyRefundValue', 'totalNetSalary'));
     }
 
     /**
@@ -252,13 +252,13 @@ class TotalSalariesReportController extends Controller {
      */
     public function printPDF(Request $request)
     {
-        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('employees'), session('monthName'), session('totalWorkingHours'), session('totalHourlyRate'), session('totalSalary'), session('totalAbsentDeduction'), session('totalLongBorrowValue'), session('totalSmallBorrowValue'), session('totalBorrowValue'), session('totalSalaryDeduction'), session('totalBonuses'), session('totalGuardianshipValue'), session('totalGuardianshipReturnValue'), session('totalNetSalary'));
+        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('employees'), session('monthName'), session('totalWorkingHours'), session('totalHourlyRate'), session('totalSalary'), session('totalAbsentDeduction'), session('totalLongBorrowValue'), session('totalSmallBorrowValue'), session('totalBorrowValue'), session('totalSalaryDeduction'), session('totalBonuses'), session('totalFinancialCustodyValue'), session('totalFinancialCustodyRefundValue'), session('totalNetSalary'));
     }
 
-    private function exportPDF($ch_detialed, $withLetterHead, $employees, $monthName, $totalWorkingHours, $totalHourlyRate, $totalSalary, $totalAbsentDeduction, $totalLongBorrowValue, $totalSmallBorrowValue, $totalBorrowValue, $totalSalaryDeduction, $totalBonuses, $totalGuardianshipValue, $totalGuardianshipReturnValue, $totalNetSalary)
+    private function exportPDF($ch_detialed, $withLetterHead, $employees, $monthName, $totalWorkingHours, $totalHourlyRate, $totalSalary, $totalAbsentDeduction, $totalLongBorrowValue, $totalSmallBorrowValue, $totalBorrowValue, $totalSalaryDeduction, $totalBonuses, $totalFinancialCustodyValue, $totalFinancialCustodyRefundValue, $totalNetSalary)
     {
         $pdfReport              = new TotalSalaries($withLetterHead);
-        $pdfReport->htmlContent = view("reports.employee.totalSalariesPrint", compact('employees', 'monthName', 'totalWorkingHours', 'totalHourlyRate', 'totalSalary', 'totalAbsentDeduction', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'totalBorrowValue', 'totalSalaryDeduction', 'totalBonuses', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalNetSalary'))->render();
+        $pdfReport->htmlContent = view("reports.employee.totalSalariesPrint", compact('employees', 'monthName', 'totalWorkingHours', 'totalHourlyRate', 'totalSalary', 'totalAbsentDeduction', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'totalBorrowValue', 'totalSalaryDeduction', 'totalBonuses', 'totalFinancialCustodyValue', 'totalFinancialCustodyRefundValue', 'totalNetSalary'))->render();
         return $pdfReport->exportPDF();
     }
 

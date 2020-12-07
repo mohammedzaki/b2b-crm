@@ -81,8 +81,8 @@ class Attendance extends Model {
     public $employeeName;
     public $processName;
     public $absentTypeName;
-    public $GuardianshipValue;
-    public $GuardianshipReturnValue;
+    public $FinancialCustodyValue;
+    public $FinancialCustodyRefundValue;
     public $borrowValue;
     public $is_managment_process;
 
@@ -101,14 +101,14 @@ class Attendance extends Model {
         return $this->belongsTo(ClientProcess::class);
     }
 
-    public function employeeGuardianship()
+    public function employeeFinancialCustody()
     {
         $startDate        = DateTime::parse($this->date)->startOfDay(); //->format('Y-m-d 00:00:00');
         $endDate          = DateTime::parse($this->date)->endOfDay(); //->format('Y-m-d 23:59:59');
         $depositWithdraws = DB::select("SELECT distinct dw.* from deposit_withdraws as dw
 JOIN employees emp ON dw.employee_id = emp.id
 WHERE emp.id = {$this->employee_id}
-AND dw.expenses_id = " . EmployeeActions::Guardianship . " 
+AND dw.expenses_id = " . EmployeeActions::FinancialCustody . " 
 AND 
 ((dw.due_date BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayFormat()}' AND dw.notes is null)
 OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayFormat()}')");
@@ -128,13 +128,13 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         }
     }
 
-    public function employeeGuardianshipReturn()
+    public function employeeFinancialCustodyRefund()
     {
         $startDate        = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
         $endDate          = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
                     ['employee_id', '=', $this->employee_id],
-                    ['expenses_id', '=', EmployeeActions::GuardianshipReturn],
+                    ['expenses_id', '=', EmployeeActions::FinancialCustodyRefund],
                     ['due_date', '>=', $startDate],
                     ['due_date', '<=', $endDate]
         ]);

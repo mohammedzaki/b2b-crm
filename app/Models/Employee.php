@@ -205,14 +205,15 @@ class Employee extends Model
         return round(($this->salaryPerMinute() / 60), Helpers::getDecimalPointCount());
     }
 
-    public function employeeGuardianships(DateTime $dt)
+    public function employeeFinancialCustodys(DateTime $dt)
     {
+        // Financial custody
         $startDate        = DateTime::parse($dt)->startOfMonth();
         $endDate          = DateTime::parse($dt)->endOfMonth();
         $depositWithdraws = DB::select("SELECT distinct dw.* from deposit_withdraws as dw
 JOIN employees emp ON dw.employee_id = emp.id
 WHERE emp.id = {$this->id}
-AND dw.expenses_id in (" . EmployeeActions::Guardianship . ", " . EmployeeActions::GuardianshipReturn . ") 
+AND dw.expenses_id in (" . EmployeeActions::FinancialCustody . ", " . EmployeeActions::FinancialCustodyRefund . ") 
 AND 
 ((dw.due_date BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayFormat()}' AND dw.notes is null)
 OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayFormat()}')");
@@ -220,12 +221,12 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         return $depositWithdraws;
     }
 
-    public function lastGuardianship()
+    public function lastFinancialCustody()
     {
         try {
             $depositWithdraws = DepositWithdraw::where([
                         ['employee_id', '=', $this->id],
-                        ['expenses_id', '=', EmployeeActions::Guardianship]
+                        ['expenses_id', '=', EmployeeActions::FinancialCustody]
                     ])->orderBy('id', 'desc')
                     ->first();
             return $depositWithdraws->withdrawValue;
@@ -234,12 +235,12 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         }
     }
 
-    public function lastGuardianshipReturn()
+    public function lastFinancialCustodyRefund()
     {
         try {
             $depositWithdraws = DepositWithdraw::where([
                         ['employee_id', '=', $this->id],
-                        ['expenses_id', '=', EmployeeActions::GuardianshipReturn]
+                        ['expenses_id', '=', EmployeeActions::FinancialCustodyRefund]
                     ])->orderBy('id', 'desc')
                     ->first();
             return $depositWithdraws->depositValue;
@@ -248,12 +249,12 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         }
     }
 
-    public function lastGuardianshipId()
+    public function lastFinancialCustodyId()
     {
         try {
             $depositWithdraws = DepositWithdraw::where([
                         ['employee_id', '=', $this->id],
-                        ['expenses_id', '=', EmployeeActions::Guardianship]
+                        ['expenses_id', '=', EmployeeActions::FinancialCustody]
                     ])->orderBy('id', 'desc')
                     ->first();
             return $depositWithdraws->id;
@@ -262,12 +263,12 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         }
     }
 
-    public function lastGuardianshipReturnId()
+    public function lastFinancialCustodyRefundId()
     {
         try {
             $depositWithdraws = DepositWithdraw::where([
                         ['employee_id', '=', $this->id],
-                        ['expenses_id', '=', EmployeeActions::GuardianshipReturn]
+                        ['expenses_id', '=', EmployeeActions::FinancialCustodyRefund]
                     ])->orderBy('id', 'desc')
                     ->first();
             return $depositWithdraws->id;

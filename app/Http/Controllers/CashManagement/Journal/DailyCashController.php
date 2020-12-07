@@ -138,11 +138,11 @@ class DailyCashController extends Controller
     {
         $employee = Employee::findOrFail($request->employee_id);
         switch ($request->expenses_id) {
-            case EmployeeActions::Guardianship:
-                $this->checkGuardianship($employee, $is_update);
+            case EmployeeActions::FinancialCustody:
+                $this->checkFinancialCustody($employee, $is_update);
                 break;
-            case EmployeeActions::GuardianshipReturn:
-                $this->checkGuardianshipReturn($employee, $request->depositValue, $is_update);
+            case EmployeeActions::FinancialCustodyRefund:
+                $this->checkFinancialCustodyRefund($employee, $request->depositValue, $is_update);
                 break;
             case EmployeeActions::PayLongBorrow:
                 $this->payLongBorrow($employee, $request->depositValue, DateTime::parse($request->due_date), $id, $is_update);
@@ -156,15 +156,15 @@ class DailyCashController extends Controller
         }
     }
 
-    function checkGuardianship(Employee $employee, $is_update = FALSE)
+    function checkFinancialCustody(Employee $employee, $is_update = FALSE)
     {
         if ($is_update) {
             return;
         }
-        $lG    = $employee->lastGuardianship();
-        $lGR   = $employee->lastGuardianshipReturn();
-        $lGId  = $employee->lastGuardianshipId();
-        $lGRId = $employee->lastGuardianshipReturnId();
+        $lG    = $employee->lastFinancialCustody();
+        $lGR   = $employee->lastFinancialCustodyRefund();
+        $lGId  = $employee->lastFinancialCustodyId();
+        $lGRId = $employee->lastFinancialCustodyRefundId();
         //
         if (($lG != $lGR) || ($lGId > $lGRId)) {
             DB::rollBack();
@@ -172,9 +172,9 @@ class DailyCashController extends Controller
         }
     }
 
-    function checkGuardianshipReturn(Employee $employee, $depositValue, $is_update = FALSE)
+    function checkFinancialCustodyRefund(Employee $employee, $depositValue, $is_update = FALSE)
     {
-        if ($employee->lastGuardianship() != $depositValue) {
+        if ($employee->lastFinancialCustody() != $depositValue) {
             DB::rollBack();
             throw new ValidationException('القيمة المردودة لا تساوى قيمة العهدة السابقة');
         }

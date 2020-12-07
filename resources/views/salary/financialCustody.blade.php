@@ -76,23 +76,23 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @forelse ($employeeGuardianships as $index => $guardianship)
+                                    @forelse ($employeeFinancialCustodys as $index => $financialCustody)
                                     <tr class="odd">
-                                        <td hidden >{{ $guardianship->id }}</td>
+                                        <td hidden >{{ $financialCustody->id }}</td>
                                         <td>{{ $index + 1 }}</td>
-                                        <td>{{ $guardianship->withdrawValue }}</td>
-                                        <td>{{ $guardianship->depositValue }}</td>
-                                        <td>{{ $guardianship->recordDesc }}</td>
-                                        <td>{{ $guardianship->due_date }}</td>
-                                        <td>{{ $guardianship->notes }}</td>
+                                        <td>{{ $financialCustody->withdrawValue }}</td>
+                                        <td>{{ $financialCustody->depositValue }}</td>
+                                        <td>{{ $financialCustody->recordDesc }}</td>
+                                        <td>{{ $financialCustody->due_date }}</td>
+                                        <td>{{ $financialCustody->notes }}</td>
                                     </tr>
                                     @empty
                                     <tr>ﻻ يوجد بيانات.</tr>
                                     @endforelse
                                     <tr>
                                         <th></th>
-                                        <th>{{ $totalGuardianshipValue }}</th>
-                                        <th>{{ $totalGuardianshipReturnValue }}</th>
+                                        <th>{{ $totalFinancialCustodyValue }}</th>
+                                        <th>{{ $totalFinancialCustodyRefundValue }}</th>
                                         <th></th>
                                         <th></th>
                                         <th></th>

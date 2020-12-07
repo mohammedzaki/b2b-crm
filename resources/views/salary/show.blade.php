@@ -55,8 +55,8 @@
                                         <td>{{ $attendance['salary_deduction'] }}</td>
                                         <td>{{ $attendance['notes'] }}</td>
                                         <td>{{ $attendance['borrowValue'] }}</td>
-                                        <td>{{ $attendance['GuardianshipValue'] }}</td>
-                                        <td>{{ $attendance['GuardianshipReturnValue'] }}</td>
+                                        <td>{{ $attendance['FinancialCustodyValue'] }}</td>
+                                        <td>{{ $attendance['FinancialCustodyRefundValue'] }}</td>
                                         <td>{{ $attendance['absentTypeName'] }}</td>
                                         <td>{{ $attendance['absent_deduction'] }}</td>
                                     </tr>
@@ -74,8 +74,8 @@
                                         <th>{{ $totalSalaryDeduction }}</th>
                                         <th></th>
                                         <th>{{ $totalBorrowValue }}</th>
-                                        <th>{{ $totalGuardianshipValue }}</th>
-                                        <th>{{ $totalGuardianshipReturnValue }}</th>
+                                        <th>{{ $totalFinancialCustodyValue }}</th>
+                                        <th>{{ $totalFinancialCustodyRefundValue }}</th>
                                         <th></th>
                                         <th>{{ $totalAbsentDeduction }}</th>
                                     </tr>
@@ -176,16 +176,16 @@
                     <div class="col-lg-3 ">
                         <div class="form-group">
                             <label>اجمالى العهدة</label>
-                            {{ Form::text('totalSalary', $totalGuardianshipValue, array(
-                                        "id" => "totalGuardianshipValue",
+                            {{ Form::text('totalSalary', $totalFinancialCustodyValue, array(
+                                        "id" => "totalFinancialCustodyValue",
                                         'class' => 'form-control')) }}
                         </div>
                     </div>
                     <div class="col-lg-3 ">
                         <div class="form-group">
                             <label>اجمالى رد العهدة</label>
-                            {{ Form::text('totalSalary', $totalGuardianshipReturnValue, array(
-                                        "id" => "totalGuardianshipReturnValue",
+                            {{ Form::text('totalSalary', $totalFinancialCustodyRefundValue, array(
+                                        "id" => "totalFinancialCustodyRefundValue",
                                         'class' => 'form-control')) }}
                         </div>
                     </div>
@@ -206,18 +206,18 @@
                 <div class="row">
                     <div class="col-lg-3 ">
                         <div class="form-group">
-                            <button class="btn btn-primary form-control" type="button" onclick="SubmitSearchGuardianship()">كشف حساب العهد</button>
+                            <button class="btn btn-primary form-control" type="button" onclick="SubmitSearchFinancialCustody()">كشف حساب العهد</button>
                         </div>
                     </div>
                     @if ($salaryIsPaid)
                     <div class="col-lg-3 ">
                         <div class="form-group">
-                            {{ link_to_route('salary.guardianshipaway', 'ترحيل العهدة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
+                            {{ link_to_route('salary.financialCustodyaway', 'ترحيل العهدة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
                         </div>
                     </div>
                     <div class="col-lg-3 ">
                         <div class="form-group">
-                            {{ link_to_route('salary.guardianshipback', 'الغاء ترحيل العهدة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
+                            {{ link_to_route('salary.financialCustodyback', 'الغاء ترحيل العهدة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
                         </div>
                     </div>
                     <div class="col-lg-3 ">
@@ -234,10 +234,10 @@
     </div>
 </row>
 <script>
-    function SubmitSearchGuardianship() {
+    function SubmitSearchFinancialCustody() {
         var empId = $("#employee").val();
-        //$('#SearchForm').prop('method', 'get').prop('action', 'guardianship/' + empId).submit();
-        $('#SearchForm').prop('action', 'guardianship/' + empId).submit();
+        //$('#SearchForm').prop('method', 'get').prop('action', 'financialCustody/' + empId).submit();
+        $('#SearchForm').prop('action', 'financialCustody/' + empId).submit();
     }
     function SubmitSearchPrintReport() {
         var empId = $("#employee").val();

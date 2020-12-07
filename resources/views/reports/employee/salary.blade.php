@@ -52,8 +52,8 @@
                         <td>{{ $attendance->salary_deduction }}</td>
                         <td>{{ $attendance->notes }}</td>
                         <td>{{ $attendance->borrowValue }}</td>
-                        <td>{{ $attendance->GuardianshipValue }}</td>
-                        <td>{{ $attendance->GuardianshipReturnValue }}</td>
+                        <td>{{ $attendance->FinancialCustodyValue }}</td>
+                        <td>{{ $attendance->FinancialCustodyRefundValue }}</td>
                         <td>{{ $attendance->absentTypeName }}</td>
                         <td>{{ $attendance->absent_deduction }}</td>
                     </tr>
@@ -70,8 +70,8 @@
                         <th>{{ $totalSalaryDeduction }}</th>
                         <th></th>
                         <th>{{ $totalBorrowValue }}</th>
-                        <th>{{ $totalGuardianshipValue }}</th>
-                        <th>{{ $totalGuardianshipReturnValue }}</th>
+                        <th>{{ $totalFinancialCustodyValue }}</th>
+                        <th>{{ $totalFinancialCustodyRefundValue }}</th>
                         <th></th>
                         <th>{{ $totalAbsentDeduction }}</th>
                     </tr>
@@ -193,13 +193,13 @@
                         </tr>
                         <tr>
                             <td>
-                                {{ Form::text('TotalSalary', $totalGuardianshipValue, array(
-                                        "id" => "totalGuardianshipValue",
+                                {{ Form::text('TotalSalary', $totalFinancialCustodyValue, array(
+                                        "id" => "totalFinancialCustodyValue",
                                         'class' => 'form-control')) }}
                             </td>
                             <td>
-                                {{ Form::text('TotalSalary', $totalGuardianshipReturnValue, array(
-                                        "id" => "totalGuardianshipReturnValue",
+                                {{ Form::text('TotalSalary', $totalFinancialCustodyRefundValue, array(
+                                        "id" => "totalFinancialCustodyRefundValue",
                                         'class' => 'form-control')) }}
                             </td>
                             <td>

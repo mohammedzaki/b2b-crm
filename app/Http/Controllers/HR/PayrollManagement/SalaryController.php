@@ -91,8 +91,8 @@ class SalaryController {
                     'employeeName'               => $attendance->employee->name,
                     'workingHours'               => $attendance->workingHoursToString(),
                     'date'                       => DateTime::parse($attendance->date)->format('l, d-m-Y'),
-                    'GuardianshipValue'          => $attendance->employeeGuardianship(),
-                    'GuardianshipReturnValue'    => $attendance->employeeGuardianshipReturn(),
+                    'FinancialCustodyValue'          => $attendance->employeeFinancialCustody(),
+                    'FinancialCustodyRefundValue'    => $attendance->employeeFinancialCustodyRefund(),
                     'borrowValue'                => $attendance->employeeSmallBorrow(),
                     'absentTypeName'             => $attendance->absentType ? $attendance->absentType->name : null,
                     'totalWorkingHoursInSeconds' => $attendance->workingHoursToSeconds(),
@@ -113,8 +113,8 @@ class SalaryController {
         $totalSalaryDeduction         = $attendances->sum('salary_deduction');
         $totalAbsentDeduction         = $attendances->sum('absent_deduction');
         $totalBonuses                 = $attendances->sum('mokaf');
-        $totalGuardianshipValue       = $attendances->sum('GuardianshipValue');
-        $totalGuardianshipReturnValue = $attendances->sum('GuardianshipReturnValue');
+        $totalFinancialCustodyValue       = $attendances->sum('FinancialCustodyValue');
+        $totalFinancialCustodyRefundValue = $attendances->sum('FinancialCustodyRefundValue');
         $totalSmallBorrowValue        = $attendances->sum('borrowValue');
         $totalWorkingHoursInSeconds   = $attendances->sum('totalWorkingHoursInSeconds');
         $totalHoursSalary             = round(($totalWorkingHoursInSeconds * (($hourlyRate / 60) / 60)), Helpers::getDecimalPointCount());
@@ -133,7 +133,7 @@ class SalaryController {
         $totalLongBorrowValue = $LongBorrowValue;
         $totalBorrowValue     = $totalSmallBorrowValue + $totalLongBorrowValue;
         $totalSalary          = ($totalHoursSalary + $totalBonuses);
-        $totalNetSalary       = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
+        $totalNetSalary       = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalFinancialCustodyValue - $totalFinancialCustodyRefundValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
 
         $salaryIsPaid    = FALSE;
         $depositWithdraw = DepositWithdraw::where([
@@ -160,8 +160,8 @@ class SalaryController {
             'totalSalary'                  => $totalSalary,
             'totalHoursSalary'             => $totalHoursSalary,
             'totalNetSalary'               => $totalNetSalary,
-            'totalGuardianshipValue'       => $totalGuardianshipValue,
-            'totalGuardianshipReturnValue' => $totalGuardianshipReturnValue,
+            'totalFinancialCustodyValue'       => $totalFinancialCustodyValue,
+            'totalFinancialCustodyRefundValue' => $totalFinancialCustodyRefundValue,
             'totalBorrowValue'             => $totalBorrowValue,
             'totalLongBorrowValue'         => $totalLongBorrowValue,
             'totalSmallBorrowValue'        => $totalSmallBorrowValue,
@@ -171,9 +171,9 @@ class SalaryController {
 
     /**
      * @return \Illuminate\Http\Response
-     * @Get("guardianship/{employee_id}", as="salary.guardianship")
+     * @Get("financialCustody/{employee_id}", as="salary.financialCustody")
      */
-    public function guardianship(Request $request, $employee_id)
+    public function financialCustody(Request $request, $employee_id)
     {
         $employees = Employee::all();
         $dt        = DateTime::parse($request->date);
@@ -181,36 +181,36 @@ class SalaryController {
             $employees_tmp[$employee->id] = $employee->name;
         }
         if ($employee_id == "all") {
-            $employeeGuardianships = []; //Attendance::all();
+            $employeeFinancialCustodys = []; //Attendance::all();
             $employee_id           = 0;
             $date                  = null;
         } else {
             $employee              = Employee::findOrFail($employee_id);
-            $employeeGuardianships = $employee->employeeGuardianships($dt);
+            $employeeFinancialCustodys = $employee->employeeFinancialCustodys($dt);
         }
         $date                         = $request->date;
         $employee_id                  = $employee_id;
-        $totalGuardianshipValue       = 0;
-        $totalGuardianshipReturnValue = 0;
+        $totalFinancialCustodyValue       = 0;
+        $totalFinancialCustodyRefundValue = 0;
 
-        foreach ($employeeGuardianships as $guardianship) {
-            $totalGuardianshipValue       += $guardianship->withdrawValue;
-            $totalGuardianshipReturnValue += $guardianship->depositValue;
+        foreach ($employeeFinancialCustodys as $financialCustody) {
+            $totalFinancialCustodyValue       += $financialCustody->withdrawValue;
+            $totalFinancialCustodyRefundValue += $financialCustody->depositValue;
         }
         $employees = $employees_tmp;
-        return view("salary.guardianship", compact(['employees', 'employeeGuardianships', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'employee_id', 'date']));
+        return view("salary.financialCustody", compact(['employees', 'employeeFinancialCustodys', 'totalFinancialCustodyValue', 'totalFinancialCustodyRefundValue', 'employee_id', 'date']));
     }
 
     /**
      * @return \Illuminate\Http\Response
-     * @Get("guardianshipaway/{employee_id}", as="salary.guardianshipaway")
+     * @Get("financialCustodyaway/{employee_id}", as="salary.financialCustodyaway")
      */
-    public function guardianshipaway(Request $request, $employee_id)
+    public function financialCustodyaway(Request $request, $employee_id)
     {
         $employee               = Employee::findOrFail($employee_id);
         $newDate                = DateTime::parse($request->date);
         $newDate->addMonth(1);
-        $depositWithdraw        = DepositWithdraw::findOrFail($employee->lastGuardianshipId());
+        $depositWithdraw        = DepositWithdraw::findOrFail($employee->lastFinancialCustodyId());
         $depositWithdraw->notes = $newDate->startOfMonth();
         $depositWithdraw->save();
         return redirect()->back()->with('success', 'تم الترحيل');
@@ -218,12 +218,12 @@ class SalaryController {
 
     /**
      * @return \Illuminate\Http\Response
-     * @Get("guardianshipback/{employee_id}", as="salary.guardianshipback")
+     * @Get("financialCustodyback/{employee_id}", as="salary.financialCustodyback")
      */
-    public function guardianshipback(Request $request, $employee_id)
+    public function financialCustodyback(Request $request, $employee_id)
     {
         $employee               = Employee::findOrFail($employee_id);
-        $depositWithdraw        = DepositWithdraw::findOrFail($employee->lastGuardianshipId());
+        $depositWithdraw        = DepositWithdraw::findOrFail($employee->lastFinancialCustodyId());
         $depositWithdraw->notes = null;
         $depositWithdraw->save();
         return redirect()->back()->with('success', 'تم الغاء ترحيل العهدة');

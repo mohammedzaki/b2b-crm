@@ -232,7 +232,7 @@
                                             <th rowspan="1" colspan="1" >ملاحظات</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="grid_GuardianshipDetails">
+                                    <tbody id="grid_FinancialCustodyDetails">
                                         @forelse ($depositWithdraws as $depositWithdraw)
                                         <tr class="gradeA odd ItemRow Saved" role="row">
                                             <td>
@@ -707,22 +707,22 @@
     console.log('employeeActions: ', employeeActions);
     
     LockAll();
-    SetGuardianshipDetailsProcess();
+    SetFinancialCustodyDetailsProcess();
     currentAmount = $("#currentAmount");
     withdrawsAmount = $("#withdrawsAmount");
     depositsAmount = $("#depositsAmount");
 
     function loadAllProcessAndClients() {
         loadAll = $("#loadAllProcessAndClients").prop("checked");
-        SetGuardianshipDetailsProcess();
+        SetFinancialCustodyDetailsProcess();
     }
 
     function LoadProcess(rowIndex) {
-        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .client_id');
-        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .supplier_id');
-        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .cbo_processes');
-        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .employee_id');
-        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .expenses_id');
+        client_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .client_id');
+        supplier_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .supplier_id');
+        cbo_processes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cbo_processes');
+        employee_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .employee_id');
+        expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
         cbo_processesVal = cbo_processes.val();
         expenses_idVal = expenses_id.val();
         client_idVal = client_id.val();
@@ -794,8 +794,8 @@
         }
     }
 
-    function SetGuardianshipDetailsProcess() {
-        var rowsCount = $('#grid_GuardianshipDetails').children().length;
+    function SetFinancialCustodyDetailsProcess() {
+        var rowsCount = $('#grid_FinancialCustodyDetails').children().length;
         for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
             LoadProcess(rowIndex);
         }
@@ -827,19 +827,19 @@
         if (rowIndex === -1) {
             return false;
         }
-        checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .checkDelete');
-        depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .depositValue');
-        withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .withdrawValue');
-        recordDesc = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .recordDesc');
-        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .cbo_processes');
-        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .client_id');
-        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .supplier_id');
-        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .employee_id');
-        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .expenses_id');
-        payMethod = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .payMethod');
-        notes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .notes');
-        id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .id');
-        saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .saveStatus');
+        checkDelete = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .checkDelete');
+        depositValue = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .depositValue');
+        withdrawValue = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .withdrawValue');
+        recordDesc = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .recordDesc');
+        cbo_processes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cbo_processes');
+        client_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .client_id');
+        supplier_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .supplier_id');
+        employee_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .employee_id');
+        expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
+        payMethod = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .payMethod');
+        notes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .notes');
+        id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .id');
+        saveStatus = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .saveStatus');
         var flag = true;
         if (recordDesc.val() === '') {
             recordDesc.parent().addClass("has-error");
@@ -939,13 +939,13 @@
     }
 
     function removeSelected() {
-        var rowsCount = $('#grid_GuardianshipDetails').children().length;
+        var rowsCount = $('#grid_FinancialCustodyDetails').children().length;
         var rowsIds = [];
         var rowsIndexs = [];
         flag = true;
         for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
-            checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .checkDelete').is(":checked");
-            id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .id').val();
+            checkDelete = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .checkDelete').is(":checked");
+            id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .id').val();
             if (checkDelete) {
                 rowsIds.push(id);
                 rowsIndexs.push(rowIndex);
@@ -988,7 +988,7 @@
     }
 
     function lockSaveAll() {
-        var rowsCount = $('#grid_GuardianshipDetails').children().length;
+        var rowsCount = $('#grid_FinancialCustodyDetails').children().length;
         var rowsIds = [];
         var rowsIndexs = [];
         flag = true;
@@ -1022,7 +1022,7 @@
                         saveStatus.val(1);
                         $.each(rowsIndexs, function (arrIndex, rowIndex) {
                             console.log(rowIndex);
-                            saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .saveStatus');
+                            saveStatus = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .saveStatus');
                             saveStatus.val(2);
                             SetRowReadonly(rowIndex);
                         });
@@ -1040,9 +1040,9 @@
 
     function LockAll() {
         if ($("#canEdit").val() !== 1) {
-            var rowsCount = $('#grid_GuardianshipDetails').children().length;
+            var rowsCount = $('#grid_FinancialCustodyDetails').children().length;
             for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
-                if ($('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .saveStatus').val() === 2) {
+                if ($('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .saveStatus').val() === 2) {
                     SetRowReadonly(rowIndex);
                 }
             }
@@ -1055,8 +1055,8 @@
             $("#depositwithdrawTable").append('<tr class="gradeA odd ItemRow" role="row"> <td> <input type="checkbox" value=""> </td><td> <div class="form-group{{$errors->has("depositValue") ? " has-error" : ""}}">{{Form::text("depositValue", null, array( "class"=> "form-control IsNumberDecimal depositValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("depositValue")) <label for="inputError" class="control-label">{{$errors->first("depositValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("withdrawValue") ? " has-error" : ""}}">{{Form::text("withdrawValue", null, array( "class"=> "form-control IsNumberDecimal withdrawValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("withdrawValue")) <label for="inputError" class="control-label">{{$errors->first("withdrawValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("recordDesc") ? " has-error" : ""}}">{{Form::text("recordDesc", null, array( "class"=> "form-control recordDesc", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("recordDesc")) <label for="inputError" class="control-label">{{$errors->first("recordDesc")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("cbo_processes") ? " has-error" : ""}}">{{Form::select("cbo_processes", [], null, array( "class"=> "form-control cbo_processes", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cbo_processes")) <label for="inputError" class="control-label">{{$errors->first("cbo_processes")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", [], null, array( "class"=> "form-control client_id", "placeholder"=> "", "id"=> "client_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "id"=> "supplier_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("employee_id") ? " has-error" : ""}}">{{Form::select("employee_id", $employees, null, array( "class"=> "form-control employee_id", "placeholder"=> "", "id"=> "emplyee_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("employee_id")) <label for="inputError" class="control-label">{{$errors->first("employee_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("expenses_id") ? " has-error" : ""}}">{{Form::select("expenses_id", [], null, array( "class"=> "form-control expenses_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("expenses_id")) <label for="inputError" class="control-label">{{$errors->first("expenses_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("payMethod") ? " has-error" : ""}}">{{Form::select("payMethod", $payMethods, null, array( "class"=> "form-control payMethod", "placeholder"=> "", "id"=> "payMethod", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("payMethod")) <label for="inputError" class="control-label">{{$errors->first("payMethod")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("notes") ? " has-error" : ""}}">{{Form::text("notes", null, array( "class"=> "form-control notes", "id"=> "notes", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("notes")) <label for="inputError" class="control-label">{{$errors->first("notes")}}</label> @endif </div></td><td hidden><input type="hidden" class="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="-1"></td><td hidden> <input type="hidden" class="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="0"> </td></tr>');
             var rowIndex = $("#depositwithdrawTable tr").length - 3;
             console.log(rowIndex);
-            client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .client_id');
-            supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .supplier_id');
+            client_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .client_id');
+            supplier_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .supplier_id');
             client_id.empty();
             client_id.append($("<option></option>"));
             supplier_id.empty();
@@ -1078,14 +1078,14 @@
     }
 
     function DoChange(rowIndex, cellName) {
-        checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .checkDelete');
-        depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .depositValue');
-        withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .withdrawValue');
-        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .cbo_processes');
-        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .client_id');
-        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .supplier_id');
-        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .employee_id');
-        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .expenses_id');
+        checkDelete = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .checkDelete');
+        depositValue = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .depositValue');
+        withdrawValue = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .withdrawValue');
+        cbo_processes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cbo_processes');
+        client_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .client_id');
+        supplier_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .supplier_id');
+        employee_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .employee_id');
+        expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
         switch (cellName) {
             case "depositValue":
                 withdrawValue.val('');
@@ -1178,7 +1178,7 @@
     }
 
     function RemoveRowAtIndex(rowIndex) {
-        $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ')').remove();
+        $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ')').remove();
     }
 
     function isNumber(evt) {
@@ -1207,19 +1207,19 @@
     }
 
     function SetRowReadonly(rowIndex) {
-        checkDelete = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .checkDelete');
-        depositValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .depositValue');
-        withdrawValue = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .withdrawValue');
-        recordDesc = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .recordDesc');
-        cbo_processes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .cbo_processes');
-        client_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .client_id');
-        supplier_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .supplier_id');
-        employee_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .employee_id');
-        expenses_id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .expenses_id');
-        payMethod = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .payMethod');
-        notes = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .notes');
-        id = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .id');
-        saveStatus = $('#grid_GuardianshipDetails tr:eq(' + rowIndex + ') .saveStatus');
+        checkDelete = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .checkDelete');
+        depositValue = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .depositValue');
+        withdrawValue = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .withdrawValue');
+        recordDesc = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .recordDesc');
+        cbo_processes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cbo_processes');
+        client_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .client_id');
+        supplier_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .supplier_id');
+        employee_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .employee_id');
+        expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
+        payMethod = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .payMethod');
+        notes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .notes');
+        id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .id');
+        saveStatus = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .saveStatus');
 
         checkDelete.attr("disabled", "disabled");
         depositValue.attr("disabled", "disabled");
@@ -1235,12 +1235,12 @@
     }
     
     function calculateCurrentAmounts() {
-        var rowsCount = $('#grid_GuardianshipDetails').children().length;
+        var rowsCount = $('#grid_FinancialCustodyDetails').children().length;
         var depositAmount = 0;
         var withdrawAmount = 0;
         for (var i = 0; i < rowsCount - 1; i++) {
-            depositAmount += parseStringInt($('#grid_GuardianshipDetails tr:eq(' + i + ') .depositValue').val());
-            withdrawAmount += parseStringInt($('#grid_GuardianshipDetails tr:eq(' + i + ') .withdrawValue').val());
+            depositAmount += parseStringInt($('#grid_FinancialCustodyDetails tr:eq(' + i + ') .depositValue').val());
+            withdrawAmount += parseStringInt($('#grid_FinancialCustodyDetails tr:eq(' + i + ') .withdrawValue').val());
         }
         depositsAmount.html(depositAmount.toString());
         withdrawsAmount.html(withdrawAmount.toString());
