@@ -14,7 +14,7 @@
 
 window.$ = window.jQuery = require('jquery');
 
-window.flatpickr = require('flatpickr');
+window.flatpickr = require("flatpickr");
 
 window.he = require('he');
 
@@ -23,3 +23,5 @@ const Arabic = require('flatpickr/dist/l10n/ar.js').ar;
 flatpickr.localize(Arabic);
 
 window.pdfobject = require('pdfobject');
+
+window.monthSelectPlugin = require('flatpickr/dist/plugins/monthSelect');

@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * App\Models\DepositWithdraw
+ * App\Models\FinancialCustodyItem
  *
  * @property int $id
  * @property float|null $depositValue
@@ -45,17 +45,14 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DepositWithdraw whereWithdrawValue($value)
  * @mixin \Eloquent
  */
-class DepositWithdraw extends Model {
+class FinancialCustodyItem extends Model {
 
-    //use SoftDeletes;
-
-    //protected $dates = ['due_date'];
 
     protected $fillable = [
         'depositValue',
         'withdrawValue',
         'recordDesc',
-        
+
         'cbo_processes',
         'client_id',
         'employee_id',
@@ -66,31 +63,16 @@ class DepositWithdraw extends Model {
         'user_id',
         'payMethod',
         'notes',
-        'due_date'
+        'due_date',
+
+        'approved_at',
+        'approved_by',
+        'daily_cash_id'
     ];
 
 
-    public function items() {
-        return $this->hasMany('App\Models\ClientProcessItem', 'process_id');
+    public function financialCustody() {
+        return $this->belongsTo(FinancialCustody::class);
     }
 
-    public function employee() {
-        return $this->hasOne('App\Models\Employee', 'id');
-    }
-    
-    public function client() {
-        return $this->hasOne('App\Models\Client', 'id');
-    }
-    
-    public function supplier() {
-        return $this->hasOne('App\Models\Supplier', 'id');
-    }
-
-    public function expenses() {
-        return $this->hasOne('App\Models\Expenses', 'id');
-    }
-    
-    public function employeeLogBorrowBillings() {
-        return $this->hasMany(EmployeeBorrowBilling::class, 'deposit_id', 'id');
-    }
 }

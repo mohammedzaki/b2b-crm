@@ -36,7 +36,7 @@ use App\Helpers\Helpers;
  * Description of DailyCashController
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
- * 
+ *
  * @Controller(prefix="/depositwithdraw")
  * @Resource("depositwithdraw")
  * @Middleware({"web", "auth", "ability:admin,deposit-withdraw"})
@@ -56,35 +56,79 @@ class DailyCashController extends Controller
         return $this->getDepositWithdrawsItems($startDate, $endDate, 0);
     }
 
-    protected function validator(array $data, $id = null)
+    private function getDepositWithdrawsItems(DateTime $startDate, DateTime $endDate, $canEdit)
     {
-        $validator = Validator::make($data, [
-                        /* 'depositValue' => 'numeric',
-                          'withdrawValue' => 'numeric',
-                          'recordDesc' => 'required|string',
-                          'cbo_processes' => 'numeric',
-                          'client_id' => 'exists:clients,id',
-                          'employee_id' => 'exists:employees,id',
-                          'supplier_id' => 'exists:suppliers,id',
-                          //'expenses_id' => 'exists:expenses,id',
-                          'payMethod' => 'required|numeric',
-                          'notes' => 'string' */
-        ]);
+        $numbers['clients_number']         = Client::count();
+        $numbers['suppliers_number']       = Supplier::count();
+        $numbers['process_number']         = ClientProcess::count();
+        $numbers['Supplierprocess_number'] = SupplierProcess::count();
+        $numbers['current_dayOfWeek']      = $startDate->dayOfWeek;
+        $numbers['current_dayOfMonth']     = $startDate->day;
+        $numbers['current_month']          = $startDate->month - 1;
+        $numbers['current_year']           = $startDate->year;
+        $depositWithdrawsItems             = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->get();
+        $numbers['withdrawsAmount']        = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
+        $numbers['depositsAmount']         = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+        $numbers['currentAmount']          = $this->calculateCurrentAmount($endDate);
+        $numbers['previousDayAmount']      = $this->calculateCurrentAmount($endDate->addDay(-1));
 
-        $validator->setAttributeNames([
-                /* 'depositValue' => 'قيمة الوارد',
-                  'withdrawValue' => 'قيمة المنصرف',
-                  'recordDesc' => 'البيان',
-                  'cbo_processes' => 'اسم العملية',
-                  'client_id' => 'اسم العميل',
-                  'employee_id' => 'مشرف العملية',
-                  'expenses_id' => 'اسم المصروف',
-                  'payMethod' => 'طريقة الدفع',
-                  'supplier_id' => 'اسم المورد',
-                  'notes' => 'ملاحظات' */
-        ]);
+        $employees       = Employee::all('id', 'name')->mapWithKeys(function ($emp) {
+            return [$emp->id => $emp->name];
+        });
+        $expenses        = Expenses::all('id', 'name');
+        $clients         = Client::all()->mapWithKeys(function ($client) {
+            return [$client->id => [
+                'name'           => $client->name,
+                'hasOpenProcess' => $client->hasOpenProcess(),
+                'processes'      => $client->processes->mapWithKeys(function ($process) {
+                    return [$process->id => [
+                        'name'   => $process->name,
+                        'status' => $process->status
+                    ]
+                    ];
+                })
+            ]
+            ];
+        });
+        $suppliers       = Supplier::all()->mapWithKeys(function ($supplier) {
+            return [$supplier->id => [
+                'name'           => $supplier->name,
+                'hasOpenProcess' => $supplier->hasOpenProcess(),
+                'processes'      => $supplier->processes->mapWithKeys(function ($process) {
+                    return [$process->id => [
+                        'name'   => $process->name,
+                        'status' => $process->status
+                    ]
+                    ];
+                })
+            ]
+            ];
+        });
+        $payMethods      = PaymentMethods::all();
+        $employeeActions = collect(EmployeeActions::all())->toJson();
 
-        return $validator;
+        return view('cash.journal.daily-cash')->with([
+                                                         'numbers'          => $numbers,
+                                                         'clients'          => $clients,
+                                                         'employees'        => $employees,
+                                                         'suppliers'        => $suppliers,
+                                                         'expenses'         => $expenses,
+                                                         'depositWithdraws' => $depositWithdrawsItems,
+                                                         'payMethods'       => $payMethods,
+                                                         'canEdit'          => $canEdit,
+                                                         'employeeActions'  => $employeeActions
+                                                     ]);
+    }
+
+    private function calculateCurrentAmount($endDate = null, $startDate = '2000-01-01 00:00:00')
+    {
+        if (!isset($endDate)) {
+            $endDate = DateTime::today()->format('Y-m-d 00:00:00');
+        }
+        $depositValue  = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+        $withdrawValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
+        $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
+        return round(($depositValue + $openingAmount) - $withdrawValue, Helpers::getDecimalPointCount());
     }
 
     /**
@@ -100,55 +144,44 @@ class DailyCashController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request  $request
+     * @param  Request $request
      * @return Response
      */
     public function store(Request $request)
     {
-        $all       = $request->all();
-        $validator = $this->validator($all);
-        if ($validator->fails()) {
-            return response()->json(array(
-                        'success' => false,
-                        'message' => 'حدث حطأ في حفظ البيانات.',
-                        'errors'  => $validator->getMessageBag()->toArray()
-            ));
-        } else {
-            // FIXME: رد عهدة مرتين
-            // FIXME: save with expense_id = null and value of deposit = 0
-            DB::beginTransaction();
-            $all['due_date'] = DateTime::parse($request->due_date);
-            $depositWithdraw = DepositWithdraw::create();
-            if (isset($request->employee_id)) {
-                $this->checkEmployeeAction($request, $depositWithdraw->id);
-            }
-            $depositWithdraw->update($all);
-            $this->checkProcessClosed($depositWithdraw);
-            DB::commit();
-            return response()->json([
-                        'success'       => true,
-                        'id'            => $depositWithdraw->id,
-                        'currentAmount' => $this->calculateCurrentAmount(),
-                        'message'       => 'تم اضافة وارد جديد.'
-            ]);
+        $request['user_id'] = auth()->user()->id;
+        DB::beginTransaction();
+        $request['due_date'] = DateTime::parse($request->due_date);
+        //dd($request->all());
+        $depositWithdraw = DepositWithdraw::create();
+        if (isset($request->employee_id)) {
+            $this->checkEmployeeAction($request, $depositWithdraw->id);
         }
+        $depositWithdraw->update($request->all());
+        $this->checkProcessClosed($depositWithdraw);
+        DB::commit();
+        return response()->json([
+                                    'success'       => true,
+                                    'id'            => $depositWithdraw->id,
+                                    'currentAmount' => $this->calculateCurrentAmount(),
+                                    'message'       => 'تم اضافة وارد جديد.'
+                                ]);
     }
 
-    function checkEmployeeAction(Request $request, $id, $is_update = FALSE)
+    function checkEmployeeAction(Request &$request, $id, $is_update = FALSE)
     {
         $employee = Employee::findOrFail($request->employee_id);
+        if (!isset($request->expenses_id)) {
+            throw new ValidationException('يجب اختيار اسم المصروف');
+        }
         switch ($request->expenses_id) {
             case EmployeeActions::FinancialCustody:
-                $this->checkFinancialCustody($employee, $is_update);
-                break;
-            case EmployeeActions::FinancialCustodyRefund:
-                $this->checkFinancialCustodyRefund($employee, $request->depositValue, $is_update);
+                $this->setFinancialCustody($employee, $request);
                 break;
             case EmployeeActions::PayLongBorrow:
                 $this->payLongBorrow($employee, $request->depositValue, DateTime::parse($request->due_date), $id, $is_update);
                 break;
             case EmployeeActions::SmallBorrow:
-
                 break;
             default:
                 DB::rollBack();
@@ -156,28 +189,21 @@ class DailyCashController extends Controller
         }
     }
 
-    function checkFinancialCustody(Employee $employee, $is_update = FALSE)
+    function setFinancialCustody(Employee $employee, Request &$request)
     {
-        if ($is_update) {
-            return;
+        $currentFinancialCustody = $employee->currentFinancialCustody();
+        if ($currentFinancialCustody == null) {
+            $date                    = DateTime::parse($request->due_date);
+            $monthName               = $date->getMonthName();
+            $currentFinancialCustody = [
+                'user_id'     => $request->user_id,
+                'description' => "عهدة شراء شهر {$monthName} ",
+                'notes'       => '',
+                'due_date'    => $request->due_date
+            ];
+            $currentFinancialCustody = $employee->financialCustodies()->create($currentFinancialCustody);
         }
-        $lG    = $employee->lastFinancialCustody();
-        $lGR   = $employee->lastFinancialCustodyRefund();
-        $lGId  = $employee->lastFinancialCustodyId();
-        $lGRId = $employee->lastFinancialCustodyRefundId();
-        //
-        if (($lG != $lGR) || ($lGId > $lGRId)) {
-            DB::rollBack();
-            throw new ValidationException('خطأ العهدة السابقة لم ترد بعد');
-        }
-    }
-
-    function checkFinancialCustodyRefund(Employee $employee, $depositValue, $is_update = FALSE)
-    {
-        if ($employee->lastFinancialCustody() != $depositValue) {
-            DB::rollBack();
-            throw new ValidationException('القيمة المردودة لا تساوى قيمة العهدة السابقة');
-        }
+        $request['financial_custody_id'] = $currentFinancialCustody->id;
     }
 
     function payLongBorrow(Employee $employee, $depositValue, $due_date, $id, $is_update)
@@ -195,6 +221,18 @@ class DailyCashController extends Controller
         } else {
             DB::rollBack();
             throw new ValidationException('هذا الموظف ليس له دفعات متبقية');
+        }
+    }
+
+    function resetDiscountBorrows($id)
+    {
+        $depositWithdraw = DepositWithdraw::find($id);
+        foreach ($depositWithdraw->employeeLogBorrowBillings as $borrow) {
+            $borrow->paying_status = EmployeeBorrowBilling::UN_PAID;
+            $borrow->paid_amount   = null;
+            $borrow->paid_date     = null;
+            $borrow->deposit_id    = null;
+            $borrow->save();
         }
     }
 
@@ -221,22 +259,23 @@ class DailyCashController extends Controller
         }
     }
 
-    function resetDiscountBorrows($id)
+    private function checkProcessClosed(DepositWithdraw $depositWithdraw)
     {
-        $depositWithdraw = DepositWithdraw::find($id);
-        foreach ($depositWithdraw->employeeLogBorrowBillings as $borrow) {
-            $borrow->paying_status = EmployeeBorrowBilling::UN_PAID;
-            $borrow->paid_amount   = null;
-            $borrow->paid_date     = null;
-            $borrow->deposit_id    = null;
-            $borrow->save();
+        if (!empty($depositWithdraw->cbo_processes)) {
+            if (!empty($depositWithdraw->client_id)) {
+                $process = ClientProcess::findOrFail($depositWithdraw->cbo_processes);
+                $process->checkProcessMustClosed();
+            } else if (!empty($depositWithdraw->supplier_id)) {
+                $process = SupplierProcess::findOrFail($depositWithdraw->cbo_processes);
+                $process->checkProcessMustClosed();
+            }
         }
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request  $request
+     * @param  Request $request
      * @return Response
      * @Post("/lockSaveAll", as="depositwithdraw.lockSaveAll")
      */
@@ -251,18 +290,18 @@ class DailyCashController extends Controller
             $rowsIds[$id] = "Done";
         }
         return response()->json(array(
-                    'success'       => true,
-                    'rowsIds'       => $rowsIds,
-                    'currentAmount' => $this->calculateCurrentAmount(),
-                    'message'       => 'تم حفظ الوارد.',
-                        //'errors' => $validator->getMessageBag()->toArray()
-        ));
+                                    'success'       => true,
+                                    'rowsIds'       => $rowsIds,
+                                    'currentAmount' => $this->calculateCurrentAmount(),
+                                    'message'       => 'تم حفظ الوارد.',
+                                    //'errors' => $validator->getMessageBag()->toArray()
+                                ));
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request  $request
+     * @param  Request $request
      * @return Response
      * @Post("/removeSelected", as="depositwithdraw.removeSelected")
      */
@@ -281,21 +320,52 @@ class DailyCashController extends Controller
             $this->checkProcessClosed($depositWithdraw);
             $this->resetDiscountBorrows($depositWithdraw->id);
             DepositWithdraw::where('id', $id)->delete();
-            $rowsIds[$id]                   = "Done";
+            $rowsIds[$id] = "Done";
         }
         return response()->json(array(
-                    'success'       => true,
-                    'rowsIds'       => $rowsIds,
-                    'currentAmount' => $this->calculateCurrentAmount(),
-                    'message'       => 'تم حذف الوارد.',
-                        //'errors' => $validator->getMessageBag()->toArray()
-        ));
+                                    'success'       => true,
+                                    'rowsIds'       => $rowsIds,
+                                    'currentAmount' => $this->calculateCurrentAmount(),
+                                    'message'       => 'تم حذف الوارد.',
+                                    //'errors' => $validator->getMessageBag()->toArray()
+                                ));
+    }
+
+    protected function validator(array $data, $id = null)
+    {
+        $validator = Validator::make($data, [
+            /* 'depositValue' => 'numeric',
+              'withdrawValue' => 'numeric',
+              'recordDesc' => 'required|string',
+              'cbo_processes' => 'numeric',
+              'client_id' => 'exists:clients,id',
+              'employee_id' => 'exists:employees,id',
+              'supplier_id' => 'exists:suppliers,id',
+              //'expenses_id' => 'exists:expenses,id',
+              'payMethod' => 'required|numeric',
+              'notes' => 'string' */
+        ]);
+
+        $validator->setAttributeNames([
+                                          /* 'depositValue' => 'قيمة الوارد',
+                                            'withdrawValue' => 'قيمة المنصرف',
+                                            'recordDesc' => 'البيان',
+                                            'cbo_processes' => 'اسم العملية',
+                                            'client_id' => 'اسم العميل',
+                                            'employee_id' => 'مشرف العملية',
+                                            'expenses_id' => 'اسم المصروف',
+                                            'payMethod' => 'طريقة الدفع',
+                                            'supplier_id' => 'اسم المورد',
+                                            'notes' => 'ملاحظات' */
+                                      ]);
+
+        return $validator;
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      * @Get("/search", as="depositwithdraw.search")
      * @Middleware({"ability:admin,deposit-withdraw-edit"})
@@ -307,74 +377,10 @@ class DailyCashController extends Controller
         return $this->getDepositWithdrawsItems($startDate, $endDate, 1, TRUE);
     }
 
-    private function getDepositWithdrawsItems(DateTime $startDate, DateTime $endDate, $canEdit)
-    {
-        $numbers['clients_number']         = Client::count();
-        $numbers['suppliers_number']       = Supplier::count();
-        $numbers['process_number']         = ClientProcess::count();
-        $numbers['Supplierprocess_number'] = SupplierProcess::count();
-        $numbers['current_dayOfWeek']      = $startDate->dayOfWeek;
-        $numbers['current_dayOfMonth']     = $startDate->day;
-        $numbers['current_month']          = $startDate->month - 1;
-        $numbers['current_year']           = $startDate->year;
-        $depositWithdrawsItems             = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->get();
-        $numbers['withdrawsAmount']        = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
-        $numbers['depositsAmount']         = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
-        $numbers['currentAmount']          = $this->calculateCurrentAmount($endDate);
-        $numbers['previousDayAmount']      = $this->calculateCurrentAmount($endDate->addDay(-1));
-
-        $employees = Employee::all('id', 'name')->mapWithKeys(function ($emp) {
-            return [$emp->id => $emp->name];
-        });
-        $expenses = Expenses::all('id', 'name');
-        $clients  = Client::all()->mapWithKeys(function ($client) {
-            return [$client->id => [
-                    'name'           => $client->name,
-                    'hasOpenProcess' => $client->hasOpenProcess(),
-                    'processes'      => $client->processes->mapWithKeys(function ($process) {
-                                return [$process->id => [
-                                        'name'   => $process->name,
-                                        'status' => $process->status
-                                    ]
-                                ];
-                            })
-                ]
-            ];
-        });
-        $suppliers = Supplier::all()->mapWithKeys(function ($supplier) {
-            return [$supplier->id => [
-                    'name'           => $supplier->name,
-                    'hasOpenProcess' => $supplier->hasOpenProcess(),
-                    'processes'      => $supplier->processes->mapWithKeys(function ($process) {
-                                return [$process->id => [
-                                        'name'   => $process->name,
-                                        'status' => $process->status
-                                    ]
-                                ];
-                            })
-                ]
-            ];
-        });
-        $payMethods      = PaymentMethods::all();
-        $employeeActions = collect(EmployeeActions::all())->toJson();
-
-        return view('cash.journal.daily-cash')->with([
-                    'numbers'          => $numbers,
-                    'clients'          => $clients,
-                    'employees'        => $employees,
-                    'suppliers'        => $suppliers,
-                    'expenses'         => $expenses,
-                    'depositWithdraws' => $depositWithdrawsItems,
-                    'payMethods'       => $payMethods,
-                    'canEdit'          => $canEdit,
-                    'employeeActions'  => $employeeActions
-        ]);
-    }
-
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function show($id)
@@ -385,7 +391,7 @@ class DailyCashController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function edit($id)
@@ -396,73 +402,39 @@ class DailyCashController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  Request  $request
-     * @param  int  $id
+     * @param  Request $request
+     * @param  int $id
      * @return Response
      */
     public function update(Request $request, $id)
     {
-        $depositWithdraw = DepositWithdraw::findOrFail($id);
-        $all             = $request->all();
-        $validator       = $this->validator($all, $depositWithdraw->id);
-
-        if ($validator->fails()) {
-            return response()->json(array(
-                        'success' => false,
-                        'message' => 'حدث حطأ في حفظ البيانات.',
-                        'errors'  => $validator->getMessageBag()->toArray()
-            ));
-        } else {
-            if (isset($request->employee_id)) {
-                $this->checkEmployeeAction($request, $depositWithdraw->id, TRUE);
-            }
-            $all['due_date'] = DateTime::parse($request->due_date);
-            $depositWithdraw->update($all);
-            $this->checkProcessClosed($depositWithdraw);
-            return response()->json(array(
-                        'success'       => true,
-                        'id'            => $depositWithdraw->id,
-                        //'$depositWithdraw->cbo_processe' => $depositWithdraw->cbo_processes,
-                        'currentAmount' => $this->calculateCurrentAmount(),
-                        'message'       => 'تم تعديل وارد جديد.',
-                            //'errors' => $validator->getMessageBag()->toArray()
-            ));
+        $request->user_id = auth()->user()->id;
+        $depositWithdraw  = DepositWithdraw::findOrFail($id);
+        if (isset($request->employee_id)) {
+            $this->checkEmployeeAction($request, $depositWithdraw->id, TRUE);
         }
+        $request['due_date'] = DateTime::parse($request->due_date);
+        $depositWithdraw->update($request->all());
+        $this->checkProcessClosed($depositWithdraw);
+        return response()->json(array(
+                                    'success'       => true,
+                                    'id'            => $depositWithdraw->id,
+                                    //'$depositWithdraw->cbo_processe' => $depositWithdraw->cbo_processes,
+                                    'currentAmount' => $this->calculateCurrentAmount(),
+                                    'message'       => 'تم تعديل وارد جديد.',
+                                    //'errors' => $validator->getMessageBag()->toArray()
+                                ));
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return Response
      */
     public function destroy($id)
     {
         //
-    }
-
-    private function calculateCurrentAmount($endDate = null, $startDate = '2000-01-01 00:00:00')
-    {
-        if (!isset($endDate)) {
-            $endDate = DateTime::today()->format('Y-m-d 00:00:00');
-        }
-        $depositValue  = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
-        $withdrawValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
-        $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
-        return round(($depositValue + $openingAmount) - $withdrawValue, Helpers::getDecimalPointCount());
-    }
-
-    private function checkProcessClosed(DepositWithdraw $depositWithdraw)
-    {
-        if (!empty($depositWithdraw->cbo_processes)) {
-            if (!empty($depositWithdraw->client_id)) {
-                $process = ClientProcess::findOrFail($depositWithdraw->cbo_processes);
-                $process->checkProcessMustClosed();
-            } else if (!empty($depositWithdraw->supplier_id)) {
-                $process = SupplierProcess::findOrFail($depositWithdraw->cbo_processes);
-                $process->checkProcessMustClosed();
-            }
-        }
     }
 
 }

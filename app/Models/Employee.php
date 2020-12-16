@@ -37,6 +37,7 @@ use App\Helpers\Helpers;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EmployeeBorrow[] $longBorrows
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DepositWithdraw[] $smallBorrows
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\User[] $users
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\FinancialCustody[] $financialCustodies
  * @method static bool|null forceDelete()
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Employee onlyTrashed()
  * @method static bool|null restore()
@@ -70,29 +71,30 @@ class Employee extends Model
 
     use SoftDeletes;
 
+    public    $username = "";
+    public    $password = "";
     protected $dates    = ['deleted_at'];
-    protected $fillable = [
-        'name',
-        'emp_id',
-        'ssn',
-        'gender',
-        'martial_status',
-        'birth_date',
-        'department',
-        'hiring_date',
-        'daily_salary',
-        'working_hours',
-        'job_title',
-        'telephone',
-        'mobile',
-        'facility_id',
-        'can_not_use_program',
-        'borrow_system',
-        'current_job_id',
-        'deleted_at_id'
-    ];
-    public $username = "";
-    public $password = "";
+    protected $fillable
+                        = [
+            'name',
+            'emp_id',
+            'ssn',
+            'gender',
+            'martial_status',
+            'birth_date',
+            'department',
+            'hiring_date',
+            'daily_salary',
+            'working_hours',
+            'job_title',
+            'telephone',
+            'mobile',
+            'facility_id',
+            'can_not_use_program',
+            'borrow_system',
+            'current_job_id',
+            'deleted_at_id'
+        ];
 
     public function users()
     {
@@ -109,19 +111,14 @@ class Employee extends Model
         return $this->belongsTo(EmployeeJobProfile::class, 'current_job_id');
     }
 
-    public function smallBorrows()
-    {
-        return $this->hasMany(DepositWithdraw::class, 'employee_id', 'id')->where('expenses_id', EmployeeActions::SmallBorrow);
-    }
-
     public function totalSmallBorrows()
     {
         return $this->smallBorrows()->sum('withdrawValue');
     }
 
-    public function longBorrows()
+    public function smallBorrows()
     {
-        return $this->hasMany(EmployeeBorrow::class);
+        return $this->hasMany(DepositWithdraw::class, 'employee_id', 'id')->where('expenses_id', EmployeeActions::SmallBorrow);
     }
 
     public function totalLongBorrows()
@@ -129,12 +126,17 @@ class Employee extends Model
         return $this->longBorrows()->sum('amount');
     }
 
+    public function longBorrows()
+    {
+        return $this->hasMany(EmployeeBorrow::class);
+    }
+
     public function hasUnpaidBorrow()
     {
         $count = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
-                        ->select('employee_borrow_billing.*')->where([
-                    ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
-                    ['employee_borrows.employee_id', '=', $this->id]])->count();
+                               ->select('employee_borrow_billing.*')->where([
+                                                                                ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
+                                                                                ['employee_borrows.employee_id', '=', $this->id]])->count();
         if ($count > 0) {
             return TRUE;
         } else {
@@ -145,9 +147,9 @@ class Employee extends Model
     public function hasPaidBorrow()
     {
         $count = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
-                        ->select('employee_borrow_billing.*')->where([
-                    ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::PAID],
-                    ['employee_borrows.employee_id', '=', $this->id]])->count();
+                               ->select('employee_borrow_billing.*')->where([
+                                                                                ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::PAID],
+                                                                                ['employee_borrows.employee_id', '=', $this->id]])->count();
         if ($count > 0) {
             return TRUE;
         } else {
@@ -158,10 +160,10 @@ class Employee extends Model
     public function totalUnpaidBorrow()
     {
         $total = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
-                ->select('employee_borrow_billing.*')
-                ->where([
-            ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
-            ['employee_borrows.employee_id', '=', $this->id]]);
+                               ->select('employee_borrow_billing.*')
+                               ->where([
+                                           ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
+                                           ['employee_borrows.employee_id', '=', $this->id]]);
         $total = $total->sum('employee_borrow_billing.pay_amount') - $total->sum('employee_borrow_billing.paid_amount');
         return empty($total) ? 0 : $total;
     }
@@ -169,21 +171,31 @@ class Employee extends Model
     public function totalPaidBorrow()
     {
         $total = EmployeeBorrow::join('employee_borrow_billing', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
-                ->select('employee_borrow_billing.*')
-                ->where([
-            ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::PAID],
-            ['employee_borrows.employee_id', '=', $this->id]]);
+                               ->select('employee_borrow_billing.*')
+                               ->where([
+                                           ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::PAID],
+                                           ['employee_borrows.employee_id', '=', $this->id]]);
         $total = $total->sum('employee_borrow_billing.paid_amount');
         return empty($total) ? 0 : $total;
     }
 
     public function unpaidBorrows()
-    { //
+    {
         $borrows = EmployeeBorrowBilling::join('employee_borrows', 'employee_borrows.id', '=', 'employee_borrow_billing.employee_borrow_id')
-                        ->select('employee_borrow_billing.*')->where([
-                    ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
-                    ['employee_borrows.employee_id', '=', $this->id]])->get();
+                                        ->select('employee_borrow_billing.*')->where([
+                                                                                         ['employee_borrow_billing.paying_status', "=", EmployeeBorrowBilling::UN_PAID],
+                                                                                         ['employee_borrows.employee_id', '=', $this->id]])->get();
         return $borrows;
+    }
+
+    public function salaryPerSecond()
+    {
+        return round(($this->salaryPerMinute() / 60), Helpers::getDecimalPointCount());
+    }
+
+    public function salaryPerMinute()
+    {
+        return round(($this->salaryPerHour() / 60), Helpers::getDecimalPointCount());
     }
 
     public function salaryPerHour()
@@ -195,86 +207,38 @@ class Employee extends Model
         }
     }
 
-    public function salaryPerMinute()
-    {
-        return round(($this->salaryPerHour() / 60), Helpers::getDecimalPointCount());
-    }
-
-    public function salaryPerSecond()
-    {
-        return round(($this->salaryPerMinute() / 60), Helpers::getDecimalPointCount());
-    }
-
-    public function employeeFinancialCustodys(DateTime $dt)
+    public function employeeFinancialCustodys(DateTime $dt = null)
     {
         // Financial custody
-        $startDate        = DateTime::parse($dt)->startOfMonth();
-        $endDate          = DateTime::parse($dt)->endOfMonth();
-        $depositWithdraws = DB::select("SELECT distinct dw.* from deposit_withdraws as dw
-JOIN employees emp ON dw.employee_id = emp.id
-WHERE emp.id = {$this->id}
-AND dw.expenses_id in (" . EmployeeActions::FinancialCustody . ", " . EmployeeActions::FinancialCustodyRefund . ") 
-AND 
-((dw.due_date BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayFormat()}' AND dw.notes is null)
-OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayFormat()}')");
-
-        return $depositWithdraws;
-    }
-
-    public function lastFinancialCustody()
-    {
-        try {
-            $depositWithdraws = DepositWithdraw::where([
-                        ['employee_id', '=', $this->id],
-                        ['expenses_id', '=', EmployeeActions::FinancialCustody]
-                    ])->orderBy('id', 'desc')
-                    ->first();
-            return $depositWithdraws->withdrawValue;
-        } catch (\Exception $exc) {
-            return 0;
+        $startDate = DateTime::parse($dt)->startOfMonth();
+        $endDate   = DateTime::parse($dt)->endOfMonth();
+        if ($dt != null) {
+            return $this->financialCustodies()->whereBetween('created_at', [$startDate, $endDate])->get();
+        } else {
+            return $this->financialCustodies;
         }
     }
 
-    public function lastFinancialCustodyRefund()
+    /**
+     * @return FinancialCustody|null
+     */
+    public function currentFinancialCustody()
     {
         try {
-            $depositWithdraws = DepositWithdraw::where([
-                        ['employee_id', '=', $this->id],
-                        ['expenses_id', '=', EmployeeActions::FinancialCustodyRefund]
-                    ])->orderBy('id', 'desc')
-                    ->first();
-            return $depositWithdraws->depositValue;
+            $lfc = $this->financialCustodies->last();
+            if ($lfc->approved_at == null) {
+                return $lfc;
+            } else {
+                return null;
+            }
         } catch (\Exception $exc) {
-            return 0;
+            return null;
         }
     }
 
-    public function lastFinancialCustodyId()
+    public function financialCustodies()
     {
-        try {
-            $depositWithdraws = DepositWithdraw::where([
-                        ['employee_id', '=', $this->id],
-                        ['expenses_id', '=', EmployeeActions::FinancialCustody]
-                    ])->orderBy('id', 'desc')
-                    ->first();
-            return $depositWithdraws->id;
-        } catch (\Exception $exc) {
-            return 0;
-        }
-    }
-
-    public function lastFinancialCustodyRefundId()
-    {
-        try {
-            $depositWithdraws = DepositWithdraw::where([
-                        ['employee_id', '=', $this->id],
-                        ['expenses_id', '=', EmployeeActions::FinancialCustodyRefund]
-                    ])->orderBy('id', 'desc')
-                    ->first();
-            return $depositWithdraws->id;
-        } catch (\Exception $exc) {
-            return 0;
-        }
+        return $this->hasMany(FinancialCustody::class);
     }
 
 }

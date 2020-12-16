@@ -8,5 +8,5 @@
         <h1 class="page-header">مرتبات الموظفين</h1>
     </div>
 </div>
-@include('salary.select-employee')
+@include('common.select-employee', ['formConfig' => ['method' => 'GET', 'route' => ['salary.show', ''], 'id' => 'SearchForm']])
 @endsection

@@ -205,7 +205,7 @@ class SalaryController {
      * @return \Illuminate\Http\Response
      * @Get("financialCustodyaway/{employee_id}", as="salary.financialCustodyaway")
      */
-    public function financialCustodyaway(Request $request, $employee_id)
+    public function financialCustodyAway(Request $request, $employee_id)
     {
         $employee               = Employee::findOrFail($employee_id);
         $newDate                = DateTime::parse($request->date);
@@ -220,7 +220,7 @@ class SalaryController {
      * @return \Illuminate\Http\Response
      * @Get("financialCustodyback/{employee_id}", as="salary.financialCustodyback")
      */
-    public function financialCustodyback(Request $request, $employee_id)
+    public function financialCustodyBack(Request $request, $employee_id)
     {
         $employee               = Employee::findOrFail($employee_id);
         $depositWithdraw        = DepositWithdraw::findOrFail($employee->lastFinancialCustodyId());

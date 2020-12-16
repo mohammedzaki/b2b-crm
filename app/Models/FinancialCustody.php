@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property-read \App\Models\Employee $employee
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EmployeeBorrowBilling[] $employeeLogBorrowBillings
  * @property-read \App\Models\Expenses $expenses
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ClientProcessItem[] $items
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DepositWithdraw[] $deposits
  * @property-read \App\Models\Supplier $supplier
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DepositWithdraw whereCboProcesses($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DepositWithdraw whereClientId($value)
@@ -45,52 +45,34 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DepositWithdraw whereWithdrawValue($value)
  * @mixin \Eloquent
  */
-class DepositWithdraw extends Model {
+class FinancialCustody extends Model {
 
-    //use SoftDeletes;
-
-    //protected $dates = ['due_date'];
+    protected $dates = ['created_at', 'updated_at', 'approved_at'];
 
     protected $fillable = [
-        'depositValue',
-        'withdrawValue',
-        'recordDesc',
-        
-        'cbo_processes',
-        'client_id',
-        'employee_id',
-        'supplier_id',
-        'expenses_id',
-        'financial_custody_id',
-
-        'user_id',
-        'payMethod',
+        'amount',
+        'description',
         'notes',
-        'due_date'
+        'due_date',
+        'user_id',
+        'employee_id',
+        'approved_by',
+        'approved_at',
+        'updated_at',
+        'created_at'
     ];
 
 
-    public function items() {
-        return $this->hasMany('App\Models\ClientProcessItem', 'process_id');
+    public function deposits() {
+        return $this->hasMany(DepositWithdraw::class, 'financial_custody_id');
+    }
+
+    public function withdraws() {
+        return $this->hasMany(FinancialCustodyItem::class, 'financial_custody_id');
     }
 
     public function employee() {
-        return $this->hasOne('App\Models\Employee', 'id');
-    }
-    
-    public function client() {
-        return $this->hasOne('App\Models\Client', 'id');
-    }
-    
-    public function supplier() {
-        return $this->hasOne('App\Models\Supplier', 'id');
+        return $this->belongsTo(Employee::class);
     }
 
-    public function expenses() {
-        return $this->hasOne('App\Models\Expenses', 'id');
-    }
-    
-    public function employeeLogBorrowBillings() {
-        return $this->hasMany(EmployeeBorrowBilling::class, 'deposit_id', 'id');
-    }
 }

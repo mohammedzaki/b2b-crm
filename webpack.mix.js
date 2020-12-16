@@ -47,7 +47,8 @@ mix.styles([
     'resources/assets/css/responsive.css',
     'resources/assets/css/bootstrap-select.min.css',
     'resources/assets/css/custom.css',
-    'node_modules/flatpickr/dist/flatpickr.css'
+    'node_modules/flatpickr/dist/flatpickr.css',
+    'node_modules/flatpickr/dist/plugins/monthSelect/style.css'
 ], 'public/css/app.css').version();
 
 
