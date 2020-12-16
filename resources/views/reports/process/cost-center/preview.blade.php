@@ -1,7 +1,11 @@
 @extends("layouts.app") 
 @section("title", "تقرير عملية عميل - التقارير")
 @section("content")
-
+<style>
+    .isPending td{
+        background-color: rgba(255, 49, 21, 0.5) !important;
+    }
+</style>
 <div class="row">
     {{ Form::open(["route" => "reports.process.cost-center.print-pdf", "method" => "GET"]) }}
     <div class="col-lg-12" id="printcontent">
@@ -44,7 +48,7 @@
                                             </thead>
                                             <tbody>
                                                 @forelse ($process['processExpenses'] as $expense)
-                                                <tr class="odd">
+                                                <tr class="odd @if($expense['pending']) isPending @endif">
                                                     <td> {{ $expense['desc'] }} </td>
                                                     <td> {{ $expense['date'] }} </td>
                                                     <td style="color: red;"> {{ $expense['totalCost'] }} </td>

@@ -138,6 +138,15 @@ class ClientProcess extends Model {
         ]);
     }
 
+    public function pendingExpenses() {
+        return $this->hasMany(FinancialCustodyItem::class, 'cbo_processes')->where([
+                                                                                  ['client_id', "=", $this->client_id],
+                                                                                  ['withdrawValue', ">", 0],
+                                                                                  ['daily_cash_id', '=', null],
+                                                                                  ['approved_at', '=', null]
+                                                                              ]);
+    }
+
     public function manpowerCost() {
         return $this->hasMany(Attendance::class, 'process_id')
                 ->select(

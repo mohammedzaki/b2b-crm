@@ -9,27 +9,30 @@ use App\Reports\BaseReport;
 use App\Reports\IReport;
 use Debugbar;
 
-class CostCenter extends BaseReport implements IReport {
+class CostCenter extends BaseReport implements IReport
+{
 
     public
-            $clientId,
-            $processIds;
+        $clientId,
+        $processIds;
     private
-            $client,
-            $processes,
-            $totalProcessSuppliers,
-            $totalManpowerHoursCost,
-            $totalProcessExpenses,
-            $totalCompanyExpenses;
+        $client,
+        $processes,
+        $totalProcessSuppliers,
+        $totalManpowerHoursCost,
+        $totalProcessExpenses,
+        $totalCompanyExpenses;
 
-    public function setReportRefs() {
+    public function setReportRefs()
+    {
         $this->reportName  = 'CostCenter.pdf';
         $this->previewView = 'reports.process.cost-center.preview';
         $this->pdfView     = 'reports.process.cost-center.pdf';
         $this->cssPath     = 'ReportsHtml/Process/CostCenter.css';
     }
 
-    public function reportData() {
+    public function reportData()
+    {
         $this->client = Client::findOrFail($this->clientId);
         foreach ($this->processIds as $processId) {
             $process                       = ClientProcess::findOrFail($processId);
@@ -58,20 +61,32 @@ class CostCenter extends BaseReport implements IReport {
         return $data;
     }
 
-    private function getProcessExpences(ClientProcess $process) {
-        $processExpences = $process->expenses->map(function ($item, $key) {
+    private function getProcessExpences(ClientProcess $process)
+    {
+        $processExpences            = $process->expenses->map(function ($item, $key) {
             return [
+                'pending'   => false,
+                'desc'      => $item['recordDesc'],
+                'date'      => $item['due_date'],
+                'totalCost' => $item['withdrawValue'],
+            ];
+        });
+        $pendingExpences            = $process->pendingExpenses->map(function ($item, $key) {
+            return [
+                'pending'   => true,
                 'desc'      => $item['recordDesc'],
                 'date'      => $item['due_date'],
                 'totalCost' => $item['withdrawValue'],
             ];
         });
         $this->totalProcessExpenses = $processExpences->sum('totalCost');
-        return $processExpences;
+        $this->totalProcessExpenses += $pendingExpences->sum('totalCost');
+        return array_merge($processExpences->toArray(), $pendingExpences->toArray());
     }
 
-    private function getProcessSuppliers(ClientProcess $process) {
-        $processSuppliers = $process->suppliers->map(function ($item, $key) {
+    private function getProcessSuppliers(ClientProcess $process)
+    {
+        $processSuppliers            = $process->suppliers->map(function ($item, $key) {
             return [
                 'name'      => $item->supplier->name,
                 'desc'      => $item['name'],
@@ -83,27 +98,9 @@ class CostCenter extends BaseReport implements IReport {
         return $processSuppliers;
     }
 
-    private function getCompanyExpenses(ClientProcess $process) {
-        $companyExpenses            = collect([
-            [
-                "name"      => "كهرباء",
-                "totalDays" => "2",
-                "totalCost" => 20.45],
-            [
-                "name"      => "sample",
-                "totalDays" => "3",
-                "totalCost" => 20.45],
-            [
-                "name"      => "مثال",
-                "totalDays" => "2",
-                "totalCost" => 20.45]
-        ]);
-        $this->totalCompanyExpenses = $companyExpenses->sum('totalCost');
-        return $companyExpenses;
-    }
-
-    private function getManpowerHoursCost(ClientProcess $process) {
-        $manpowerCost = $process->manpowerCost->map(function ($item, $key) {
+    private function getManpowerHoursCost(ClientProcess $process)
+    {
+        $manpowerCost                 = $process->manpowerCost->map(function ($item, $key) {
             return [
                 'name'       => $item->employee->name,
                 'totalHours' => Helpers::hoursMinutsToString($item->working_hours_in_seconds),
@@ -116,11 +113,33 @@ class CostCenter extends BaseReport implements IReport {
         return $manpowerCost;
     }
 
-    private function getTotalProcessCost() {
+    private function getCompanyExpenses(ClientProcess $process)
+    {
+        $companyExpenses            = collect([
+                                                  [
+                                                      "name"      => "كهرباء",
+                                                      "totalDays" => "2",
+                                                      "totalCost" => 20.45],
+                                                  [
+                                                      "name"      => "sample",
+                                                      "totalDays" => "3",
+                                                      "totalCost" => 20.45],
+                                                  [
+                                                      "name"      => "مثال",
+                                                      "totalDays" => "2",
+                                                      "totalCost" => 20.45]
+                                              ]);
+        $this->totalCompanyExpenses = $companyExpenses->sum('totalCost');
+        return $companyExpenses;
+    }
+
+    private function getTotalProcessCost()
+    {
         return ($this->totalProcessSuppliers + $this->totalManpowerHoursCost + $this->totalProcessExpenses + $this->totalCompanyExpenses);
     }
 
-    private function resetTotals() {
+    private function resetTotals()
+    {
         $this->totalProcessSuppliers  = 0;
         $this->totalManpowerHoursCost = 0;
         $this->totalProcessExpenses   = 0;
