@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Constants\EmployeeActions;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property float|null $depositValue
  * @property float|null $withdrawValue
- * @property string|null $recordDesc
+ * @property string|null $description
  * @property int|null $cbo_processes
  * @property int|null $client_id
  * @property int|null $employee_id
@@ -64,7 +65,7 @@ class FinancialCustody extends Model {
 
 
     public function deposits() {
-        return $this->hasMany(DepositWithdraw::class, 'financial_custody_id');
+        return $this->hasMany(DepositWithdraw::class, 'financial_custody_id')->where('expenses_id', EmployeeActions::FinancialCustody);
     }
 
     public function withdraws() {
@@ -73,6 +74,10 @@ class FinancialCustody extends Model {
 
     public function employee() {
         return $this->belongsTo(Employee::class);
+    }
+
+    public function approved_by_data() {
+        return $this->hasOne(User::class, 'id', 'approved_by');
     }
 
 }

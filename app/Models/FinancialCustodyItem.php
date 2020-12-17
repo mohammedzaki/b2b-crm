@@ -64,6 +64,7 @@ class FinancialCustodyItem extends Model {
         'payMethod',
         'notes',
         'due_date',
+        'saveStatus',
 
         'approved_at',
         'approved_by',

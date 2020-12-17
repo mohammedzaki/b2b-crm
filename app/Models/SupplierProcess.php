@@ -110,11 +110,22 @@ class SupplierProcess extends Model {
         return $this->belongsTo(ClientProcess::class);
     }
 
-    public function withdrawals() {
+    public function withdrawals()
+    {
         return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
-                    ['supplier_id', "=", $this->supplier_id],
-                    ['withdrawValue', ">", 0],
-        ]);
+                                                                                  ['supplier_id', "=", $this->supplier_id],
+                                                                                  ['withdrawValue', ">", 0],
+                                                                              ]);
+    }
+
+    public function pendingWithdrawals()
+    {
+        return $this->hasMany(FinancialCustodyItem::class, 'cbo_processes')->where([
+                                                                                       ['supplier_id', "=", $this->supplier_id],
+                                                                                       ['withdrawValue', ">", 0],
+                                                                                       ['daily_cash_id', '=', null],
+                                                                                       ['approved_at', '=', null]
+                                                                                   ]);
     }
 
     public function totalWithdrawals() {

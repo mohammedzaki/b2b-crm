@@ -413,7 +413,7 @@ class DailyCashController extends Controller
         if (isset($request->employee_id)) {
             $this->checkEmployeeAction($request, $depositWithdraw->id, TRUE);
         }
-        $request['due_date'] = DateTime::parse($request->due_date);
+        unset($request['due_date']); // to prevent changing the date
         $depositWithdraw->update($request->all());
         $this->checkProcessClosed($depositWithdraw);
         return response()->json(array(

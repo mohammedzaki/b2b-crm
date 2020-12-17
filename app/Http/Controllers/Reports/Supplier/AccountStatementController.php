@@ -134,6 +134,19 @@ class AccountStatementController extends Controller {
                     $proceses[$id]['processDetails'][$index]['desc'] = $withdrawal->recordDesc;
                     $index++;
                 }
+
+                foreach ($supplierProcess->pendingWithdrawals as $withdrawal) {
+                    $totalWithdrawalValue += $withdrawal->withdrawValue;
+                    $proceses[$id]['processDetails'][$index]['pending'] = 1;
+                    $proceses[$id]['processDetails'][$index]['date'] = DateTime::parse($withdrawal->due_date)->format('Y-m-d');
+                    $proceses[$id]['processDetails'][$index]['remaining'] = $supplierProcess->total_price_taxes - $totalWithdrawalValue;
+                    $proceses[$id]['processDetails'][$index]['paid'] = $withdrawal->withdrawValue;
+                    $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
+                    $proceses[$id]['processDetails'][$index]['unitPrice'] = "";
+                    $proceses[$id]['processDetails'][$index]['quantity'] = "";
+                    $proceses[$id]['processDetails'][$index]['desc'] = $withdrawal->recordDesc;
+                    $index++;
+                }
             }
         }
         session([
