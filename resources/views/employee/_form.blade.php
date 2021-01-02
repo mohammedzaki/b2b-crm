@@ -8,7 +8,7 @@
 
             <div class="col-lg-12">
                 <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
-                    {{ Form::label('name', 'اسم الموظف') }} 
+                    {{ Form::label('name', 'اسم الموظف') }}
                     {{ Form::text('name', null, 
                         array(
                             'class' => 'form-control', 
@@ -27,7 +27,7 @@
 
             <div class="col-lg-6">
                 <div class="form-group{{ $errors->has('ssn') ? ' has-error' : '' }}">
-                    {{ Form::label('ssn', 'الرقم القومى') }} 
+                    {{ Form::label('ssn', 'الرقم القومى') }}
                     {{ Form::text('ssn', null, 
                         array(
                             'class' => 'form-control', 
@@ -188,7 +188,7 @@
             <div class="clearboth"></div>
 
             <div class="hidden_input02" >
-                <div class="col-lg-6"> 
+                <div class="col-lg-6">
                     <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
                         {{ Form::label('username', 'اسم المستخدم') }}
                         {{ Form::text('username', null, 
@@ -206,7 +206,7 @@
                     </div>
                 </div>
 
-                <div class="col-lg-6"> 
+                <div class="col-lg-6">
                     <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
                         {{ Form::label('password', 'كلمة المرور') }}
                         {{ Form::password('password', 
@@ -232,7 +232,7 @@
                             'id' => 'borrow_system',
                             'class' => 'checkbox_show_input'
                         )
-                    ) }} 
+                    ) }}
                     {{ Form::label('borrow_system', 'نظام السلف') }}
                 </div>
             </div>
@@ -241,7 +241,7 @@
         <!-- /.panel-body -->
     </div>
     <!-- /.panel -->
-
+    @if(isset($model))
     <div class="panel panel-default">
         <div class="panel-heading">
             بيانات الوظيفة
@@ -302,7 +302,7 @@
                     @endif
                 </div>
             </div>
-            @if(isset($model))
+
             <div class="col-lg-3 ">
                 <div class="form-group">
                     <label for="inputError" class="control-label">
@@ -321,12 +321,13 @@
                     </button>
                 </div>
             </div>
-            @endif
+
         </div>
+
         <!-- /.panel-body -->
     </div>
     <!-- /.panel -->
-
+    @endif
 </div>
 
 <div class="col-lg-5">
@@ -393,8 +394,20 @@
 
 @section('scripts')
 <script>
-    @if(isset($model)) 
+    @if(isset($model))
         var empId = '{{ $employee->id }}';
+        $('#btnUpdateJobProfile').on({
+            'click': function () {
+                var link = "{{ route('employee.employeeJobProfile.create', ['employee' => $employee->id]) }}";
+                window.location.href = link;
+            }
+        });
+        $('#btnViewJobProfiles').on({
+            'click': function () {
+                var link = "{{ route('employee.employeeJobProfile.index', ['employee' => $employee->id]) }}";
+                window.location.href = link;
+            }
+        });
     @endif
     $(function () {
       $("#datepicker").datepicker({
@@ -418,18 +431,6 @@
         $("#username").val('');
         $("#password").val('');
       }
-      $('#btnUpdateJobProfile').on({
-        'click': function () {
-            var link = "{{ route('employee.employeeJobProfile.create', ['employee' => $employee->id]) }}";
-            window.location.href = link;
-        }
-      });
-      $('#btnViewJobProfiles').on({
-        'click': function () {
-            var link = "{{ route('employee.employeeJobProfile.index', ['employee' => $employee->id]) }}";
-            window.location.href = link;
-        }
-      });
     });
 </script>
 @endsection
