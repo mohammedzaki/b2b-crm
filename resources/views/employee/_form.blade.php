@@ -16,9 +16,9 @@
                         )
                     }}
                     @if ($errors->has('name'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('name') }}
-                    </label>
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('name') }}
+                        </label>
                     @endif
                 </div>
             </div>
@@ -35,9 +35,9 @@
                         )
                     }}
                     @if ($errors->has('ssn'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('ssn') }}
-                    </label>
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('ssn') }}
+                        </label>
                     @endif
                 </div>
             </div>
@@ -58,9 +58,9 @@
                         )
                     }}
                     @if ($errors->has('gender'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('gender') }}
-                    </label>
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('gender') }}
+                        </label>
                     @endif
                 </div>
             </div>
@@ -85,9 +85,9 @@
                         )
                     }}
                     @if ($errors->has('martial_status'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('martial_status') }}
-                    </label>
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('martial_status') }}
+                        </label>
                     @endif
                 </div>
             </div>
@@ -102,9 +102,9 @@
                         )
                     }}
                     @if ($errors->has('department'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('department') }}
-                    </label>
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('department') }}
+                        </label>
                     @endif
                 </div>
             </div>
@@ -122,9 +122,9 @@
                         )
                     }}
                     @if ($errors->has('birth_date'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('birth_date') }}
-                    </label>
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('birth_date') }}
+                        </label>
                     @endif
 
                 </div>
@@ -141,9 +141,9 @@
                         )
                     }}
                     @if ($errors->has('hiring_date'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('hiring_date') }}
-                    </label>
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('hiring_date') }}
+                        </label>
                     @endif
 
                 </div>
@@ -161,9 +161,9 @@
                         )
                     }}
                     @if ($errors->has('mobile'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('mobile') }}
-                    </label>
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('mobile') }}
+                        </label>
                     @endif
                 </div>
             </div>
@@ -178,16 +178,16 @@
                         )
                     }}
                     @if ($errors->has('telephone'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('telephone') }}
-                    </label>
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('telephone') }}
+                        </label>
                     @endif
                 </div>
             </div>
 
             <div class="clearboth"></div>
 
-            <div class="hidden_input02" >
+            <div class="hidden_input02">
                 <div class="col-lg-6">
                     <div class="form-group{{ $errors->has('username') ? ' has-error' : '' }}">
                         {{ Form::label('username', 'اسم المستخدم') }}
@@ -199,9 +199,9 @@
                         )
                         }}
                         @if ($errors->has('username'))
-                        <label for="inputError" class="control-label">
-                            {{ $errors->first('username') }}
-                        </label>
+                            <label for="inputError" class="control-label">
+                                {{ $errors->first('username') }}
+                            </label>
                         @endif
                     </div>
                 </div>
@@ -217,9 +217,9 @@
                         )
                         }}
                         @if ($errors->has('password'))
-                        <label for="inputError" class="control-label">
-                            {{ $errors->first('password') }}
-                        </label>
+                            <label for="inputError" class="control-label">
+                                {{ $errors->first('password') }}
+                            </label>
                         @endif
                     </div>
                 </div>
@@ -242,91 +242,91 @@
     </div>
     <!-- /.panel -->
     @if(isset($model))
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            بيانات الوظيفة
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                بيانات الوظيفة
+            </div>
+            <!-- /.panel-heading -->
+            <div class="panel-body">
+
+                <div class="col-lg-6 ">
+                    <div class="form-group{{ $errors->has('job_title') ? ' has-error' : '' }}">
+                        {{ Form::label('currentJobProfile[job_title]', 'الوظيفة') }}
+                        {{ Form::text('currentJobProfile[job_title]', null,
+                            array(
+                                'disabled' => 'disabled',
+                                'class' => 'form-control',
+                                'placeholder' => 'ادخل الوظيفة')
+                            )
+                        }}
+                        @if ($errors->has('job_title'))
+                            <label for="inputError" class="control-label">
+                                {{ $errors->first('job_title') }}
+                            </label>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="col-lg-6 ">
+                    <div class="form-group{{ $errors->has('daily_salary') ? ' has-error' : '' }}">
+                        {{ Form::label('currentJobProfile[daily_salary]', 'الراتب اليومى') }}
+                        {{ Form::text('currentJobProfile[daily_salary]', null,
+                            array(
+                                'disabled' => 'disabled',
+                                'class' => 'form-control',
+                                'placeholder' => 'ادخل الراتب اليومى')
+                            )
+                        }}
+                        @if ($errors->has('daily_salary'))
+                            <label for="inputError" class="control-label">
+                                {{ $errors->first('daily_salary') }}
+                            </label>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="col-lg-6 ">
+                    <div class="form-group{{ $errors->has('working_hours') ? ' has-error' : '' }}">
+                        {{ Form::label('currentJobProfile[working_hours]', 'ساعات العمل') }}
+                        {{ Form::text('currentJobProfile[working_hours]', null,
+                            array(
+                                'disabled' => 'disabled',
+                                'class' => 'form-control',
+                                'placeholder' => 'ادخل ساعات العمل')
+                            )
+                        }}
+                        @if ($errors->has('working_hours'))
+                            <label for="inputError" class="control-label">
+                                {{ $errors->first('working_hours') }}
+                            </label>
+                        @endif
+                    </div>
+                </div>
+
+                <div class="col-lg-3 ">
+                    <div class="form-group">
+                        <label for="inputError" class="control-label">
+                        </label>
+                        <button class="btn btn-lg btn-block btn-success" type="button" id="btnUpdateJobProfile">
+                            تعديل بيانات الوظيفة
+                        </button>
+                    </div>
+                </div>
+                <div class="col-lg-3 ">
+                    <div class="form-group">
+                        <label for="inputError" class="control-label">
+                        </label>
+                        <button class="btn btn-lg btn-block btn-success" type="button" id="btnViewJobProfiles">
+                            الوظائف السابقة
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- /.panel-body -->
         </div>
-        <!-- /.panel-heading -->
-        <div class="panel-body">
-
-            <div class="col-lg-6 ">
-                <div class="form-group{{ $errors->has('job_title') ? ' has-error' : '' }}">
-                    {{ Form::label('currentJobProfile[job_title]', 'الوظيفة') }}
-                    {{ Form::text('currentJobProfile[job_title]', null, 
-                        array(
-                            'disabled' => 'disabled',
-                            'class' => 'form-control', 
-                            'placeholder' => 'ادخل الوظيفة')
-                        )
-                    }}
-                    @if ($errors->has('job_title'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('job_title') }}
-                    </label>
-                    @endif
-                </div>
-            </div>
-
-            <div class="col-lg-6 ">
-                <div class="form-group{{ $errors->has('daily_salary') ? ' has-error' : '' }}">
-                    {{ Form::label('currentJobProfile[daily_salary]', 'الراتب اليومى') }}
-                    {{ Form::text('currentJobProfile[daily_salary]', null, 
-                        array(
-                            'disabled' => 'disabled',
-                            'class' => 'form-control', 
-                            'placeholder' => 'ادخل الراتب اليومى')
-                        )
-                    }}
-                    @if ($errors->has('daily_salary'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('daily_salary') }}
-                    </label>
-                    @endif
-                </div>
-            </div>
-
-            <div class="col-lg-6 ">
-                <div class="form-group{{ $errors->has('working_hours') ? ' has-error' : '' }}">
-                    {{ Form::label('currentJobProfile[working_hours]', 'ساعات العمل') }}
-                    {{ Form::text('currentJobProfile[working_hours]', null, 
-                        array(
-                            'disabled' => 'disabled',
-                            'class' => 'form-control', 
-                            'placeholder' => 'ادخل ساعات العمل')
-                        )
-                    }}
-                    @if ($errors->has('working_hours'))
-                    <label for="inputError" class="control-label">
-                        {{ $errors->first('working_hours') }}
-                    </label>
-                    @endif
-                </div>
-            </div>
-
-            <div class="col-lg-3 ">
-                <div class="form-group">
-                    <label for="inputError" class="control-label">
-                    </label>
-                    <button class="btn btn-lg btn-block btn-success" type="button" id="btnUpdateJobProfile">
-                        تعديل بيانات الوظيفة
-                    </button>
-                </div>
-            </div>
-            <div class="col-lg-3 ">
-                <div class="form-group">
-                    <label for="inputError" class="control-label">
-                    </label>
-                    <button class="btn btn-lg btn-block btn-success" type="button" id="btnViewJobProfiles">
-                        الوظائف السابقة
-                    </button>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- /.panel-body -->
-    </div>
-    <!-- /.panel -->
+        <!-- /.panel -->
     @endif
 </div>
 
@@ -340,28 +340,28 @@
             <div class="table-responsive hidden_input02">
                 <table class="table table-striped table-bordered table-hover">
                     <thead>
-                        <tr>
-                            <th style="width: 35px;">م</th>
-                            <th style="width: 50px;">اختيار</th>
-                            <th>شاشات النظام</th>
-                        </tr>
+                    <tr>
+                        <th style="width: 35px;">م</th>
+                        <th style="width: 50px;">اختيار</th>
+                        <th>شاشات النظام</th>
+                    </tr>
                     </thead>
                     <tbody>
-                        @forelse ($permissions as $permission)
+                    @forelse ($permissions as $permission)
                         <tr role="row">
                             <td class="text-center">{{ $permission->id }}</td>
                             <td class="text-center">
                                 @if(isset($selectedPermissions))
-                                {{ Form::checkbox('permissions[]', $permission->id, in_array($permission->id, $selectedPermissions)) }}
+                                    {{ Form::checkbox('permissions[]', $permission->id, in_array($permission->id, $selectedPermissions)) }}
                                 @else
-                                {{ Form::checkbox('permissions[]', $permission->id) }}
+                                    {{ Form::checkbox('permissions[]', $permission->id) }}
                                 @endif
                             </td>
                             <td>{{ $permission->display_name }}</td>
                         </tr>
-                        @empty
+                    @empty
                         <tr>لا يوجد صلاحيات.</tr>
-                        @endforelse
+                    @endforelse
                     </tbody>
                 </table>
             </div>
@@ -384,17 +384,17 @@
     <div class="col-lg-7">
         <button class="btn btn-lg btn-block btn-success" type="submit">
             @if(isset($model))
-            تعديل بيانات موظف
+                تعديل بيانات موظف
             @else
-            أضف موظف جديد
+                أضف موظف جديد
             @endif
         </button>
     </div>
 </row>
 
 @section('scripts')
-<script>
-    @if(isset($model))
+    <script>
+        @if(isset($model))
         var empId = '{{ $employee->id }}';
         $('#btnUpdateJobProfile').on({
             'click': function () {
@@ -408,29 +408,29 @@
                 window.location.href = link;
             }
         });
-    @endif
-    $(function () {
-      $("#datepicker").datepicker({
-        changeMonth: true,
-        changeYear: true,
-        yearRange: "-60:-15",
-        dateFormat: 'yy-mm-dd'
-      });
-      $("#datepicker2").datepicker({
-        changeMonth: true,
-        changeYear: true,
-        yearRange: "-20:+0",
-        dateFormat: 'yy-mm-dd'
-      });
+        @endif
+        $(function () {
+            $("#datepicker").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "-60:-15",
+                dateFormat: 'yy-mm-dd'
+            });
+            $("#datepicker2").datepicker({
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "-20:+0",
+                dateFormat: 'yy-mm-dd'
+            });
 
-      $('#can_not_use_program').click(function () {
-        $(".hidden_input02").slideToggle(this.checked);
-      });
-      if ($('#can_not_use_program').is(':checked')) {
-        $(".hidden_input02").slideToggle(this.checked);
-        $("#username").val('');
-        $("#password").val('');
-      }
-    });
-</script>
+            $('#can_not_use_program').click(function () {
+                $(".hidden_input02").slideToggle(this.checked);
+            });
+            if ($('#can_not_use_program').is(':checked')) {
+                $(".hidden_input02").slideToggle(this.checked);
+                $("#username").val('');
+                $("#password").val('');
+            }
+        });
+    </script>
 @endsection

@@ -19,7 +19,7 @@ use Validator;
 class EmployeeController extends Controller
 {
 
-    protected function validator(array $data, $user = null)
+    protected function validator(array $data, $user_id = null)
     {
         $validator = Validator::make($data, [
                     'name'                            => 'required|min:6|max:255',
@@ -33,7 +33,7 @@ class EmployeeController extends Controller
                     'mobile'                          => 'required|digits:11',
                     'can_not_use_program'             => 'boolean',
                     'borrow_system'                   => 'boolean',
-                    'username'                        => 'required_without:can_not_use_program|unique:users,username,' . $user->id,
+                    'username'                        => 'required_without:can_not_use_program|unique:users,username,' . $user_id,
                     'password'                        => 'required_without:can_not_use_program'
         ]);
 
@@ -176,7 +176,7 @@ class EmployeeController extends Controller
         if (empty($request->password)) {
             $all['password'] = "noChange";
         }
-        $validator = $this->validator($all, $user);
+        $validator = $this->validator($all, $user->id);
 
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
