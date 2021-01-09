@@ -24,10 +24,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Carbon\Carbon|null $updated_at
  * @property-read \App\Models\Client $client
  * @property-read \App\Models\Employee $employee
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\EmployeeBorrowBilling[] $employeeLogBorrowBillings
- * @property-read \App\Models\Expenses $expenses
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ClientProcessItem[] $items
- * @property-read \App\Models\Supplier $supplier
+ * @property-read \App\Models\FinancialCustody $financialCustody
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DepositWithdraw whereCboProcesses($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DepositWithdraw whereClientId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DepositWithdraw whereCreatedAt($value)

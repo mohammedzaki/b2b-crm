@@ -68,6 +68,10 @@ class FinancialCustody extends Model {
         return $this->hasMany(DepositWithdraw::class, 'financial_custody_id')->where('expenses_id', EmployeeActions::FinancialCustody);
     }
 
+    public function refundedDeposits() {
+        return $this->hasMany(DepositWithdraw::class, 'financial_custody_id')->where('expenses_id', EmployeeActions::FinancialCustodyRefund);
+    }
+
     public function withdraws() {
         return $this->hasMany(FinancialCustodyItem::class, 'financial_custody_id');
     }

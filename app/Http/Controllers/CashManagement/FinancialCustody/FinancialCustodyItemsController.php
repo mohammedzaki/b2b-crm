@@ -68,7 +68,7 @@ class FinancialCustodyItemsController extends Controller
             $currentFinancialCustody = FinancialCustody::find($id);
         }
         //if ($currentFinancialCustody->approved_at != null) {
-            $canEdit = 0;
+        $canEdit = 0;
         //}
         $financialCustodyDeposits      = $currentFinancialCustody->deposits;
         $amounts['current_dayOfWeek']  = $today->dayOfWeek;
@@ -174,16 +174,20 @@ class FinancialCustodyItemsController extends Controller
      */
     public function store(Request $request)
     {
-        $currentFinancialCustody = $this->getCurrentFinancialCustody($request);
-        $request['due_date']     = DateTime::parse($request->due_date);
-        $request['user_id']      = auth()->user()->id;
-        $financialCustodyItem    = $currentFinancialCustody->withdraws()->create($request->all());
-        return response()->json([
-                                    'success'       => true,
-                                    'id'            => $financialCustodyItem->id,
-                                    'currentAmount' => $this->calculateCurrentAmount($request),
-                                    'message'       => 'تم اضافة وارد جديد.'
-                                ]);
+        try {
+            $currentFinancialCustody = $this->getCurrentFinancialCustody($request);
+            $request['due_date']     = DateTime::parse($request->due_date);
+            $request['user_id']      = auth()->user()->id;
+            $financialCustodyItem    = $currentFinancialCustody->withdraws()->create($request->all());
+            return response()->json([
+                                        'success'       => true,
+                                        'id'            => $financialCustodyItem->id,
+                                        'currentAmount' => $this->calculateCurrentAmount($request),
+                                        'message'       => 'تم اضافة وارد جديد.'
+                                    ]);
+        } catch (\Exception $ex) {
+            throw new ValidationException("حدث حطأ في حفظ البيانات. {$ex->getMessage()}");
+        }
     }
 
     private function calculateCurrentAmount(Request $request)
@@ -200,31 +204,53 @@ class FinancialCustodyItemsController extends Controller
      * @param  Request $request
      * @return Response
      * @Post("/acceptItems", as="financialCustodyItems.acceptItems")
+     * @throws ValidationException
      */
     public function acceptItems(Request $request)
     {
+        $c_user_id = auth()->user()->id;
+        DB::beginTransaction();
         $all = $request->all();
-
         $rowsIds = [];
+        try {
+            $date = DateTime::parse($request->due_date);
+            foreach ($all['rowsIds'] as $id) {
+                $financialCustodyItem    = FinancialCustodyItem::find($id);
+                $currentFinancialCustody = $financialCustodyItem->financialCustody;
+                $depositWithdraw         = DepositWithdraw::create($financialCustodyItem->toArray());
 
-        foreach ($all['rowsIds'] as $id) {
-            $financialCustodyItem = FinancialCustodyItem::find($id);
-            $depositWithdraw      = DepositWithdraw::create($financialCustodyItem->toArray());
-            FinancialCustodyItem::where('id', $id)->update([
-                                                               'saveStatus'    => 2,
-                                                               'daily_cash_id' => $depositWithdraw->id,
-                                                               'approved_at'   => DateTime::now(),
-                                                               'approved_by'   => auth()->user()->id
-                                                           ]);
-            $rowsIds[$id] = "Done";
+                FinancialCustodyItem::where('id', $id)->update([
+                                                                   'saveStatus'    => 2,
+                                                                   'daily_cash_id' => $depositWithdraw->id,
+                                                                   'approved_at'   => DateTime::now(),
+                                                                   'approved_by'   => $c_user_id
+                                                               ]);
+
+                DepositWithdraw::create([
+                                            'depositValue'         => $depositWithdraw->withdrawValue,
+                                            'recordDesc'           => "رد {$currentFinancialCustody->description}",
+                                            'employee_id'          => $currentFinancialCustody->employee_id,
+                                            'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
+                                            'financial_custody_id' => $currentFinancialCustody->id,
+                                            'user_id'              => $c_user_id,
+                                            'payMethod'            => PaymentMethods::CASH,
+                                            'due_date'             => $date
+                                        ]);
+
+                $rowsIds[$id] = "Done";
+            }
+            DB::commit();
+            return response()->json(array(
+                                        'success'       => true,
+                                        'rowsIds'       => $rowsIds,
+                                        'currentAmount' => $this->calculateCurrentAmount($request),
+                                        'message'       => 'تم حفظ الوارد.',
+                                        //'errors' => $validator->getMessageBag()->toArray()
+                                    ));
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            throw new ValidationException("حدث حطأ في حفظ البيانات. {$ex->getMessage()}");
         }
-        return response()->json(array(
-                                    'success'       => true,
-                                    'rowsIds'       => $rowsIds,
-                                    'currentAmount' => $this->calculateCurrentAmount($request),
-                                    'message'       => 'تم حفظ الوارد.',
-                                    //'errors' => $validator->getMessageBag()->toArray()
-                                ));
     }
 
     /**
@@ -283,7 +309,7 @@ class FinancialCustodyItemsController extends Controller
             }
             $date = DateTime::parse($request->due_date);
             DepositWithdraw::create([
-                                        'depositValue'         => $currentFinancialCustody->deposits()->sum('withdrawValue'),
+                                        'depositValue'         => ($currentFinancialCustody->deposits()->sum('withdrawValue') - $currentFinancialCustody->refundedDeposits()->sum('depositValue')),
                                         'recordDesc'           => "رد {$currentFinancialCustody->description}",
                                         'employee_id'          => $currentFinancialCustody->employee_id,
                                         'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
@@ -342,7 +368,7 @@ class FinancialCustodyItemsController extends Controller
     {
         $financialCustodyItem = FinancialCustodyItem::findOrFail($id);
         // $request['due_date']  = DateTime::parse($request->due_date);
-        $request['user_id']  = auth()->user()->id;
+        $request['user_id'] = auth()->user()->id;
         unset($request['due_date']); // to prevent changing the date
         $financialCustodyItem->update($request->all());
         return response()->json(array(
