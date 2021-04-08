@@ -472,7 +472,6 @@
                                                value='{{ $amounts["current_dayOfMonth"] }}-{{ $amounts["current_month"] + 1 }}-{{ $amounts["current_year"] }}'/>
                                         <input type="hidden" name="employee_id" value="{{ $employee_id }}"/>
                                         <button type="submit" class="btn btn-primary form-control">تسوية العهدة</button>
-
                                         {{ Form::close() }}
                                     </div>
                                 @endif

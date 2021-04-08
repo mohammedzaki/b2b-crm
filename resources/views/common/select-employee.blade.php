@@ -18,7 +18,8 @@
             <!-- /.panel-heading -->
             <div class="panel-body">
                 {{ Form::open($formConfig) }}
-
+                <!-- Equivalent to... -->
+                <input type="hidden" name="_token" value="{{ csrf_token() }}" />
                 <div class="col-lg-6 ">
                     <div class="form-group{{ $errors->has('id') ? ' has-error' : '' }}">
                         {{ Form::label('id', 'اسم الموظف') }}
