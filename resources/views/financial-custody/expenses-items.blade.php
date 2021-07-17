@@ -510,6 +510,7 @@
                                     <div class="col-md-4" style="padding: 4px;">
                                         {{ Form::open(['route' => 'financialCustodyItems.financialCustodyRefund', 'method' => 'POST',
                                         'onsubmit' => "return confirm('هل انت متاكد من تصفية عهدة الموظف / {$employee_name} ؟');"]) }}
+                                        <input hidden value="{{ $financialCustodyId }}" name="id" />
                                         <input type="hidden" name="due_date"
                                                value='{{ $amounts["current_dayOfMonth"] }}-{{ $amounts["current_month"] + 1 }}-{{ $amounts["current_year"] }}'/>
                                         <input type="hidden" name="employee_id" value="{{ $employee_id }}"/>

@@ -238,7 +238,7 @@ class FinancialCustodyItemsController extends Controller
                                                                      'financial_custody_id' => $currentFinancialCustody->id,
                                                                      'user_id'              => $c_user_id,
                                                                      'payMethod'            => PaymentMethods::CASH,
-                                                                     'due_date'             => $date
+                                                                     'due_date'             => $depositWithdraw->due_date
                                                                  ]);
 
                 FinancialCustodyItem::where('id', $id)->update([
@@ -349,8 +349,12 @@ class FinancialCustodyItemsController extends Controller
         $c_user_id = auth()->user()->id;
         DB::beginTransaction();
         try {
-            $currentFinancialCustody = $this->getCurrentFinancialCustody($request);
-
+            $id = $request['id'];
+            if (!isset($id) & empty($id)) {
+                $currentFinancialCustody = $this->getCurrentFinancialCustody($request);
+            } else {
+                $currentFinancialCustody = FinancialCustody::find($id);
+            }
             foreach ($currentFinancialCustody->withdraws as $financialCustodyItem) {
                 if (!isset($financialCustodyItem->approved_at)) {
                     $depositWithdraw = DepositWithdraw::create($financialCustodyItem->toArray());
