@@ -789,6 +789,7 @@
                             currentAmount.html(data.currentAmount);
                             calculateCurrentAmounts();
                             console.log("message: " + data.message);
+                            alert("تم حذف البنود");
                         }
                     },
                     error: function (error) {
@@ -903,6 +904,7 @@
                             currentAmount.html(data.currentAmount);
                             calculateCurrentAmounts();
                             console.log("message: " + data.message);
+                            alert("تم استرجاع البنود");
                         }
                     },
                     error: function (error) {
@@ -930,12 +932,12 @@
         function checkAll() {
             var rowsCount = $('#grid_FinancialCustodyDetails').children().length;
             for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
-                if ($('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .saveStatus').val() == 2) {
+
                     if ($("#canEdit").val() == 1) {
                         checkDelete = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .checkDelete');
                         checkDelete.prop('checked', true);
                     }
-                }
+
             }
         }
 
