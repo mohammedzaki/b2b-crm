@@ -207,12 +207,12 @@ class Employee extends Model
         }
     }
 
-    public function employeeFinancialCustodys(DateTime $dt = null)
+    public function employeeFinancialCustodys($dt = null)
     {
         // Financial custody
-        $startDate = DateTime::parse($dt)->startOfMonth();
-        $endDate   = DateTime::parse($dt)->endOfMonth();
         if ($dt != null) {
+            $startDate = DateTime::parse($dt)->startOfMonth();
+            $endDate   = DateTime::parse($dt)->endOfMonth();
             return $this->financialCustodies()->whereBetween('created_at', [$startDate, $endDate])->get();
         } else {
             return $this->financialCustodies;

@@ -52,71 +52,79 @@ class FinancialCustodyItemsController extends Controller
      */
     public function index(Request $request)
     {
+        $startDate = DateTime::today()->startOfDay();
+        $endDate   = DateTime::today()->endOfDay();
         if (auth()->user()->hasRole('admin')) {
-            return $this->getFinancialCustodyItems(1, $request);
+            return $this->getFinancialCustodyItems($startDate, $endDate, 1, $request);
         } else {
-            return $this->getFinancialCustodyItems(0, $request);
+            return $this->getFinancialCustodyItems($startDate, $endDate, 0, $request);
         }
     }
 
-    private function getFinancialCustodyItems($canEdit, Request $request = null, $id = null)
+    private function getFinancialCustodyItems(DateTime $startDate, DateTime $endDate, $canEdit, Request $request, $viewAll = false, $id = null)
     {
-        $today = DateTime::today()->startOfDay();
         if ($id == null) {
             $currentFinancialCustody = $this->getCurrentFinancialCustody($request);
         } else {
             $currentFinancialCustody = FinancialCustody::find($id);
         }
         //if ($currentFinancialCustody->approved_at != null) {
-        $canEdit = 0;
+        // $canEdit = 0;
         //}
         $financialCustodyDeposits      = $currentFinancialCustody->deposits;
-        $amounts['current_dayOfWeek']  = $today->dayOfWeek;
-        $amounts['current_dayOfMonth'] = $today->day;
-        $amounts['current_month']      = $today->month - 1;
-        $amounts['current_year']       = $today->year;
+        $amounts['current_dayOfWeek']  = $startDate->dayOfWeek;
+        $amounts['current_dayOfMonth'] = $startDate->day;
+        $amounts['current_month']      = $startDate->month - 1;
+        $amounts['current_year']       = $startDate->year;
         $amounts['withdrawsAmount']    = $currentFinancialCustody->withdraws()->sum('withdrawValue');
         $amounts['depositsAmount']     = $currentFinancialCustody->deposits()->sum('withdrawValue');
         $amounts['currentAmount']      = $amounts['depositsAmount'] - $amounts['withdrawsAmount'];
-        $financialCustodyItems         = $currentFinancialCustody->withdraws;
+        $financialCustodyItems         = [];
+        if (!$viewAll) {
+            $financialCustodyItems = $currentFinancialCustody->withdraws()->whereBetween('due_date', [$startDate, $endDate])->get();
+        } else {
+            $financialCustodyItems = $currentFinancialCustody->withdraws;
+        }
 
-        $employees = Employee::all('id', 'name')->mapWithKeys(function ($emp) {
+
+        $employees       = Employee::all('id', 'name')->mapWithKeys(function ($emp) {
             return [$emp->id => $emp->name];
         });
-        $expenses  = Expenses::all('id', 'name');
-
-        $clients   = Client::all()->mapWithKeys(function ($client) {
-            return [$client->id => [
-                'name'           => $client->name,
-                'hasOpenProcess' => $client->hasOpenProcess(),
-                'processes'      => $client->processes->mapWithKeys(function ($process) {
-                    return [$process->id => [
-                        'name'   => $process->name,
-                        'status' => $process->status
-                    ]
-                    ];
-                })
-            ]
+        $expenses        = Expenses::all('id', 'name');
+        $clients         = Client::all()->mapWithKeys(function ($client) {
+            return [
+                $client->id => [
+                    'name'           => $client->name,
+                    'hasOpenProcess' => $client->hasOpenProcess(),
+                    'processes'      => $client->processes->mapWithKeys(function ($process) {
+                        return [
+                            $process->id => [
+                                'name'   => $process->name,
+                                'status' => $process->status
+                            ]
+                        ];
+                    })
+                ]
             ];
         });
-        $suppliers = Supplier::all()->mapWithKeys(function ($supplier) {
-            return [$supplier->id => [
-                'name'           => $supplier->name,
-                'hasOpenProcess' => $supplier->hasOpenProcess(),
-                'processes'      => $supplier->processes->mapWithKeys(function ($process) {
-                    return [$process->id => [
-                        'name'   => $process->name,
-                        'status' => $process->status
-                    ]
-                    ];
-                })
-            ]
+        $suppliers       = Supplier::all()->mapWithKeys(function ($supplier) {
+            return [
+                $supplier->id => [
+                    'name'           => $supplier->name,
+                    'hasOpenProcess' => $supplier->hasOpenProcess(),
+                    'processes'      => $supplier->processes->mapWithKeys(function ($process) {
+                        return [
+                            $process->id => [
+                                'name'   => $process->name,
+                                'status' => $process->status
+                            ]
+                        ];
+                    })
+                ]
             ];
         });
-
         $payMethods      = PaymentMethods::all();
         $employeeActions = collect(EmployeeActions::all())->toJson();
-
 
         return view('financial-custody.expenses-items')->with([
                                                                   'employee_id'              => $currentFinancialCustody->employee->id,
@@ -132,6 +140,7 @@ class FinancialCustodyItemsController extends Controller
                                                                   'employeeActions'          => $employeeActions,
                                                                   'financialCustodyItems'    => $financialCustodyItems,
                                                                   'canEdit'                  => $canEdit,
+                                                                  'targetDate'               => $startDate,
                                                                   'financialCustodyDeposits' => $financialCustodyDeposits
                                                               ]);
     }
@@ -149,7 +158,7 @@ class FinancialCustodyItemsController extends Controller
         }
         $currentFinancialCustody = $currentEmployee->currentFinancialCustody();
 
-        if ($currentFinancialCustody == null || count($currentFinancialCustody->deposits) <= 0) {
+        if ($currentFinancialCustody == null) { // || count($currentFinancialCustody->deposits) <= 0) {
             abort(403, 'عفوا لا يوجد عهدة مسجلة. ');
         }
         return $currentFinancialCustody;
@@ -210,7 +219,7 @@ class FinancialCustodyItemsController extends Controller
     {
         $c_user_id = auth()->user()->id;
         DB::beginTransaction();
-        $all = $request->all();
+        $all     = $request->all();
         $rowsIds = [];
         try {
             $date = DateTime::parse($request->due_date);
@@ -219,24 +228,68 @@ class FinancialCustodyItemsController extends Controller
                 $currentFinancialCustody = $financialCustodyItem->financialCustody;
                 $depositWithdraw         = DepositWithdraw::create($financialCustodyItem->toArray());
 
+                $depositWithdrawRefund = DepositWithdraw::create([
+                                                                     'depositValue'         => $depositWithdraw->withdrawValue,
+                                                                     'recordDesc'           => "رد {$currentFinancialCustody->description}",
+                                                                     'employee_id'          => $currentFinancialCustody->employee_id,
+                                                                     'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
+                                                                     'financial_custody_id' => $currentFinancialCustody->id,
+                                                                     'user_id'              => $c_user_id,
+                                                                     'payMethod'            => PaymentMethods::CASH,
+                                                                     'due_date'             => $date
+                                                                 ]);
+
                 FinancialCustodyItem::where('id', $id)->update([
-                                                                   'saveStatus'    => 2,
-                                                                   'daily_cash_id' => $depositWithdraw->id,
-                                                                   'approved_at'   => DateTime::now(),
-                                                                   'approved_by'   => $c_user_id
+                                                                   'saveStatus'           => 2,
+                                                                   'daily_cash_id'        => $depositWithdraw->id,
+                                                                   'daily_cash_refund_id' => $depositWithdrawRefund->id,
+                                                                   'approved_at'          => DateTime::now(),
+                                                                   'approved_by'          => $c_user_id
                                                                ]);
 
-                DepositWithdraw::create([
-                                            'depositValue'         => $depositWithdraw->withdrawValue,
-                                            'recordDesc'           => "رد {$currentFinancialCustody->description}",
-                                            'employee_id'          => $currentFinancialCustody->employee_id,
-                                            'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
-                                            'financial_custody_id' => $currentFinancialCustody->id,
-                                            'user_id'              => $c_user_id,
-                                            'payMethod'            => PaymentMethods::CASH,
-                                            'due_date'             => $date
-                                        ]);
+                $rowsIds[$id] = "Done";
+            }
+            DB::commit();
+            return response()->json(array(
+                                        'success'       => true,
+                                        'rowsIds'       => $rowsIds,
+                                        'currentAmount' => $this->calculateCurrentAmount($request),
+                                        'message'       => 'تم حفظ الوارد.',
+                                        //'errors' => $validator->getMessageBag()->toArray()
+                                    ));
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            throw new ValidationException("حدث حطأ في حفظ البيانات. {$ex->getMessage()}");
+        }
+    }
 
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  Request $request
+     * @return Response
+     * @Post("/unlockItems", as="financialCustodyItems.unlockItems")
+     * @throws ValidationException
+     */
+    public function unlockItems(Request $request)
+    {
+        $c_user_id = auth()->user()->id;
+        DB::beginTransaction();
+        $all     = $request->all();
+        $rowsIds = [];
+        try {
+            foreach ($all['rowsIds'] as $id) {
+                $financialCustodyItem = FinancialCustodyItem::find($id);
+                DepositWithdraw::where('id', $financialCustodyItem->daily_cash_id)->delete();
+                DepositWithdraw::where('id', $financialCustodyItem->daily_cash_refund_id)->delete();
+
+                FinancialCustodyItem::where('id', $id)->update([
+                                                                   'saveStatus'           => 1,
+                                                                   // 'daily_cash_id'        => null,
+                                                                   // 'daily_cash_refund_id' => null,
+                                                                   'approved_at'          => null,
+                                                                   'approved_by'          => null
+                                                               ]);
                 $rowsIds[$id] = "Done";
             }
             DB::commit();
@@ -339,10 +392,12 @@ class FinancialCustodyItemsController extends Controller
      */
     public function show(Request $request, $id)
     {
+        $startDate = DateTime::today()->startOfDay();
+        $endDate   = DateTime::today()->endOfDay();
         if (auth()->user()->hasRole('admin')) {
-            return $this->getFinancialCustodyItems(1, $request, $id);
+            return $this->getFinancialCustodyItems($startDate, $endDate, 1, $request);
         } else {
-            return $this->getFinancialCustodyItems(0, $request, $id);
+            return $this->getFinancialCustodyItems($startDate, $endDate, 0, $request);
         }
     }
 
@@ -404,6 +459,30 @@ class FinancialCustodyItemsController extends Controller
                                     'message'       => 'تم حذف الوارد.',
                                     //'errors' => $validator->getMessageBag()->toArray()
                                 ));
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  int $id
+     * @return Response
+     * @Get("/search", as="financialCustodyItems.search")
+     */
+    public function search(Request $request)
+    {
+        $viewAll = isset($request['view']) & $request['view'] == "1";
+        if (!$viewAll) {
+            $startDate = DateTime::parse($request['targetdate'])->startOfDay();
+            $endDate   = DateTime::parse($request['targetdate'])->endOfDay();
+        } else {
+            $startDate = DateTime::today()->startOfDay();
+            $endDate   = DateTime::today()->endOfDay();
+        }
+        if (auth()->user()->hasRole('admin')) {
+            return $this->getFinancialCustodyItems($startDate, $endDate, 1, $request, $viewAll);
+        } else {
+            return $this->getFinancialCustodyItems($startDate, $endDate, 0, $request, $viewAll);
+        }
     }
 
 }

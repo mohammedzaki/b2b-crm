@@ -374,7 +374,7 @@ class DailyCashController extends Controller
     {
         $startDate = DateTime::parse($request['targetdate'])->startOfDay();
         $endDate   = DateTime::parse($request['targetdate'])->endOfDay();
-        return $this->getDepositWithdrawsItems($startDate, $endDate, 1, TRUE);
+        return $this->getDepositWithdrawsItems($startDate, $endDate, 1);
     }
 
     /**

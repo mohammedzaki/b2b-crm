@@ -125,19 +125,36 @@
                 <!-- /.panel-heading -->
                 <div class="panel-body">
                     <div class="row text-center">
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
+                            <div class="alert alert-info"><label id="clock">Loading...</label></div>
+                            <script type="text/javascript">
+                                function refrClock() {
+                                    var d = new Date();
+                                    var day = d.getDay();
+                                    var date = d.getDate();
+                                    var month = d.getMonth();
+                                    var year = d.getFullYear();
+                                    var days = new Array("الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت");
+                                    var months = new Array("يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "اكتوبر", "نوفمبر", "ديسمبر");
+                                    document.getElementById("clock").innerHTML = days['{{ $amounts["current_dayOfWeek"] }}'] + " " + '{{ $amounts["current_dayOfMonth"] }}' + " " + months['{{ $amounts["current_month"] }}'] + " " + '{{ $amounts["current_year"] }}';
+                                    setTimeout("refrClock()", 1000);
+                                }
+                                refrClock();
+                            </script>
+                        </div>
+                        <div class="col-sm-3">
                             <div class="alert alert-info">
                                 <label>اجمالي العهدة : <span id="depositsAmount">{{ $amounts['depositsAmount'] }}</span>
                                     جنيه</label>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
                             <div class="alert alert-danger">
                                 <label>المنصرف : <span id="withdrawsAmount">{{ $amounts['withdrawsAmount'] }}</span>
                                     جنيه</label>
                             </div>
                         </div>
-                        <div class="col-sm-4">
+                        <div class="col-sm-3">
                             <div class="alert alert-success">
                                 <label>الرصيد الحالي : <span
                                             id="currentAmount">{{ $amounts['currentAmount'] }}</span>
@@ -158,7 +175,7 @@
                                                aria-describedby="dataTables-example_info">
                                             <thead>
                                             <tr role="row">
-                                                <th rowspan="1" colspan="1" style="width:10px;">اختيار</th>
+                                                <th rowspan="1" colspan="1" style="width:10px;"> <input type="checkbox" value="" onclick="checkAll()" class="checkAllDelete"/>اختيار</th>
                                                 <th rowspan="1" colspan="1" hidden>وارد</th>
                                                 <th rowspan="1" colspan="1">منصرف</th>
                                                 <th rowspan="1" colspan="1">بيان</th>
@@ -179,7 +196,6 @@
                                                             {{ Form::text("withdrawValue", ($financialCustodyItem->withdrawValue > 0 ? $financialCustodyItem->withdrawValue : null),
                                                                         array(
                                                                             "class" => "form-control IsNumberDecimal withdrawValue",
-                                                                            "id" => "",
                                                                             "style" => "width:85px;",
                                                                             "onchange" => "AddNewRow(this)",
                                                                             "onblur" => "OnRowLeave(this)",
@@ -198,7 +214,6 @@
                                                             {{ Form::text("recordDesc", $financialCustodyItem->recordDesc,
                                                                         array(
                                                                             "class" => "form-control recordDesc",
-                                                                            "id" => "",
                                                                             "style" => "width:85px;",
                                                                             "onchange" => "AddNewRow(this)",
                                                                             "onblur" => "OnRowLeave(this)",
@@ -218,8 +233,6 @@
                                                                         array(
                                                                             "class" => "form-control cbo_processes",
                                                                             "placeholder" => "",
-                                                                            "id" => "",
-                                                                           
                                                                             "style" => "width:85px;",
                                                                             "onchange" => "AddNewRow(this)",
                                                                             "onblur" => "OnRowLeave(this)",
@@ -240,7 +253,6 @@
                                                                 array(
                                                                     "class" => "form-control client_id",
                                                                     "placeholder" => "",
-                                                                    "id" => "",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
@@ -260,7 +272,6 @@
                                                                 array(
                                                                     "class" => "form-control supplier_id",
                                                                     "placeholder" => "",
-                                                                    "id" => "",
                                                                     "style" => "width:85px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
@@ -279,7 +290,6 @@
                                                             {{ Form::text("notes", $financialCustodyItem->notes,
                                                                         array(
                                                                             "class" => "form-control notes",
-                                                                            "id" => "",
                                                                             "style" => "width:85px;",
                                                                             "onchange" => "AddNewRow(this)",
                                                                             "onblur" => "OnRowLeave(this)",
@@ -316,7 +326,6 @@
                                                         {{ Form::text("withdrawValue", null,
                                                                     array(
                                                                         "class" => "form-control IsNumberDecimal withdrawValue",
-                                                                        "id" => "",
                                                                         "style" => "width:85px;",
                                                                         "onchange" => "AddNewRow(this)",
                                                                         "onblur" => "OnRowLeave(this)",
@@ -335,7 +344,6 @@
                                                         {{ Form::text("recordDesc", null,
                                                                     array(
                                                                         "class" => "form-control recordDesc",
-                                                                        "id" => "",
                                                                         "style" => "width:85px;",
                                                                         "onchange" => "AddNewRow(this)",
                                                                         "onblur" => "OnRowLeave(this)",
@@ -355,7 +363,6 @@
                                                                     array(
                                                                         "class" => "form-control cbo_processes",
                                                                         "placeholder" => "",
-                                                                        "id" => "",
                                                                         "style" => "width:85px;",
                                                                         "onchange" => "AddNewRow(this)",
                                                                         "onblur" => "OnRowLeave(this)",
@@ -376,7 +383,6 @@
                                                             array(
                                                                 "class" => "form-control client_id",
                                                                 "placeholder" => "",
-                                                                "id" => "client_id",
                                                                 "style" => "width:85px;",
                                                                 "onchange" => "AddNewRow(this)",
                                                                 "onblur" => "OnRowLeave(this)",
@@ -396,7 +402,6 @@
                                                             array(
                                                                 "class" => "form-control supplier_id",
                                                                 "placeholder" => "",
-                                                                "id" => "",
                                                                 "style" => "width:85px;",
                                                                 "onchange" => "AddNewRow(this)",
                                                                 "onblur" => "OnRowLeave(this)",
@@ -415,7 +420,6 @@
                                                         {{ Form::text("notes", null,
                                                                     array(
                                                                         "class" => "form-control notes",
-                                                                        "id" => "",
                                                                         "style" => "width:85px;",
                                                                         "onchange" => "AddNewRow(this)",
                                                                         "onblur" => "OnRowLeave(this)",
@@ -466,6 +470,11 @@
                                         </button>
                                     </div>
                                     <div class="col-md-4" style="padding: 4px;">
+                                        <button type="button" class="btn btn-primary form-control"
+                                                onclick="unlockItems()">ارجعاع
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4" style="padding: 4px;">
                                         {{ Form::open(['route' => 'financialCustodyItems.financialCustodyRefund', 'method' => 'POST',
                                         'onsubmit' => "return confirm('هل انت متاكد من تصفية عهدة الموظف / {$employee_name} ؟');"]) }}
                                         <input type="hidden" name="due_date"
@@ -477,7 +486,24 @@
                                 @endif
                             </div>
                         @endif
-
+                        <div class="col-md-6">
+                            <!-- Date Picker-->
+                            <div class="col-md-12">
+                                {{ Form::open(['route' => 'financialCustodyItems.search', 'method' => 'get']) }}
+                                <input hidden value="{{ $employee_id }}" name="employee_id" />
+                                <div class="col-md-8" style="padding: 4px;">
+                                    <input type="text" id="targetdate" name="targetdate" readonly
+                                           class="form-control datepickerCommon" value="{{ $targetDate }}">
+                                </div>
+                                <div class="col-md-2" style="padding: 4px;">
+                                    <button type="submit" class="btn btn-primary form-control">بحث</button>
+                                </div>
+                                <div class="col-md-2" style="padding: 4px;">
+                                    <button type="submit" class="btn btn-danger form-control" value="1" name="view">عرض الكل</button>
+                                </div>
+                                {{ Form::close() }}
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- /.panel-body -->
@@ -499,10 +525,11 @@
         var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
         var loadAll = false;
 
-        console.log('expenses: ', expenses);
-        console.log('employeeActions: ', employeeActions);
-        SetFinancialCustodyDetailsProcess();
-        LockAll();
+        $(function () {
+            SetFinancialCustodyDetailsProcess();
+            LockAll();
+        });
+
         currentAmount = $("#currentAmount");
         withdrawsAmount = $("#withdrawsAmount");
         depositsAmount = $("#depositsAmount");
@@ -828,6 +855,62 @@
             }
         }
 
+        function unlockItems() {
+            var rowsCount = $('#grid_FinancialCustodyDetails').children().length;
+            var rowsIds = [];
+            var rowsIndexes = [];
+            flag = true;
+            // for (var i = 0; i < rowsCount - 1; i++) {
+            //     if (IsValid(i)) {
+            //         rowsIds.push(id.val());
+            //         rowsIndexs.push(i);
+            //     } else {
+            //         flag = false;
+            //     }
+            // }
+            for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
+                checkDelete = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .checkDelete').is(":checked");
+                id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .id').val();
+                if (checkDelete) {
+                    rowsIds.push(id);
+                    rowsIndexes.push(rowIndex);
+                }
+            }
+
+            if (flag) {
+                $.ajaxSetup({
+                    headers: {
+                        'X-CSRF-TOKEN': $('input[name="_token"]').val()
+                    }
+                });
+                var formData = {
+                    rowsIds: rowsIds
+                };
+                $.ajax({
+                    type: 'POST',
+                    url: '{!! route("financialCustodyItems.unlockItems", ["employee_id" => $employee_id]) !!}',
+                    data: formData,
+                    dataType: 'json',
+                    success: function (data) {
+                        if (data.success) {
+                            $.each(rowsIndexes, function (arrIndex, rowIndex) {
+                                console.log(rowIndex);
+                                saveStatus = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .saveStatus');
+                                saveStatus.val(1);
+                                RemoveRowApproval(rowIndex);
+                            });
+                            currentAmount.html(data.currentAmount);
+                            calculateCurrentAmounts();
+                            console.log("message: " + data.message);
+                        }
+                    },
+                    error: function (error) {
+                        console.log('Error: ', error);
+                    }
+                });
+            }
+        }
+
         function LockAll() {
             var rowsCount = $('#grid_FinancialCustodyDetails').children().length;
             for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
@@ -843,10 +926,22 @@
             }
         }
 
+        function checkAll() {
+            var rowsCount = $('#grid_FinancialCustodyDetails').children().length;
+            for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
+                if ($('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .saveStatus').val() == 2) {
+                    if ($("#canEdit").val() == 1) {
+                        checkDelete = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .checkDelete');
+                        checkDelete.prop('checked', true);
+                    }
+                }
+            }
+        }
+
         function AddNewRow(CellChildInput) {
             SetCurrentRowIndex(CellChildInput);
             if ($(AfterCurrentRow).hasClass("ItemRow") === false) {
-                $("#depositwithdrawTable").append('<tr class="gradeA odd ItemRow" role="row"> <td> <input type="checkbox" value=""> </td> <td> <div class="form-group{{$errors->has("withdrawValue") ? " has-error" : ""}}">{{Form::text("withdrawValue", null, array( "class"=> "form-control IsNumberDecimal withdrawValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("withdrawValue")) <label for="inputError" class="control-label">{{$errors->first("withdrawValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("recordDesc") ? " has-error" : ""}}">{{Form::text("recordDesc", null, array( "class"=> "form-control recordDesc", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("recordDesc")) <label for="inputError" class="control-label">{{$errors->first("recordDesc")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("cbo_processes") ? " has-error" : ""}}">{{Form::select("cbo_processes", [], null, array( "class"=> "form-control cbo_processes", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cbo_processes")) <label for="inputError" class="control-label">{{$errors->first("cbo_processes")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", [], null, array( "class"=> "form-control client_id", "placeholder"=> "", "id"=> "client_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "id"=> "supplier_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td> <td> <div class="form-group{{$errors->has("notes") ? " has-error" : ""}}">{{Form::text("notes", null, array( "class"=> "form-control notes", "id"=> "notes", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("notes")) <label for="inputError" class="control-label">{{$errors->first("notes")}}</label> @endif </div></td><td hidden><input type="hidden" class="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="-1"></td><td hidden> <input type="hidden" class="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="0"> </td></tr>');
+                $("#depositwithdrawTable").append('<tr class="gradeA odd ItemRow" role="row"> <td> <input type="checkbox" value=""> </td> <td> <div class="form-group{{$errors->has("withdrawValue") ? " has-error" : ""}}">{{Form::text("withdrawValue", null, array( "class"=> "form-control IsNumberDecimal withdrawValue", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("withdrawValue")) <label for="inputError" class="control-label">{{$errors->first("withdrawValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("recordDesc") ? " has-error" : ""}}">{{Form::text("recordDesc", null, array( "class"=> "form-control recordDesc", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("recordDesc")) <label for="inputError" class="control-label">{{$errors->first("recordDesc")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("cbo_processes") ? " has-error" : ""}}">{{Form::select("cbo_processes", [], null, array( "class"=> "form-control cbo_processes", "placeholder"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cbo_processes")) <label for="inputError" class="control-label">{{$errors->first("cbo_processes")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", [], null, array( "class"=> "form-control client_id", "placeholder"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td> <td> <div class="form-group{{$errors->has("notes") ? " has-error" : ""}}">{{Form::text("notes", null, array( "class"=> "form-control notes", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("notes")) <label for="inputError" class="control-label">{{$errors->first("notes")}}</label> @endif </div></td><td hidden><input type="hidden" class="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="-1"></td><td hidden> <input type="hidden" class="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="0"> </td></tr>');
                 var rowIndex = $("#depositwithdrawTable tr").length - 3;
                 console.log(rowIndex);
                 client_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .client_id');
@@ -1023,6 +1118,11 @@
             expenses_id.attr("disabled", "disabled");
             notes.attr("disabled", "disabled");
             checkDelete.parent().parent().addClass('approved');
+        }
+
+        function RemoveRowApproval(rowIndex) {
+            checkDelete = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .checkDelete');
+            checkDelete.parent().parent().removeClass('approved');
         }
 
         function calculateCurrentAmounts() {

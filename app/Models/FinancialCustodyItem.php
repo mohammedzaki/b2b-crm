@@ -65,7 +65,8 @@ class FinancialCustodyItem extends Model {
 
         'approved_at',
         'approved_by',
-        'daily_cash_id'
+        'daily_cash_id',
+        'daily_cash_refund_id'
     ];
 
 

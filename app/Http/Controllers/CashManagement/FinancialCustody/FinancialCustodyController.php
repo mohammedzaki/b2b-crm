@@ -64,7 +64,7 @@ class FinancialCustodyController extends Controller
     public function employeeCustody(Request $request, $employee_id)
     {
         $employees = Employee::all();
-        $dt        = DateTime::parse($request->date);
+        // $dt        = DateTime::parse();
         foreach ($employees as $employee) {
             $employees_tmp[$employee->id] = $employee->name;
         }
@@ -74,7 +74,7 @@ class FinancialCustodyController extends Controller
             $date                      = null;
         } else {
             $employee                  = Employee::findOrFail($employee_id);
-            $employeeFinancialCustodys = $employee->employeeFinancialCustodys($dt);
+            $employeeFinancialCustodys = $employee->employeeFinancialCustodys($request->date);
         }
         $date                             = $request->date;
         $employee_id                      = $employee_id;
