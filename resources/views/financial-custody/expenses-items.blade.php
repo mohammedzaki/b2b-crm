@@ -491,6 +491,7 @@
                             <div class="col-md-12">
                                 {{ Form::open(['route' => 'financialCustodyItems.search', 'method' => 'get']) }}
                                 <input hidden value="{{ $employee_id }}" name="employee_id" />
+                                <input hidden value="{{ $financialCustodyId }}" name="id" />
                                 <div class="col-md-8" style="padding: 4px;">
                                     <input type="text" id="targetdate" name="targetdate" readonly
                                            class="form-control datepickerCommon" value="{{ $targetDate }}">

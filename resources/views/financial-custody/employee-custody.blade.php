@@ -45,7 +45,7 @@
                                         <td>{{ $financialCustody->due_date }}</td>
                                         <td>{{ $financialCustody->notes }}</td>
                                         <td>
-                                            {{ link_to_route('financialCustodyItems.index', 'عرض/تعديل', array('employee_id' => $financialCustody->employee_id), array('class' => 'btn btn-primary')) }}
+                                            {{ link_to_route('financialCustodyItems.index', 'عرض/تعديل', ['employee_id' => $financialCustody->employee_id, 'id' => $financialCustody->id], array('class' => 'btn btn-primary')) }}
                                         </td>
                                     </tr>
                                 @empty

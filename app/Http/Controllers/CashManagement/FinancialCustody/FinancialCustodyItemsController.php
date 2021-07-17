@@ -54,16 +54,17 @@ class FinancialCustodyItemsController extends Controller
     {
         $startDate = DateTime::today()->startOfDay();
         $endDate   = DateTime::today()->endOfDay();
+        $id        = $request['id'];
         if (auth()->user()->hasRole('admin')) {
-            return $this->getFinancialCustodyItems($startDate, $endDate, 1, $request);
+            return $this->getFinancialCustodyItems($startDate, $endDate, 1, $request, false, $id);
         } else {
-            return $this->getFinancialCustodyItems($startDate, $endDate, 0, $request);
+            return $this->getFinancialCustodyItems($startDate, $endDate, 0, $request, false, $id);
         }
     }
 
     private function getFinancialCustodyItems(DateTime $startDate, DateTime $endDate, $canEdit, Request $request, $viewAll = false, $id = null)
     {
-        if ($id == null) {
+        if (!isset($id) & empty($id)) {
             $currentFinancialCustody = $this->getCurrentFinancialCustody($request);
         } else {
             $currentFinancialCustody = FinancialCustody::find($id);
@@ -141,6 +142,7 @@ class FinancialCustodyItemsController extends Controller
                                                                   'financialCustodyItems'    => $financialCustodyItems,
                                                                   'canEdit'                  => $canEdit,
                                                                   'targetDate'               => $startDate,
+                                                                  'financialCustodyId'       => $id,
                                                                   'financialCustodyDeposits' => $financialCustodyDeposits
                                                               ]);
     }
@@ -284,11 +286,11 @@ class FinancialCustodyItemsController extends Controller
                 DepositWithdraw::where('id', $financialCustodyItem->daily_cash_refund_id)->delete();
 
                 FinancialCustodyItem::where('id', $id)->update([
-                                                                   'saveStatus'           => 1,
+                                                                   'saveStatus'  => 1,
                                                                    // 'daily_cash_id'        => null,
                                                                    // 'daily_cash_refund_id' => null,
-                                                                   'approved_at'          => null,
-                                                                   'approved_by'          => null
+                                                                   'approved_at' => null,
+                                                                   'approved_by' => null
                                                                ]);
                 $rowsIds[$id] = "Done";
             }
@@ -471,6 +473,7 @@ class FinancialCustodyItemsController extends Controller
     public function search(Request $request)
     {
         $viewAll = isset($request['view']) & $request['view'] == "1";
+        $id      = $request['id'];
         if (!$viewAll) {
             $startDate = DateTime::parse($request['targetdate'])->startOfDay();
             $endDate   = DateTime::parse($request['targetdate'])->endOfDay();
@@ -479,9 +482,9 @@ class FinancialCustodyItemsController extends Controller
             $endDate   = DateTime::today()->endOfDay();
         }
         if (auth()->user()->hasRole('admin')) {
-            return $this->getFinancialCustodyItems($startDate, $endDate, 1, $request, $viewAll);
+            return $this->getFinancialCustodyItems($startDate, $endDate, 1, $request, $viewAll, $id);
         } else {
-            return $this->getFinancialCustodyItems($startDate, $endDate, 0, $request, $viewAll);
+            return $this->getFinancialCustodyItems($startDate, $endDate, 0, $request, $viewAll, $id);
         }
     }
 
