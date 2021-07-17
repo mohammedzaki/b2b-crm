@@ -289,20 +289,21 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">
-                                                            {{ Form::select("employee_id", $employees, $financialCustodyItem->employee_id,
+                                                        <div class="form-group{{ $errors->has("rowEmployee_id") ? " has-error" : "" }}">
+                                                            {{ Form::select("rowEmployee_id", $employees, $financialCustodyItem->employee_id,
                                                                 array(
                                                                     "class" => "form-control employee_id",
                                                                     "placeholder" => "",
                                                                     "style" => "width:85px;",
+                                                                    "name" => "employee_id",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
                                                                     "onfocus" => "OnRowFocus(this)")
                                                                 )
                                                             }}
-                                                            @if ($errors->has("employee_id"))
+                                                            @if ($errors->has("rowEmployee_id"))
                                                                 <label for="inputError" class="control-label">
-                                                                    {{ $errors->first("employee_id") }}
+                                                                    {{ $errors->first("rowEmployee_id") }}
                                                                 </label>
                                                             @endif
                                                         </div>
@@ -473,20 +474,21 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">
-                                                        {{ Form::select("employee_id", $employees, null,
+                                                    <div class="form-group{{ $errors->has("rowEmployee_id") ? " has-error" : "" }}">
+                                                        {{ Form::select("rowEmployee_id", $employees, null,
                                                             array(
                                                                 "class" => "form-control employee_id",
                                                                 "placeholder" => "",
                                                                 "style" => "width:85px;",
+                                                                    "name" => "employee_id",
                                                                 "onchange" => "AddNewRow(this)",
                                                                 "onblur" => "OnRowLeave(this)",
                                                                 "onfocus" => "OnRowFocus(this)")
                                                             )
                                                         }}
-                                                        @if ($errors->has("employee_id"))
+                                                        @if ($errors->has("rowEmployee_id"))
                                                             <label for="inputError" class="control-label">
-                                                                {{ $errors->first("employee_id") }}
+                                                                {{ $errors->first("rowEmployee_id") }}
                                                             </label>
                                                         @endif
                                                     </div>
@@ -1058,7 +1060,7 @@
             if ($(AfterCurrentRow).hasClass("ItemRow") === false) {
                 $("#financialCustodyItemsTable").append('<tr class="gradeA odd ItemRow" role="row"> <td> <input type="checkbox" value=""> </td> <td> <div class="form-group{{$errors->has("withdrawValue") ? " has-error" : ""}}">{{Form::text("withdrawValue", null, array( "class"=> "form-control IsNumberDecimal withdrawValue", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("withdrawValue")) <label for="inputError" class="control-label">{{$errors->first("withdrawValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("recordDesc") ? " has-error" : ""}}">{{Form::text("recordDesc", null, array( "class"=> "form-control recordDesc", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("recordDesc")) <label for="inputError" class="control-label">{{$errors->first("recordDesc")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("cbo_processes") ? " has-error" : ""}}">{{Form::select("cbo_processes", [], null, array( "class"=> "form-control cbo_processes", "placeholder"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cbo_processes")) <label for="inputError" class="control-label">{{$errors->first("cbo_processes")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", [], null, array( "class"=> "form-control client_id", "placeholder"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td>' +
                     '<td> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td> ' +
-                    '<td> <div class="form-group{{$errors->has("employee_id") ? " has-error" : ""}}">{{Form::select("employee_id", $employees, null, array( "class"=> "form-control employee_id", "placeholder"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("employee_id")) <label for="inputError" class="control-label">{{$errors->first("employee_id")}}</label> @endif </div></td> ' +
+                    '<td> <div class="form-group{{$errors->has("rowEmployee_id") ? " has-error" : ""}}">{{Form::select("rowEmployee_id", $employees, null, array( "class"=> "form-control employee_id", "placeholder"=> "", "style"=> "width:85px;", "name" => "employee_id", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("rowEmployee_id")) <label for="inputError" class="control-label">{{$errors->first("rowEmployee_id")}}</label> @endif </div></td> ' +
                     '<td> <div class="form-group{{$errors->has("expenses_id") ? " has-error" : ""}}">{{Form::select("expenses_id", [], null, array( "class"=> "form-control expenses_id", "placeholder"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("expenses_id")) <label for="inputError" class="control-label">{{$errors->first("expenses_id")}}</label> @endif </div></td>' +
                     '<td> <div class="form-group{{$errors->has("notes") ? " has-error" : ""}}">{{Form::text("notes", null, array( "class"=> "form-control notes", "style"=> "width:100px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("notes")) <label for="inputError" class="control-label">{{$errors->first("notes")}}</label> @endif </div></td>' +
                     '<td> <div class="form-group{{$errors->has("due_date") ? " has-error" : ""}}">{{Form::text("due_date", null, array( "class"=> "form-control due_date", "style"=> "width:100px;", "disabled" => "disabled") )}}@if ($errors->has("due_date")) <label for="inputError" class="control-label">{{$errors->first("due_date")}}</label> @endif </div></td> ' +

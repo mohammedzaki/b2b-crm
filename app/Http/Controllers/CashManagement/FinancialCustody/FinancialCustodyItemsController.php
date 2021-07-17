@@ -125,7 +125,7 @@ class FinancialCustodyItemsController extends Controller
             ];
         });
         $payMethods      = PaymentMethods::all();
-        $employeeActions = collect(EmployeeActions::all())->toJson();
+        $employeeActions = collect(EmployeeActions::all())->whereIn('id', [EmployeeActions::LongBorrow, EmployeeActions::SmallBorrow])->toJson();
 
         return view('financial-custody.expenses-items')->with([
                                                                   'employee_id'              => $currentFinancialCustody->employee->id,
