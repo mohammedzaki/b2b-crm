@@ -148,10 +148,10 @@ class AttendanceController extends Controller {
                 ]
             ];
         });
-        $employeesSalaries = Employee::all()->mapWithKeys(function ($employee) {
+        $employeesSalaries = Employee::all()->mapWithKeys(function ($employee) use ($attendance) {
             return [
                 $employee['id'] => [
-                    'dailySalary' => $employee->daily_salary
+                    'dailySalary' => $employee->currentJobProfile->daily_salary
                 ]
             ];
         });
@@ -376,6 +376,7 @@ class AttendanceController extends Controller {
     {
         $attendance = Attendance::findOrFail($id);
         $all        = $request->all();
+
         $validator  = $this->validatorCheckin($all, $attendance->id);
 
         if ($validator->fails()) {

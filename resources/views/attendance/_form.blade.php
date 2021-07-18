@@ -306,11 +306,13 @@ $(function () {
         }
     }); 
     @endif
+    SetAbsentDeduction();
 });
 
 function caluclateHours() {
     _startDate = check_inPickr.parseDate($('#check_in').val());
     _endDate = check_inPickr.parseDate($('#check_out').val());
+
     var seconds = Math.floor((_endDate - (_startDate))/1000);
     var minutes = Math.floor(seconds/60);
     var hours = Math.floor(minutes/60);
@@ -321,6 +323,9 @@ function caluclateHours() {
     seconds = seconds-(days*24*60*60)-(hours*60*60)-(minutes*60);
     hours = hours + (days*24);
     //console.log('test: ' + hours + ":" + minutes, _startDate , _endDate);
+    hours = isNaN(hours) ? '00' : hours;
+    minutes = isNaN(minutes) ? '00' : minutes;
+
     $('#working_hours').val(hours + ":" + minutes);
 }
 
@@ -348,12 +353,13 @@ function ResetManagmentProcess() {
 }
 function SetAbsentDeduction() {
     if ($("#absent_type_id").val() != 0 && $("#employee_id").val() != 0) {
+        console.log(employeesSalaries[$("#employee_id").val()].dailySalary, absentTypesInfo[$("#absent_type_id").val()].salaryDeduction);
         var s_d = employeesSalaries[$("#employee_id").val()].dailySalary * (absentTypesInfo[$("#absent_type_id").val()].salaryDeduction / 100);
         $("#absent_deduction").val(s_d);
         if (absentTypesInfo[$("#absent_type_id").val()].editable == '0') {
-            $("#absent_deduction").prop('disabled', true);
+            $("#absent_deduction").prop('readonly', true);
         } else {
-            $("#absent_deduction").prop('disabled', false);
+            $("#absent_deduction").prop('readonly', false);
         }
     } else {
         $("#absent_deduction").val('');
