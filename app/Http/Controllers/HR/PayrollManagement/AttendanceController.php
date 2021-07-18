@@ -45,7 +45,7 @@ class AttendanceController extends Controller {
         if (!$user->ability('admin', 'attendance-edit')) {
             return response()->view('errors.403', [], 403);
         }
-        $date = DateTime::parse($request['targetdate']);
+        $date = DateTime::parse($request['date']);
         return $this->getAttendanceItems($employee_id, $date, null, 1);
     }
 
