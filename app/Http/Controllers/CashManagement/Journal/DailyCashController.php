@@ -199,6 +199,8 @@ class DailyCashController extends Controller
                 'user_id'     => $request->user_id,
                 'description' => "عهدة شراء شهر {$monthName} ",
                 'notes'       => '',
+                'approved_by' => null,
+                'approved_at' => null,
                 'due_date'    => $request->due_date
             ];
             $currentFinancialCustody = $employee->financialCustodies()->create($currentFinancialCustody);

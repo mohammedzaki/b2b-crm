@@ -221,11 +221,6 @@
                             </div>
                             <div class="col-lg-3 ">
                                 <div class="form-group">
-                                    {{ link_to_route('salary.financialCustodyback', 'الغاء ترحيل العهدة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
-                                </div>
-                            </div>
-                            <div class="col-lg-3 ">
-                                <div class="form-group">
                                     {{ link_to_route('salary.longBorrowAway', 'ترحيل السلفة المستديمة', array('employee_id' => $employee_id, 'date' => $date), array('class' => 'btn btn-primary form-control')) }}
                                 </div>
                             </div>

@@ -205,29 +205,79 @@ class SalaryController
     /**
      * @return \Illuminate\Http\Response
      * @Get("financialCustodyaway/{employee_id}", as="salary.financialCustodyaway")
+     * @throws Exception
      */
     public function financialCustodyAway(Request $request, $employee_id)
     {
-        $employee = Employee::findOrFail($employee_id);
-        $newDate  = DateTime::parse($request->date);
-        $newDate->addMonth(1);
-        $depositWithdraw        = DepositWithdraw::findOrFail($employee->lastFinancialCustodyId());
-        $depositWithdraw->notes = $newDate->startOfMonth();
-        $depositWithdraw->save();
-        return redirect()->back()->with('success', 'تم الترحيل');
+        $c_user_id = auth()->user()->id;
+        DB::beginTransaction();
+        try {
+            $currentFinancialCustody = $this->getCurrentFinancialCustody($employee_id);
+            $employee                = Employee::find($employee_id);
+            $allItemsApproved        = !$currentFinancialCustody->hasNotApprovedItems();
+            $awayDate                = DateTime::parse($request->date)->lastOfMonth();
+            $dueDate                 = DateTime::parse($request->date)->addMonth(1)->firstOfMonth();
+            if ($awayDate->isFriday()) {
+                $awayDate = $awayDate->subDay(1);
+            }
+            if ($dueDate->isFriday()) {
+                $dueDate = $awayDate->addDay(1);
+            }
+            if ($allItemsApproved) {
+                $depositValue = ($currentFinancialCustody->deposits()->sum('withdrawValue') - $currentFinancialCustody->refundedDeposits()->sum('depositValue'));
+                DepositWithdraw::create([
+                                            'depositValue'         => $depositValue,
+                                            'recordDesc'           => "رد {$currentFinancialCustody->description}",
+                                            'employee_id'          => $currentFinancialCustody->employee_id,
+                                            'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
+                                            'financial_custody_id' => $currentFinancialCustody->id,
+                                            'user_id'              => $c_user_id,
+                                            'payMethod'            => PaymentMethods::CASH,
+                                            'due_date'             => $awayDate
+                                        ]);
+                $currentFinancialCustody->approved_at = DateTime::now();
+                $currentFinancialCustody->approved_by = auth()->user()->id;
+                $currentFinancialCustody->save();
+                $monthName           = $dueDate->getMonthName();
+                $newFinancialCustody = [
+                    'user_id'     => $c_user_id,
+                    'description' => "عهدة شراء شهر {$monthName} ",
+                    'notes'       => '',
+                    'approved_by' => null,
+                    'approved_at' => null,
+                    'due_date'    => $dueDate
+                ];
+                $newFinancialCustody = $employee->financialCustodies()->create($newFinancialCustody);
+                DepositWithdraw::create([
+                                            'withdrawValue'        => $depositValue,
+                                            'recordDesc'           => "باقي العهدة المرحلة {$currentFinancialCustody->description}",
+                                            'employee_id'          => $currentFinancialCustody->employee_id,
+                                            'expenses_id'          => EmployeeActions::FinancialCustody,
+                                            'financial_custody_id' => $newFinancialCustody->id,
+                                            'user_id'              => $c_user_id,
+                                            'payMethod'            => PaymentMethods::CASH,
+                                            'due_date'             => $dueDate
+                                        ]);
+                DB::commit();
+                return redirect()->back()->with('success', 'تم الترحيل');
+            } else {
+                return redirect()->back()->with('error', 'لم يتم الترحيل! يجب الموافقة علي باقي بنود العهدة الحالية');
+            }
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', "حدث خطأ في حفظ البيانات. {$ex->getMessage()}");
+        }
     }
 
-    /**
-     * @return \Illuminate\Http\Response
-     * @Get("financialCustodyback/{employee_id}", as="salary.financialCustodyback")
-     */
-    public function financialCustodyBack(Request $request, $employee_id)
+    private function getCurrentFinancialCustody($employee_id)
     {
-        $employee               = Employee::findOrFail($employee_id);
-        $depositWithdraw        = DepositWithdraw::findOrFail($employee->lastFinancialCustodyId());
-        $depositWithdraw->notes = null;
-        $depositWithdraw->save();
-        return redirect()->back()->with('success', 'تم الغاء ترحيل العهدة');
+        $currentEmployee         = Employee::find($employee_id);
+        $currentFinancialCustody = $currentEmployee->currentFinancialCustody();
+
+        if ($currentFinancialCustody == null) {
+            abort(403, 'عفوا لا يوجد عهدة مسجلة. ');
+        }
+        return $currentFinancialCustody;
     }
 
     /**

@@ -88,32 +88,4 @@ class FinancialCustodyController extends Controller
         $employees = $employees_tmp;
         return view("financial-custody.employee-custody", compact(['employees', 'employeeFinancialCustodys', 'totalFinancialCustodyValue', 'totalFinancialCustodyRefundValue', 'employee_id', 'date']));
     }
-
-    /**
-     * @return \Illuminate\Http\Response
-     * @Get("financialCustodyaway/{employee_id}", as="salary.financialCustodyaway")
-     */
-    public function financialCustodyAway(Request $request, $employee_id)
-    {
-        $employee = Employee::findOrFail($employee_id);
-        $newDate  = DateTime::parse($request->date);
-        $newDate->addMonth(1);
-        $depositWithdraw        = DepositWithdraw::findOrFail($employee->lastFinancialCustodyId());
-        $depositWithdraw->notes = $newDate->startOfMonth();
-        $depositWithdraw->save();
-        return redirect()->back()->with('success', 'تم الترحيل');
-    }
-
-    /**
-     * @return \Illuminate\Http\Response
-     * @Get("financialCustodyback/{employee_id}", as="salary.financialCustodyback")
-     */
-    public function financialCustodyBack(Request $request, $employee_id)
-    {
-        $employee               = Employee::findOrFail($employee_id);
-        $depositWithdraw        = DepositWithdraw::findOrFail($employee->lastFinancialCustodyId());
-        $depositWithdraw->notes = null;
-        $depositWithdraw->save();
-        return redirect()->back()->with('success', 'تم الغاء ترحيل العهدة');
-    }
 }

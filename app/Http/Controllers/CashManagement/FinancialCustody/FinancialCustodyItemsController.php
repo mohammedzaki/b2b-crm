@@ -377,13 +377,11 @@ class FinancialCustodyItemsController extends Controller
                                         'payMethod'            => PaymentMethods::CASH,
                                         'due_date'             => $date
                                     ]);
-
             $currentFinancialCustody->approved_at = DateTime::now();
             $currentFinancialCustody->approved_by = auth()->user()->id;
             $currentFinancialCustody->save();
             DB::commit();
-
-            return redirect()->route("financialCustodyItems.show", ['id' => $currentFinancialCustody->id])->with('success', 'تم تسوية العهدة.');
+            return redirect()->route("financialCustodyItems.index", ['id' => $currentFinancialCustody->id])->with('success', 'تم تسوية العهدة.');
         } catch (\Exception $ex) {
             DB::rollBack();
             return redirect()->back()->withInput()->with('error', "حدث حطأ في حفظ البيانات. {$ex->getMessage()}");

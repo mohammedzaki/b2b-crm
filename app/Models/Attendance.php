@@ -105,43 +105,28 @@ class Attendance extends Model
 
     public function employeeFinancialCustody()
     {
-        $startDate                      = DateTime::parse($this->date)->startOfDay();
-        $endDate                        = DateTime::parse($this->date)->endOfDay();
-        // $totalFinancialCustodyWithdraws = FinancialCustodyItem::whereBetween('due_date', [$startDate, $endDate])->get()->sum('withdrawValue');
-
+        $startDate                     = DateTime::parse($this->date)->startOfDay();
+        $endDate                       = DateTime::parse($this->date)->endOfDay();
         $totalFinancialCustodyDeposits = DepositWithdraw::where([
-                                               ['employee_id', '=', $this->employee_id],
-                                               ['expenses_id', '=', EmployeeActions::FinancialCustody],
-                                               ['due_date', '>=', $startDate],
-                                               ['due_date', '<=', $endDate]
-                                           ])->get()->sum('withdrawValue');
-
+                                                                    ['employee_id', '=', $this->employee_id],
+                                                                    ['expenses_id', '=', EmployeeActions::FinancialCustody],
+                                                                    ['due_date', '>=', $startDate],
+                                                                    ['due_date', '<=', $endDate]
+                                                                ])->get()->sum('withdrawValue');
         return $totalFinancialCustodyDeposits;
     }
 
     public function employeeFinancialCustodyRefund()
     {
-//        $startDate        = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
-//        $endDate          = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
-//        $depositWithdraws = DepositWithdraw::where([
-//                                                       ['employee_id', '=', $this->employee_id],
-//                                                       ['expenses_id', '=', EmployeeActions::FinancialCustodyRefund],
-//                                                       ['due_date', '>=', $startDate],
-//                                                       ['due_date', '<=', $endDate]
-//                                                   ]);
-//        try {
-//            if ($this->shift == 1) {
-//                return $depositWithdraws->sum('depositValue');
-//            } else {
-//                return 0;
-//            }
-//        } catch (\Exception $exc) {
-//            return 0;
-//        }
-        $startDate                      = DateTime::parse($this->date)->startOfDay();
-        $endDate                        = DateTime::parse($this->date)->endOfDay();
-        $totalFinancialCustodyWithdraws = FinancialCustodyItem::whereBetween('due_date', [$startDate, $endDate])->get()->sum('withdrawValue');
-        return $totalFinancialCustodyWithdraws;
+        $startDate                    = DateTime::parse($this->date)->startOfDay();
+        $endDate                      = DateTime::parse($this->date)->endOfDay();
+        $totalFinancialCustodyRefunds = DepositWithdraw::where([
+                                                                   ['employee_id', '=', $this->employee_id],
+                                                                   ['expenses_id', '=', EmployeeActions::FinancialCustodyRefund],
+                                                                   ['due_date', '>=', $startDate],
+                                                                   ['due_date', '<=', $endDate]
+                                                               ])->get()->sum('depositValue');
+        return $totalFinancialCustodyRefunds;
     }
 
     public function employeeSmallBorrow()

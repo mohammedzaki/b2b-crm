@@ -84,4 +84,14 @@ class FinancialCustody extends Model {
         return $this->hasOne(User::class, 'id', 'approved_by');
     }
 
+    public function hasNotApprovedItems() {
+        $financialCustodyItems = $this->hasMany(FinancialCustodyItem::class, 'financial_custody_id')->get();
+        foreach ($financialCustodyItems as $financialCustodyItem) {
+            if (!isset($financialCustodyItem->approved_at)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }
