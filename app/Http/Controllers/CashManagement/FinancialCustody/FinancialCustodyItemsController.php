@@ -77,8 +77,8 @@ class FinancialCustodyItemsController extends Controller
         $amounts['current_dayOfMonth'] = $startDate->day;
         $amounts['current_month']      = $startDate->month - 1;
         $amounts['current_year']       = $startDate->year;
-        $amounts['withdrawsAmount']    = $currentFinancialCustody->withdraws()->sum('withdrawValue');
-        $amounts['depositsAmount']     = $currentFinancialCustody->deposits()->sum('withdrawValue');
+        $amounts['withdrawsAmount']    = $currentFinancialCustody->totalWithdraws();
+        $amounts['depositsAmount']     = $currentFinancialCustody->totalDeposits();
         $amounts['currentAmount']      = $amounts['depositsAmount'] - $amounts['withdrawsAmount'];
         $financialCustodyItems         = [];
         if (!$viewAll) {
@@ -204,8 +204,8 @@ class FinancialCustodyItemsController extends Controller
     private function calculateCurrentAmount(Request $request)
     {
         $currentFinancialCustody = $this->getCurrentFinancialCustody($request);
-        $depositValue            = $currentFinancialCustody->deposits()->sum('withdrawValue');
-        $withdrawValue           = $currentFinancialCustody->withdraws()->sum('withdrawValue');
+        $depositValue            = $currentFinancialCustody->totalDeposits();
+        $withdrawValue           = $currentFinancialCustody->totalWithdraws();
         return round(($depositValue - $withdrawValue), Helpers::getDecimalPointCount());
     }
 
@@ -368,7 +368,7 @@ class FinancialCustodyItemsController extends Controller
             }
             $date = DateTime::parse($request->due_date);
             DepositWithdraw::create([
-                                        'depositValue'         => ($currentFinancialCustody->deposits()->sum('withdrawValue') - $currentFinancialCustody->refundedDeposits()->sum('depositValue')),
+                                        'depositValue'         => ($currentFinancialCustody->totalDeposits() - $currentFinancialCustody->refundedDeposits()->sum('depositValue')),
                                         'recordDesc'           => "رد {$currentFinancialCustody->description}",
                                         'employee_id'          => $currentFinancialCustody->employee_id,
                                         'expenses_id'          => EmployeeActions::FinancialCustodyRefund,

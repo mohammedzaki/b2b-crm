@@ -224,7 +224,7 @@ class SalaryController
                 $dueDate = $awayDate->addDay(1);
             }
             if ($allItemsApproved) {
-                $depositValue = ($currentFinancialCustody->deposits()->sum('withdrawValue') - $currentFinancialCustody->refundedDeposits()->sum('depositValue'));
+                $depositValue = ($currentFinancialCustody->totalDeposits() - $currentFinancialCustody->totalRefundedDeposits());
                 DepositWithdraw::create([
                                             'depositValue'         => $depositValue,
                                             'recordDesc'           => "رد {$currentFinancialCustody->description}",
