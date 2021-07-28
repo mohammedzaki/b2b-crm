@@ -46,57 +46,77 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DepositWithdraw whereWithdrawValue($value)
  * @mixin \Eloquent
  */
-class FinancialCustody extends Model {
+class FinancialCustody extends Model
+{
 
     protected $dates = ['created_at', 'updated_at', 'approved_at'];
 
-    protected $fillable = [
-        'amount',
-        'description',
-        'notes',
-        'due_date',
-        'user_id',
-        'employee_id',
-        'approved_by',
-        'approved_at',
-        'updated_at',
-        'created_at'
-    ];
+    protected $fillable
+        = [
+            'amount',
+            'description',
+            'notes',
+            'due_date',
+            'user_id',
+            'employee_id',
+            'approved_by',
+            'approved_at',
+            'updated_at',
+            'created_at'
+        ];
 
-
-    public function deposits() {
-        return $this->hasMany(DepositWithdraw::class, 'financial_custody_id')->where('expenses_id', EmployeeActions::FinancialCustody);
-    }
-
-    public function totalDeposits() {
+    public function totalDeposits()
+    {
         return $this->deposits()->sum('withdrawValue');
     }
 
-    public function refundedDeposits() {
-        return $this->hasMany(DepositWithdraw::class, 'financial_custody_id')->where('expenses_id', EmployeeActions::FinancialCustodyRefund);
+    public function deposits()
+    {
+        return $this->hasMany(DepositWithdraw::class, 'financial_custody_id')
+                    ->where([
+                                ['expenses_id', '=', EmployeeActions::FinancialCustody],
+                                ['depositValue', '=', NULL, 'or'],
+                                ['depositValue', '=', 0]
+                            ]);
     }
 
-    public function totalRefundedDeposits() {
+    public function totalRefundedDeposits()
+    {
         return $this->refundedDeposits()->sum('depositValue');
     }
 
-    public function withdraws() {
-        return $this->hasMany(FinancialCustodyItem::class, 'financial_custody_id');
+    public function refundedDeposits()
+    {
+        return $this->hasMany(DepositWithdraw::class, 'financial_custody_id')
+                    ->where([
+                                ['expenses_id', '=', EmployeeActions::FinancialCustodyRefund],
+                                ['withdrawValue', '=', NULL, 'or'],
+                                ['withdrawValue', '=', 0]
+                            ]);
     }
 
-    public function totalWithdraws() {
+    public function totalWithdraws()
+    {
         return $this->withdraws()->sum('withdrawValue');
     }
 
-    public function employee() {
+    public function withdraws()
+    {
+        return $this->hasMany(FinancialCustodyItem::class, 'financial_custody_id');
+    }
+
+    public function employee()
+    {
         return $this->belongsTo(Employee::class);
     }
 
-    public function approved_by_data() {
+    public function approved_by_data()
+    {
         return $this->hasOne(User::class, 'id', 'approved_by');
     }
 
-    public function hasNotApprovedItems() {
+    public function hasNotApprovedItems()
+    {
         $financialCustodyItems = $this->hasMany(FinancialCustodyItem::class, 'financial_custody_id')->get();
         foreach ($financialCustodyItems as $financialCustodyItem) {
             if (!isset($financialCustodyItem->approved_at)) {

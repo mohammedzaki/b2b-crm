@@ -74,7 +74,11 @@ class FinancialCustodyController extends Controller
             $date                      = null;
         } else {
             $employee                  = Employee::findOrFail($employee_id);
-            $employeeFinancialCustodys = $employee->employeeFinancialCustodys($request->date);
+            if (isset($request->date) & !empty($request->date)) {
+                $employeeFinancialCustodys = $employee->employeeFinancialCustodys($request->date);
+            } else {
+                $employeeFinancialCustodys = $employee->employeeFinancialCustodys();
+            }
         }
         $date                             = $request->date;
         $employee_id                      = $employee_id;
