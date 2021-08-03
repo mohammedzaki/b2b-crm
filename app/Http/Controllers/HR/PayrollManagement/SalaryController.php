@@ -88,35 +88,33 @@ class SalaryController
                                   ->mapWithKeys(function ($attendance) {
                                       return [
                                           $attendance->id => [
-                                              'id'                          => $attendance->id,
-                                              'processName'                 => $attendance->process ? $attendance->process->name : 'عمليات ادارية',
-                                              'employeeName'                => $attendance->employee->name,
-                                              'workingHours'                => $attendance->workingHoursToString(),
-                                              'date'                        => DateTime::parse($attendance->date)->format('l, d-m-Y'),
-                                              //'FinancialCustodyValue'       => $attendance->employeeFinancialCustody(),
-                                              //'FinancialCustodyRefundValue' => $attendance->employeeFinancialCustodyRefund(),
-                                              'borrowValue'                 => $attendance->employeeSmallBorrow(),
-                                              'absentTypeName'              => $attendance->absentType ? $attendance->absentType->name : null,
-                                              'totalWorkingHoursInSeconds'  => $attendance->workingHoursToSeconds(),
-                                              'salary_deduction'            => $attendance->salary_deduction,
-                                              'absent_deduction'            => $attendance->absent_deduction,
-                                              'mokaf'                       => $attendance->mokaf,
-                                              'date'                        => $attendance->date,
-                                              'shift'                       => $attendance->shift,
-                                              'check_in'                    => $attendance->check_in,
-                                              'check_out'                   => $attendance->check_out,
-                                              'notes'                       => $attendance->notes,
-                                              'employee_id'                 => $attendance->employee_id,
-                                              'process_id'                  => $attendance->process_id
+                                              'id'                         => $attendance->id,
+                                              'processName'                => $attendance->process ? $attendance->process->name : 'عمليات ادارية',
+                                              'employeeName'               => $attendance->employee->name,
+                                              'workingHours'               => $attendance->workingHoursToString(),
+                                              'date'                       => DateTime::parse($attendance->date)->format('l, d-m-Y'),
+                                              'borrowValue'                => $attendance->employeeSmallBorrow(),
+                                              'absentTypeName'             => $attendance->absentType ? $attendance->absentType->name : null,
+                                              'totalWorkingHoursInSeconds' => $attendance->workingHoursToSeconds(),
+                                              'salary_deduction'           => $attendance->salary_deduction,
+                                              'absent_deduction'           => $attendance->absent_deduction,
+                                              'mokaf'                      => $attendance->mokaf,
+                                              'date'                       => $attendance->date,
+                                              'shift'                      => $attendance->shift,
+                                              'check_in'                   => $attendance->check_in,
+                                              'check_out'                  => $attendance->check_out,
+                                              'notes'                      => $attendance->notes,
+                                              'employee_id'                => $attendance->employee_id,
+                                              'process_id'                 => $attendance->process_id
                                           ]
                                       ];
                                   });
         $attendances instanceof \Illuminate\Support\Collection;
         $employeeFinancialCustodys = FinancialCustody::where([
-                                                                ['employee_id', '=', $employee->id]
-                                                            ])
-                                                    ->whereYear('due_date', $date->year)
-                                                    ->whereMonth('due_date', $date->month)->get();
+                                                                 ['employee_id', '=', $employee->id]
+                                                             ])
+                                                     ->whereYear('due_date', $date->year)
+                                                     ->whereMonth('due_date', $date->month)->get();
 
         $totalSalaryDeduction             = $attendances->sum('salary_deduction');
         $totalAbsentDeduction             = $attendances->sum('absent_deduction');
@@ -124,7 +122,7 @@ class SalaryController
         $totalFinancialCustodyValue       = $employeeFinancialCustodys->sum(function (FinancialCustody $fin) {
             return $fin->totalDeposits();
         });
-         $totalFinancialCustodyRefundValue = $employeeFinancialCustodys->sum(function (FinancialCustody $fin) {
+        $totalFinancialCustodyRefundValue = $employeeFinancialCustodys->sum(function (FinancialCustody $fin) {
             return $fin->totalRefundedDeposits();
         });
         $totalSmallBorrowValue            = $attendances->sum('borrowValue');
