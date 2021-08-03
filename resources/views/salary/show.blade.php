@@ -35,8 +35,8 @@
                                     <th>الخصومات</th>
                                     <th>الملاحظات</th>
                                     <th>السلف</th>
-                                    <th>العهد</th>
-                                    <th>العهد المردودة</th>
+                                    {{--<th>العهد</th>--}}
+                                    {{--<th>العهد المردودة</th>--}}
                                     <th>نوع الغياب</th>
                                     <th>خصم الغياب</th>
                                 </tr>
@@ -54,8 +54,8 @@
                                         <td>{{ $attendance['salary_deduction'] }}</td>
                                         <td>{{ $attendance['notes'] }}</td>
                                         <td>{{ $attendance['borrowValue'] }}</td>
-                                        <td>{{ $attendance['FinancialCustodyValue'] }}</td>
-                                        <td>{{ $attendance['FinancialCustodyRefundValue'] }}</td>
+                                        {{--<td>{{ $attendance['FinancialCustodyValue'] }}</td>--}}
+                                        {{--<td>{{ $attendance['FinancialCustodyRefundValue'] }}</td>--}}
                                         <td>{{ $attendance['absentTypeName'] }}</td>
                                         <td>{{ $attendance['absent_deduction'] }}</td>
                                     </tr>
@@ -73,8 +73,8 @@
                                     <th>{{ $totalSalaryDeduction }}</th>
                                     <th></th>
                                     <th>{{ $totalBorrowValue }}</th>
-                                    <th>{{ $totalFinancialCustodyValue }}</th>
-                                    <th>{{ $totalFinancialCustodyRefundValue }}</th>
+                                    {{--<th>{{ $totalFinancialCustodyValue }}</th>--}}
+                                    {{--<th>{{ $totalFinancialCustodyRefundValue }}</th>--}}
                                     <th></th>
                                     <th>{{ $totalAbsentDeduction }}</th>
                                 </tr>

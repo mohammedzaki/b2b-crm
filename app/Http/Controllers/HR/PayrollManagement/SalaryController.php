@@ -20,6 +20,7 @@ use App\Models\Attendance;
 use App\Models\DepositWithdraw;
 use App\Models\Employee;
 use App\Models\EmployeeBorrowBilling;
+use App\Models\FinancialCustody;
 use App\Reports\Employee\Salary;
 use Illuminate\Http\Request;
 use DB;
@@ -92,8 +93,8 @@ class SalaryController
                                               'employeeName'                => $attendance->employee->name,
                                               'workingHours'                => $attendance->workingHoursToString(),
                                               'date'                        => DateTime::parse($attendance->date)->format('l, d-m-Y'),
-                                              'FinancialCustodyValue'       => $attendance->employeeFinancialCustody(),
-                                              'FinancialCustodyRefundValue' => $attendance->employeeFinancialCustodyRefund(),
+                                              //'FinancialCustodyValue'       => $attendance->employeeFinancialCustody(),
+                                              //'FinancialCustodyRefundValue' => $attendance->employeeFinancialCustodyRefund(),
                                               'borrowValue'                 => $attendance->employeeSmallBorrow(),
                                               'absentTypeName'              => $attendance->absentType ? $attendance->absentType->name : null,
                                               'totalWorkingHoursInSeconds'  => $attendance->workingHoursToSeconds(),
@@ -111,11 +112,21 @@ class SalaryController
                                       ];
                                   });
         $attendances instanceof \Illuminate\Support\Collection;
+        $employeeFinancialCustodys = FinancialCustody::where([
+                                                                ['employee_id', '=', $employee->id]
+                                                            ])
+                                                    ->whereYear('due_date', $date->year)
+                                                    ->whereMonth('due_date', $date->month)->get();
+
         $totalSalaryDeduction             = $attendances->sum('salary_deduction');
         $totalAbsentDeduction             = $attendances->sum('absent_deduction');
         $totalBonuses                     = $attendances->sum('mokaf');
-        $totalFinancialCustodyValue       = $attendances->sum('FinancialCustodyValue');
-        $totalFinancialCustodyRefundValue = $attendances->sum('FinancialCustodyRefundValue');
+        $totalFinancialCustodyValue       = $employeeFinancialCustodys->sum(function (FinancialCustody $fin) {
+            return $fin->totalDeposits();
+        });
+         $totalFinancialCustodyRefundValue = $employeeFinancialCustodys->sum(function (FinancialCustody $fin) {
+            return $fin->totalRefundedDeposits();
+        });
         $totalSmallBorrowValue            = $attendances->sum('borrowValue');
         $totalWorkingHoursInSeconds       = $attendances->sum('totalWorkingHoursInSeconds');
         $totalHoursSalary                 = round(($totalWorkingHoursInSeconds * (($hourlyRate / 60) / 60)), Helpers::getDecimalPointCount());
