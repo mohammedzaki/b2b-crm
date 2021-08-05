@@ -246,6 +246,7 @@
              }*/
             if (ConfirmPay()) {
                 $('#SearchForm').append('<input type="hidden" name="totalNetSalary" value="' + $('#totalNetSalary').val() + '" />');
+                $('#SearchForm').append('<input type="hidden" name="_token" value="{{ csrf_token() }}" />');
                 $('#SearchForm').prop('method', 'post').prop('action', 'paySalary/' + empId).submit();
             }
         }
