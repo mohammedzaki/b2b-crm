@@ -69,7 +69,7 @@ class AttendanceController extends Controller {
             } else {
                 $attendances = Attendance::where([
                             ['employee_id', '=', $id]
-                        ]) 
+                        ])
                         ->whereYear('date', $dt->year)
                         ->whereMonth('date', $dt->month)->get();
             }
@@ -91,7 +91,7 @@ class AttendanceController extends Controller {
                 $attendance->absentTypeName = $attendance->absentType->name;
             }
         }
-        
+
         return view('attendance.index', compact(['employees', 'attendances', 'date', 'employee_id', 'hasData']));
     }
 
@@ -211,6 +211,7 @@ class AttendanceController extends Controller {
     public function store(Request $request)
     {
         $all = $request->all();
+        $date =  DateTime::parse($all['date']);
         if (!empty($request->check_in)) {
             $validator = $this->validatorCheckin($all);
         } else {
@@ -223,7 +224,7 @@ class AttendanceController extends Controller {
                     ->orderBy('id', 'desc')
                     ->first();
             $attendanceToday       = Attendance::where([
-                        ["date", "=", $all['date']],
+                        ["date", "=", $date],
                         ["employee_id", "=", $all['employee_id']]
                     ])
                     ->orderBy('id', 'desc')
@@ -236,20 +237,13 @@ class AttendanceController extends Controller {
                     ->first();
             if ($request->checkin == -1) {
                 $attendance          = Attendance::firstOrCreate([
-                            ["date", "=", $all['date']],
+                            ["date", "=", $date],
                             ["employee_id", "=", $all['employee_id']]
                 ]);
                 $all['absent_check'] = TRUE;
                 goto skip;
             } else if ($request->checkin == 0) {
-                
-            } else if (empty($attendance)) {
-                if (isset($request->is_second_shift)) {
-                    $errors['is_second_shift'] = "يجب تسجيل الوردية الاولى اولا";
-                    return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($errors);
-                } else if (empty($request->check_in)) {
-                    return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل حضور اولا')->withErrors($validator);
-                }
+
             } else if (!empty($attendanceToday)) {
                 if (isset($attendanceToday->absent_check)) {
                     return redirect()->back()->withInput($all)->with('error', 'لقد تم تسجيل غياب لهذا العامل يرجى التعديل من شاشة التعديل');
@@ -278,7 +272,7 @@ class AttendanceController extends Controller {
                 }
                 if (isset($attendanceToday->check_in) && isset($attendanceToday->check_out) && isset($request->is_second_shift)) {
                     $attendance   = Attendance::firstOrCreate([
-                                ["date", "=", $all['date']],
+                                ["date", "=", $date],
                                 ["employee_id", "=", $all['employee_id']],
                                 ["shift", "=", 2]
                     ]);
@@ -292,13 +286,7 @@ class AttendanceController extends Controller {
                     $errors['is_second_shift'] = "يجب تسجيل الوردية الاولى اولا";
                     return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($errors);
                 } else if (isset($request->check_in)) {
-                    $checkinDate  = DateTime::parse($request->check_in);
-                    $checkoutDate = DateTime::parse($attendance->check_out);
-                    if (empty($attendance->check_out)) {
-                        return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل انصراف اولا');
-                    } else if ($checkoutDate->gt($checkinDate)) {
-                        return redirect()->back()->withInput($all)->with('error', 'تاريخ الدخول اكبر من اخر تاريخ انصراف');
-                    }
+
                 } else if (isset($request->check_out)) {
                     $checkinDate  = DateTime::parse($attendance->check_in);
                     $checkoutDate = DateTime::parse($request->check_out);
@@ -310,7 +298,7 @@ class AttendanceController extends Controller {
                 }
             }
             $attendance   = Attendance::firstOrCreate([
-                        ["date", "=", $all['date']],
+                        ["date", "=", $date],
                         ["employee_id", "=", $all['employee_id']],
                         ["shift", "=", 1]
             ]);
