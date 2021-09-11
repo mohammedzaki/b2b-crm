@@ -438,7 +438,7 @@ class DailyCashController extends Controller
      */
     public function destroy($id)
     {
-        //
+        // test
     }
 
 }
