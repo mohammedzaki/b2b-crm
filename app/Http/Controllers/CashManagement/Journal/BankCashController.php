@@ -19,4 +19,6 @@ namespace App\Http\Controllers\CashManagement\Journal;
  */
 class BankCashController {
     //put your code here
+
+    // test 2
 }
