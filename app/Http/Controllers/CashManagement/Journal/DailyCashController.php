@@ -410,6 +410,7 @@ class DailyCashController extends Controller
      */
     public function update(Request $request, $id)
     {
+        DB::beginTransaction();
         $request->user_id = auth()->user()->id;
         $depositWithdraw  = DepositWithdraw::findOrFail($id);
         if (isset($request->employee_id)) {
@@ -418,6 +419,7 @@ class DailyCashController extends Controller
         unset($request['due_date']); // to prevent changing the date
         $depositWithdraw->update($request->all());
         $this->checkProcessClosed($depositWithdraw);
+        DB::commit();
         return response()->json(array(
                                     'success'       => true,
                                     'id'            => $depositWithdraw->id,
