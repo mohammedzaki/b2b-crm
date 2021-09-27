@@ -609,7 +609,7 @@
                             <div class="col-md-12">
                                 {{ Form::open(['route' => 'financialCustodyItems.search', 'method' => 'get']) }}
                                 <input hidden value="{{ $employee_id }}" name="employee_id" />
-                                <input hidden value="{{ $financialCustodyId }}" name="id" />
+                                <input hidden value="{{ $financialCustodyId }}" name="id" id="financialCustodyId" />
                                 <div class="col-md-8" style="padding: 4px;">
                                     <input type="text" id="targetdate" name="targetdate" readonly
                                            class="form-control datepickerCommon" value="{{ $targetDate }}">
@@ -643,20 +643,16 @@
             recordDesc, notes, saveStatus, id, flag, canEdit, currentAmount, withdrawsAmount, depositsAmount;
         var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
         var loadAll = false;
+        var financialCustodyId = '';
 
         $(function () {
+            currentAmount = $("#currentAmount");
+            withdrawsAmount = $("#withdrawsAmount");
+            depositsAmount = $("#depositsAmount");
+            financialCustodyId = $("#financialCustodyId").val();
             SetFinancialCustodyDetailsProcess();
             LockAll();
         });
-
-        currentAmount = $("#currentAmount");
-        withdrawsAmount = $("#withdrawsAmount");
-        depositsAmount = $("#depositsAmount");
-
-        function loadAllProcessAndClients() {
-            loadAll = $("#loadAllProcessAndClients").prop("checked");
-            SetFinancialCustodyDetailsProcess();
-        }
 
         function LoadProcess(rowIndex) {
             client_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .client_id');
@@ -849,7 +845,7 @@
                 URL += '/' + id.val();
                 METHOD = 'PUT';
             }
-            URL += '?employee_id={{$employee_id}}';
+            URL += '?employee_id={{$employee_id}}&f_id='+financialCustodyId;
             checkDelete.parent().parent().addClass('InSave');
             $.ajax({
                 type: METHOD,
@@ -1195,15 +1191,6 @@
             $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ')').remove();
         }
 
-        function isNumber(evt) {
-            evt = (evt) ? evt : window.event;
-            var charCode = (evt.which) ? evt.which : evt.keyCode;
-            if (charCode > 31 && (charCode < 48 || charCode > 57)) {
-                return false;
-            }
-            return true;
-        }
-
         function SetCurrentRowIndex(CellChildInput) {
             CurrentCell = $(CellChildInput).parent().parent();
             CurrentCellName = $(CellChildInput).attr('name');
@@ -1265,7 +1252,5 @@
             var parsedVal = parseInt(val);
             return isNaN(parsedVal) ? 0 : parsedVal;
         }
-
-
     </script>
 @endsection

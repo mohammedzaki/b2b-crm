@@ -130,21 +130,26 @@ class ClientProcess extends Model {
                     ['depositValue', ">", 0],
         ]);
     }
-    
-    public function expenses() {
-        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
-                    ['client_id', "=", $this->client_id],
-                    ['withdrawValue', ">", 0],
-        ]);
-    }
 
-    public function pendingExpenses() {
-        return $this->hasMany(FinancialCustodyItem::class, 'cbo_processes')->where([
+    public function dwExpenses()
+    {
+        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
                                                                                   ['client_id', "=", $this->client_id],
                                                                                   ['withdrawValue', ">", 0],
-                                                                                  ['daily_cash_id', '=', null],
-                                                                                  ['approved_at', '=', null]
-                                                                              ]);
+                                                                              ])->select(DB::raw('NULL as pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
+    }
+
+    public function fcExpenses()
+    {
+        return $this->hasMany(FinancialCustodyItem::class, 'cbo_processes')->where([
+                                                                                       ['client_id', "=", $this->client_id],
+                                                                                       ['withdrawValue', ">", 0],
+                                                                                       ['approved_at', '=', null]
+                                                                                   ])->select(DB::raw('1 as pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
+    }
+
+    public function expenses() {
+        return collect($this->dwExpenses)->merge($this->fcExpenses)->sortBy('due_date');
     }
 
     public function manpowerCost() {

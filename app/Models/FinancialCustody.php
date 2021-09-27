@@ -80,21 +80,6 @@ class FinancialCustody extends Model
                             ]);
     }
 
-    public function totalRefundedDeposits()
-    {
-        return $this->refundedDeposits()->sum('depositValue');
-    }
-
-    public function refundedDeposits()
-    {
-        return $this->hasMany(DepositWithdraw::class, 'financial_custody_id')
-                    ->where([
-                                ['expenses_id', '=', EmployeeActions::FinancialCustodyRefund],
-                                ['withdrawValue', '=', NULL, 'or'],
-                                ['withdrawValue', '=', 0]
-                            ]);
-    }
-
     public function totalWithdraws()
     {
         return $this->withdraws()->sum('withdrawValue');

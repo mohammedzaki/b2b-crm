@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use DB;
 
 /**
  * App\Models\SupplierProcess
@@ -110,22 +111,26 @@ class SupplierProcess extends Model {
         return $this->belongsTo(ClientProcess::class);
     }
 
-    public function withdrawals()
+    public function dwWithdrawals()
     {
         return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
                                                                                   ['supplier_id', "=", $this->supplier_id],
                                                                                   ['withdrawValue', ">", 0],
-                                                                              ]);
+                                                                              ])->select(DB::raw('NULL as pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
     }
 
-    public function pendingWithdrawals()
+    public function fcWithdrawals()
     {
         return $this->hasMany(FinancialCustodyItem::class, 'cbo_processes')->where([
                                                                                        ['supplier_id', "=", $this->supplier_id],
                                                                                        ['withdrawValue', ">", 0],
-                                                                                       ['daily_cash_id', '=', null],
                                                                                        ['approved_at', '=', null]
-                                                                                   ]);
+                                                                                   ])->select(DB::raw('1 as pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
+    }
+
+    public function withdrawals()
+    {
+        return collect($this->dwWithdrawals)->merge($this->fcWithdrawals)->sortBy('due_date');
     }
 
     public function totalWithdrawals() {

@@ -73,14 +73,15 @@ class FinancialCustodyItemsController extends Controller
         // $canEdit = 0;
         //}
         $financialCustodyDeposits      = $currentFinancialCustody->deposits;
+        $depositValue                  = $currentFinancialCustody->totalDeposits();
+        $withdrawValue                 = $currentFinancialCustody->totalWithdraws();
         $amounts['current_dayOfWeek']  = $startDate->dayOfWeek;
         $amounts['current_dayOfMonth'] = $startDate->day;
         $amounts['current_month']      = $startDate->month - 1;
         $amounts['current_year']       = $startDate->year;
-        $amounts['withdrawsAmount']    = $currentFinancialCustody->totalWithdraws();
-        $amounts['depositsAmount']     = $currentFinancialCustody->totalDeposits();
-        $amounts['currentAmount']      = $amounts['depositsAmount'] - $amounts['withdrawsAmount'];
-        $financialCustodyItems         = [];
+        $amounts['withdrawsAmount']    = $withdrawValue;
+        $amounts['depositsAmount']     = $depositValue;
+        $amounts['currentAmount']      = round(($depositValue - $withdrawValue), Helpers::getDecimalPointCount());
         if (!$viewAll) {
             $financialCustodyItems = $currentFinancialCustody->withdraws()->whereBetween('due_date', [$startDate, $endDate])->get();
         } else {
@@ -153,13 +154,17 @@ class FinancialCustodyItemsController extends Controller
      */
     private function getCurrentFinancialCustody(Request $request)
     {
-        $employee_id     = $request->get('employee_id');
-        $currentEmployee = Employee::find(auth()->user()->employee_id);
+        $employee_id        = $request->get('employee_id');
+        $financialCustodyId = $request->get('f_id');
+        $currentEmployee    = Employee::find(auth()->user()->employee_id);
         if (isset($employee_id) && $employee_id != null) {
             $currentEmployee = Employee::find($employee_id);
         }
-        $currentFinancialCustody = $currentEmployee->currentFinancialCustody();
-
+        if (isset($financialCustodyId)) {
+            $currentFinancialCustody = FinancialCustody::find($financialCustodyId);
+        } else {
+            $currentFinancialCustody = $currentEmployee->currentFinancialCustody();
+        }
         if ($currentFinancialCustody == null) { // || count($currentFinancialCustody->deposits) <= 0) {
             abort(403, 'عفوا لا يوجد عهدة مسجلة. ');
         }
@@ -226,29 +231,11 @@ class FinancialCustodyItemsController extends Controller
         try {
             $date = DateTime::parse($request->due_date);
             foreach ($all['rowsIds'] as $id) {
-                $financialCustodyItem    = FinancialCustodyItem::find($id);
-                $currentFinancialCustody = $financialCustodyItem->financialCustody;
-                $depositWithdraw         = DepositWithdraw::create($financialCustodyItem->toArray());
-
-                $depositWithdrawRefund = DepositWithdraw::create([
-                                                                     'depositValue'         => $depositWithdraw->withdrawValue,
-                                                                     'recordDesc'           => "رد {$currentFinancialCustody->description}",
-                                                                     'employee_id'          => $currentFinancialCustody->employee_id,
-                                                                     'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
-                                                                     'financial_custody_id' => $currentFinancialCustody->id,
-                                                                     'user_id'              => $c_user_id,
-                                                                     'payMethod'            => PaymentMethods::CASH,
-                                                                     'due_date'             => $depositWithdraw->due_date
-                                                                 ]);
-
                 FinancialCustodyItem::where('id', $id)->update([
-                                                                   'saveStatus'           => 2,
-                                                                   'daily_cash_id'        => $depositWithdraw->id,
-                                                                   'daily_cash_refund_id' => $depositWithdrawRefund->id,
-                                                                   'approved_at'          => DateTime::now(),
-                                                                   'approved_by'          => $c_user_id
+                                                                   'saveStatus'  => 2,
+                                                                   'approved_at' => DateTime::now(),
+                                                                   'approved_by' => $c_user_id
                                                                ]);
-
                 $rowsIds[$id] = "Done";
             }
             DB::commit();
@@ -357,18 +344,16 @@ class FinancialCustodyItemsController extends Controller
             }
             foreach ($currentFinancialCustody->withdraws as $financialCustodyItem) {
                 if (!isset($financialCustodyItem->approved_at)) {
-                    $depositWithdraw = DepositWithdraw::create($financialCustodyItem->toArray());
                     $financialCustodyItem->update([
-                                                      'saveStatus'    => 2,
-                                                      'daily_cash_id' => $depositWithdraw->id,
-                                                      'approved_at'   => DateTime::now(),
-                                                      'approved_by'   => $c_user_id
+                                                      'saveStatus'  => 2,
+                                                      'approved_at' => DateTime::now(),
+                                                      'approved_by' => $c_user_id
                                                   ]);
                 }
             }
             $date = DateTime::parse($request->due_date);
             DepositWithdraw::create([
-                                        'depositValue'         => ($currentFinancialCustody->totalDeposits() - $currentFinancialCustody->refundedDeposits()->sum('depositValue')),
+                                        'depositValue'         => ($currentFinancialCustody->totalDeposits() - $currentFinancialCustody->totalWithdraws()),
                                         'recordDesc'           => "رد {$currentFinancialCustody->description}",
                                         'employee_id'          => $currentFinancialCustody->employee_id,
                                         'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
