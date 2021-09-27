@@ -124,8 +124,8 @@ class SupplierProcess extends Model {
         return $this->hasMany(FinancialCustodyItem::class, 'cbo_processes')->where([
                                                                                        ['supplier_id', "=", $this->supplier_id],
                                                                                        ['withdrawValue', ">", 0],
-                                                                                       ['approved_at', '=', null]
-                                                                                   ])->select(DB::raw('1 as pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
+                                                                                       // ['approved_at', '=', null]
+                                                                                   ])->select(DB::raw('IF(ISNULL(approved_at),NULL,1)AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
     }
 
     public function withdrawals()
