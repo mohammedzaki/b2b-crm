@@ -125,7 +125,7 @@ class SupplierProcess extends Model {
                                                                                        ['supplier_id', "=", $this->supplier_id],
                                                                                        ['withdrawValue', ">", 0],
                                                                                        // ['approved_at', '=', null]
-                                                                                   ])->select(DB::raw('IF(ISNULL(approved_at),NULL,1)AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
+                                                                                   ])->select(DB::raw('IF(ISNULL(approved_at),1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
     }
 
     public function withdrawals()
