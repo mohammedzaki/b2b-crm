@@ -19,7 +19,7 @@
                     @forelse ($proceses as $process)
                         <div class="col-lg-12 no-padding">
                             <div class="col-lg-6 no-padding">
-                                <label>اسم العميل :</label> {{ $supplierName }}
+                                <label>اسم المورد :</label> {{ $supplierName }}
                             </div>
                             <div class="col-lg-6 no-padding">
                                 <label>اسم العملية :</label> {{ $process['processName'] }}

@@ -128,7 +128,7 @@ class ClientProcess extends Model {
         return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
                     ['client_id', "=", $this->client_id],
                     ['depositValue', ">", 0],
-        ]);
+        ])->orderBy('due_date');
     }
 
     public function dwExpenses()

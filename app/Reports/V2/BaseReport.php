@@ -103,8 +103,8 @@ abstract class BaseReport implements IReport
 
     protected function generatePDFHTML()
     {
-        $arr = array_merge(['reportLayout' => $this->reportPDFView], $this->getReportBaseData(), $this->getReportData());
-        return view($this->reportView)->with($arr)->render();
+        $reportData = array_merge(['reportLayout' => $this->reportPDFView], $this->getReportBaseData(), $this->getReportData());
+        return view($this->reportView)->with($reportData)->render();
     }
 
 }
