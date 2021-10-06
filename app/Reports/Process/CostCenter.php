@@ -63,25 +63,16 @@ class CostCenter extends BaseReport implements IReport
 
     private function getProcessExpences(ClientProcess $process)
     {
-        $processExpences            = $process->expenses->map(function ($item, $key) {
+        $processExpences            = $process->expenses()->map(function ($item, $key) {
             return [
-                'pending'   => false,
-                'desc'      => $item['recordDesc'],
-                'date'      => $item['due_date'],
-                'totalCost' => $item['withdrawValue'],
-            ];
-        });
-        $pendingExpences            = $process->pendingExpenses->map(function ($item, $key) {
-            return [
-                'pending'   => true,
+                'pending'   => $item['pendingStatus'],
                 'desc'      => $item['recordDesc'],
                 'date'      => $item['due_date'],
                 'totalCost' => $item['withdrawValue'],
             ];
         });
         $this->totalProcessExpenses = $processExpences->sum('totalCost');
-        $this->totalProcessExpenses += $pendingExpences->sum('totalCost');
-        return array_merge($processExpences->toArray(), $pendingExpences->toArray());
+        return $processExpences->toArray();
     }
 
     private function getProcessSuppliers(ClientProcess $process)
