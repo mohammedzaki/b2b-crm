@@ -51,30 +51,31 @@ class AnalyticalCenterController extends Controller
 
         $suppliers = [];
         foreach ($request->selectedIds as $id) {
-            $supplier                       = Supplier::findOrFail($id);
-            $suppliers[$id]['supplierName'] = $supplier->name;
-            $suppliers[$id]['supplierNum']  = $supplier->id;
+            $supplier                                 = Supplier::findOrFail($id);
+            $suppliers[$id]['supplierName']           = $supplier->name;
+            $suppliers[$id]['supplierNum']            = $supplier->id;
+            $suppliers[$id]['supplierTotalPrice']     = 0;
+            $suppliers[$id]['supplierTotalPaid']      = 0;
+            $suppliers[$id]['supplierTotalRemaining'] = 0;
 
-            $suppliers[$id]['supplierTotalPrice']     = $supplier->getTotalDeal();
-            $suppliers[$id]['supplierTotalPaid']      = $supplier->getTotalPaid();
-            $suppliers[$id]['supplierTotalRemaining'] = $supplier->getTotalRemaining();
-
-            $allSuppliersTotalPrice     += $suppliers[$id]['supplierTotalPrice'];
-            $allSuppliersTotalPaid      += $suppliers[$id]['supplierTotalPaid'];
-            $allSuppliersTotalRemaining += $suppliers[$id]['supplierTotalRemaining'];
-
-            if ($request->ch_detialed == TRUE) {
-                $index                            = 0;
-                $suppliers[$id]['processDetails'] = [];
-                foreach ($supplier->processes as $process) {
+            $index                            = 0;
+            $suppliers[$id]['processDetails'] = [];
+            foreach ($supplier->processes as $process) {
+                if ($request->ch_detialed == TRUE) {
                     $suppliers[$id]['processDetails'][$index]['name']       = $process->name;
                     $suppliers[$id]['processDetails'][$index]['totalPrice'] = $process->total_price_taxes;
                     $suppliers[$id]['processDetails'][$index]['paid']       = $process->totalWithdrawals();
                     $suppliers[$id]['processDetails'][$index]['remaining']  = $process->totalRemaining();
                     $suppliers[$id]['processDetails'][$index]['date']       = $process->created_at;
-                    $index++;
                 }
+                $suppliers[$id]['supplierTotalPrice']     += $process->total_price_taxes;
+                $suppliers[$id]['supplierTotalPaid']      += $process->totalWithdrawals();
+                $suppliers[$id]['supplierTotalRemaining'] += $process->totalRemaining();
+                $index++;
             }
+            $allSuppliersTotalPrice     += $suppliers[$id]['supplierTotalPrice'];
+            $allSuppliersTotalPaid      += $suppliers[$id]['supplierTotalPaid'];
+            $allSuppliersTotalRemaining += $suppliers[$id]['supplierTotalRemaining'];
         }
 
         session([

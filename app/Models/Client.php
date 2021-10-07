@@ -45,129 +45,139 @@ use DB;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Client withoutTrashed()
  * @mixin \Eloquent
  */
-class Client extends Model {
+class Client extends Model
+{
 
     use SoftDeletes;
 
     protected $dates = ['deleted_at'];
-    protected $fillable = [
-        'name',
-        'address',
-        'telephone',
-        'mobile',
-        'referral_id',
-        'referral_percentage',
-        'credit_limit',
-        'is_client_company'
-    ];
+    protected $fillable
+                     = [
+            'name',
+            'address',
+            'telephone',
+            'mobile',
+            'referral_id',
+            'referral_percentage',
+            'credit_limit',
+            'is_client_company'
+        ];
 
-    public function processes() {
-        return $this->hasMany(ClientProcess::class);
+    public static function allHasOpenProcess()
+    {
+        $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
+                         ->select('clients.*')->where('client_processes.status', ClientProcess::statusOpened)
+                         ->distinct()
+                         ->get();
+        return $clients;
     }
 
-    public function unInvoiceProcesses() {
+    public static function allHasUnBilledInvoiceProcess()
+    {
+        $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
+                         ->select('clients.*')->where([
+                                                          //['client_processes.status', ClientProcess::statusOpened],
+                                                          ['client_processes.invoice_billed', '=', ClientProcess::invoiceUnBilled],
+                                                          ['client_processes.require_invoice', '=', TRUE],
+                                                      ])
+                         ->distinct()
+                         ->get();
+        return $clients;
+    }
+
+    public static function allHasInvoiceProcess()
+    {
+        $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
+                         ->select('clients.*')->where([
+                                                          //['client_processes.status', ClientProcess::statusOpened],
+                                                          //['client_processes.invoice_billed', '=', ClientProcess::invoiceUnBilled],
+                                                          ['client_processes.require_invoice', '=', TRUE],
+                                                      ])
+                         ->distinct()
+                         ->get();
+        return $clients;
+    }
+
+    public function unInvoiceProcesses()
+    {
         return $this->hasMany(ClientProcess::class)->where([
-                    ['invoice_billed', '=', ClientProcess::invoiceUnBilled],
-                    ['require_invoice', '=', TRUE],
-        ]);
+                                                               ['invoice_billed', '=', ClientProcess::invoiceUnBilled],
+                                                               ['require_invoice', '=', TRUE],
+                                                           ]);
     }
 
-    public function invoiceProcesses() {
+    public function invoiceProcesses()
+    {
         return $this->hasMany(ClientProcess::class)->where([
-                    //['invoice_billed', '=', ClientProcess::invoiceUnBilled],
-                    ['require_invoice', '=', TRUE],
-        ]);
+                                                               //['invoice_billed', '=', ClientProcess::invoiceUnBilled],
+                                                               ['require_invoice', '=', TRUE],
+                                                           ]);
     }
 
-    public function closedProcess() {
+    public function closedProcess()
+    {
         return $this->hasMany(ClientProcess::class)->where('status', ClientProcess::statusClosed);
     }
 
-    public function openProcess() {
+    public function openProcess()
+    {
         return $this->hasMany(ClientProcess::class)->where('status', ClientProcess::statusOpened);
     }
 
-    public function hasOpenProcess() {
+    public function hasOpenProcess()
+    {
         $client = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
-                ->select('clients.*')->where([
-                    ['client_processes.status', '=', ClientProcess::statusOpened],
-                    ['clients.id', '=', $this->id]])
-                ->distinct()
-                ->get();
-
-        if ($client->count() > 0) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
-    }
-
-    public function hasClosedProcess() {
-        $client = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
-                ->select('clients.*')->where([
-                    ['client_processes.status', '=', ClientProcess::statusClosed],
-                    ['clients.id', '=', $this->id]])
-                ->distinct()
-                ->get();
-
-        if ($client->count() > 0) {
-            return TRUE;
-        } else {
-            return FALSE;
-        }
-    }
-
-    public static function allHasOpenProcess() {
-        $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
-                ->select('clients.*')->where('client_processes.status', ClientProcess::statusOpened)
-                ->distinct()
-                ->get();
-        return $clients;
-    }
-
-    public static function allHasUnBilledInvoiceProcess() {
-        $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
-                ->select('clients.*')->where([
-                    //['client_processes.status', ClientProcess::statusOpened],
-                    ['client_processes.invoice_billed', '=', ClientProcess::invoiceUnBilled],
-                    ['client_processes.require_invoice', '=', TRUE],
-                ])
-                ->distinct()
-                ->get();
-        return $clients;
-    }
-
-    public static function allHasInvoiceProcess() {
-        $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
-                ->select('clients.*')->where([
-                    //['client_processes.status', ClientProcess::statusOpened],
-                    //['client_processes.invoice_billed', '=', ClientProcess::invoiceUnBilled],
-                    ['client_processes.require_invoice', '=', TRUE],
-                ])
-                ->distinct()
-                ->get();
-        return $clients;
-    }
-
-    public function getTotalPaid() {
-        return DB::table('clients')
-                        ->join('client_processes', 'client_processes.client_id', '=', 'clients.id')
-                        ->join('deposit_withdraws', 'client_processes.id', '=', 'deposit_withdraws.cbo_processes')
-                        ->join('deposit_withdraws as dw', 'clients.id', '=', 'deposit_withdraws.client_id')
+                        ->select('clients.*')->where([
+                                                         ['client_processes.status', '=', ClientProcess::statusOpened],
+                                                         ['clients.id', '=', $this->id]])
                         ->distinct()
-                        ->where([
-                            ['clients.id', '=', $this->id]
-                        ])
-                        ->select(['deposit_withdraws.depositValue', 'deposit_withdraws.cbo_processes'])
-                        ->get()->sum('depositValue');
+                        ->get();
+
+        if ($client->count() > 0) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
     }
 
-    public function getTotalRemaining() {
+    public function hasClosedProcess()
+    {
+        $client = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
+                        ->select('clients.*')->where([
+                                                         ['client_processes.status', '=', ClientProcess::statusClosed],
+                                                         ['clients.id', '=', $this->id]])
+                        ->distinct()
+                        ->get();
+
+        if ($client->count() > 0) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+
+    public function getTotalRemaining()
+    {
         return $this->getTotalDeal() - $this->getTotalPaid();
     }
 
-    public function getTotalDeal() {
+    public function getTotalDeal()
+    {
         return $this->processes()->sum('total_price_taxes');
+    }
+
+    public function processes()
+    {
+        return $this->hasMany(ClientProcess::class);
+    }
+
+    public function getTotalPaid()
+    {
+        $total = 0;
+        foreach ($this->processes as $process) {
+            $total += $process->totalDeposits();
+        }
+        return $total;
     }
 
 }
