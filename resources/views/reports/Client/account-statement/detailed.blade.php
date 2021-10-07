@@ -27,27 +27,27 @@
             @forelse ($processes as $process)
                 <table class="table table-striped table-bordered table-hover">
                     <thead>
-                    <tr class="processHeader">
-                        <th>
-                            <div>
-                                <label> مسلسل :</label> {{ $process['processNum'] }}
-                            </div>
-                        </th>
-                        <th colspan="6">
-                            <div>
-                                <label> اسم العملية :</label> {{ $process['processName'] }}
-                            </div>
-                        </th>
-                    </tr>
-                    <tr>
-                        <th>تاريخ</th>
-                        <th>المتبقى</th>
-                        <th>المدفوع</th>
-                        <th>الاجمالى</th>
-                        <th>سعر الوحدة</th>
-                        <th>الكمية</th>
-                        <th>بيان</th>
-                    </tr>
+                        <tr class="processHeader">
+                            <th>
+                                <div>
+                                    <label> مسلسل :</label> {{ $process['processNum'] }}
+                                </div>
+                            </th>
+                            <th colspan="6">
+                                <div>
+                                    <label> اسم العملية :</label> {{ $process['processName'] }}
+                                </div>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>تاريخ</th>
+                            <th>المتبقى</th>
+                            <th>المدفوع</th>
+                            <th>الاجمالى</th>
+                            <th>سعر الوحدة</th>
+                            <th>الكمية</th>
+                            <th>بيان</th>
+                        </tr>
                     </thead>
                     <tbody>
                     @forelse ($process['processDetails'] as $details)

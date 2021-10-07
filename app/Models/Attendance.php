@@ -139,8 +139,14 @@ class Attendance extends Model
                                                        ['due_date', '>=', $startDate],
                                                        ['due_date', '<=', $endDate]
                                                    ]);
+        $fci = FinancialCustodyItem::where([
+                                                       ['employee_id', '=', $this->employee_id],
+                                                       ['expenses_id', '=', EmployeeActions::SmallBorrow],
+                                                       ['due_date', '>=', $startDate],
+                                                       ['due_date', '<=', $endDate]
+                                                   ]);
         try {
-            return $depositWithdraws->sum('withdrawValue');
+            return $depositWithdraws->sum('withdrawValue') + $fci->sum('withdrawValue');
         } catch (\Exception $exc) {
             return 0;
         }

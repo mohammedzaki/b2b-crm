@@ -72,7 +72,7 @@ class CostCenter extends BaseReport implements IReport
             ];
         });
         $this->totalProcessExpenses = $processExpences->sum('totalCost');
-        return $processExpences->toArray();
+        return $processExpences;
     }
 
     private function getProcessSuppliers(ClientProcess $process)

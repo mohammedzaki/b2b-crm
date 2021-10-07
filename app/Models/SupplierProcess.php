@@ -115,7 +115,7 @@ class SupplierProcess extends Model {
     {
         return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
                                                                                   ['supplier_id', "=", $this->supplier_id],
-                                                                                  ['withdrawValue', ">", 0],
+                                                                                  ['withdrawValue', ">", 0]
                                                                               ])->select(DB::raw('NULL as pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
     }
 
@@ -123,8 +123,7 @@ class SupplierProcess extends Model {
     {
         return $this->hasMany(FinancialCustodyItem::class, 'cbo_processes')->where([
                                                                                        ['supplier_id', "=", $this->supplier_id],
-                                                                                       ['withdrawValue', ">", 0],
-                                                                                       // ['approved_at', '=', null]
+                                                                                       ['withdrawValue', ">", 0]
                                                                                    ])->select(DB::raw('IF(ISNULL(approved_at),1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
     }
 

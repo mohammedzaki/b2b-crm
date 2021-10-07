@@ -226,9 +226,8 @@ class DailyCashController extends Controller
         }
     }
 
-    function resetDiscountBorrows($id)
+    function resetDiscountBorrows($depositWithdraw)
     {
-        $depositWithdraw = DepositWithdraw::find($id);
         foreach ($depositWithdraw->employeeLogBorrowBillings as $borrow) {
             $borrow->paying_status = EmployeeBorrowBilling::UN_PAID;
             $borrow->paid_amount   = null;
@@ -316,12 +315,9 @@ class DailyCashController extends Controller
 
         foreach ($all['rowsIds'] as $id) {
             $depositWithdraw                = DepositWithdraw::findOrFail($id);
-            $depositWithdraw->depositValue  = 0;
-            $depositWithdraw->withdrawValue = 0;
-            $depositWithdraw->save();
-            $this->checkProcessClosed($depositWithdraw);
-            $this->resetDiscountBorrows($depositWithdraw->id);
             DepositWithdraw::where('id', $id)->delete();
+            $this->checkProcessClosed($depositWithdraw);
+            $this->resetDiscountBorrows($depositWithdraw);
             $rowsIds[$id] = "Done";
         }
         return response()->json(array(

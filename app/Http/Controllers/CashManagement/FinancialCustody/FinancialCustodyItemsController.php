@@ -353,6 +353,16 @@ class FinancialCustodyItemsController extends Controller
             }
             $date = DateTime::parse($request->due_date);
             DepositWithdraw::create([
+                                        'depositValue'         => $currentFinancialCustody->totalWithdraws(),
+                                        'recordDesc'           => "رد {$currentFinancialCustody->description}",
+                                        'employee_id'          => $currentFinancialCustody->employee_id,
+                                        'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
+                                        'financial_custody_id' => $currentFinancialCustody->id,
+                                        'user_id'              => $c_user_id,
+                                        'payMethod'            => PaymentMethods::CASH,
+                                        'due_date'             => $date
+                                    ]);
+            DepositWithdraw::create([
                                         'depositValue'         => ($currentFinancialCustody->totalDeposits() - $currentFinancialCustody->totalWithdraws()),
                                         'recordDesc'           => "رد {$currentFinancialCustody->description}",
                                         'employee_id'          => $currentFinancialCustody->employee_id,
