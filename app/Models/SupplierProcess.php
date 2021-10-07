@@ -136,6 +136,10 @@ class SupplierProcess extends Model {
         return $this->withdrawals()->sum('withdrawValue');
     }
 
+    public function totalRemaining() {
+        return $this->totalPriceAfterTaxes() - $this->totalWithdrawals();
+    }
+
     public function totalPriceAfterTaxes() {
         return ($this->total_price - $this->discount_value) + $this->taxesValue();
     }

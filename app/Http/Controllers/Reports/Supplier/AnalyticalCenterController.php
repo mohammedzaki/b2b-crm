@@ -70,7 +70,7 @@ class AnalyticalCenterController extends Controller
                     $suppliers[$id]['processDetails'][$index]['name']       = $process->name;
                     $suppliers[$id]['processDetails'][$index]['totalPrice'] = $process->total_price_taxes;
                     $suppliers[$id]['processDetails'][$index]['paid']       = $process->totalWithdrawals();
-                    $suppliers[$id]['processDetails'][$index]['remaining']  = $process->total_price_taxes - $process->totalWithdrawals();
+                    $suppliers[$id]['processDetails'][$index]['remaining']  = $process->totalRemaining();
                     $suppliers[$id]['processDetails'][$index]['date']       = $process->created_at;
                     $index++;
                 }
