@@ -25,9 +25,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property \Carbon\Carbon|null $deleted_at
  * @property \Carbon\Carbon|null $created_at
  * @property \Carbon\Carbon|null $updated_at
- * @property-read \App\Models\Client $client
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\InvoiceItem[] $items
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ClientProcess[] $processes
+ * @property \App\Models\Client $client
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\InvoiceItem[] $items
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\ClientProcess[] $processes
  * @method static bool|null forceDelete()
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Invoice onlyTrashed()
  * @method static bool|null restore()

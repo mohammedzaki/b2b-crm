@@ -57,9 +57,8 @@ class AnalyticalCenterController extends Controller
             $suppliers[$id]['supplierTotalPrice']     = 0;
             $suppliers[$id]['supplierTotalPaid']      = 0;
             $suppliers[$id]['supplierTotalRemaining'] = 0;
-
-            $index                            = 0;
-            $suppliers[$id]['processDetails'] = [];
+            $index                                    = 0;
+            $suppliers[$id]['processDetails']         = [];
             foreach ($supplier->processes as $process) {
                 if ($request->ch_detialed == TRUE) {
                     $suppliers[$id]['processDetails'][$index]['name']       = $process->name;

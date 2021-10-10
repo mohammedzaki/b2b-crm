@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * App\Models\DepositWithdraw
@@ -47,10 +48,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class DepositWithdraw extends Model {
 
-    //use SoftDeletes;
+    use SoftDeletes;
 
-    //protected $dates = ['due_date'];
-
+    protected $dates = ['deleted_at', 'due_date'];
     protected $fillable = [
         'depositValue',
         'withdrawValue',

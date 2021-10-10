@@ -62,9 +62,8 @@ class AnalyticalCenterController extends Controller
             $clients[$id]['clientTotalPrice']     = 0;
             $clients[$id]['clientTotalPaid']      = 0;
             $clients[$id]['clientTotalRemaining'] = 0;
-
-            $index                          = 0;
-            $clients[$id]['processDetails'] = [];
+            $index                                = 0;
+            $clients[$id]['processDetails']       = [];
             foreach ($client->processes as $process) {
                 if ($request->ch_detialed == TRUE) {
                     $clients[$id]['processDetails'][$index]['name']       = $process->name;

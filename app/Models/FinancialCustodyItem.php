@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use App\UserLog\Models\BaseModel;
+use Illuminate\Database\Eloquent\Concerns\HasEvents;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * App\Models\FinancialCustodyItem
@@ -44,7 +47,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class FinancialCustodyItem extends Model {
 
+    use SoftDeletes;
 
+    protected $dates = ['deleted_at', 'due_date'];
     protected $fillable = [
         'depositValue',
         'withdrawValue',

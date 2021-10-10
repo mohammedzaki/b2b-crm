@@ -160,6 +160,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\AnnotationsServiceProvider::class,
         App\Providers\ResponseMacroServiceProvider::class,
+        App\UserLog\Providers\UserLogServiceProvider::class,
     ],
     /*
       |--------------------------------------------------------------------------
