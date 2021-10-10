@@ -194,6 +194,7 @@ class FinancialCustodyItemsController extends Controller
             $currentFinancialCustody = $this->getCurrentFinancialCustody($request);
             $request['due_date']     = DateTime::parse($request->due_date);
             $request['user_id']      = auth()->user()->id;
+            $request['saveStatus']   = 1;
             $financialCustodyItem    = $currentFinancialCustody->withdraws()->create($request->all());
             return response()->json([
                                         'success'       => true,
@@ -448,7 +449,7 @@ class FinancialCustodyItemsController extends Controller
         $all     = $request->all();
         $rowsIds = [];
         foreach ($all['rowsIds'] as $id) {
-            FinancialCustodyItem::where('id', $id)->delete();
+            FinancialCustodyItem::where('id', $id)->first()->delete();
             $rowsIds[$id] = "Done";
         }
         return response()->json(array(

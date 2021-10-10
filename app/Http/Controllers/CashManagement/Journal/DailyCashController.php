@@ -157,6 +157,7 @@ class DailyCashController extends Controller
         if (isset($request->employee_id)) {
             $this->checkEmployeeAction($request, $depositWithdraw->id);
         }
+        $request['saveStatus'] = 1;
         $depositWithdraw->update($request->all());
         $this->checkProcessClosed($depositWithdraw);
         DB::commit();
@@ -315,7 +316,7 @@ class DailyCashController extends Controller
 
         foreach ($all['rowsIds'] as $id) {
             $depositWithdraw                = DepositWithdraw::findOrFail($id);
-            DepositWithdraw::where('id', $id)->delete();
+            DepositWithdraw::where('id', $id)->first()->delete();
             $this->checkProcessClosed($depositWithdraw);
             $this->resetDiscountBorrows($depositWithdraw);
             $rowsIds[$id] = "Done";
