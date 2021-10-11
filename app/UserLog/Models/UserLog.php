@@ -51,9 +51,9 @@ class UserLog extends Model
 
     public function getLogData() {
         if ($this->action_id === LogAction::insert) {
-            return '';
+            return [];
         } else {
-            return $this->log_data;
+            return collect(json_decode($this->log_data))->values()->filter(function ($value) { return !is_null($value); })->toArray();
         }
     }
 }

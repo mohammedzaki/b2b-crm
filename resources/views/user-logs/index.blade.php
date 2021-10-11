@@ -109,7 +109,11 @@
                                         <td>{{ $userLog['employee'] }}</td>
                                         <td>{{ $userLog['action'] }}</td>
                                         <td>{{ $userLog['entity'] }}</td>
-                                        <td>{{ $userLog['log_data'] }}</td>
+                                        <td>
+                                            @foreach($userLog['log_data'] as $item)
+                                                {{ $item }} ___
+                                            @endforeach
+                                        </td>
                                         <td>{{ $userLog['created_at'] }}</td>
                                     </tr>
                                 @empty
