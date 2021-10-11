@@ -58,6 +58,12 @@
                 </li>
             @endif
 
+            @if(Entrust::ability('admin', 'show-user-log'))
+                <li>
+                    <a href="{{ route('userLog.index') }}"><i class="fa fa-file-pdf-o fa-fw"></i>سجلات المستخدمين</a>
+                </li>
+            @endif
+
             @if(Entrust::ability('admin', 'attendance'))
                 <li>
                     <a href="attendances"><i class="fa fa-table fa-fw"></i> حضور/انصراف الموظف<span

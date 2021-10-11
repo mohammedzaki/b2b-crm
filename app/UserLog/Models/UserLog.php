@@ -2,6 +2,7 @@
 
 namespace App\UserLog\Models;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -32,4 +33,27 @@ class UserLog extends Model
             'user_id',
             'log_data'
         ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function entity()
+    {
+        return $this->belongsTo(EntityName::class);
+    }
+
+    public function action()
+    {
+        return $this->belongsTo(LogAction::class);
+    }
+
+    public function getLogData() {
+        if ($this->action_id === LogAction::insert) {
+            return '';
+        } else {
+            return $this->log_data;
+        }
+    }
 }

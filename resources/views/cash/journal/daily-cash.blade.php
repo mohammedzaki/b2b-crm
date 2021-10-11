@@ -215,7 +215,7 @@
                                                 <th rowspan="1" colspan="1">اسم المورد</th>
                                                 <th rowspan="1" colspan="1">اسم الموظف</th>
                                                 <th rowspan="1" colspan="1">اسم المصروف</th>
-                                                <th rowspan="1" colspan="1">طريقة الدفع</th>
+                                                <th rowspan="1" colspan="1">السجل</th>
                                                 <th rowspan="1" colspan="1">ملاحظات</th>
                                             </tr>
                                             </thead>
@@ -384,25 +384,9 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <div class="form-group{{ $errors->has("payMethod") ? " has-error" : "" }}">
-                                                            {{ Form::select("payMethod", $payMethods, $depositWithdraw->payMethod,
-                                                                array(
-                                                                    "class" => "form-control payMethod",
-                                                                    "placeholder" => "",
-                                                                    "id" => "",
-                                                                    "style" => "width:85px;",
-                                                                    "onchange" => "AddNewRow(this)",
-                                                                    "onblur" => "OnRowLeave(this)",
-                                                                    "onfocus" => "OnRowFocus(this)")
-                                                                )
-                                                            }}
-                                                            @if ($errors->has("payMethod"))
-                                                                <label for="inputError" class="control-label">
-                                                                    {{ $errors->first("payMethod") }}
-                                                                </label>
-                                                            @endif
+                                                        <div class="form-group track-user-log">
+                                                            {{ link_to_route('userLog.search', 'عرض', array('row_id' => $depositWithdraw->id), array('class' => 'btn btn-primary')) }}
                                                         </div>
-
                                                     </td>
                                                     <td>
                                                         <div class="form-group{{ $errors->has("notes") ? " has-error" : "" }}">
@@ -600,25 +584,9 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="form-group{{ $errors->has("payMethod") ? " has-error" : "" }}">
-                                                        {{ Form::select("payMethod", $payMethods, null,
-                                                            array(
-                                                                "class" => "form-control payMethod",
-                                                                "placeholder" => "",
-                                                                "id" => "",
-                                                                "style" => "width:85px;",
-                                                                "onchange" => "AddNewRow(this)",
-                                                                "onblur" => "OnRowLeave(this)",
-                                                                "onfocus" => "OnRowFocus(this)")
-                                                            )
-                                                        }}
-                                                        @if ($errors->has("payMethod"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("payMethod") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
+                                                    <div class="form-group">
 
+                                                    </div>
                                                 </td>
                                                 <td>
                                                     <div class="form-group{{ $errors->has("notes") ? " has-error" : "" }}">
@@ -697,7 +665,7 @@
         var suppliers = {!! $suppliers !!};
         var clients = {!! $clients !!};
         var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id,
-            recordDesc, notes, payMethod, saveStatus, id, flag, canEdit, currentAmount, withdrawsAmount, depositsAmount;
+            recordDesc, notes, saveStatus, id, flag, canEdit, currentAmount, withdrawsAmount, depositsAmount;
         var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
         var loadAll = false;
 
@@ -834,7 +802,6 @@
             supplier_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .supplier_id');
             employee_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .employee_id');
             expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
-            payMethod = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .payMethod');
             notes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .notes');
             id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .id');
             saveStatus = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .saveStatus');
@@ -844,12 +811,6 @@
                 flag = false;
             } else {
                 recordDesc.parent().removeClass("has-error");
-            }
-            if (payMethod.val() === '') {
-                payMethod.parent().addClass("has-error");
-                flag = false;
-            } else {
-                payMethod.parent().removeClass("has-error");
             }
             if (depositValue.val() === '' && withdrawValue.val() === '') {
                 depositValue.parent().addClass("has-error");
@@ -903,7 +864,7 @@
                 supplier_id: supplier_id.val(),
                 employee_id: employee_id.val(),
                 expenses_id: expenses_id.val(),
-                payMethod: payMethod.val(),
+                payMethod: 0,
                 notes: notes.val(),
                 saveStatus: saveStatus.val()
             };
@@ -1053,7 +1014,9 @@
                 $("#depositwithdrawTable").append('<tr class="gradeA odd ItemRow" role="row"> <td> <input type="checkbox" value=""> </td><td> <div class="form-group{{$errors->has("depositValue") ? " has-error" : ""}}">{{Form::text("depositValue", null, array( "class"=> "form-control IsNumberDecimal depositValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("depositValue")) <label for="inputError" class="control-label">{{$errors->first("depositValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("withdrawValue") ? " has-error" : ""}}">{{Form::text("withdrawValue", null, array( "class"=> "form-control IsNumberDecimal withdrawValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("withdrawValue")) <label for="inputError" class="control-label">{{$errors->first("withdrawValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("recordDesc") ? " has-error" : ""}}">{{Form::text("recordDesc", null, array( "class"=> "form-control recordDesc", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("recordDesc")) <label for="inputError" class="control-label">{{$errors->first("recordDesc")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("cbo_processes") ? " has-error" : ""}}">{{Form::select("cbo_processes", [], null, array( "class"=> "form-control cbo_processes", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cbo_processes")) <label for="inputError" class="control-label">{{$errors->first("cbo_processes")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", [], null, array( "class"=> "form-control client_id", "placeholder"=> "", "id"=> "client_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "id"=> "supplier_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td> ' +
                     '<td> <div class="form-group{{$errors->has("employee_id") ? " has-error" : ""}}">{{Form::select("employee_id", $employees, null, array( "class"=> "form-control employee_id", "placeholder"=> "", "id"=> "emplyee_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("employee_id")) <label for="inputError" class="control-label">{{$errors->first("employee_id")}}</label> @endif </div></td> ' +
                     '<td> <div class="form-group{{$errors->has("expenses_id") ? " has-error" : ""}}">{{Form::select("expenses_id", [], null, array( "class"=> "form-control expenses_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("expenses_id")) <label for="inputError" class="control-label">{{$errors->first("expenses_id")}}</label> @endif </div></td>' +
-                    '<td> <div class="form-group{{$errors->has("payMethod") ? " has-error" : ""}}">{{Form::select("payMethod", $payMethods, null, array( "class"=> "form-control payMethod", "placeholder"=> "", "id"=> "payMethod", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("payMethod")) <label for="inputError" class="control-label">{{$errors->first("payMethod")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("notes") ? " has-error" : ""}}">{{Form::text("notes", null, array( "class"=> "form-control notes", "id"=> "notes", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("notes")) <label for="inputError" class="control-label">{{$errors->first("notes")}}</label> @endif </div></td><td hidden><input type="hidden" class="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="-1"></td><td hidden> <input type="hidden" class="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="0"> </td></tr>');
+                    '<td> <div class="form-group track-user-log"></div> </td>' +
+                    '<td> <div class="form-group{{$errors->has("notes") ? " has-error" : ""}}">{{Form::text("notes", null, array( "class"=> "form-control notes", "id"=> "notes", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("notes")) <label for="inputError" class="control-label">{{$errors->first("notes")}}</label> @endif </div></td>' +
+                    '<td hidden><input type="hidden" class="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="-1"></td><td hidden> <input type="hidden" class="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="0"> </td></tr>');
                 var rowIndex = $("#depositwithdrawTable tr").length - 3;
                 console.log(rowIndex);
                 client_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .client_id');
@@ -1169,8 +1132,6 @@
                     }
                     cbo_processes.empty();
                     break;
-                case "payMethod":
-                    break;
                 case "notes":
                     break;
                 default:
@@ -1217,7 +1178,6 @@
             supplier_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .supplier_id');
             employee_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .employee_id');
             expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
-            payMethod = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .payMethod');
             notes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .notes');
             id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .id');
             saveStatus = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .saveStatus');
@@ -1231,7 +1191,6 @@
             supplier_id.attr("disabled", "disabled");
             employee_id.attr("disabled", "disabled");
             expenses_id.attr("disabled", "disabled");
-            payMethod.attr("disabled", "disabled");
             notes.attr("disabled", "disabled");
         }
 

@@ -26,7 +26,7 @@ class UserLogObserver
     /**
      * @param $model Model
      */
-    public function updated($model)
+    public function updating($model)
     {
         $this->addNewLog($model->getTable(), LogAction::update, $model->id, json_encode($model->getDirty()));
     }
