@@ -118,6 +118,7 @@ class ClientDetailed extends BaseReport
         $data = [
             'clientName'               => $clientName,
             'date'                     => $date,
+            'withUserLog'              => $withUserLog,
             'processes'                => $processes,
             'allProcessesTotalPrice'   => $allProcessesTotalPrice,
             'allProcessTotalPaid'      => $allProcessTotalPaid,

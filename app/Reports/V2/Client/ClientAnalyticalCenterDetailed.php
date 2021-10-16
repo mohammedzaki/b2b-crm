@@ -2,9 +2,9 @@
 
 namespace App\Reports\V2\Client;
 
+use App\Extensions\DateTime;
 use App\Models\Client;
 use App\Reports\V2\BaseReport;
-use App\Extensions\DateTime;
 
 class ClientAnalyticalCenterDetailed extends BaseReport
 {
@@ -64,8 +64,8 @@ class ClientAnalyticalCenterDetailed extends BaseReport
         }
 
         $data = [
-            // 'clientName'               => $clientName,
             'date'                     => $date,
+            'withUserLog'              => $withUserLog,
             'clients'                  => $clients,
             'allClientsTotalPrice'     => $allClientsTotalPrice,
             'allClientsTotalPaid'      => $allClientsTotalPaid,

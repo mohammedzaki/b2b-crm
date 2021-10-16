@@ -61,6 +61,7 @@ class SupplierAnalyticalCenterDetailed extends BaseReport
 
         $data = [
             'date'                       => $date,
+            'withUserLog'                => $withUserLog,
             'suppliers'                  => $suppliers,
             'allSuppliersTotalPrice'     => $allSuppliersTotalPrice,
             'allSuppliersTotalPaid'      => $allSuppliersTotalPaid,

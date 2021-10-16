@@ -118,6 +118,7 @@ class SupplierDetailed extends BaseReport
         $data = [
             'supplierName'             => $supplierName,
             'date'                     => $date,
+            'withUserLog'              => $withUserLog,
             'processes'                => $processes,
             'allProcessesTotalPrice'   => $allProcessesTotalPrice,
             'allProcessTotalPaid'      => $allProcessTotalPaid,
