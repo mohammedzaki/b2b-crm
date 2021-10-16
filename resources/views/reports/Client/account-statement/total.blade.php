@@ -1,5 +1,6 @@
 @extends($reportLayout)
 @section('reportTitle', 'كشف حساب عميل مجمع')
+@section("title", "كشف حساب عميل مجمع - التقارير")
 @section('styles')
     <link href="/{{$reportStyle}}" rel="stylesheet">
 @endsection
@@ -24,7 +25,6 @@
 @section('reportHTML')
     <div class="col-lg-12 no-padding">
         <div class="table-responsive">
-
             <table class="table table-striped table-bordered table-hover">
                 <thead>
                 <tr>

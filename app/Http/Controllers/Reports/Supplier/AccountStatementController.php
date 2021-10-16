@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers\Reports\Supplier;
 
-use App\Extensions\DateTime;
 use App\Http\Controllers\Controller;
 use App\Models\Supplier;
-use App\Models\SupplierProcess;
-use App\Reports\Supplier\SupplierDetailed;
-use App\Reports\Supplier\SupplierTotal;
+use App\Reports\V2\Supplier\SupplierDetailed;
+use App\Reports\V2\Supplier\SupplierTotal;
 use Illuminate\Http\Request;
 
 /**
@@ -42,160 +40,34 @@ class AccountStatementController extends Controller
         }
         $suppliers         = json_encode($suppliers_tmp);
         $supplierProcesses = json_encode($supplierProcesses);
-        return view('reports.Supplier.AccountStatement.index', compact("suppliers", "supplierProcesses"));
+        return view('reports.supplier.account-statement.index', compact("suppliers", "supplierProcesses"));
     }
 
     /**
-     * Show the Index Page
-     * @Any("/view-report", as="reports.supplier.accountStatement.viewReport")
+     * Show the ViewReport Page
+     * @Get("/view-report", as="reports.supplier.accountStatement.viewReport")
      */
     public function viewReport(Request $request)
     {
-        $supplier                 = Supplier::findOrFail($request->supplier_id);
-        $supplierName             = $supplier->name;
-        $allProcessesTotalPrice   = 0;
-        $allProcessTotalPaid      = 0;
-        $allProcessTotalRemaining = 0;
+        return $this->getReport($request)->preview();
+    }
 
-        $proceses = [];
-        foreach ($request->processes as $id) {
-            $supplierProcess                        = SupplierProcess::findOrFail($id);
-            $proceses[$id]['processName']           = $supplierProcess->name;
-            $proceses[$id]['processTotalPrice']     = $supplierProcess->total_price;
-            $proceses[$id]['processTotalPaid']      = $supplierProcess->totalWithdrawals() + $supplierProcess->discount_value;
-            $proceses[$id]['processTotalRemaining'] = $supplierProcess->total_price_taxes - $supplierProcess->totalWithdrawals();
-            $proceses[$id]['processDate']           = DateTime::today()->format('Y-m-d'); //DateTime::parse($supplierProcess->created_at)->format('Y-m-d');
-            $proceses[$id]['processNum']            = $id;
-            $allProcessesTotalPrice                 += $proceses[$id]['processTotalPrice'];
-            $allProcessTotalPaid                    += $proceses[$id]['processTotalPaid'];
-            $allProcessTotalRemaining               += $proceses[$id]['processTotalRemaining'];
+    /**
+     * Show the PrintPDF Page
+     * @Get("/print-pdf", as="reports.supplier.accountStatement.printPDF")
+     */
+    public function printPDF(Request $request)
+    {
+        return $this->getReport($request)->exportPDF();
+    }
 
-            if ($request->ch_detialed == TRUE) {
-                $index                = 0;
-                $totalWithdrawalValue = 0;
-                foreach ($supplierProcess->items as $item) {
-                    $proceses[$id]['processDetails'][$index]['date']       = DateTime::parse($item->created_at)->format('Y-m-d');
-                    $proceses[$id]['processDetails'][$index]['remaining']  = "";
-                    $proceses[$id]['processDetails'][$index]['paid']       = "";
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $item->quantity * $item->unit_price;
-                    $proceses[$id]['processDetails'][$index]['unitPrice']  = $item->unit_price;
-                    $proceses[$id]['processDetails'][$index]['quantity']   = $item->quantity;
-                    $proceses[$id]['processDetails'][$index]['desc']       = $item->description;
-                    $index++;
-                }
-                if ($supplierProcess->has_discount == TRUE) {
-                    $proceses[$id]['processDetails'][$index]['date']       = DateTime::parse($item->created_at)->format('Y-m-d');
-                    $proceses[$id]['processDetails'][$index]['remaining']  = "";
-                    $proceses[$id]['processDetails'][$index]['paid']       = $supplierProcess->discount_value;
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
-                    $proceses[$id]['processDetails'][$index]['unitPrice']  = "";
-                    $proceses[$id]['processDetails'][$index]['quantity']   = "";
-                    $proceses[$id]['processDetails'][$index]['desc']       = "خصم بسبب : " . $supplierProcess->discount_reason;
-                    $index++;
-                }
-                if ($supplierProcess->has_source_discount == TRUE) {
-                    $proceses[$id]['processDetails'][$index]['date']       = DateTime::parse($supplierProcess->created_at)->format('Y-m-d');
-                    $proceses[$id]['processDetails'][$index]['remaining']  = "";
-                    $proceses[$id]['processDetails'][$index]['paid']       = "";
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $supplierProcess->source_discount_value;
-                    $proceses[$id]['processDetails'][$index]['unitPrice']  = "";
-                    $proceses[$id]['processDetails'][$index]['quantity']   = "";
-                    $proceses[$id]['processDetails'][$index]['desc']       = "خصم من المنبع";
-                    $index++;
-                }
-                if ($supplierProcess->has_source_discount == TRUE) {
-                    $proceses[$id]['processDetails'][$index]['date']       = DateTime::parse($supplierProcess->created_at)->format('Y-m-d');
-                    $proceses[$id]['processDetails'][$index]['remaining']  = "";
-                    $proceses[$id]['processDetails'][$index]['paid']       = "";
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $supplierProcess->source_discount_value;
-                    $proceses[$id]['processDetails'][$index]['unitPrice']  = "";
-                    $proceses[$id]['processDetails'][$index]['quantity']   = "";
-                    $proceses[$id]['processDetails'][$index]['desc']       = "خصم من المنبع";
-                    $index++;
-                }
-                if ($supplierProcess->require_invoice == TRUE) {
-                    $proceses[$id]['processDetails'][$index]['date']       = DateTime::parse($item->created_at)->format('Y-m-d');
-                    $proceses[$id]['processDetails'][$index]['remaining']  = "";
-                    $proceses[$id]['processDetails'][$index]['paid']       = "";
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = $supplierProcess->taxesValue();
-                    $proceses[$id]['processDetails'][$index]['unitPrice']  = "";
-                    $proceses[$id]['processDetails'][$index]['quantity']   = "";
-                    $proceses[$id]['processDetails'][$index]['desc']       = "قيمة الضريبة المضافة";
-                    $index++;
-                }
-
-                foreach ($supplierProcess->withdrawals() as $withdrawal) {
-                    $totalWithdrawalValue                                  += $withdrawal->withdrawValue;
-                    $proceses[$id]['processDetails'][$index]['pending']    = $withdrawal->pendingStatus;
-                    $proceses[$id]['processDetails'][$index]['date']       = DateTime::parse($withdrawal->due_date)->format('Y-m-d');
-                    $proceses[$id]['processDetails'][$index]['remaining']  = $supplierProcess->total_price_taxes - $totalWithdrawalValue;
-                    $proceses[$id]['processDetails'][$index]['paid']       = $withdrawal->withdrawValue;
-                    $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
-                    $proceses[$id]['processDetails'][$index]['unitPrice']  = "";
-                    $proceses[$id]['processDetails'][$index]['quantity']   = "";
-                    $proceses[$id]['processDetails'][$index]['desc']       = $withdrawal->recordDesc;
-                    $index++;
-                }
-
-//                foreach ($supplierProcess->pendingWithdrawals as $withdrawal) {
-//                    $totalWithdrawalValue                                  += $withdrawal->withdrawValue;
-//                    $proceses[$id]['processDetails'][$index]['pending']    = 1;
-//                    $proceses[$id]['processDetails'][$index]['date']       = DateTime::parse($withdrawal->due_date)->format('Y-m-d');
-//                    $proceses[$id]['processDetails'][$index]['remaining']  = $supplierProcess->total_price_taxes - $totalWithdrawalValue;
-//                    $proceses[$id]['processDetails'][$index]['paid']       = $withdrawal->withdrawValue;
-//                    $proceses[$id]['processDetails'][$index]['totalPrice'] = "";
-//                    $proceses[$id]['processDetails'][$index]['unitPrice']  = "";
-//                    $proceses[$id]['processDetails'][$index]['quantity']   = "";
-//                    $proceses[$id]['processDetails'][$index]['desc']       = $withdrawal->recordDesc;
-//                    $index++;
-//                }
-            }
-        }
-        session([
-                    'supplierName'             => $supplierName,
-                    'proceses'                 => $proceses,
-                    'allProcessesTotalPrice'   => $allProcessesTotalPrice,
-                    'allProcessTotalPaid'      => $allProcessTotalPaid,
-                    'allProcessTotalRemaining' => $allProcessTotalRemaining
-                ]);
+    private function getReport(Request $request)
+    {
         if ($request->ch_detialed == FALSE) {
-            return view("reports.Supplier.AccountStatement.total", compact('supplierName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
+            return new SupplierTotal($request->withLetterHead, $request->supplier_id, $request->processes);
         } else {
-            return view("reports.Supplier.AccountStatement.detialed", compact('supplierName', 'proceses', 'allProcessesTotalPrice', 'allProcessTotalPaid', 'allProcessTotalRemaining'));
+            return new SupplierDetailed($request->withLetterHead, $request->supplier_id, $request->processes);
         }
-    }
-
-    /**
-     * Show the Index Page
-     * @Get("/print-total-pdf", as="reports.supplier.accountStatement.printTotalPDF")
-     */
-    public function printTotalPDF(Request $request)
-    {
-        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('supplierName'), session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
-    }
-
-    private function exportPDF($ch_detialed, $withLetterHead, $supplierName, $proceses, $allProcessesTotalPrice, $allProcessTotalPaid, $allProcessTotalRemaining)
-    {
-        if ($ch_detialed == FALSE) {
-            $pdfReport = new SupplierTotal($withLetterHead);
-        } else {
-            $pdfReport = new SupplierDetailed($withLetterHead);
-        }
-        $pdfReport->supplierName             = $supplierName;
-        $pdfReport->proceses                 = $proceses;
-        $pdfReport->allProcessesTotalPrice   = $allProcessesTotalPrice;
-        $pdfReport->allProcessTotalPaid      = $allProcessTotalPaid;
-        $pdfReport->allProcessTotalRemaining = $allProcessTotalRemaining;
-        return $pdfReport->exportPDF();
-    }
-
-    /**
-     * Show the Index Page
-     * @Get("/print-detailed-pdf", as="reports.supplier.accountStatement.printDetailedPDF")
-     */
-    public function printDetailedPDF(Request $request)
-    {
-        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('supplierName'), session('proceses'), session('allProcessesTotalPrice'), session('allProcessTotalPaid'), session('allProcessTotalRemaining'));
     }
 
 }

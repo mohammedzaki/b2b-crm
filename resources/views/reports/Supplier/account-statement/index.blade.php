@@ -30,7 +30,7 @@
                 تقرير عملية مورد
             </div>
             <!-- /.panel-heading -->
-            {{ Form::open(["route" => "reports.supplier.accountStatement.viewReport"]) }}
+            {{ Form::open(["route" => "reports.supplier.accountStatement.viewReport", 'method' => 'GET']) }}
             <div class="panel-body">
 
                 <div class="legend">

@@ -24,7 +24,6 @@
             </a>
             <ul class="dropdown-menu dropdown-user">
                 @if(Entrust::ability('admin', 'facility-info'))
-
                     <li><a href="{{ URL::to('/facility/1/edit') }}"><i class="fa fa-gear fa-fw"></i> بيانات المنشاه</a>
                     </li>
                     <li><a href="{{ URL::to('/facilityopeningamount') }}"><i class="fa fa-gear fa-fw"></i> الرصيد
@@ -57,30 +56,20 @@
                 </a>
                 <ul class="dropdown-menu dropdown-user">
                     <li>
-                        <a href="{{ url('/logout') }}"
+                        <a href="{{ route($printRouteAction) }}"
                            onclick="event.preventDefault();
-                               document.getElementById('pdf-form').submit();">
+                               window.location.href = this.href + '/' + window.location.search + '&withLetterHead=0';
+                               ">
                             <i class="fa fa-sign-out fa-fw"></i> طباعة
                         </a>
-                        {{ Form::open(["route" => $printRouteAction, "method" => "GET", "style" => "display: none;", "id" => 'pdf-form']) }}
-                        {{ Form::hidden("ch_detialed", "1", null) }}
-                        {{ Form::close() }}
                     </li>
                     <li>
-                        <a href="{{ url('/logout') }}"
+                        <a href="{{ route($printRouteAction) }}"
                            onclick="event.preventDefault();
-                               document.getElementById('pdf-form-withLetterHead').submit();">
+                               window.location.href = this.href + '/' + window.location.search + '&withLetterHead=1';
+                               ">
                             <i class="fa fa-sign-out fa-fw"></i> طباعة بالليتر هد
                         </a>
-                        {{ Form::open(["route" => $printRouteAction, "method" => "GET", "style" => "display: none;", "id" => 'pdf-form-withLetterHead']) }}
-                        {{ Form::hidden("ch_detialed", "1", null) }}
-                        {{ Form::checkbox("withLetterHead", "1", 1,
-                                    array(
-                                        "id" => "withLetterHead",
-                                        "class" => "checkbox_show_input"
-                                    )
-                                ) }}
-                        {{ Form::close() }}
                     </li>
                 </ul>
             </li>

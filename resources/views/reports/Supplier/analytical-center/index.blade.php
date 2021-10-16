@@ -1,10 +1,10 @@
 @extends("layouts.app") 
-@section("title", "المركز التحليلى للعملاء - التقارير")
+@section("title", "المركز التحليلى للموردين - التقارير")
 @section("content")
 
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">التقارير <small>المركز التحليلى للعملاء</small></h1>
+        <h1 class="page-header">التقارير <small>المركز التحليلى للموردين</small></h1>
     </div>
 </div>
 <!-- /.row -->
@@ -26,10 +26,10 @@
     <div class="col-lg-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                المركز التحليلى للعملاء
+                المركز التحليلى للموردين
             </div>
             <!-- /.panel-heading -->
-            {{ Form::open(["route" => "reports.client.analyticalCenter.viewReport"]) }}
+            {{ Form::open(["route" => "reports.supplier.analyticalCenter.viewReport", 'method' => 'GET']) }}
             <div class="panel-body">
 
                 <div class="legend">
@@ -68,22 +68,22 @@
                             <thead>
                                 <tr role="row">
                                     <th rowspan="1" colspan="1" style="padding: 8px;">اختيار</th>
-                                    <th rowspan="1" colspan="1" >اسم العميل</th>
+                                    <th rowspan="1" colspan="1" >اسم المورد</th>
                                     <th rowspan="1" colspan="1" >حجم التعامل</th>
                                     <th rowspan="1" colspan="1" >اجمالي المدفوع</th>
                                     <th rowspan="1" colspan="1" >اجمالي المستحق</th>
                                 </tr>
                             </thead>
                             <tbody id="grid_SelectedIds">
-                                @forelse ($clients as $index => $client)
+                                @forelse ($suppliers as $index => $supplier)
                                 <tr class="odd">
                                     <td> <input class="" type="checkbox" value="1" onchange="SelectId(this)"> </td>
-                                    <td> {{ $client['name'] }} </td>
-                                    <td> {{ $client['totalDeal'] }} </td>
-                                    <td> {{ $client['totalPaid'] }} </td>
-                                    <td> {{ $client['totalRemaining'] }} </td>
+                                    <td> {{ $supplier['name'] }} </td>
+                                    <td> {{ $supplier['totalDeal'] }} </td>
+                                    <td> {{ $supplier['totalPaid'] }} </td>
+                                    <td> {{ $supplier['totalRemaining'] }} </td>
                                     <td hidden>
-                                        <input class="form-control" disabled="disabled" name="selectedIds[{{ $index }}]" type="hidden" value="{{ $client['id'] }}">
+                                        <input class="form-control" disabled="disabled" name="selectedIds[{{ $index }}]" type="hidden" value="{{ $supplier['id'] }}">
                                     </td>
                                 </tr>
                                 @empty

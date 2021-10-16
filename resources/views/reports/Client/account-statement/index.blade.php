@@ -39,7 +39,7 @@
                     تقرير عملية عميل
                 </div>
                 <!-- /.panel-heading -->
-                {{ Form::open(["route" => "reports.client.accountStatement.viewReport"]) }}
+                {{ Form::open(["route" => "reports.client.accountStatement.viewReport", 'method' => 'get']) }}
                 <div class="panel-body">
 
                     <div class="legend">
@@ -118,7 +118,7 @@
                                 <!--
                                 <tr class="gradeA odd ItemRow" role="row">
                                     <td style="text-align:center; vertical-align: middle;">
-                                        {{ Form::checkbox("processChoice", "1", null, 
+                                        {{ Form::checkbox("processChoice", "1", null,
                                                                 array(
                                                                     "class" => "",
                                                                     "id" => "processChoice")
@@ -128,7 +128,7 @@
                                         <td>
 {{ Form::text("processName", null,
                                                                 array(
-                                                                    "class" => "form-control", 
+                                                                    "class" => "form-control",
                                                                     "id" => "processName",
                                                                     "disabled" => "disabled")
                                                                 )
@@ -137,7 +137,7 @@
                                         <td>
 {{ Form::text("processTotal", null,
                                                                 array(
-                                                                    "class" => "form-control", 
+                                                                    "class" => "form-control",
                                                                     "id" => "processTotal",
                                                                     "disabled" => "disabled")
                                                                 )

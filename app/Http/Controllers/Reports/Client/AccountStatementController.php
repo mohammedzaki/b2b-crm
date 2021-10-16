@@ -5,8 +5,6 @@ namespace App\Http\Controllers\Reports\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Client;
-use App\Models\ClientProcess;
-use App\Extensions\DateTime;
 use App\Reports\V2\Client\ClientTotal;
 use App\Reports\V2\Client\ClientDetailed;
 
@@ -48,53 +46,30 @@ class AccountStatementController extends Controller
     }
 
     /**
-     * Show the Index Page
-     * @Any("/view-report", as="reports.client.accountStatement.viewReport")
+     * Show the ViewReport Page
+     * @Get("/view-report", as="reports.client.accountStatement.viewReport")
      */
     public function viewReport(Request $request)
     {
+        return $this->getReport($request)->preview();
+    }
+
+    /**
+     * Show the PrintPDF Page
+     * @Get("/print-pdf", as="reports.client.accountStatement.printPDF")
+     */
+    public function printPDF(Request $request)
+    {
+        return $this->getReport($request)->exportPDF();
+    }
+
+    private function getReport(Request $request)
+    {
         if ($request->ch_detialed == FALSE) {
-            $pdfReport = new ClientTotal($request->withLetterHead);
+            return new ClientTotal($request->withLetterHead, $request->client_id, $request->processes);
         } else {
-            $pdfReport = new ClientDetailed($request->withLetterHead);
+            return new ClientDetailed($request->withLetterHead, $request->client_id, $request->processes);
         }
-        $pdfReport->clientId = $request->client_id;
-        $pdfReport->processIds = $request->processes;
-        session([
-                    'clientId'   => $request->client_id,
-                    'processIds' => $request->processes
-                ]);
-        return $pdfReport->preview();
-    }
-
-    /**
-     * Show the Index Page
-     * @Get("/print-total-pdf", as="reports.client.accountStatement.printTotalPDF")
-     */
-    public function printTotalPDF(Request $request)
-    {
-        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('clientId'), session('processIds'));
-    }
-
-    /**
-     * Show the Index Page
-     * @Get("/print-detailed-pdf", as="reports.client.accountStatement.printDetailedPDF")
-     */
-    public function printDetailedPDF(Request $request)
-    {
-        return $this->exportPDF($request->ch_detialed, $request->withLetterHead, session('clientId'), session('processIds'));
-    }
-
-    private function exportPDF($ch_detailed, $withLetterHead, $clientId, $processIds)
-    {
-        if ($ch_detailed == FALSE) {
-            $pdfReport = new ClientTotal($withLetterHead);
-        } else {
-            $pdfReport = new ClientDetailed($withLetterHead);
-        }
-        $pdfReport->clientId = $clientId;
-        $pdfReport->processIds = $processIds;
-        return $pdfReport->exportPDF();
     }
 
 }

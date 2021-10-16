@@ -1,5 +1,6 @@
 @extends($reportLayout)
 @section('reportTitle', 'كشف حساب عميل مفصل')
+@section("title", "كشف حساب عميل مفصل - التقارير")
 @section('styles')
     <link href="/{{$reportStyle}}" rel="stylesheet">
 @endsection

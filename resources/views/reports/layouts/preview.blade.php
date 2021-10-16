@@ -1,5 +1,4 @@
 @extends("layouts.app")
-@section("title", "تقرير عملية عميل - التقارير")
 @section("content")
     <div class="col-lg-12" id="printcontent">
         <div class="panel panel-default">
