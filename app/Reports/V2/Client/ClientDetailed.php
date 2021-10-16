@@ -63,6 +63,9 @@ class ClientDetailed extends BaseReport
                 $processes[$id]['processDetails'][$index]['unitPrice']  = $item->unit_price;
                 $processes[$id]['processDetails'][$index]['quantity']   = $item->quantity;
                 $processes[$id]['processDetails'][$index]['desc']       = $item->description;
+                if ($withUserLog) {
+                    $processes[$id]['processDetails'][$index]['id'] = $item->id;
+                }
                 $index++;
             }
             if ($clientProcess->has_discount == TRUE) {
@@ -95,7 +98,8 @@ class ClientDetailed extends BaseReport
                 $processes[$id]['processDetails'][$index]['desc']       = "قيمة الضريبة المضافة";
                 $index++;
             }
-            foreach ($clientProcess->deposits as $deposit) {
+            $items = $withUserLog ? $clientProcess->depositsWithTrashed : $clientProcess->deposits;
+            foreach ($items as $deposit) {
                 $totalDepositValue                                      += $deposit->depositValue;
                 $processes[$id]['processDetails'][$index]['date']       = DateTime::parseToDateFormat($deposit->due_date);
                 $processes[$id]['processDetails'][$index]['remaining']  = $clientProcess->total_price_taxes - $totalDepositValue;
@@ -104,6 +108,10 @@ class ClientDetailed extends BaseReport
                 $processes[$id]['processDetails'][$index]['unitPrice']  = "";
                 $processes[$id]['processDetails'][$index]['quantity']   = "";
                 $processes[$id]['processDetails'][$index]['desc']       = $deposit->recordDesc;
+                if($withUserLog) {
+                    $processes[$id]['processDetails'][$index]['deleted'] = $deposit->deleted_at;
+                    $processes[$id]['processDetails'][$index]['id']      = $deposit->id;
+                }
                 $index++;
             }
         }

@@ -61,6 +61,9 @@ class SupplierDetailed extends BaseReport
                 $processes[$id]['processDetails'][$index]['unitPrice']  = $item->unit_price;
                 $processes[$id]['processDetails'][$index]['quantity']   = $item->quantity;
                 $processes[$id]['processDetails'][$index]['desc']       = $item->description;
+                if ($withUserLog) {
+                    $processes[$id]['processDetails'][$index]['id'] = $item->id;
+                }
                 $index++;
             }
             if ($supplierProcess->has_discount == TRUE) {
@@ -104,13 +107,12 @@ class SupplierDetailed extends BaseReport
                 $processes[$id]['processDetails'][$index]['unitPrice']  = "";
                 $processes[$id]['processDetails'][$index]['quantity']   = "";
                 $processes[$id]['processDetails'][$index]['desc']       = $withdrawal->recordDesc;
-                if($withUserLog) {
+                if ($withUserLog) {
                     $processes[$id]['processDetails'][$index]['deleted'] = $withdrawal->deleted_at;
                     $processes[$id]['processDetails'][$index]['id']      = $withdrawal->id;
                 }
                 $index++;
             }
-            //dd($processes);
         }
 
         $data = [

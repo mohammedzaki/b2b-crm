@@ -131,6 +131,11 @@ class ClientProcess extends Model {
         ])->orderBy('due_date');
     }
 
+    public function depositsWithTrashed()
+    {
+        return $this->deposits()->withTrashed();
+    }
+
     public function dwExpenses()
     {
         return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
