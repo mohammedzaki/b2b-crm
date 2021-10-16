@@ -59,7 +59,8 @@
                             <td> {{ $details['totalPrice'] }} </td>
                             <td> {{ $details['unitPrice'] }} </td>
                             <td> {{ $details['quantity'] }} </td>
-                            <td> {{ $details['desc'] }} @if(isset($details['id'])) {{ link_to_route('userLog.search', 'عرض', array('row_id' => $details['id']), array('class' => 'btn btn-primary')) }} @endif </td>
+                            <td> {{ $details['desc'] }} </td>
+                            @if(isset($details['id'])) <td> {{ link_to_route('userLog.search', 'عرض', array('row_id' => $details['id']), array('class' => 'btn btn-primary')) }} </td> @endif
                         </tr>
                     @empty
                     @endforelse

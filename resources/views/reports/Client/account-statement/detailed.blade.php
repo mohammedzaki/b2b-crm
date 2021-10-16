@@ -52,7 +52,7 @@
                     </thead>
                     <tbody>
                     @forelse ($process['processDetails'] as $details)
-                        <tr class="odd">
+                        <tr class="odd @if(isset($details['deleted'])) isDeleted @endif">
                             <td> {{ $details['date'] }} </td>
                             <td> {{ $details['remaining'] }} </td>
                             <td class="redColor"> {{ $details['paid'] }} </td>
@@ -60,6 +60,7 @@
                             <td> {{ $details['unitPrice'] }} </td>
                             <td> {{ $details['quantity'] }} </td>
                             <td> {{ $details['desc'] }} </td>
+                            @if(isset($details['id'])) <td> {{ link_to_route('userLog.search', 'عرض', array('row_id' => $details['id']), array('class' => 'btn btn-primary')) }} </td> @endif
                         </tr>
                     @empty
                     @endforelse
