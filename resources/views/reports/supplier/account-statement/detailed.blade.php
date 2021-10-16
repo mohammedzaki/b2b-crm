@@ -52,14 +52,14 @@
                     </thead>
                     <tbody>
                     @forelse ($process['processDetails'] as $details)
-                        <tr class="odd @if(isset($details['pending'])) isPending @endif">
+                        <tr class="odd @if(isset($details['pending'])) isPending @endif @if(isset($details['deleted'])) isDeleted @endif">
                             <td> {{ $details['date'] }} </td>
                             <td> {{ $details['remaining'] }} </td>
                             <td> {{ $details['paid'] }} </td>
                             <td> {{ $details['totalPrice'] }} </td>
                             <td> {{ $details['unitPrice'] }} </td>
                             <td> {{ $details['quantity'] }} </td>
-                            <td> {{ $details['desc'] }} </td>
+                            <td> {{ $details['desc'] }} @if(isset($details['id'])) {{ link_to_route('userLog.search', 'عرض', array('row_id' => $details['id']), array('class' => 'btn btn-primary')) }} @endif </td>
                         </tr>
                     @empty
                     @endforelse

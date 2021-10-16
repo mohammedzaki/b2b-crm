@@ -29,7 +29,7 @@ class SupplierDetailed extends BaseReport
         $this->printRouteAction = 'reports.supplier.accountStatement.printPDF';
     }
 
-    public function getReportData()
+    public function getReportData($withUserLog = false)
     {
         $supplier                 = Supplier::findOrFail($this->supplierId);
         $supplierName             = $supplier->name;
@@ -83,16 +83,6 @@ class SupplierDetailed extends BaseReport
                 $processes[$id]['processDetails'][$index]['desc']       = "خصم من المنبع";
                 $index++;
             }
-            if ($supplierProcess->has_source_discount == TRUE) {
-                $processes[$id]['processDetails'][$index]['date']       = DateTime::parse($supplierProcess->created_at)->format('Y-m-d');
-                $processes[$id]['processDetails'][$index]['remaining']  = "";
-                $processes[$id]['processDetails'][$index]['paid']       = "";
-                $processes[$id]['processDetails'][$index]['totalPrice'] = $supplierProcess->source_discount_value;
-                $processes[$id]['processDetails'][$index]['unitPrice']  = "";
-                $processes[$id]['processDetails'][$index]['quantity']   = "";
-                $processes[$id]['processDetails'][$index]['desc']       = "خصم من المنبع";
-                $index++;
-            }
             if ($supplierProcess->require_invoice == TRUE) {
                 $processes[$id]['processDetails'][$index]['date']       = DateTime::parse($item->created_at)->format('Y-m-d');
                 $processes[$id]['processDetails'][$index]['remaining']  = "";
@@ -103,8 +93,8 @@ class SupplierDetailed extends BaseReport
                 $processes[$id]['processDetails'][$index]['desc']       = "قيمة الضريبة المضافة";
                 $index++;
             }
-
-            foreach ($supplierProcess->withdrawals() as $withdrawal) {
+            $items = $withUserLog ? $supplierProcess->withdrawalsWithTrashed() : $supplierProcess->withdrawals();
+            foreach ($items as $withdrawal) {
                 $totalWithdrawalValue                                   += $withdrawal->withdrawValue;
                 $processes[$id]['processDetails'][$index]['pending']    = $withdrawal->pendingStatus;
                 $processes[$id]['processDetails'][$index]['date']       = DateTime::parse($withdrawal->due_date)->format('Y-m-d');
@@ -114,8 +104,13 @@ class SupplierDetailed extends BaseReport
                 $processes[$id]['processDetails'][$index]['unitPrice']  = "";
                 $processes[$id]['processDetails'][$index]['quantity']   = "";
                 $processes[$id]['processDetails'][$index]['desc']       = $withdrawal->recordDesc;
+                if($withUserLog) {
+                    $processes[$id]['processDetails'][$index]['deleted'] = $withdrawal->deleted_at;
+                    $processes[$id]['processDetails'][$index]['id']      = $withdrawal->id;
+                }
                 $index++;
             }
+            //dd($processes);
         }
 
         $data = [

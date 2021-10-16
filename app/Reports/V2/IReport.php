@@ -16,7 +16,7 @@ interface IReport {
 
     function setReportRefs();
 
-    function getReportData();
+    function getReportData($withUserLog = false);
 
     function getReportName();
 }

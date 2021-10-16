@@ -26,7 +26,7 @@ class ClientAnalyticalCenterDetailed extends BaseReport
         $this->printRouteAction = 'reports.client.analyticalCenter.printPDF';
     }
 
-    public function getReportData()
+    public function getReportData($withUserLog = false)
     {
         $allClientsTotalPrice     = 0;
         $allClientsTotalPaid      = 0;

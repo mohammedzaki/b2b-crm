@@ -26,7 +26,7 @@ class SupplierAnalyticalCenterDetailed extends BaseReport
         $this->printRouteAction = 'reports.supplier.analyticalCenter.printPDF';
     }
 
-    public function getReportData()
+    public function getReportData($withUserLog = false)
     {
         $allSuppliersTotalPrice     = 0;
         $allSuppliersTotalPaid      = 0;

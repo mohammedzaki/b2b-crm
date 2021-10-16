@@ -124,12 +124,17 @@ class SupplierProcess extends Model {
         return $this->hasMany(FinancialCustodyItem::class, 'cbo_processes')->where([
                                                                                        ['supplier_id', "=", $this->supplier_id],
                                                                                        ['withdrawValue', ">", 0]
-                                                                                   ])->select(DB::raw('IF(ISNULL(approved_at),1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
+                                                                                   ])->select(DB::raw('IF(ISNULL(approved_at),1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc', 'deleted_at', 'id');
     }
 
     public function withdrawals()
     {
         return collect($this->dwWithdrawals)->merge($this->fcWithdrawals)->sortBy('due_date');
+    }
+
+    public function withdrawalsWithTrashed()
+    {
+        return collect($this->dwWithdrawals()->withTrashed()->get())->merge($this->fcWithdrawals()->withTrashed()->get())->sortBy('due_date');
     }
 
     public function totalWithdrawals() {

@@ -41,7 +41,7 @@ abstract class BaseReport implements IReport
 
     public function preview()
     {
-        $arr = array_merge(['reportLayout' => $this->reportPreviewView], $this->getReportBaseData(), $this->getReportData());
+        $arr = array_merge(['reportLayout' => $this->reportPreviewView], $this->getReportBaseData(), $this->getReportData(true));
         return view($this->reportView)->with($arr);
     }
 

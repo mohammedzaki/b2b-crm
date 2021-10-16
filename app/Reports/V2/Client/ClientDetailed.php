@@ -29,7 +29,7 @@ class ClientDetailed extends BaseReport
         $this->printRouteAction = 'reports.client.accountStatement.printPDF';
     }
 
-    public function getReportData()
+    public function getReportData($withUserLog = false)
     {
         $client                   = Client::findOrFail($this->clientId);
         $clientName               = $client->name;
