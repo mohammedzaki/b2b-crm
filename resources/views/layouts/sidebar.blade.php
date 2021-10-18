@@ -45,6 +45,13 @@
                 </li>
             @endif
 
+            @if(Entrust::ability('admin', 'bank-cash'))
+                <li>
+                    <a href="{{ route('bank-cash.index') }}">
+                        <i class="fa fa-briefcase fa-fw"></i> وارد / منصرف بنك</a>
+                </li>
+            @endif
+
             @if(Entrust::ability('admin', 'financial-custody-items'))
                 <li>
                     <a href="{{ route('financialCustodyItems.index') }}"><i class="fa fa-briefcase fa-fw"></i> مصروفات
@@ -75,6 +82,18 @@
                         <li><a href="{{ route('attendance.manualadding') }}">تسجيل جديد</a></li>
                         <li><a href="{{ route('financialCustody.index', 'all') }}">سجل العهد</a></li>
                         <li><a href="{{ route('salary.index') }}">مرتبات</a></li>
+                    </ul>
+                </li>
+            @endif
+
+            @if(Entrust::ability('admin', 'manage-bank-profile'))
+                <li>
+                    <a href="client-processes"><i class="fa fa-edit fa-fw"></i>إدارة البنوك<span
+                                class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li><a href="{{ route('bank-profile.index') }}">الكل</a></li>
+                        <li><a href="{{ route('bank-profile.create') }}">أضف جديد</a></li>
+                        <li><a href="{{ route('bank-profile.trash') }}">المحذوفات</a></li>
                     </ul>
                 </li>
             @endif

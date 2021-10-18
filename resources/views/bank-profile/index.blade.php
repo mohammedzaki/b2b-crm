@@ -1,10 +1,10 @@
 @extends('layouts.app') 
-@section('title', 'المحذوفات - اضف عميل') 
+@section('title', 'عرض الكل - ادارة البنكوك')
 @section('content')
 
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">اضافة عميل <small>المحذوفات</small></h1>
+        <h1 class="page-header">ادارة البنكوك <small>عرض الكل</small></h1>
     </div>
 </div>
 <!-- /.row -->
@@ -26,7 +26,7 @@
 	<div class="col-lg-12">
 	    <div class="panel panel-default">
 	        <div class="panel-heading">
-	           العملاء
+	           البنكوك
 	        </div>
 	        <!-- /.panel-heading -->
 	        <div class="panel-body">
@@ -35,30 +35,30 @@
 	                    <table class="table table-striped table-bordered table-hover" id="dataTables-example">
 	                        <thead>
 	                            <tr>
-	                                <th width="40">الرقم</th>
-	                                <th>اسم العميل</th>
-	                                <th>العنوان</th>
-	                                <th>الحد اﻻئتماني</th>
-	                                <th width="60">التليفون</th>
-	                                <th width="60">المحمول</th>
-	                                <th width="100">تحكم</th>
+									<th width="40">الرقم</th>
+									<th>اسم البنك</th>
+									<th>رقم الحساب</th>
+									<th>عنوان الفرع</th>
+									<th width="100">تحكم</th>
 	                            </tr>
 	                        </thead>
 	                        <tbody>
-	                        	@forelse ($clients as $client)
+	                        	@forelse ($bankProfiles as $bankProfile)
 	                        	<tr role="row">
-	                        	    <td class="text-center">{{ $client->id }}</td>
-	                        	    <td>{{ $client->name }}</td>
-	                        	    <td>{{ $client->address }}</td>
-	                        	    <td>{{ $client->credit_limit }}</td>
-	                        	    <td>{{ $client->telephone }}</td>
-	                        	    <td>{{ $client->mobile }}</td>
+									<td class="text-center">{{ $bankProfile->id }}</td>
+									<td>{{ $bankProfile->name }}</td>
+									<td>{{ $bankProfile->statement_number }}</td>
+									<td>{{ $bankProfile->branch_address }}</td>
 	                        	    <td>
-	                        	        {{ link_to_route('client.restore', 'استرجاع', array('id' => $client->id), array('class' => 'btn btn-warning')) }}
+	                        	        {{ Form::open(['method' => 'DELETE', 'route' => ['bank-profile.destroy', $bankProfile->id], 'onsubmit' => 'return ConfirmDelete()', 'style' => 'display: inline-block;']) }}
+	                        	            {{ Form::button('حذف', array('type' => 'submit', 'class' => 'btn btn-danger')) }}
+	                        	        {{ Form::close() }}
+
+	                        	        {{ link_to_route('bank-profile.edit', 'تعديل', array('id' => $bankProfile->id), array('class' => 'btn btn-primary')) }}
 	                        	    </td>
 	                        	</tr>
 	                        	@empty
-                                    <tr>ﻻ يوجد عمﻻء.</tr>
+                                    <tr>ﻻ يوجد مصروفات.</tr>
                                 @endforelse
 	                        </tbody>
 	                    </table>  
@@ -72,11 +72,12 @@
 	</div>
 	<!-- /.col-lg-12 -->
 </div>
+@endsection
 
-
+@section('scripts')
 <script>
 function ConfirmDelete() {
-    return confirm("هل انت متأكد من حذف العميل ؟");
+    return confirm("هل انت متأكد من حذف البنك ؟");
 }
 
 $(document).ready(function() {

@@ -1,10 +1,10 @@
 @extends('layouts.app') 
-@section('title', 'اضف عميل جديد - اضف عميل') 
+@section('title', 'اضف بنك جديد - ادارة البنكوك')
 @section('content')
 
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">اضافة عميل <small>أضف جديد</small></h1>
+        <h1 class="page-header">ادارة البنكوك <small>أضف جديد</small></h1>
     </div>
 </div>
 <!-- /.row -->
@@ -23,13 +23,9 @@
         </div>
     @endif
 
-    {{ Form::open(['route' => 'client.store']) }}
-        @include('client._form', ['authorized' => old('authorized')])
+    {{ Form::open(['route' => 'bank-profile.store']) }}
+        @include('bank-profile._form')
     {{ Form::close() }}
-
-    <script type="text/javascript">
-        var authorizedPeopleCount = {{ count(old('authorized')) }};
-    </script>
 
 </div>
 @endsection
