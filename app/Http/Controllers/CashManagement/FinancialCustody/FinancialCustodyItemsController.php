@@ -12,25 +12,18 @@ use App\Constants\EmployeeActions;
 use App\Constants\PaymentMethods;
 use App\Exceptions\ValidationException;
 use App\Extensions\DateTime;
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\DepositWithdraw;
-use App\Models\FinancialCustody;
-use App\Models\User;
-use App\Models\ClientProcess;
-use App\Models\FinancialCustodyItem;
 use App\Models\Employee;
-use App\Models\EmployeeBorrowBilling;
 use App\Models\Expenses;
-use App\Models\OpeningAmount;
+use App\Models\FinancialCustody;
+use App\Models\FinancialCustodyItem;
 use App\Models\Supplier;
-use App\Models\SupplierProcess;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Validator;
-use App\Helpers\Helpers;
-use Illuminate\Auth\AuthenticationException;
 
 
 /**
@@ -378,6 +371,42 @@ class FinancialCustodyItemsController extends Controller
             $currentFinancialCustody->save();
             DB::commit();
             return redirect()->route("financialCustodyItems.index", ['id' => $currentFinancialCustody->id])->with('success', 'تم تسوية العهدة.');
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', "حدث حطأ في حفظ البيانات. {$ex->getMessage()}");
+        }
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  Request $request
+     * @return Response
+     * @Post("/financialCustodyReopen", as="financialCustodyItems.financialCustodyReopen")
+     * @Middleware({"web", "auth", "ability:admin,financial-custody-reopen"})
+     * @throws \Exception
+     */
+    public function financialCustodyReopen(Request $request)
+    {
+        DB::beginTransaction();
+        try {
+            $id = $request['id'];
+            if (!isset($id) & empty($id)) {
+                $currentFinancialCustody = $this->getCurrentFinancialCustody($request);
+            } else {
+                $currentFinancialCustody = FinancialCustody::find($id);
+            }
+            DepositWithdraw::where([
+                                       ['financial_custody_id', '=', $currentFinancialCustody->id],
+                                       ['expenses_id', '=', EmployeeActions::FinancialCustodyRefund],
+                                       ['withdrawValue', '=', NULL, 'or'],
+                                       ['withdrawValue', '=', 0]
+                                   ])->forceDelete();
+            $currentFinancialCustody->approved_at = null;
+            $currentFinancialCustody->approved_by = null;
+            $currentFinancialCustody->save();
+            DB::commit();
+            return redirect()->route("financialCustodyItems.index", ['id' => $currentFinancialCustody->id])->with('success', 'تم إعادة فتح العهدة.');
         } catch (\Exception $ex) {
             DB::rollBack();
             return redirect()->back()->withInput()->with('error', "حدث حطأ في حفظ البيانات. {$ex->getMessage()}");

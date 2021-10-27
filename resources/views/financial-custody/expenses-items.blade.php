@@ -602,6 +602,25 @@
                                     </div>
                                     {{ Form::close() }}
                                 @endif
+                                @if(Entrust::ability('admin', 'financial-custody-reopen') && $approved_at != null)
+                                    {{ Form::open(['route' => 'financialCustodyItems.financialCustodyReopen', 'method' => 'POST', 'onsubmit' => "return confirm('هل انت متاكد من إعادة فتح عهدة الموظف / {$employee_name} ؟');"]) }}
+                                    <div class="col-md-6" style="padding: 4px;">
+                                        <input type="hidden" name="id" value="{{ $financialCustodyId }}" />
+                                        <input type="hidden" name="employee_id" value="{{ $employee_id }}"/>
+                                        <button type="submit" class="btn btn-danger form-control">إعادة فتح العهدة</button>
+                                    </div>
+                                    {{ Form::close() }}
+                                @endif
+                            </div>
+                        @elseif(Entrust::ability('admin', 'financial-custody-reopen'))
+                            <div class="col-md-6">
+                                {{ Form::open(['route' => 'financialCustodyItems.financialCustodyReopen', 'method' => 'POST', 'onsubmit' => "return confirm('هل انت متاكد من إعادة فتح عهدة الموظف / {$employee_name} ؟');"]) }}
+                                <div class="col-md-6" style="padding: 4px;">
+                                    <input type="hidden" name="id" value="{{ $financialCustodyId }}" />
+                                    <input type="hidden" name="employee_id" value="{{ $employee_id }}"/>
+                                    <button type="submit" class="btn btn-danger form-control">إعادة فتح العهدة</button>
+                                </div>
+                                {{ Form::close() }}
                             </div>
                         @endif
                         <div class="col-md-6">
