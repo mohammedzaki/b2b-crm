@@ -77,6 +77,28 @@ class HomeController extends Controller
      * Show the application dashboard.
      *
      * @return \Illuminate\Http\Response
+     * @Get("/FixProcessIsClosed", as="FixProcessIsClosed")
+     * @Middleware({"web"})
+     */
+    public function FixProcessIsClosed()
+    {
+        $cProcess = \App\Models\ClientProcess::all();
+        foreach ($cProcess as $cp) {
+            $cp->checkProcessMustClosed();
+            echo "client: {$cp->id} <br/>";
+        }
+        $sProcess = \App\Models\SupplierProcess::all();
+        foreach ($sProcess as $sp) {
+            $sp->checkProcessMustClosed();
+            echo "supplier: {$sp->id} <br/>";
+        }
+        echo 'done';
+    }
+
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Http\Response
      * @Get("/fixEmployeeProfiles", as="fixEmployeeProfiles")
      * @Middleware({"web"})
      */

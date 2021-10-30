@@ -230,6 +230,7 @@ class FinancialCustodyItemsController extends Controller
                                                                    'approved_at' => DateTime::now(),
                                                                    'approved_by' => $c_user_id
                                                                ]);
+                $this->checkProcessClosed($id);
                 $rowsIds[$id] = "Done";
             }
             DB::commit();
@@ -243,6 +244,19 @@ class FinancialCustodyItemsController extends Controller
         } catch (\Exception $ex) {
             DB::rollBack();
             throw new ValidationException("حدث حطأ في حفظ البيانات. {$ex->getMessage()}");
+        }
+    }
+
+
+    private function checkProcessClosed($financialCustodyItemId)
+    {
+        $fItem = FinancialCustodyItem::where('id', $financialCustodyItemId)->first();
+
+        if (!empty($fItem->cbo_processes)) {
+            if (!empty($fItem->supplier_id)) {
+                $process = SupplierProcess::findOrFail($fItem->cbo_processes);
+                $process->checkProcessMustClosed();
+            }
         }
     }
 
@@ -343,6 +357,7 @@ class FinancialCustodyItemsController extends Controller
                                                       'approved_at' => DateTime::now(),
                                                       'approved_by' => $c_user_id
                                                   ]);
+                    $this->checkProcessClosed($financialCustodyItem->id);
                 }
             }
             $date = DateTime::parse($request->due_date);
