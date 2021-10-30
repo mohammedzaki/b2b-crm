@@ -21,6 +21,7 @@ use App\Models\Expenses;
 use App\Models\FinancialCustody;
 use App\Models\FinancialCustodyItem;
 use App\Models\Supplier;
+use App\Models\SupplierProcess;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
