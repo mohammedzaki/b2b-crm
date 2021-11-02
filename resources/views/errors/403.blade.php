@@ -11,11 +11,7 @@
 <!-- /.row -->
 <div class="row">
     <div class="alert alert-danger">
-        @if($exception->getMessage() != '')
-            {{ $exception->getMessage() }}
-        @else
-            ليس لديك صلاحية للدخول الي هذة الصفحة.
-        @endif
+        ليس لديك صلاحية للدخول الي هذة الصفحة.
         {{ link_to('/', 'اضغط هنا للرجوع الي الرئيسية') }}
     </div>
 </div>
