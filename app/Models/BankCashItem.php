@@ -46,10 +46,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DepositWithdraw whereWithdrawValue($value)
  * @mixin \Eloquent
  */
-class BankCash extends Model {
+class BankCashItem extends Model {
 
     use SoftDeletes;
-
+    protected $table = "bank_cashes";
     protected $dates = ['deleted_at', 'due_date'];
     protected $fillable = [
         'depositValue',
@@ -61,12 +61,13 @@ class BankCash extends Model {
         'employee_id',
         'supplier_id',
         'expenses_id',
-        'financial_custody_id',
+        'bank_profile_id',
 
         'user_id',
-        'payMethod',
+        'cashing_date',
         'notes',
-        'due_date'
+        'due_date',
+        'is_paid'
     ];
 
 
@@ -90,7 +91,7 @@ class BankCash extends Model {
         return $this->hasOne('App\Models\Expenses', 'id');
     }
     
-    public function employeeLogBorrowBillings() {
-        return $this->hasMany(EmployeeBorrowBilling::class, 'deposit_id', 'id');
+    public function bank() {
+        return $this->belongsTo(BankProfile::class);
     }
 }

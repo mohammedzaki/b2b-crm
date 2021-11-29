@@ -47,7 +47,7 @@
 
             @if(Entrust::ability('admin', 'bank-cash'))
                 <li>
-                    <a href="{{ route('bank-cash.index') }}">
+                    <a href="{{ route('bank-profile.index') }}">
                         <i class="fa fa-briefcase fa-fw"></i> وارد / منصرف بنك</a>
                 </li>
             @endif

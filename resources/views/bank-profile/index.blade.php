@@ -35,10 +35,10 @@
 	                    <table class="table table-striped table-bordered table-hover" id="dataTables-example">
 	                        <thead>
 	                            <tr>
-									<th width="40">الرقم</th>
-									<th>اسم البنك</th>
-									<th>رقم الحساب</th>
-									<th>عنوان الفرع</th>
+									<th width="5%">الرقم</th>
+									<th width="30">اسم البنك</th>
+									<th width="30">رقم الحساب</th>
+									<th width="50">عنوان الفرع</th>
 									<th width="100">تحكم</th>
 	                            </tr>
 	                        </thead>
@@ -55,6 +55,8 @@
 	                        	        {{ Form::close() }}
 
 	                        	        {{ link_to_route('bank-profile.edit', 'تعديل', array('id' => $bankProfile->id), array('class' => 'btn btn-primary')) }}
+
+										{{ link_to_route('bankCash.index', 'وارد/منصرف', array('bankId' => $bankProfile->id), array('class' => 'btn btn-primary')) }}
 	                        	    </td>
 	                        	</tr>
 	                        	@empty

@@ -1,28 +1,24 @@
 <?php
-
-/*
- * B2B CRM Software License
- *
- * Copyright (C) ZakiSoft ltd - All Rights Reserved.
- *
- * Unauthorized copying of this file, via any medium is strictly prohibited
- * Proprietary and confidential
- * Written by Mohammed Zaki mohammedzaki.dev@gmail.com, September 2017
+/**
+ * Created by PhpStorm.
+ * User: mohamedzaki
+ * Date: 12/7/20
+ * Time: 6:27 PM
  */
 
-namespace App\Http\Controllers\CashManagement\Journal;
+namespace App\Http\Controllers\CashManagement\Journal\BankCash;
 
 use App\Constants\EmployeeActions;
 use App\Constants\PaymentMethods;
 use App\Exceptions\ValidationException;
 use App\Extensions\DateTime;
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
+use App\Models\BankCashItem;
 use App\Models\BankProfile;
 use App\Models\Client;
 use App\Models\ClientProcess;
-use App\Models\BankCash;
 use App\Models\Employee;
-use App\Models\EmployeeBorrowBilling;
 use App\Models\Expenses;
 use App\Models\OpeningAmount;
 use App\Models\Supplier;
@@ -30,34 +26,37 @@ use App\Models\SupplierProcess;
 use DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Validator;
-use App\Helpers\Helpers;
+
 
 /**
- * Description of BankCashController
+ * Description of BankCashItemController
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
  *
- * @Controller(prefix="/bank-cash")
- * @Resource("bank-cash")
+ * @Controller(prefix="/bank-cash/{bankId}")
  * @Middleware({"web", "auth", "ability:admin,bank-cash"})
  */
 class BankCashController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *
-     * @return Response
+     * @param $bankId
+     * @return \Illuminate\Http\Response
+     * @Get("", as="bankCash.index")
      */
-    public function index()
+    public function index($bankId)
     {
         $startDate = DateTime::today()->startOfDay();
         $endDate   = DateTime::today()->endOfDay();
-        return $this->getBankCashItems($startDate, $endDate, 0);
+        if (auth()->user()->hasRole('admin')) {
+            return $this->getBankCashItem($startDate, $endDate, 1, $bankId);
+        } else {
+            return $this->getBankCashItem($startDate, $endDate, 0, $bankId);
+        }
     }
 
-    private function getBankCashItems(DateTime $startDate, DateTime $endDate, $canEdit)
+    private function getBankCashItem(DateTime $startDate, DateTime $endDate, $canEdit, $bankId)
     {
         $numbers['clients_number']         = Client::count();
         $numbers['suppliers_number']       = Supplier::count();
@@ -67,16 +66,16 @@ class BankCashController extends Controller
         $numbers['current_dayOfMonth']     = $startDate->day;
         $numbers['current_month']          = $startDate->month - 1;
         $numbers['current_year']           = $startDate->year;
-        $depositWithdrawsItems             = BankCash::whereBetween('due_date', [$startDate, $endDate])->get();
-        $numbers['withdrawsAmount']        = BankCash::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
-        $numbers['depositsAmount']         = BankCash::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+        $bankCashItemsItems                = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->get();
+        $numbers['withdrawsAmount']        = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
+        $numbers['depositsAmount']         = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
         $numbers['currentAmount']          = $this->calculateCurrentAmount($endDate);
         $numbers['previousDayAmount']      = $this->calculateCurrentAmount($endDate->addDay(-1));
 
         $employees       = Employee::all('id', 'name')->mapWithKeys(function ($emp) {
             return [$emp->id => $emp->name];
         });
-        $expenses        = BankProfile::all('id', 'name');
+        $expenses        = Expenses::all('id', 'name');
         $clients         = Client::all()->mapWithKeys(function ($client) {
             return [$client->id => [
                 'name'           => $client->name,
@@ -102,22 +101,26 @@ class BankCashController extends Controller
                     ]
                     ];
                 })
-            ] ];
+            ]
+            ];
         });
         $payMethods      = PaymentMethods::all();
         $employeeActions = collect(EmployeeActions::all())->toJson();
+        $bankProfile     = BankProfile::findOrFail($bankId);
 
         return view('cash.journal.bank-cash')->with([
-                                                         'numbers'          => $numbers,
-                                                         'clients'          => $clients,
-                                                         'employees'        => $employees,
-                                                         'suppliers'        => $suppliers,
-                                                         'expenses'         => $expenses,
-                                                         'depositWithdraws' => $depositWithdrawsItems,
-                                                         'payMethods'       => $payMethods,
-                                                         'canEdit'          => $canEdit,
-                                                         'employeeActions'  => $employeeActions
-                                                     ]);
+                                                        'numbers'         => $numbers,
+                                                        'clients'         => $clients,
+                                                        'employees'       => $employees,
+                                                        'suppliers'       => $suppliers,
+                                                        'expenses'        => $expenses,
+                                                        'bankCashItems'   => $bankCashItemsItems,
+                                                        'payMethods'      => $payMethods,
+                                                        'canEdit'         => $canEdit,
+                                                        'employeeActions' => $employeeActions,
+                                                        'bankId'          => $bankId,
+                                                        'bankName'        => $bankProfile->name
+                                                    ]);
     }
 
     private function calculateCurrentAmount($endDate = null, $startDate = '2000-01-01 00:00:00')
@@ -125,19 +128,21 @@ class BankCashController extends Controller
         if (!isset($endDate)) {
             $endDate = DateTime::today()->format('Y-m-d 00:00:00');
         }
-        $depositValue  = BankCash::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
-        $withdrawValue = BankCash::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
-        return round(($depositValue) - $withdrawValue, Helpers::getDecimalPointCount());
+        $depositValue  = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+        $withdrawValue = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
+        $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
+        return round(($depositValue + $openingAmount) - $withdrawValue, Helpers::getDecimalPointCount());
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Display the specified resource.
      *
+     * @param  int $bankId
      * @return Response
      */
     public function create()
     {
-        //
+
     }
 
     /**
@@ -145,24 +150,26 @@ class BankCashController extends Controller
      *
      * @param  Request $request
      * @return Response
+     * @throws ValidationException
+     * @Post("", as="bankCash.store")
      */
-    public function store(Request $request)
+    public function store(Request $request, $bankId)
     {
         $request['user_id'] = auth()->user()->id;
         DB::beginTransaction();
         $request['due_date'] = DateTime::parse($request->due_date);
         //dd($request->all());
-        $depositWithdraw = BankCash::create();
+        $bankCashItem = BankCashItem::create();
         if (isset($request->employee_id)) {
-            $this->checkEmployeeAction($request, $depositWithdraw->id);
+            $this->checkEmployeeAction($request, $bankCashItem->id);
         }
         $request['saveStatus'] = 1;
-        $depositWithdraw->update($request->all());
-        $this->checkProcessClosed($depositWithdraw);
+        $bankCashItem->update($request->all());
+        $this->checkProcessClosed($bankCashItem);
         DB::commit();
         return response()->json([
                                     'success'       => true,
-                                    'id'            => $depositWithdraw->id,
+                                    'id'            => $bankCashItem->id,
                                     'currentAmount' => $this->calculateCurrentAmount(),
                                     'message'       => 'تم اضافة وارد جديد.'
                                 ]);
@@ -226,9 +233,9 @@ class BankCashController extends Controller
         }
     }
 
-    function resetDiscountBorrows($depositWithdraw)
+    function resetDiscountBorrows($bankCashItem)
     {
-        foreach ($depositWithdraw->employeeLogBorrowBillings as $borrow) {
+        foreach ($bankCashItem->employeeLogBorrowBillings as $borrow) {
             $borrow->paying_status = EmployeeBorrowBilling::UN_PAID;
             $borrow->paid_amount   = null;
             $borrow->paid_date     = null;
@@ -260,14 +267,14 @@ class BankCashController extends Controller
         }
     }
 
-    private function checkProcessClosed(BankCash $depositWithdraw)
+    private function checkProcessClosed(BankCashItem $bankCashItem)
     {
-        if (!empty($depositWithdraw->cbo_processes)) {
-            if (!empty($depositWithdraw->client_id)) {
-                $process = ClientProcess::findOrFail($depositWithdraw->cbo_processes);
+        if (!empty($bankCashItem->cbo_processes)) {
+            if (!empty($bankCashItem->client_id)) {
+                $process = ClientProcess::findOrFail($bankCashItem->cbo_processes);
                 $process->checkProcessMustClosed();
-            } else if (!empty($depositWithdraw->supplier_id)) {
-                $process = SupplierProcess::findOrFail($depositWithdraw->cbo_processes);
+            } else if (!empty($bankCashItem->supplier_id)) {
+                $process = SupplierProcess::findOrFail($bankCashItem->cbo_processes);
                 $process->checkProcessMustClosed();
             }
         }
@@ -278,7 +285,7 @@ class BankCashController extends Controller
      *
      * @param  Request $request
      * @return Response
-     * @Post("/lockSaveAll", as="bank-cash.lockSaveAll")
+     * @Post("/lockSaveAll", as="bankCash.lockSaveAll")
      */
     public function lockSaveAll(Request $request)
     {
@@ -287,7 +294,7 @@ class BankCashController extends Controller
         $rowsIds = [];
 
         foreach ($all['rowsIds'] as $id) {
-            BankCash::where('id', $id)->update(['saveStatus' => 2]);
+            BankCashItem::where('id', $id)->update(['saveStatus' => 2]);
             $rowsIds[$id] = "Done";
         }
         return response()->json(array(
@@ -303,8 +310,37 @@ class BankCashController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  Request $request
+     * @param $bankId
+     * @param $id
+     * @param $status
      * @return Response
-     * @Post("/removeSelected", as="bank-cash.removeSelected")
+     * @Get("/pay-check", as="bankCash.PayCheck")
+     */
+    public function PayCheck(Request $request, $bankId)
+    {
+        $rowsIds = [];
+        BankCashItem::where('id', $request->id)->update(['is_paid' => $request->status]);
+        $rowsIds[$request->id] = "Done";
+
+//        return response()->json(array(
+//                                    'success'       => true,
+//                                    'rowsIds'       => $rowsIds,
+//                                    'currentAmount' => $this->calculateCurrentAmount(),
+//                                    'message'       => 'تم الحفظ.',
+//                                    //'errors' => $validator->getMessageBag()->toArray()
+//                                ));
+        return redirect()->route('bankCash.index', ['bankId' => $bankId]);
+    }
+
+    //
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  Request $request
+     * @return Response
+     * @Post("/removeSelected", as="bankCash.removeSelected")
+     * @throws \Exception
      */
     public function removeSelected(Request $request)
     {
@@ -314,10 +350,10 @@ class BankCashController extends Controller
         $rowsIds = [];
 
         foreach ($all['rowsIds'] as $id) {
-            $depositWithdraw                = BankCash::findOrFail($id);
-            BankCash::where('id', $id)->first()->delete();
-            $this->checkProcessClosed($depositWithdraw);
-            $this->resetDiscountBorrows($depositWithdraw);
+            $bankCashItem = BankCashItem::findOrFail($id);
+            BankCashItem::where('id', $id)->first()->delete();
+            $this->checkProcessClosed($bankCashItem);
+            $this->resetDiscountBorrows($bankCashItem);
             $rowsIds[$id] = "Done";
         }
         return response()->json(array(
@@ -363,16 +399,21 @@ class BankCashController extends Controller
     /**
      * Display the specified resource.
      *
+     * @param Request $request
      * @param  int $id
      * @return Response
-     * @Get("/search", as="bank-cash.search")
-     * @Middleware({"ability:admin,deposit-withdraw-edit"})
+     * @Get("/search", as="bankCash.search")
+     * @Middleware({"ability:admin,bank-cash-edit"})
      */
-    public function search(Request $request)
+    public function search(Request $request, $id)
     {
         $startDate = DateTime::parse($request['targetdate'])->startOfDay();
         $endDate   = DateTime::parse($request['targetdate'])->endOfDay();
-        return $this->getBankCashItems($startDate, $endDate, 1);
+        if (auth()->user()->hasRole('admin')) {
+            return $this->getBankCashItem($startDate, $endDate, 1, $id);
+        } else {
+            return $this->getBankCashItem($startDate, $endDate, 0, $id);
+        }
     }
 
     /**
@@ -389,10 +430,11 @@ class BankCashController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
+     * @param Request $request
      * @param  int $id
      * @return Response
      */
-    public function edit($id)
+    public function edit(Request $request, $bankId, $id)
     {
         //
     }
@@ -403,23 +445,24 @@ class BankCashController extends Controller
      * @param  Request $request
      * @param  int $id
      * @return Response
+     * @throws ValidationException
      */
     public function update(Request $request, $id)
     {
         DB::beginTransaction();
         $request->user_id = auth()->user()->id;
-        $depositWithdraw  = BankCash::findOrFail($id);
+        $bankCashItem     = BankCashItem::findOrFail($id);
         if (isset($request->employee_id)) {
-            $this->checkEmployeeAction($request, $depositWithdraw->id, TRUE);
+            $this->checkEmployeeAction($request, $bankCashItem->id, TRUE);
         }
         unset($request['due_date']); // to prevent changing the date
-        $depositWithdraw->update($request->all());
-        $this->checkProcessClosed($depositWithdraw);
+        $bankCashItem->update($request->all());
+        $this->checkProcessClosed($bankCashItem);
         DB::commit();
         return response()->json(array(
                                     'success'       => true,
-                                    'id'            => $depositWithdraw->id,
-                                    //'$depositWithdraw->cbo_processe' => $depositWithdraw->cbo_processes,
+                                    'id'            => $bankCashItem->id,
+                                    //'$bankCashItem->cbo_processe' => $bankCashItem->cbo_processes,
                                     'currentAmount' => $this->calculateCurrentAmount(),
                                     'message'       => 'تم تعديل وارد جديد.',
                                     //'errors' => $validator->getMessageBag()->toArray()
