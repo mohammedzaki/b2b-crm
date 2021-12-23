@@ -79,7 +79,8 @@ return [
     'timezone'             => 'The :attribute must be a valid zone.',
     'unique'               => ':attribute مستخدم من قبل.',
     'url'                  => 'The :attribute format is invalid.',
-
+    'greater_than_field'   => 'يجب ان تكون قيمة :attribute أكبر من قيمة :field.',
+    'greater_than'         => 'يجب أن تكون :attribute أكبر من :value.',
     /*
     |--------------------------------------------------------------------------
     | Custom Validation Language Lines

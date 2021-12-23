@@ -83,5 +83,8 @@ return [
         App\Models\SupplierProcessItem::class,
         App\Models\TestTimer::class,
         App\Models\User::class,
+        App\Models\BankProfile::class,
+        App\Models\BankChequeBook::class,
+        App\Models\BankCashItem::class,
     ]
 ];

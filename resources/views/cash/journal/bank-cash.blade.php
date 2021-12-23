@@ -126,7 +126,8 @@
                                                 <th rowspan="1" colspan="1">اسم الموظف</th>
                                                 <th rowspan="1" colspan="1">اسم المصروف</th>
                                                 <th rowspan="1" colspan="1">تاريخ الصرف</th>
-                                                <th rowspan="1" colspan="1">ملاحظات</th>
+                                                <th rowspan="1" colspan="1">رقم الشيك</th>
+                                                <th rowspan="1" colspan="1">الحالة</th>
                                                 <th rowspan="1" colspan="1">السجل</th>
                                             </tr>
                                             </thead>
@@ -315,10 +316,10 @@
                                                         </div>
                                                     </td>
                                                     <td>
-                                                        <div class="form-group{{ $errors->has("notes") ? " has-error" : "" }}">
-                                                            {{ Form::text("notes", $bankCashItem->notes,
+                                                        <div class="form-group{{ $errors->has("cheque_number") ? " has-error" : "" }}">
+                                                            {{ Form::text("cheque_number", $bankCashItem->cheque_number,
                                                                         array(
-                                                                            "class" => "form-control notes",
+                                                                            "class" => "form-control cheque_number",
                                                                             "id" => "",
                                                                             "style" => "width:85px;",
                                                                             "onchange" => "AddNewRow(this)",
@@ -326,9 +327,29 @@
                                                                             "onfocus" => "OnRowFocus(this)")
                                                                         )
                                                             }}
-                                                            @if ($errors->has("notes"))
+                                                            @if ($errors->has("cheque_number"))
                                                                 <label for="inputError" class="control-label">
-                                                                    {{ $errors->first("notes") }}
+                                                                    {{ $errors->first("cheque_number") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="form-group{{ $errors->has("cheque_status") ? " has-error" : "" }}">
+                                                            {{ Form::select("cheque_status", $chequeStatuses, $bankCashItem->cheque_status,
+                                                                array(
+                                                                    "class" => "form-control cheque_status",
+                                                                    "placeholder" => "",
+                                                                    "id" => "",
+                                                                    "style" => "width:85px;",
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("cheque_status"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("cheque_status") }}
                                                                 </label>
                                                             @endif
                                                         </div>
@@ -336,11 +357,6 @@
                                                     <td>
                                                         <div class="form-group track-user-log">
                                                             {{ link_to_route('userLog.search', 'عرض', array('row_id' => $bankCashItem->id), array('class' => 'btn btn-primary')) }}
-                                                            @if($bankCashItem->is_paid)
-                                                                {{ link_to_route('bankCash.PayCheck', 'إرجاع', array('bankId' => $bankId, 'id' => $bankCashItem->id, 'status' => !$bankCashItem->is_paid), array('class' => 'btn btn-danger')) }}
-                                                            @else
-                                                                {{ link_to_route('bankCash.PayCheck', 'تم التحصيل', array('bankId' => $bankId, 'id' => $bankCashItem->id, 'status' => !$bankCashItem->is_paid), array('class' => 'btn btn-success')) }}
-                                                            @endif
                                                         </div>
                                                     </td>
                                                     <td hidden>
@@ -540,10 +556,10 @@
                                                     </div>
                                                 </td>
                                                 <td>
-                                                    <div class="form-group{{ $errors->has("notes") ? " has-error" : "" }}">
-                                                        {{ Form::text("notes", null,
+                                                    <div class="form-group{{ $errors->has("cheque_number") ? " has-error" : "" }}">
+                                                        {{ Form::text("cheque_number", null,
                                                                     array(
-                                                                        "class" => "form-control notes",
+                                                                        "class" => "form-control cheque_number",
                                                                         "id" => "",
                                                                         "style" => "width:85px;",
                                                                         "onchange" => "AddNewRow(this)",
@@ -551,9 +567,29 @@
                                                                         "onfocus" => "OnRowFocus(this)")
                                                                     )
                                                         }}
-                                                        @if ($errors->has("notes"))
+                                                        @if ($errors->has("cheque_number"))
                                                             <label for="inputError" class="control-label">
-                                                                {{ $errors->first("notes") }}
+                                                                {{ $errors->first("cheque_number") }}
+                                                            </label>
+                                                        @endif
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="form-group{{ $errors->has("cheque_status") ? " has-error" : "" }}">
+                                                        {{ Form::select("cheque_status", $chequeStatuses, null,
+                                                            array(
+                                                                "class" => "form-control cheque_status",
+                                                                "placeholder" => "",
+                                                                "id" => "",
+                                                                "style" => "width:85px;",
+                                                                "onchange" => "AddNewRow(this)",
+                                                                "onblur" => "OnRowLeave(this)",
+                                                                "onfocus" => "OnRowFocus(this)")
+                                                            )
+                                                        }}
+                                                        @if ($errors->has("cheque_status"))
+                                                            <label for="inputError" class="control-label">
+                                                                {{ $errors->first("cheque_status") }}
                                                             </label>
                                                         @endif
                                                     </div>
@@ -621,12 +657,9 @@
         var suppliers = {!! $suppliers !!};
         var clients = {!! $clients !!};
         var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id,
-            recordDesc, notes, saveStatus, id, flag, canEdit, currentAmount, withdrawsAmount, depositsAmount, cashing_date, is_paid;
+            recordDesc, cheque_number, cheque_status, saveStatus, id, flag, canEdit, currentAmount, withdrawsAmount, depositsAmount, cashing_date, is_paid;
         var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
         var loadAll = false;
-
-        console.log('expenses: ', expenses);
-        console.log('employeeActions: ', employeeActions);
 
         LockAll();
         SetFinancialCustodyDetailsProcess();
@@ -758,7 +791,8 @@
             supplier_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .supplier_id');
             employee_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .employee_id');
             expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
-            notes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .notes');
+            cheque_number = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_number');
+            cheque_status = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_status');
             cashing_date = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cashing_date');
             is_paid = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .is_paid');
             id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .id');
@@ -830,7 +864,8 @@
                 expenses_id: expenses_id.val(),
                 payMethod: 0,
                 bank_profile_id: '{{ $bankId }}',
-                notes: notes.val(),
+                cheque_number: cheque_number.val(),
+                cheque_status: cheque_status.val(),
                 cashing_date: cashing_date.val(),
                 is_paid: is_paid.val(),
                 saveStatus: saveStatus.val()
@@ -992,11 +1027,17 @@
         function AddNewRow(CellChildInput) {
             SetCurrentRowIndex(CellChildInput);
             if ($(AfterCurrentRow).hasClass("ItemRow") === false) {
-                $("#bankCashTable").append('<tr class="gradeA odd ItemRow" role="row"> <td> <input type="checkbox" value=""> </td><td> <div class="form-group{{$errors->has("depositValue") ? " has-error" : ""}}">{{Form::text("depositValue", null, array( "class"=> "form-control IsNumberDecimal depositValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("depositValue")) <label for="inputError" class="control-label">{{$errors->first("depositValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("withdrawValue") ? " has-error" : ""}}">{{Form::text("withdrawValue", null, array( "class"=> "form-control IsNumberDecimal withdrawValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("withdrawValue")) <label for="inputError" class="control-label">{{$errors->first("withdrawValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("recordDesc") ? " has-error" : ""}}">{{Form::text("recordDesc", null, array( "class"=> "form-control recordDesc", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("recordDesc")) <label for="inputError" class="control-label">{{$errors->first("recordDesc")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("cbo_processes") ? " has-error" : ""}}">{{Form::select("cbo_processes", [], null, array( "class"=> "form-control cbo_processes", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cbo_processes")) <label for="inputError" class="control-label">{{$errors->first("cbo_processes")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", [], null, array( "class"=> "form-control client_id", "placeholder"=> "", "id"=> "client_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "id"=> "supplier_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td> ' +
-                    '<td> <div class="form-group{{$errors->has("employee_id") ? " has-error" : ""}}">{{Form::select("employee_id", $employees, null, array( "class"=> "form-control employee_id", "placeholder"=> "", "id"=> "emplyee_id", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("employee_id")) <label for="inputError" class="control-label">{{$errors->first("employee_id")}}</label> @endif </div></td> ' +
+                $("#bankCashTable").append('<tr class="gradeA odd ItemRow" role="row"> <td> <input type="checkbox" value=""> </td><td> <div class="form-group{{$errors->has("depositValue") ? " has-error" : ""}}">{{Form::text("depositValue", null, array( "class"=> "form-control IsNumberDecimal depositValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("depositValue")) <label for="inputError" class="control-label">{{$errors->first("depositValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("withdrawValue") ? " has-error" : ""}}">{{Form::text("withdrawValue", null, array( "class"=> "form-control IsNumberDecimal withdrawValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("withdrawValue")) <label for="inputError" class="control-label">{{$errors->first("withdrawValue")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("recordDesc") ? " has-error" : ""}}">{{Form::text("recordDesc", null, array( "class"=> "form-control recordDesc", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("recordDesc")) <label for="inputError" class="control-label">{{$errors->first("recordDesc")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("cbo_processes") ? " has-error" : ""}}">{{Form::select("cbo_processes", [], null, array( "class"=> "form-control cbo_processes", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cbo_processes")) <label for="inputError" class="control-label">{{$errors->first("cbo_processes")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", [], null, array( "class"=> "form-control client_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td><td> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td> ' +
+                    '<td> <div class="form-group{{$errors->has("employee_id") ? " has-error" : ""}}">{{Form::select("employee_id", $employees, null, array( "class"=> "form-control employee_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("employee_id")) <label for="inputError" class="control-label">{{$errors->first("employee_id")}}</label> @endif </div></td> ' +
+
                     '<td> <div class="form-group{{$errors->has("expenses_id") ? " has-error" : ""}}">{{Form::select("expenses_id", [], null, array( "class"=> "form-control expenses_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("expenses_id")) <label for="inputError" class="control-label">{{$errors->first("expenses_id")}}</label> @endif </div></td>' +
+
                     '<td> <div class="form-group{{ $errors->has("cashing_date") ? " has-error" : "" }}"> {{ Form::text("cashing_date", null, array("class" => "form-control datepickerCommon cashing_date", "id" => "", "style" => "width:85px;", "onchange" => "AddNewRow(this)", "onblur" => "OnRowLeave(this)", "onfocus" => "OnRowFocus(this)") ) }} @if ($errors->has("cashing_date")) <label for="inputError" class="control-label"> {{ $errors->first("cashing_date") }} </label> @endif </div> </td>' +
-                    '<td> <div class="form-group{{$errors->has("notes") ? " has-error" : ""}}">{{Form::text("notes", null, array( "class"=> "form-control notes", "id"=> "notes", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("notes")) <label for="inputError" class="control-label">{{$errors->first("notes")}}</label> @endif </div></td>' +
+
+                    '<td> <div class="form-group{{$errors->has("cheque_number") ? " has-error" : ""}}">{{Form::text("cheque_number", null, array( "class"=> "form-control cheque_number", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cheque_number")) <label for="inputError" class="control-label">{{$errors->first("cheque_number")}}</label> @endif </div></td> ' +
+
+                    '<td> <div class="form-group{{$errors->has("cheque_status") ? " has-error" : ""}}">{{Form::select("cheque_status", $chequeStatuses, null, array( "class"=> "form-control cheque_status", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cheque_status")) <label for="inputError" class="control-label">{{$errors->first("cheque_status")}}</label> @endif </div></td> ' +
+
                     '<td> <div class="form-group track-user-log"></div> </td>' +
                     '<td hidden><input type="hidden" class="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="-1"></td><td hidden> <input type="hidden" class="saveStatus" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="0"> </td></tr>');
                 var rowIndex = $("#bankCashTable tr").length - 3;
@@ -1017,6 +1058,13 @@
                         supplier_id.append($("<option></option>").attr("value", supplierId).text(supplier.name));
                     }
                 });
+                $(".datepickerCommon").flatpickr({
+                    enableTime: false,
+                    //maxDate: new Date(),
+                    altInput: true,
+                    altFormat: "l, j F, Y",
+                    locale: "ar"
+                });
                 DoChange(currentRowIndex, CurrentCellName);
             } else {
                 DoChange(currentRowIndex, CurrentCellName);
@@ -1032,6 +1080,7 @@
             supplier_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .supplier_id');
             employee_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .employee_id');
             expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
+            cheque_number = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_number');
             switch (cellName) {
                 case "depositValue":
                     withdrawValue.val('');
@@ -1039,6 +1088,7 @@
                     employee_id.val('');
                     expenses_id.empty();
                     expenses_id.append($("<option></option>"));
+                    cheque_number.removeAttr("disabled");
                     break;
                 case "withdrawValue":
                     depositValue.val('');
@@ -1048,6 +1098,7 @@
                     $.each(expenses, function (i, expense) {
                         expenses_id.append('<option value="' + expense.id + '">' + expense.name + '</option>');
                     });
+                    cheque_number.attr("disabled", "disabled");
                     break;
                 case "recordDesc":
                     break;
@@ -1114,7 +1165,9 @@
                     }
                     cbo_processes.empty();
                     break;
-                case "notes":
+                case "cheque_number":
+                    break;
+                case "cheque_status":
                     break;
                 default:
                     break;
@@ -1160,7 +1213,8 @@
             supplier_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .supplier_id');
             employee_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .employee_id');
             expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
-            notes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .notes');
+            cheque_number = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_number');
+            cheque_status = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_status');
             cashing_date = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cashing_date');
             id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .id');
             saveStatus = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .saveStatus');
@@ -1174,7 +1228,8 @@
             supplier_id.attr("disabled", "disabled");
             employee_id.attr("disabled", "disabled");
             expenses_id.attr("disabled", "disabled");
-            notes.attr("disabled", "disabled");
+            cheque_number.attr("disabled", "disabled");
+            cheque_status.attr("disabled", "disabled");
             cashing_date.attr("disabled", "disabled");
         }
 

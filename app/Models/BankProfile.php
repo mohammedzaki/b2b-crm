@@ -23,13 +23,27 @@ class BankProfile extends Model
 {
     use SoftDeletes;
 
-    protected $dates    = ['deleted_at'];
+    protected $dates = ['deleted_at'];
 
-    protected $fillable = [
-        'name',
-        'statement_number',
-        'branch_address'
-    ];
-    
+    protected $fillable
+        = [
+            'name',
+            'statement_number',
+            'branch_address'
+        ];
 
+    public function cashItems()
+    {
+        return $this->hasMany(BankCashItem::class, 'bank_profile_id');
+    }
+
+    public function chequeBooks()
+    {
+        return $this->hasMany(BankChequeBook::class, 'bank_profile_id');
+    }
+
+    public function getCurrentChequeBook()
+    {
+        return $this->chequeBooks()->first();
+    }
 }

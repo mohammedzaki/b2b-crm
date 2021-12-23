@@ -1,10 +1,3 @@
-
-@section('script_taxes')
-<script>
-    var TaxesRate = {{ \App\Http\Controllers\FacilityManagement\FacilityController::TaxesRate() / 100 }};</script>
-</script>
-@endsection
-
 <div class="row">
     <div class="col-lg-4">
         <div class="panel panel-default">
@@ -375,6 +368,13 @@
         <!-- /.panel -->
     </div>
 </div>
+
+@section('script_taxes')
+    <script>
+        var TaxesRate = {{ \App\Http\Controllers\FacilityManagement\FacilityController::TaxesRate() / 100 }};
+    </script>
+@endsection
+
 @section('scripts')
 <script src="{{ mix('js/prcoess_items.js') }}"></script>
 @endsection

@@ -25,7 +25,7 @@ use Validator;
  * @Resource("bank-profile")
  * @Middleware({"web", "auth", "ability:admin,bank-profile"})
  */
-class ProfileController
+class BankProfileController
 {
 
     protected function validator(array $data, $id = null)
@@ -71,29 +71,29 @@ class ProfileController
 
     public function edit($id)
     {
-        $bankProfiles = BankProfile::findOrFail($id);
-        return view('bank-profile.edit', compact('bankProfiles'));
+        $bankProfile = BankProfile::with('chequeBooks')->findOrFail($id);
+        return view('bank-profile.edit', compact('bankProfile'));
     }
 
     public function update(Request $request, $id)
     {
-        $bankProfiles = BankProfile::findOrFail($id);
+        $bankProfile = BankProfile::findOrFail($id);
 
-        $validator = $this->validator($request->all(), $bankProfiles->id);
+        $validator = $this->validator($request->all(), $bankProfile->id);
 
         if ($validator->fails()) {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
 
-            $bankProfiles->update($request->all());
+            $bankProfile->update($request->all());
             return redirect()->back()->with('success', 'تم تعديل بيانات البنك.');
         }
     }
 
     public function destroy($id)
     {
-        $bankProfiles = BankProfile::findOrFail($id);
-        $bankProfiles->delete();
+        $bankProfile = BankProfile::findOrFail($id);
+        $bankProfile->delete();
 
         return redirect()->back()->with('success', 'تم حذف بنك.');
     }

@@ -65,9 +65,9 @@ class BankCashItem extends Model {
 
         'user_id',
         'cashing_date',
-        'notes',
-        'due_date',
-        'is_paid'
+        'cheque_number',
+        'cheque_status',
+        'due_date'
     ];
 
 

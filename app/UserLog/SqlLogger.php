@@ -75,32 +75,32 @@ class SqlLogger
 
     public function log($sql, $bindings)
     {
-        if ($this->sqlChecker->isDML($sql) && $this->sqlChecker->checkIgnoredTable($sql)) {
-            $sqlQuery = $this->prepareSql->prepare($sql, $bindings);
-            $entity   = null;//$this->sqlChecker->getEntity($sqlQuery);
-            $actionId = $this->sqlChecker->getActionLogId($sqlQuery);
-            $logData  = '';
-            $rowId    = NULL;
-            if ($actionId == LogAction::update) {
-                $rowId   = $this->sqlChecker->getRowId($sqlQuery);
-                $prefix  = "update `{$entity->name}` set ";
-                $suffix  = " where `id` = {$rowId}";
-                $logData = str_replace($prefix, '', $sqlQuery);
-                $logData = str_replace($suffix, '', $logData);
-                preg_match_all('/(, `updated_at` = \"[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\")/', $logData, $matches);
-                $logData = str_replace($matches[1][0], '', $logData);
-            } elseif ($actionId == LogAction::insert) {
-                $logData = $sqlQuery;
-            }
-            $userLogData = [
-                'entity_id' => 12,
-                'action_id' => $actionId,
-                'row_id'    => $rowId,
-                'user_id'   => \Auth::user()->id,
-                'log_data'  => $logData
-            ];
-            //event(new UserLogCreatedEvent($userLogData));
-        }
+//        if ($this->sqlChecker->isDML($sql) && $this->sqlChecker->checkIgnoredTable($sql)) {
+//            $sqlQuery = $this->prepareSql->prepare($sql, $bindings);
+//            $entity   = null;//$this->sqlChecker->getEntity($sqlQuery);
+//            $actionId = $this->sqlChecker->getActionLogId($sqlQuery);
+//            $logData  = '';
+//            $rowId    = NULL;
+//            if ($actionId == LogAction::update) {
+//                $rowId   = $this->sqlChecker->getRowId($sqlQuery);
+//                $prefix  = "update `{$entity->name}` set ";
+//                $suffix  = " where `id` = {$rowId}";
+//                $logData = str_replace($prefix, '', $sqlQuery);
+//                $logData = str_replace($suffix, '', $logData);
+//                preg_match_all('/(, `updated_at` = \"[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\")/', $logData, $matches);
+//                $logData = str_replace($matches[1][0], '', $logData);
+//            } elseif ($actionId == LogAction::insert) {
+//                $logData = $sqlQuery;
+//            }
+//            $userLogData = [
+//                'entity_id' => 12,
+//                'action_id' => $actionId,
+//                'row_id'    => $rowId,
+//                'user_id'   => \Auth::user()->id,
+//                'log_data'  => $logData
+//            ];
+//            //event(new UserLogCreatedEvent($userLogData));
+//        }
     }
 
 

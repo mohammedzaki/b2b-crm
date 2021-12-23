@@ -6,10 +6,10 @@
  * Time: 6:27 PM
  */
 
-namespace App\Http\Controllers\CashManagement\Journal\BankCash;
+namespace App\Http\Controllers\CashManagement\Journal;
 
+use App\Constants\ChequeStatuses;
 use App\Constants\EmployeeActions;
-use App\Constants\PaymentMethods;
 use App\Exceptions\ValidationException;
 use App\Extensions\DateTime;
 use App\Helpers\Helpers;
@@ -104,7 +104,7 @@ class BankCashController extends Controller
             ]
             ];
         });
-        $payMethods      = PaymentMethods::all();
+        $chequeStatuses  = ChequeStatuses::all();
         $employeeActions = collect(EmployeeActions::all())->toJson();
         $bankProfile     = BankProfile::findOrFail($bankId);
 
@@ -115,7 +115,7 @@ class BankCashController extends Controller
                                                         'suppliers'       => $suppliers,
                                                         'expenses'        => $expenses,
                                                         'bankCashItems'   => $bankCashItemsItems,
-                                                        'payMethods'      => $payMethods,
+                                                        'chequeStatuses'  => $chequeStatuses,
                                                         'canEdit'         => $canEdit,
                                                         'employeeActions' => $employeeActions,
                                                         'bankId'          => $bankId,
@@ -446,8 +446,9 @@ class BankCashController extends Controller
      * @param  int $id
      * @return Response
      * @throws ValidationException
+     * @PUT("{id}", as="bankCash.update")
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $bankId, $id)
     {
         DB::beginTransaction();
         $request->user_id = auth()->user()->id;

@@ -20,7 +20,7 @@ class UserLogObserver
      */
     public function created($model)
     {
-        $this->addNewLog($model->getTable(), LogAction::insert, $model->id);
+        $this->addNewLog($model->getTable(), LogAction::insert, $model->id, json_encode($model));
     }
 
     /**

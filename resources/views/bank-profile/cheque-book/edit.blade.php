@@ -1,16 +1,16 @@
 @extends('layouts.app') 
-@section('title', 'اضف عملية جديدة - عمليه جديدة عميل') 
-
+@section('title', 'تعديل الدفتر')
 @section('content')
 
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">عمليه جديدة عميل <small>أضف جديد</small></h1>
+        <h1 class="page-header"> <small>تعديل الدفتر</small></h1>
     </div>
 </div>
 <!-- /.row -->
 
 <div class="row">
+
     @if (session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
@@ -23,13 +23,17 @@
         </div>
     @endif
 
-    {{ Form::open(['route' => 'client.process.store']) }}
-        @include('client.process._form', ['items' => old('items')])
+    {{ Form::model($bankChequeBook,
+            array(
+                'route' => array('bank-profile.cheque-book.update', $bankProfile->id, $bankChequeBook->id),
+                'method' => 'put'
+            )
+        ) 
+    }}
+        @include('bank-profile.cheque-book._form', ['model' => 'edit'])
     {{ Form::close() }}
 
-    <script type="text/javascript">
-        var processItemsCount = 0;
-    </script>
+    
 
 </div>
 @endsection
