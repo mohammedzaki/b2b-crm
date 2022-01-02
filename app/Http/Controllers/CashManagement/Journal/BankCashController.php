@@ -56,7 +56,61 @@ class BankCashController extends Controller
         }
     }
 
-    private function getBankCashItem(DateTime $startDate, DateTime $endDate, $canEdit, $bankId)
+    /**
+     * Display a listing of the resource.
+     *
+     * @param $bankId
+     * @return \Illuminate\Http\Response
+     * @Get("/{chequeBookId}/index", as="bankCash.chequeBooks")
+     */
+    public function chequeBooks($bankId, $chequeBookId)
+    {
+        $startDate = DateTime::today()->startOfDay();
+        $endDate   = DateTime::today()->endOfDay();
+        if (auth()->user()->hasRole('admin')) {
+            return $this->getBankCashItem($startDate, $endDate, 1, $bankId, $chequeBookId, 'cash.journal.withdraw-cheque');
+        } else {
+            return $this->getBankCashItem($startDate, $endDate, 0, $bankId, $chequeBookId, 'cash.journal.withdraw-cheque');
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @param $bankId
+     * @return \Illuminate\Http\Response
+     * @Get("/deposit-cheque", as="bankCash.depositChequeBook")
+     */
+    public function depositChequeBook($bankId)
+    {
+        $startDate = DateTime::today()->startOfDay();
+        $endDate   = DateTime::today()->endOfDay();
+        if (auth()->user()->hasRole('admin')) {
+            return $this->getBankCashItem($startDate, $endDate, 1, $bankId, null, 'cash.journal.deposit-cheque');
+        } else {
+            return $this->getBankCashItem($startDate, $endDate, 0, $bankId, null, 'cash.journal.deposit-cheque');
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @param $bankId
+     * @return \Illuminate\Http\Response
+     * @Get("/withdraw-cheque", as="bankCash.withdrawChequeBook")
+     */
+    public function withdrawChequeBook($bankId)
+    {
+        $startDate = DateTime::today()->startOfDay();
+        $endDate   = DateTime::today()->endOfDay();
+        if (auth()->user()->hasRole('admin')) {
+            return $this->getBankCashItem($startDate, $endDate, 1, $bankId, null, 'cash.journal.withdraw-cheque');
+        } else {
+            return $this->getBankCashItem($startDate, $endDate, 0, $bankId, null, 'cash.journal.withdraw-cheque');
+        }
+    }
+
+    private function getBankCashItem(DateTime $startDate, DateTime $endDate, $canEdit, $bankId, $chequeBookId = null, $viewName = 'cash.journal.bank-cash')
     {
         $numbers['clients_number']         = Client::count();
         $numbers['suppliers_number']       = Supplier::count();
@@ -108,7 +162,7 @@ class BankCashController extends Controller
         $employeeActions = collect(EmployeeActions::all())->toJson();
         $bankProfile     = BankProfile::findOrFail($bankId);
 
-        return view('cash.journal.bank-cash')->with([
+        return view($viewName)->with([
                                                         'numbers'         => $numbers,
                                                         'clients'         => $clients,
                                                         'employees'       => $employees,
@@ -132,17 +186,6 @@ class BankCashController extends Controller
         $withdrawValue = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
         $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
         return round(($depositValue + $openingAmount) - $withdrawValue, Helpers::getDecimalPointCount());
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $bankId
-     * @return Response
-     */
-    public function create()
-    {
-
     }
 
     /**
@@ -310,34 +353,6 @@ class BankCashController extends Controller
      * Store a newly created resource in storage.
      *
      * @param  Request $request
-     * @param $bankId
-     * @param $id
-     * @param $status
-     * @return Response
-     * @Get("/pay-check", as="bankCash.PayCheck")
-     */
-    public function PayCheck(Request $request, $bankId)
-    {
-        $rowsIds = [];
-        BankCashItem::where('id', $request->id)->update(['is_paid' => $request->status]);
-        $rowsIds[$request->id] = "Done";
-
-//        return response()->json(array(
-//                                    'success'       => true,
-//                                    'rowsIds'       => $rowsIds,
-//                                    'currentAmount' => $this->calculateCurrentAmount(),
-//                                    'message'       => 'تم الحفظ.',
-//                                    //'errors' => $validator->getMessageBag()->toArray()
-//                                ));
-        return redirect()->route('bankCash.index', ['bankId' => $bankId]);
-    }
-
-    //
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  Request $request
      * @return Response
      * @Post("/removeSelected", as="bankCash.removeSelected")
      * @throws \Exception
@@ -417,29 +432,6 @@ class BankCashController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param Request $request
-     * @param  int $id
-     * @return Response
-     */
-    public function edit(Request $request, $bankId, $id)
-    {
-        //
-    }
-
-    /**
      * Update the specified resource in storage.
      *
      * @param  Request $request
@@ -468,17 +460,6 @@ class BankCashController extends Controller
                                     'message'       => 'تم تعديل وارد جديد.',
                                     //'errors' => $validator->getMessageBag()->toArray()
                                 ));
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int $id
-     * @return Response
-     */
-    public function destroy($id)
-    {
-        // test
     }
 
 }

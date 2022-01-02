@@ -61,6 +61,7 @@
                                             {{ Form::button('حذف', array('type' => 'submit', 'class' => 'btn btn-danger')) }}
                                             {{ Form::close() }}
                                             {{ link_to_route('bank-profile.cheque-book.edit', 'تعديل', ['bank_profile' => $bankProfile->id, 'cheque_book' => $cheque->id], array('class' => 'btn btn-primary')) }}
+                                            {{ link_to_route('bankCash.chequeBooks', 'الشيكات', ['bank_profile' => $bankProfile->id, 'chequeBook' => $cheque->id], array('class' => 'btn btn-primary')) }}
                                         </td>
                                     </tr>
                                 @empty

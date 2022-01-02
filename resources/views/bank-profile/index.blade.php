@@ -57,6 +57,10 @@
 	                        	        {{ link_to_route('bank-profile.edit', 'تعديل', array('id' => $bankProfile->id), array('class' => 'btn btn-primary')) }}
 
 										{{ link_to_route('bankCash.index', 'وارد/منصرف', array('bankId' => $bankProfile->id), array('class' => 'btn btn-primary')) }}
+
+										{{ link_to_route('bankCash.depositChequeBook', 'إصدار شيك وارد', array('bankId' => $bankProfile->id), array('class' => 'btn btn-primary')) }}
+
+										{{ link_to_route('bankCash.withdrawChequeBook', 'إصدار شيك منصرف', array('bankId' => $bankProfile->id), array('class' => 'btn btn-primary')) }}
 	                        	    </td>
 	                        	</tr>
 	                        	@empty
