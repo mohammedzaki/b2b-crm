@@ -122,9 +122,9 @@
                                                 <th rowspan="1" colspan="1">بيان</th>
                                                 <th rowspan="1" colspan="1">اسم العملية</th>
                                                 <th rowspan="1" colspan="1">اسم العميل</th>
-                                                <th rowspan="1" colspan="1">اسم المورد</th>
-                                                <th rowspan="1" colspan="1">اسم الموظف</th>
-                                                <th rowspan="1" colspan="1">اسم المصروف</th>
+                                                {{--<th rowspan="1" colspan="1">اسم المورد</th>--}}
+                                                {{--<th rowspan="1" colspan="1">اسم الموظف</th>--}}
+                                                {{--<th rowspan="1" colspan="1">اسم المصروف</th>--}}
                                                 <th rowspan="1" colspan="1">تاريخ الصرف</th>
                                                 <th rowspan="1" colspan="1">رقم الشيك</th>
                                                 <th rowspan="1" colspan="1">الحالة</th>
@@ -235,66 +235,66 @@
                                                             @endif
                                                         </div>
                                                     </td>
-                                                    <td>
-                                                        <div class="form-group{{ $errors->has("supplier_id") ? " has-error" : "" }}">
-                                                            {{ Form::select("supplier_id", [$bankCashItem->supplier_id => $bankCashItem->supplier_id], $bankCashItem->supplier_id,
-                                                                array(
-                                                                    "class" => "form-control supplier_id",
-                                                                    "placeholder" => "",
-                                                                    "id" => "",
-                                                                    "style" => "width:85px;",
-                                                                    "onchange" => "AddNewRow(this)",
-                                                                    "onblur" => "OnRowLeave(this)",
-                                                                    "onfocus" => "OnRowFocus(this)")
-                                                                )
-                                                            }}
-                                                            @if ($errors->has("supplier_id"))
-                                                                <label for="inputError" class="control-label">
-                                                                    {{ $errors->first("supplier_id") }}
-                                                                </label>
-                                                            @endif
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">
-                                                            {{ Form::select("employee_id", $employees, $bankCashItem->employee_id,
-                                                                array(
-                                                                    "class" => "form-control employee_id",
-                                                                    "placeholder" => "",
-                                                                    "id" => "",
-                                                                    "style" => "width:85px;",
-                                                                    "onchange" => "AddNewRow(this)",
-                                                                    "onblur" => "OnRowLeave(this)",
-                                                                    "onfocus" => "OnRowFocus(this)")
-                                                                )
-                                                            }}
-                                                            @if ($errors->has("employee_id"))
-                                                                <label for="inputError" class="control-label">
-                                                                    {{ $errors->first("employee_id") }}
-                                                                </label>
-                                                            @endif
-                                                        </div>
-                                                    </td>
-                                                    <td>
-                                                        <div class="form-group{{ $errors->has("expenses_id") ? " has-error" : "" }}">
-                                                            {{ Form::select("expenses_id", [$bankCashItem->expenses_id => $bankCashItem->expenses_id], $bankCashItem->expenses_id,
-                                                                array(
-                                                                    "class" => "form-control expenses_id",
-                                                                    "placeholder" => "",
-                                                                    "id" => "",
-                                                                    "style" => "width:85px;",
-                                                                    "onchange" => "AddNewRow(this)",
-                                                                    "onblur" => "OnRowLeave(this)",
-                                                                    "onfocus" => "OnRowFocus(this)")
-                                                                )
-                                                            }}
-                                                            @if ($errors->has("expenses_id"))
-                                                                <label for="inputError" class="control-label">
-                                                                    {{ $errors->first("expenses_id") }}
-                                                                </label>
-                                                            @endif
-                                                        </div>
-                                                    </td>
+                                                    {{--<td>--}}
+                                                        {{--<div class="form-group{{ $errors->has("supplier_id") ? " has-error" : "" }}">--}}
+                                                            {{--{{ Form::select("supplier_id", [$bankCashItem->supplier_id => $bankCashItem->supplier_id], $bankCashItem->supplier_id,--}}
+                                                                {{--array(--}}
+                                                                    {{--"class" => "form-control supplier_id",--}}
+                                                                    {{--"placeholder" => "",--}}
+                                                                    {{--"id" => "",--}}
+                                                                    {{--"style" => "width:85px;",--}}
+                                                                    {{--"onchange" => "AddNewRow(this)",--}}
+                                                                    {{--"onblur" => "OnRowLeave(this)",--}}
+                                                                    {{--"onfocus" => "OnRowFocus(this)")--}}
+                                                                {{--)--}}
+                                                            {{--}}--}}
+                                                            {{--@if ($errors->has("supplier_id"))--}}
+                                                                {{--<label for="inputError" class="control-label">--}}
+                                                                    {{--{{ $errors->first("supplier_id") }}--}}
+                                                                {{--</label>--}}
+                                                            {{--@endif--}}
+                                                        {{--</div>--}}
+                                                    {{--</td>--}}
+                                                    {{--<td>--}}
+                                                        {{--<div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">--}}
+                                                            {{--{{ Form::select("employee_id", $employees, $bankCashItem->employee_id,--}}
+                                                                {{--array(--}}
+                                                                    {{--"class" => "form-control employee_id",--}}
+                                                                    {{--"placeholder" => "",--}}
+                                                                    {{--"id" => "",--}}
+                                                                    {{--"style" => "width:85px;",--}}
+                                                                    {{--"onchange" => "AddNewRow(this)",--}}
+                                                                    {{--"onblur" => "OnRowLeave(this)",--}}
+                                                                    {{--"onfocus" => "OnRowFocus(this)")--}}
+                                                                {{--)--}}
+                                                            {{--}}--}}
+                                                            {{--@if ($errors->has("employee_id"))--}}
+                                                                {{--<label for="inputError" class="control-label">--}}
+                                                                    {{--{{ $errors->first("employee_id") }}--}}
+                                                                {{--</label>--}}
+                                                            {{--@endif--}}
+                                                        {{--</div>--}}
+                                                    {{--</td>--}}
+                                                    {{--<td>--}}
+                                                        {{--<div class="form-group{{ $errors->has("expenses_id") ? " has-error" : "" }}">--}}
+                                                            {{--{{ Form::select("expenses_id", [$bankCashItem->expenses_id => $bankCashItem->expenses_id], $bankCashItem->expenses_id,--}}
+                                                                {{--array(--}}
+                                                                    {{--"class" => "form-control expenses_id",--}}
+                                                                    {{--"placeholder" => "",--}}
+                                                                    {{--"id" => "",--}}
+                                                                    {{--"style" => "width:85px;",--}}
+                                                                    {{--"onchange" => "AddNewRow(this)",--}}
+                                                                    {{--"onblur" => "OnRowLeave(this)",--}}
+                                                                    {{--"onfocus" => "OnRowFocus(this)")--}}
+                                                                {{--)--}}
+                                                            {{--}}--}}
+                                                            {{--@if ($errors->has("expenses_id"))--}}
+                                                                {{--<label for="inputError" class="control-label">--}}
+                                                                    {{--{{ $errors->first("expenses_id") }}--}}
+                                                                {{--</label>--}}
+                                                            {{--@endif--}}
+                                                        {{--</div>--}}
+                                                    {{--</td>--}}
                                                     <td>
                                                         <div class="form-group{{ $errors->has("cashing_date") ? " has-error" : "" }}">
                                                             {{ Form::text("cashing_date", $bankCashItem->cashing_date,
@@ -475,66 +475,66 @@
                                                         @endif
                                                     </div>
                                                 </td>
-                                                <td>
-                                                    <div class="form-group{{ $errors->has("supplier_id") ? " has-error" : "" }}">
-                                                        {{ Form::select("supplier_id", [], null,
-                                                            array(
-                                                                "class" => "form-control supplier_id",
-                                                                "placeholder" => "",
-                                                                "id" => "",
-                                                                "style" => "width:85px;",
-                                                                "onchange" => "AddNewRow(this)",
-                                                                "onblur" => "OnRowLeave(this)",
-                                                                "onfocus" => "OnRowFocus(this)")
-                                                            )
-                                                        }}
-                                                        @if ($errors->has("supplier_id"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("supplier_id") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">
-                                                        {{ Form::select("employee_id", $employees, null,
-                                                            array(
-                                                                "class" => "form-control employee_id",
-                                                                "placeholder" => "",
-                                                                "id" => "",
-                                                                "style" => "width:85px;",
-                                                                "onchange" => "AddNewRow(this)",
-                                                                "onblur" => "OnRowLeave(this)",
-                                                                "onfocus" => "OnRowFocus(this)")
-                                                            )
-                                                        }}
-                                                        @if ($errors->has("employee_id"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("employee_id") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td>
-                                                    <div class="form-group{{ $errors->has("expenses_id") ? " has-error" : "" }}">
-                                                        {{ Form::select("expenses_id", [], null,
-                                                            array(
-                                                                "class" => "form-control expenses_id",
-                                                                "placeholder" => "",
-                                                                "id" => "",
-                                                                "style" => "width:85px;",
-                                                                "onchange" => "AddNewRow(this)",
-                                                                "onblur" => "OnRowLeave(this)",
-                                                                "onfocus" => "OnRowFocus(this)")
-                                                            )
-                                                        }}
-                                                        @if ($errors->has("expenses_id"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("expenses_id") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
+                                                {{--<td>--}}
+                                                    {{--<div class="form-group{{ $errors->has("supplier_id") ? " has-error" : "" }}">--}}
+                                                        {{--{{ Form::select("supplier_id", [], null,--}}
+                                                            {{--array(--}}
+                                                                {{--"class" => "form-control supplier_id",--}}
+                                                                {{--"placeholder" => "",--}}
+                                                                {{--"id" => "",--}}
+                                                                {{--"style" => "width:85px;",--}}
+                                                                {{--"onchange" => "AddNewRow(this)",--}}
+                                                                {{--"onblur" => "OnRowLeave(this)",--}}
+                                                                {{--"onfocus" => "OnRowFocus(this)")--}}
+                                                            {{--)--}}
+                                                        {{--}}--}}
+                                                        {{--@if ($errors->has("supplier_id"))--}}
+                                                            {{--<label for="inputError" class="control-label">--}}
+                                                                {{--{{ $errors->first("supplier_id") }}--}}
+                                                            {{--</label>--}}
+                                                        {{--@endif--}}
+                                                    {{--</div>--}}
+                                                {{--</td>--}}
+                                                {{--<td>--}}
+                                                    {{--<div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">--}}
+                                                        {{--{{ Form::select("employee_id", $employees, null,--}}
+                                                            {{--array(--}}
+                                                                {{--"class" => "form-control employee_id",--}}
+                                                                {{--"placeholder" => "",--}}
+                                                                {{--"id" => "",--}}
+                                                                {{--"style" => "width:85px;",--}}
+                                                                {{--"onchange" => "AddNewRow(this)",--}}
+                                                                {{--"onblur" => "OnRowLeave(this)",--}}
+                                                                {{--"onfocus" => "OnRowFocus(this)")--}}
+                                                            {{--)--}}
+                                                        {{--}}--}}
+                                                        {{--@if ($errors->has("employee_id"))--}}
+                                                            {{--<label for="inputError" class="control-label">--}}
+                                                                {{--{{ $errors->first("employee_id") }}--}}
+                                                            {{--</label>--}}
+                                                        {{--@endif--}}
+                                                    {{--</div>--}}
+                                                {{--</td>--}}
+                                                {{--<td>--}}
+                                                    {{--<div class="form-group{{ $errors->has("expenses_id") ? " has-error" : "" }}">--}}
+                                                        {{--{{ Form::select("expenses_id", [], null,--}}
+                                                            {{--array(--}}
+                                                                {{--"class" => "form-control expenses_id",--}}
+                                                                {{--"placeholder" => "",--}}
+                                                                {{--"id" => "",--}}
+                                                                {{--"style" => "width:85px;",--}}
+                                                                {{--"onchange" => "AddNewRow(this)",--}}
+                                                                {{--"onblur" => "OnRowLeave(this)",--}}
+                                                                {{--"onfocus" => "OnRowFocus(this)")--}}
+                                                            {{--)--}}
+                                                        {{--}}--}}
+                                                        {{--@if ($errors->has("expenses_id"))--}}
+                                                            {{--<label for="inputError" class="control-label">--}}
+                                                                {{--{{ $errors->first("expenses_id") }}--}}
+                                                            {{--</label>--}}
+                                                        {{--@endif--}}
+                                                    {{--</div>--}}
+                                                {{--</td>--}}
                                                 <td>
                                                     <div class="form-group{{ $errors->has("cashing_date") ? " has-error" : "" }}">
                                                         {{ Form::text("cashing_date", null,
@@ -1039,11 +1039,11 @@
 
                     '<td> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", [], null, array( "class"=> "form-control client_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td>' +
 
-                    '<td> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td> ' +
+                    {{--'<td> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td> ' +--}}
 
-                    '<td> <div class="form-group{{$errors->has("employee_id") ? " has-error" : ""}}">{{Form::select("employee_id", $employees, null, array( "class"=> "form-control employee_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("employee_id")) <label for="inputError" class="control-label">{{$errors->first("employee_id")}}</label> @endif </div></td> ' +
+                    {{--'<td> <div class="form-group{{$errors->has("employee_id") ? " has-error" : ""}}">{{Form::select("employee_id", $employees, null, array( "class"=> "form-control employee_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("employee_id")) <label for="inputError" class="control-label">{{$errors->first("employee_id")}}</label> @endif </div></td> ' +--}}
 
-                    '<td> <div class="form-group{{$errors->has("expenses_id") ? " has-error" : ""}}">{{Form::select("expenses_id", [], null, array( "class"=> "form-control expenses_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("expenses_id")) <label for="inputError" class="control-label">{{$errors->first("expenses_id")}}</label> @endif </div></td>' +
+                    {{--'<td> <div class="form-group{{$errors->has("expenses_id") ? " has-error" : ""}}">{{Form::select("expenses_id", [], null, array( "class"=> "form-control expenses_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("expenses_id")) <label for="inputError" class="control-label">{{$errors->first("expenses_id")}}</label> @endif </div></td>' +--}}
 
                     '<td> <div class="form-group{{ $errors->has("cashing_date") ? " has-error" : "" }}"> {{ Form::text("cashing_date", null, array("class" => "form-control datepickerCommon cashing_date", "id" => "", "style" => "width:85px;", "onchange" => "AddNewRow(this)", "onblur" => "OnRowLeave(this)", "onfocus" => "OnRowFocus(this)") ) }} @if ($errors->has("cashing_date")) <label for="inputError" class="control-label"> {{ $errors->first("cashing_date") }} </label> @endif </div> </td>' +
 
