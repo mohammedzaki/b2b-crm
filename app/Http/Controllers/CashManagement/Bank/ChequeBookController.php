@@ -55,7 +55,7 @@ class ChequeBookController extends Controller
         $bankProfile    = BankProfile::findOrFail($bankProfileId);
         $bankChequeBook = BankChequeBook::findOrFail($chequeBookId);
         if ($bankChequeBook->totalUsedNumbers() == 0) {
-            $bankChequeBook->force_delete();
+            $bankChequeBook->forceDelete();
             return redirect()->back()->with('success', 'تم حذف دفتر الشيكات.');
         } else {
             return redirect()->back()->with('error', 'لا يكمن حذف دفتر الشيكات لصرف شيكات منه.');

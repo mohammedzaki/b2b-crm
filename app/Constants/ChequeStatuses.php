@@ -12,20 +12,22 @@ namespace App\Constants;
 class ChequeStatuses
 {
 
-    const CANCELED = 1;
-    const NOT_USED = 2;
-    const REJECTED = 3;
-    const STOPPED  = 4;
-    const USED     = 5;
+    const CANCELED  = 1;
+    const NOT_USED  = 2;
+    const REJECTED  = 3;
+    const STOPPED   = 4;
+    const USED      = 5;
+    const POSTPONED = 6;
 
     public static function all()
     {
-        $chequeStatuses                           = [];
-        $chequeStatuses[ChequeStatuses::CANCELED] = "ملغي";
-        $chequeStatuses[ChequeStatuses::NOT_USED] = "غير مستخدم";
-        $chequeStatuses[ChequeStatuses::REJECTED] = "مرفوض";
-        $chequeStatuses[ChequeStatuses::STOPPED]  = "متوقف";
-        $chequeStatuses[ChequeStatuses::USED]     = "مستخدم";
+        $chequeStatuses                            = [];
+        $chequeStatuses[ChequeStatuses::CANCELED]  = "ملغي";
+        $chequeStatuses[ChequeStatuses::NOT_USED]  = "غير مستخدم";
+        $chequeStatuses[ChequeStatuses::REJECTED]  = "مرفوض";
+        $chequeStatuses[ChequeStatuses::STOPPED]   = "متوقف";
+        $chequeStatuses[ChequeStatuses::USED]      = "مستخدم";
+        $chequeStatuses[ChequeStatuses::POSTPONED] = "تأجيل الشيك للسداد";
         return $chequeStatuses;
     }
 

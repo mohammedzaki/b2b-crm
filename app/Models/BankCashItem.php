@@ -62,7 +62,8 @@ class BankCashItem extends Model {
         'supplier_id',
         'expenses_id',
         'bank_profile_id',
-
+        'cheque_book_id',
+        
         'user_id',
         'cashing_date',
         'cheque_number',

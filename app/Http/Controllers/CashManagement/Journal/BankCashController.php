@@ -15,6 +15,7 @@ use App\Extensions\DateTime;
 use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\BankCashItem;
+use App\Models\BankChequeBook;
 use App\Models\BankProfile;
 use App\Models\Client;
 use App\Models\ClientProcess;
@@ -56,60 +57,6 @@ class BankCashController extends Controller
         }
     }
 
-    /**
-     * Display a listing of the resource.
-     *
-     * @param $bankId
-     * @return \Illuminate\Http\Response
-     * @Get("/{chequeBookId}/index", as="bankCash.chequeBooks")
-     */
-    public function chequeBooks($bankId, $chequeBookId)
-    {
-        $startDate = DateTime::today()->startOfDay();
-        $endDate   = DateTime::today()->endOfDay();
-        if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $bankId, $chequeBookId, 'cash.journal.withdraw-cheque');
-        } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $bankId, $chequeBookId, 'cash.journal.withdraw-cheque');
-        }
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @param $bankId
-     * @return \Illuminate\Http\Response
-     * @Get("/deposit-cheque", as="bankCash.depositChequeBook")
-     */
-    public function depositChequeBook($bankId)
-    {
-        $startDate = DateTime::today()->startOfDay();
-        $endDate   = DateTime::today()->endOfDay();
-        if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $bankId, null, 'cash.journal.deposit-cheque');
-        } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $bankId, null, 'cash.journal.deposit-cheque');
-        }
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @param $bankId
-     * @return \Illuminate\Http\Response
-     * @Get("/withdraw-cheque", as="bankCash.withdrawChequeBook")
-     */
-    public function withdrawChequeBook($bankId)
-    {
-        $startDate = DateTime::today()->startOfDay();
-        $endDate   = DateTime::today()->endOfDay();
-        if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $bankId, null, 'cash.journal.withdraw-cheque');
-        } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $bankId, null, 'cash.journal.withdraw-cheque');
-        }
-    }
-
     private function getBankCashItem(DateTime $startDate, DateTime $endDate, $canEdit, $bankId, $chequeBookId = null, $viewName = 'cash.journal.bank-cash')
     {
         $numbers['clients_number']         = Client::count();
@@ -120,11 +67,20 @@ class BankCashController extends Controller
         $numbers['current_dayOfMonth']     = $startDate->day;
         $numbers['current_month']          = $startDate->month - 1;
         $numbers['current_year']           = $startDate->year;
-        $bankCashItemsItems                = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->get();
-        $numbers['withdrawsAmount']        = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
-        $numbers['depositsAmount']         = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
-        $numbers['currentAmount']          = $this->calculateCurrentAmount($endDate);
-        $numbers['previousDayAmount']      = $this->calculateCurrentAmount($endDate->addDay(-1));
+        $chequeBookName                    = '';
+        if ($chequeBookId == null) {
+            $bankCashItemsItems = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->get();
+        } else {
+            $bankCashItemsItems = collect(BankCashItem::where('cheque_book_id', $chequeBookId)->get());
+
+            $arr                = collect([new BankCashItem(['cheque_book_id' => $chequeBookId, 'cheque_number' => 200]), new BankCashItem(['cheque_book_id' => $chequeBookId, 'cheque_number' => 200])]);
+            $bankCashItemsItems = $bankCashItemsItems->merge($arr);
+            $chequeBookName     = BankChequeBook::find($chequeBookId)->name;
+        }
+        $numbers['withdrawsAmount']   = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
+        $numbers['depositsAmount']    = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+        $numbers['currentAmount']     = $this->calculateCurrentAmount($endDate);
+        $numbers['previousDayAmount'] = $this->calculateCurrentAmount($endDate->addDay(-1));
 
         $employees       = Employee::all('id', 'name')->mapWithKeys(function ($emp) {
             return [$emp->id => $emp->name];
@@ -163,18 +119,19 @@ class BankCashController extends Controller
         $bankProfile     = BankProfile::findOrFail($bankId);
 
         return view($viewName)->with([
-                                                        'numbers'         => $numbers,
-                                                        'clients'         => $clients,
-                                                        'employees'       => $employees,
-                                                        'suppliers'       => $suppliers,
-                                                        'expenses'        => $expenses,
-                                                        'bankCashItems'   => $bankCashItemsItems,
-                                                        'chequeStatuses'  => $chequeStatuses,
-                                                        'canEdit'         => $canEdit,
-                                                        'employeeActions' => $employeeActions,
-                                                        'bankId'          => $bankId,
-                                                        'bankName'        => $bankProfile->name
-                                                    ]);
+                                         'numbers'         => $numbers,
+                                         'clients'         => $clients,
+                                         'employees'       => $employees,
+                                         'suppliers'       => $suppliers,
+                                         'expenses'        => $expenses,
+                                         'bankCashItems'   => $bankCashItemsItems,
+                                         'chequeStatuses'  => $chequeStatuses,
+                                         'canEdit'         => $canEdit,
+                                         'employeeActions' => $employeeActions,
+                                         'bankId'          => $bankId,
+                                         'bankName'        => $bankProfile->name,
+                                         'chequeBookName'  => $chequeBookName
+                                     ]);
     }
 
     private function calculateCurrentAmount($endDate = null, $startDate = '2000-01-01 00:00:00')
@@ -186,6 +143,60 @@ class BankCashController extends Controller
         $withdrawValue = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
         $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
         return round(($depositValue + $openingAmount) - $withdrawValue, Helpers::getDecimalPointCount());
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @param $bankId
+     * @return \Illuminate\Http\Response
+     * @Get("/{chequeBookId}/index", as="bankCash.chequeBooks")
+     */
+    public function chequeBooks($bankId, $chequeBookId)
+    {
+        $startDate = DateTime::today()->startOfDay();
+        $endDate   = DateTime::today()->endOfDay();
+        if (auth()->user()->hasRole('admin')) {
+            return $this->getBankCashItem($startDate, $endDate, 1, $bankId, $chequeBookId, 'cash.journal.cheque-book');
+        } else {
+            return $this->getBankCashItem($startDate, $endDate, 0, $bankId, $chequeBookId, 'cash.journal.cheque-book');
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @param $bankId
+     * @return \Illuminate\Http\Response
+     * @Get("/deposit-cheque", as="bankCash.depositChequeBook")
+     */
+    public function depositChequeBook($bankId)
+    {
+        $startDate = DateTime::today()->startOfDay();
+        $endDate   = DateTime::today()->endOfDay();
+        if (auth()->user()->hasRole('admin')) {
+            return $this->getBankCashItem($startDate, $endDate, 1, $bankId, null, 'cash.journal.deposit-cheque');
+        } else {
+            return $this->getBankCashItem($startDate, $endDate, 0, $bankId, null, 'cash.journal.deposit-cheque');
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @param $bankId
+     * @return \Illuminate\Http\Response
+     * @Get("/withdraw-cheque", as="bankCash.withdrawChequeBook")
+     */
+    public function withdrawChequeBook($bankId)
+    {
+        $startDate = DateTime::today()->startOfDay();
+        $endDate   = DateTime::today()->endOfDay();
+        if (auth()->user()->hasRole('admin')) {
+            return $this->getBankCashItem($startDate, $endDate, 1, $bankId, null, 'cash.journal.withdraw-cheque');
+        } else {
+            return $this->getBankCashItem($startDate, $endDate, 0, $bankId, null, 'cash.journal.withdraw-cheque');
+        }
     }
 
     /**

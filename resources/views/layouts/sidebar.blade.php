@@ -88,7 +88,7 @@
 
             @if(Entrust::ability('admin', 'manage-bank-profile'))
                 <li>
-                    <a href="client-processes"><i class="fa fa-edit fa-fw"></i>إدارة البنوك<span
+                    <a href="client-processes"><i class="fa fa-bank fa-fw"></i>إدارة البنوك<span
                                 class="fa arrow"></span></a>
                     <ul class="nav nav-second-level collapse">
                         <li><a href="{{ route('bank-profile.index') }}">الكل</a></li>
@@ -162,18 +162,6 @@
                         <li><a href="{{ route('invoice.index') }}">الكل</a></li>
                         <li><a href="{{ route('invoice.create') }}">أضف جديد</a></li>
                     </ul>
-                </li>
-            @endif
-
-            @if(Entrust::ability('admin', ''))
-                <li>
-                    <a href="#"><i class="fa fa-bank fa-fw"></i> بنك جديد</a>
-                </li>
-                <li>
-                    <a href="#"><i class="fa fa-briefcase fa-fw"></i> وارد منصرف بنك</a>
-                </li>
-                <li>
-                    <a href=#"><i class="fa fa-list-alt fa-fw"></i> دراسة جدوى العملية</a>
                 </li>
             @endif
 
