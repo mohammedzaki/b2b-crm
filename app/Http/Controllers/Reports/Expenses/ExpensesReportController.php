@@ -55,7 +55,7 @@ class ExpensesReportController extends Controller {
             if ($request->ch_detialed == TRUE) {
                 $index = 0;
                 $expenses[$id]['expenseDetails'] = [];
-                foreach ($expense->paidItems as $item) {
+                foreach ($expense->paidItems() as $item) {
                     $expenses[$id]['expenseDetails'][$index]['desc'] = $item->recordDesc;
                     $expenses[$id]['expenseDetails'][$index]['paid'] = $item->withdrawValue;
                     $expenses[$id]['expenseDetails'][$index]['date'] = $item->due_date;
