@@ -1,13 +1,13 @@
 <?php
 
-namespace App\Reports\Process;
+namespace App\Reports\V2\Process;
 
+use App\Extensions\DateTime;
 use App\Helpers\Helpers;
 use App\Models\Client;
 use App\Models\ClientProcess;
-use App\Reports\BaseReport;
-use App\Reports\IReport;
-use Debugbar;
+use App\Reports\V2\BaseReport;
+use App\Reports\V2\IReport;
 
 class CostCenter extends BaseReport implements IReport
 {
@@ -23,17 +23,25 @@ class CostCenter extends BaseReport implements IReport
         $totalProcessExpenses,
         $totalCompanyExpenses;
 
-    public function setReportRefs()
+    public function __construct($withLetterHead = true, $clientId = null, $processIds = null)
     {
-        $this->reportName  = 'CostCenter.pdf';
-        $this->previewView = 'reports.process.cost-center.preview';
-        $this->pdfView     = 'reports.process.cost-center.pdf';
-        $this->cssPath     = 'ReportsHtml/Process/CostCenter.css';
+        parent::__construct($withLetterHead);
+        $this->processIds = $processIds;
+        $this->clientId   = $clientId;
     }
 
-    public function reportData()
+    public function setReportRefs()
+    {
+        $this->reportName       = 'Cost_Center_Report';
+        $this->reportView       = 'reports.process.cost-center.preview';
+        $this->cssPath          = 'reports/css/process/cost-center.css';
+        $this->printRouteAction = 'reports.process.costCenter.printPDF';
+    }
+
+    public function getReportData($withUserLog = false)
     {
         $this->client = Client::findOrFail($this->clientId);
+        $date         = DateTime::todayDateformat();
         foreach ($this->processIds as $processId) {
             $process                       = ClientProcess::findOrFail($processId);
             $this->processes[$process->id] = [
@@ -53,11 +61,11 @@ class CostCenter extends BaseReport implements IReport
             $this->resetTotals();
         }
         $data = [
-            'clientName'     => $this->client->name,
-            'processes'      => $this->processes,
-            'showLetterHead' => $this->withLetterHead ? 'on' : 'off',
+            'clientName'  => $this->client->name,
+            'date'        => $date,
+            'withUserLog' => $withUserLog,
+            'processes'   => $this->processes
         ];
-        Debugbar::info($data);
         return $data;
     }
 
@@ -91,15 +99,20 @@ class CostCenter extends BaseReport implements IReport
 
     private function getManpowerHoursCost(ClientProcess $process)
     {
-        $manpowerCost                 = $process->manpowerCost->map(function ($item, $key) {
-            return [
-                'name'       => $item->employee->name,
-                'totalHours' => Helpers::hoursMinutsToString($item->working_hours_in_seconds),
-                'totalDays'  => $item->totalDays,
-                'hourRate'   => $item->employee->salaryPerHour(),
-                'totalCost'  => round($item->employee->salaryPerSecond() * $item->working_hours_in_seconds, Helpers::getDecimalPointCount()),
-            ];
-        });
+        $manpowerCost = $process->manpowerCost
+            ->each(function ($item) {
+                $item->working_hours_in_seconds = $item->workingHoursToSeconds();
+            })
+            ->groupBy('employee_id')
+            ->map(function ($gg) {
+                return [
+                    'name'       => $gg->first()->employee->name,
+                    'totalHours' => Helpers::hoursMinutsToString($gg->sum('working_hours_in_seconds')),
+                    'totalDays'  => $gg->count(),
+                    'hourRate'   => $gg->first()->employee->salaryPerHour(),
+                    'totalCost'  => round($gg->first()->employee->salaryPerSecond() * $gg->sum('working_hours_in_seconds'), Helpers::getDecimalPointCount()),
+                ];
+            });
         $this->totalManpowerHoursCost = $manpowerCost->sum('totalCost');
         return $manpowerCost;
     }
@@ -136,5 +149,4 @@ class CostCenter extends BaseReport implements IReport
         $this->totalProcessExpenses   = 0;
         $this->totalCompanyExpenses   = 0;
     }
-
 }

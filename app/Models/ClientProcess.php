@@ -158,12 +158,12 @@ class ClientProcess extends Model {
     }
 
     public function manpowerCost() {
-        return $this->hasMany(Attendance::class, 'process_id')
-                ->select(
-                        'employee_id', 
-                        DB::raw('count(employee_id) as totalDays'), 
-                        DB::raw('SUM(working_hours_in_seconds) as working_hours_in_seconds'))
-                ->groupBy('employee_id');
+        return $this->hasMany(Attendance::class, 'process_id');
+//                ->select(
+//                        'employee_id',
+//                        DB::raw('count(employee_id) as totalDays'),
+//                        DB::raw('SUM(working_hours_in_seconds) as working_hours_in_seconds'))
+//                ->groupBy('employee_id');
     }
 
     public function companyExpences() {

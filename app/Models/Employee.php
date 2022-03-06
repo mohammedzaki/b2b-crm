@@ -188,22 +188,30 @@ class Employee extends Model
         return $borrows;
     }
 
-    public function salaryPerSecond()
+    public function salaryPerSecond($date = null)
     {
-        return round(($this->salaryPerMinute() / 60), Helpers::getDecimalPointCount());
+        return round(($this->salaryPerMinute($date) / 60), Helpers::getDecimalPointCount());
     }
 
-    public function salaryPerMinute()
+    public function salaryPerMinute($date = null)
     {
-        return round(($this->salaryPerHour() / 60), Helpers::getDecimalPointCount());
+        return round(($this->salaryPerHour($date) / 60), Helpers::getDecimalPointCount());
     }
 
-    public function salaryPerHour()
+    public function salaryPerHour($date = null)
     {
-        if ($this->daily_salary > 0) {
-            return round(($this->daily_salary / $this->working_hours), Helpers::getDecimalPointCount());
+        if ($date == null) {
+            if ($this->daily_salary > 0) {
+                return round(($this->daily_salary / $this->working_hours), Helpers::getDecimalPointCount());
+            } else {
+                return round(($this->currentJobProfile->daily_salary / $this->currentJobProfile->working_hours), Helpers::getDecimalPointCount());
+            }
         } else {
-            return round(($this->currentJobProfile->daily_salary / $this->currentJobProfile->working_hours), Helpers::getDecimalPointCount());
+            if ($this->daily_salary > 0) {
+                return round(($this->daily_salary / $this->working_hours), Helpers::getDecimalPointCount());
+            } else {
+                return round(($this->currentJobProfile->daily_salary / $this->currentJobProfile->working_hours), Helpers::getDecimalPointCount());
+            }
         }
     }
 

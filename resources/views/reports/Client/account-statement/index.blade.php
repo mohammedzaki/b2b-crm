@@ -115,36 +115,7 @@
                                 </tr>
                                 </thead>
                                 <tbody id="grid_ClientProcess">
-                                <!--
-                                <tr class="gradeA odd ItemRow" role="row">
-                                    <td style="text-align:center; vertical-align: middle;">
-                                        {{ Form::checkbox("processChoice", "1", null,
-                                                                array(
-                                                                    "class" => "",
-                                                                    "id" => "processChoice")
-                                                        )
-                                        }}
-                                        </td>
-                                        <td>
-{{ Form::text("processName", null,
-                                                                array(
-                                                                    "class" => "form-control",
-                                                                    "id" => "processName",
-                                                                    "disabled" => "disabled")
-                                                                )
-                                        }}
-                                        </td>
-                                        <td>
-{{ Form::text("processTotal", null,
-                                                                array(
-                                                                    "class" => "form-control",
-                                                                    "id" => "processTotal",
-                                                                    "disabled" => "disabled")
-                                                                )
-                                        }}
-                                        </td>
-                                    </tr>
--->
+
                                 </tbody>
                             </table>
                         </div>
