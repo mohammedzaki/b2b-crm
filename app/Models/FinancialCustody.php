@@ -82,7 +82,7 @@ class FinancialCustody extends Model
 
     public function totalRefundedDeposits()
     {
-        return $this->refundedDeposits()->sum('depositValue');
+        return $this->refundedDeposits()->sum('depositValue') + $this->totalWithdraws();
     }
 
     public function refundedDeposits()
