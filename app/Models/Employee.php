@@ -96,6 +96,13 @@ class Employee extends Model
             'deleted_at_id'
         ];
 
+    public static function allAsList()
+    {
+        return static::all('id', 'name')->mapWithKeys(function ($emp) {
+            return [$emp->id => $emp->name];
+        });
+    }
+
     public function users()
     {
         return $this->hasMany(User::class, 'employee_id');

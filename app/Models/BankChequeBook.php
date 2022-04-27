@@ -39,4 +39,19 @@ class BankChequeBook extends Model
     {
         return 0;
     }
+
+    public function getBankCashItemsItems()
+    {
+        $bankCashItemsItems = collect(BankCashItem::where('cheque_book_id', $this->id)->get());
+        $allBankCashItemsItems = collect();
+        for ($i = $this->start_number; $i < $this->end_number; $i++)
+        {
+            $item = $bankCashItemsItems->where('cheque_number', $i)->first();
+            if(empty($item))
+                $allBankCashItemsItems->push(new BankCashItem(['cheque_book_id' => $this->id, 'cheque_number' => $i]));
+            else
+                $allBankCashItemsItems->push($item);
+        }
+        return $allBankCashItemsItems;
+    }
 }

@@ -63,6 +63,9 @@ class Client extends Model
             'is_client_company'
         ];
 
+    /**
+     * @return Client[]|\Illuminate\Database\Eloquent\Collection
+     */
     public static function allHasOpenProcess()
     {
         $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
@@ -72,6 +75,9 @@ class Client extends Model
         return $clients;
     }
 
+    /**
+     * @return Client[]|\Illuminate\Database\Eloquent\Collection
+     */
     public static function allHasUnBilledInvoiceProcess()
     {
         $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
@@ -85,6 +91,9 @@ class Client extends Model
         return $clients;
     }
 
+    /**
+     * @return Client[]|\Illuminate\Database\Eloquent\Collection
+     */
     public static function allHasInvoiceProcess()
     {
         $clients = Client::join('client_processes', 'client_processes.client_id', '=', 'clients.id')
@@ -96,6 +105,29 @@ class Client extends Model
                          ->distinct()
                          ->get();
         return $clients;
+    }
+
+    /**
+     * @return Client[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function allAsList()
+    {
+        return Client::all()->mapWithKeys(function ($client) {
+            return [
+                $client->id => [
+                    'name'           => $client->name,
+                    'hasOpenProcess' => $client->hasOpenProcess(),
+                    'processes'      => $client->processes->mapWithKeys(function ($process) {
+                        return [
+                            $process->id => [
+                                'name'   => $process->name,
+                                'status' => $process->status
+                            ]
+                        ];
+                    })
+                ]
+            ];
+        });
     }
 
     public function unInvoiceProcesses()

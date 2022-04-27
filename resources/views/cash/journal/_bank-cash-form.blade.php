@@ -320,7 +320,7 @@
                                                                     array(
                                                                         "class" => "form-control cheque_number",
                                                                         "id" => "",
-                                                                        "style" => "width:85px;",
+                                                                        "style" => "width:150px;",
                                                                         "onchange" => "AddNewRow(this)",
                                                                         "onblur" => "OnRowLeave(this)",
                                                                         "onfocus" => "OnRowFocus(this)")
@@ -372,6 +372,7 @@
                                             </tr>
                                         @empty
                                         @endforelse
+                                        @if(empty($canAddRow))
                                         <tr class="gradeA odd ItemRow" role="row">
                                             <td class="handle-checkDelete">
                                                 <input type="checkbox" value="" class="checkDelete">
@@ -560,7 +561,7 @@
                                                                 array(
                                                                     "class" => "form-control cheque_number",
                                                                     "id" => "",
-                                                                    "style" => "width:85px;",
+                                                                    "style" => "width:150px;",
                                                                     "onchange" => "AddNewRow(this)",
                                                                     "onblur" => "OnRowLeave(this)",
                                                                     "onfocus" => "OnRowFocus(this)")
@@ -609,6 +610,7 @@
                                                        value="0">
                                             </td>
                                         </tr>
+                                        @endif
                                         </tbody>
                                     </table>
                                     <input type="hidden" id="canEdit" name="canEdit" value="{{ $canEdit }}"/>
@@ -659,17 +661,12 @@
             depositsAmount, cashing_date, is_paid;
         var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
         var loadAll = false;
-
+        var canAddRow = @if(empty($canAddRow)) true; @else {!! $canAddRow !!}; @endif
         LockAll();
         SetFinancialCustodyDetailsProcess();
         currentAmount = $("#currentAmount");
         withdrawsAmount = $("#withdrawsAmount");
         depositsAmount = $("#depositsAmount");
-
-        function loadAllProcessAndClients() {
-            loadAll = $("#loadAllProcessAndClients").prop("checked");
-            SetFinancialCustodyDetailsProcess();
-        }
 
         function LoadProcess(rowIndex) {
             client_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .client_id');
@@ -677,6 +674,7 @@
             cbo_processes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cbo_processes');
             employee_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .employee_id');
             expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
+            cheque_number = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_number');
             cbo_processesVal = cbo_processes.val();
             expenses_idVal = expenses_id.val();
             client_idVal = client_id.val();
@@ -689,6 +687,10 @@
             client_id.append($("<option></option>"));
             supplier_id.empty();
             supplier_id.append($("<option></option>"));
+            @if(!empty($chequeBookId))
+                cheque_number.attr("disabled", "disabled");
+            @endif
+
             if (client_idVal > 0) {
                 $.each(clients, function (clientId, client) {
                     if (clientId === client_idVal) {
@@ -706,6 +708,11 @@
                         if (process.status === 'active' || loadAll) {
                             cbo_processes.append($("<option></option>").attr("value", processId).text(process.name));
                         }
+                    }
+                });
+                $.each(suppliers, function (supplierId, supplier) {
+                    if (supplier.hasOpenProcess || loadAll) {
+                        supplier_id.append($("<option></option>").attr("value", supplierId).text(supplier.name));
                     }
                 });
             } else if (supplier_idVal > 0) {
@@ -727,10 +734,25 @@
                         }
                     }
                 });
+                $.each(clients, function (clientId, client) {
+                    if (client.hasOpenProcess || loadAll) {
+                        client_id.append($("<option></option>").attr("value", clientId).text(client.name));
+                    }
+                });
+            } else {
+                $.each(clients, function (clientId, client) {
+                    if (client.hasOpenProcess || loadAll) {
+                        client_id.append($("<option></option>").attr("value", clientId).text(client.name));
+                    }
+                });
+                $.each(suppliers, function (supplierId, supplier) {
+                    if (supplier.hasOpenProcess || loadAll) {
+                        supplier_id.append($("<option></option>").attr("value", supplierId).text(supplier.name));
+                    }
+                });
             }
             if (employee_id.val() > 0) {
                 $.each(employeeActions, function (i, employeeAction) {
-                    console.log(employeeAction.id, expenses_idVal, (employeeAction.id === expenses_idVal));
                     if (employeeAction.id == expenses_idVal) {
                         expenses_id.append('<option selected value="' + employeeAction.id + '">' + employeeAction.name + '</option>');
                     } else {
@@ -746,11 +768,18 @@
                     }
                 });
             }
+            $(".datepickerCommon").flatpickr({
+                enableTime: false,
+                //maxDate: new Date(),
+                altInput: true,
+                altFormat: "l, j F, Y",
+                locale: "ar"
+            });
         }
 
         function SetFinancialCustodyDetailsProcess() {
             var rowsCount = $('#grid_FinancialCustodyDetails').children().length;
-            for (var rowIndex = 0; rowIndex < rowsCount - 1; rowIndex++) {
+            for (var rowIndex = 0; rowIndex < rowsCount; rowIndex++) {
                 LoadProcess(rowIndex);
             }
         }
@@ -995,7 +1024,6 @@
                         if (data.success) {
                             saveStatus.val(1);
                             $.each(rowsIndexs, function (arrIndex, rowIndex) {
-                                console.log(rowIndex);
                                 saveStatus = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .saveStatus');
                                 saveStatus.val(2);
                                 SetRowReadonly(rowIndex);
@@ -1025,7 +1053,7 @@
 
         function AddNewRow(CellChildInput) {
             SetCurrentRowIndex(CellChildInput);
-            if ($(AfterCurrentRow).hasClass("ItemRow") === false) {
+            if ($(AfterCurrentRow).hasClass("ItemRow") === false && canAddRow) {
                 $("#bankCashTable").append('<tr class="gradeA odd ItemRow" role="row"> ' +
                     '<td class="handle-checkDelete"> <input type="checkbox" value="" class="checkDelete"> </td>' +
 
@@ -1047,7 +1075,7 @@
 
                     '<td class="handle-cashing_date"> <div class="form-group{{ $errors->has("cashing_date") ? " has-error" : "" }}"> {{ Form::text("cashing_date", null, array("class" => "form-control datepickerCommon cashing_date", "id" => "", "style" => "width:85px;", "onchange" => "AddNewRow(this)", "onblur" => "OnRowLeave(this)", "onfocus" => "OnRowFocus(this)") ) }} @if ($errors->has("cashing_date")) <label for="inputError" class="control-label"> {{ $errors->first("cashing_date") }} </label> @endif </div> </td>' +
 
-                    '<td class="handle-cheque_number"> <div class="form-group{{$errors->has("cheque_number") ? " has-error" : ""}}">{{Form::text("cheque_number", null, array( "class"=> "form-control cheque_number", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cheque_number")) <label for="inputError" class="control-label">{{$errors->first("cheque_number")}}</label> @endif </div></td> ' +
+                    '<td class="handle-cheque_number"> <div class="form-group{{$errors->has("cheque_number") ? " has-error" : ""}}">{{Form::text("cheque_number", null, array( "class"=> "form-control cheque_number", "id"=> "", "style"=> "width:150px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cheque_number")) <label for="inputError" class="control-label">{{$errors->first("cheque_number")}}</label> @endif </div></td> ' +
 
                     '<td class="handle-cheque_status"> <div class="form-group{{$errors->has("cheque_status") ? " has-error" : ""}}">{{Form::select("cheque_status", $chequeStatuses, null, array( "class"=> "form-control cheque_status", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cheque_status")) <label for="inputError" class="control-label">{{$errors->first("cheque_status")}}</label> @endif </div></td> ' +
 
@@ -1059,7 +1087,7 @@
 
                     '</tr>');
                 var rowIndex = $("#bankCashTable tr").length - 3;
-                console.log(rowIndex);
+                //console.log('rowIndex: ' + rowIndex + ', ' + 'currentRowIndex: ' + currentRowIndex);
                 client_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .client_id');
                 supplier_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .supplier_id');
                 client_id.empty();
@@ -1116,7 +1144,9 @@
                     $.each(expenses, function (i, expense) {
                         expenses_id.append('<option value="' + expense.id + '">' + expense.name + '</option>');
                     });
-                    cheque_number.attr("disabled", "disabled");
+                    @if(!empty($chequeBookId))
+                        cheque_number.attr("disabled", "disabled");
+                    @endif
                     break;
                 case "recordDesc":
                     break;

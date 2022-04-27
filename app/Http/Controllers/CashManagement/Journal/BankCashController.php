@@ -59,6 +59,14 @@ class BankCashController extends Controller
 
     private function getBankCashItem(DateTime $startDate, DateTime $endDate, $canEdit, $bankId, $chequeBookId = null, $viewName = 'cash.journal.bank-cash')
     {
+        if ($chequeBookId == null) {
+            $bankCashItemsItems = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->get();
+            $chequeBookName     = '';
+        } else {
+            $chequeBook         = BankChequeBook::find($chequeBookId);
+            $chequeBookName     = $chequeBook->name;
+            $bankCashItemsItems = $chequeBook->getBankCashItemsItems();
+        }
         $numbers['clients_number']         = Client::count();
         $numbers['suppliers_number']       = Supplier::count();
         $numbers['process_number']         = ClientProcess::count();
@@ -67,57 +75,17 @@ class BankCashController extends Controller
         $numbers['current_dayOfMonth']     = $startDate->day;
         $numbers['current_month']          = $startDate->month - 1;
         $numbers['current_year']           = $startDate->year;
-        $chequeBookName                    = '';
-        if ($chequeBookId == null) {
-            $bankCashItemsItems = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->get();
-        } else {
-            $bankCashItemsItems = collect(BankCashItem::where('cheque_book_id', $chequeBookId)->get());
-
-            $arr                = collect([new BankCashItem(['cheque_book_id' => $chequeBookId, 'cheque_number' => 200]), new BankCashItem(['cheque_book_id' => $chequeBookId, 'cheque_number' => 200])]);
-            $bankCashItemsItems = $bankCashItemsItems->merge($arr);
-            $chequeBookName     = BankChequeBook::find($chequeBookId)->name;
-        }
-        $numbers['withdrawsAmount']   = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
-        $numbers['depositsAmount']    = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
-        $numbers['currentAmount']     = $this->calculateCurrentAmount($endDate);
-        $numbers['previousDayAmount'] = $this->calculateCurrentAmount($endDate->addDay(-1));
-
-        $employees       = Employee::all('id', 'name')->mapWithKeys(function ($emp) {
-            return [$emp->id => $emp->name];
-        });
-        $expenses        = Expenses::all('id', 'name');
-        $clients         = Client::all()->mapWithKeys(function ($client) {
-            return [$client->id => [
-                'name'           => $client->name,
-                'hasOpenProcess' => $client->hasOpenProcess(),
-                'processes'      => $client->processes->mapWithKeys(function ($process) {
-                    return [$process->id => [
-                        'name'   => $process->name,
-                        'status' => $process->status
-                    ]
-                    ];
-                })
-            ]
-            ];
-        });
-        $suppliers       = Supplier::all()->mapWithKeys(function ($supplier) {
-            return [$supplier->id => [
-                'name'           => $supplier->name,
-                'hasOpenProcess' => $supplier->hasOpenProcess(),
-                'processes'      => $supplier->processes->mapWithKeys(function ($process) {
-                    return [$process->id => [
-                        'name'   => $process->name,
-                        'status' => $process->status
-                    ]
-                    ];
-                })
-            ]
-            ];
-        });
-        $chequeStatuses  = ChequeStatuses::all();
-        $employeeActions = collect(EmployeeActions::all())->toJson();
-        $bankProfile     = BankProfile::findOrFail($bankId);
-
+        $numbers['withdrawsAmount']        = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
+        $numbers['depositsAmount']         = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+        $numbers['currentAmount']          = $this->calculateCurrentAmount($endDate);
+        $numbers['previousDayAmount']      = $this->calculateCurrentAmount($endDate->addDay(-1));
+        $employees                         = Employee::allAsList();
+        $expenses                          = Expenses::all('id', 'name');
+        $clients                           = Client::allAsList();
+        $suppliers                         = Supplier::allAsList();
+        $chequeStatuses                    = ChequeStatuses::all();
+        $employeeActions                   = collect(EmployeeActions::all())->toJson();
+        $bankProfile                       = BankProfile::findOrFail($bankId);
         return view($viewName)->with([
                                          'numbers'         => $numbers,
                                          'clients'         => $clients,
@@ -130,7 +98,8 @@ class BankCashController extends Controller
                                          'employeeActions' => $employeeActions,
                                          'bankId'          => $bankId,
                                          'bankName'        => $bankProfile->name,
-                                         'chequeBookName'  => $chequeBookName
+                                         'chequeBookName'  => $chequeBookName,
+                                         'chequeBookId'    => $chequeBookId
                                      ]);
     }
 

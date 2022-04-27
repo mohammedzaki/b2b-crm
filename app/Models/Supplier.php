@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use DB;
 
 /**
  * App\Models\Supplier
@@ -52,13 +51,39 @@ class Supplier extends Model
             'debit_limit'
         ];
 
+    /**
+     * @return Supplier[]|\Illuminate\Database\Eloquent\Collection
+     */
     public static function allHasOpenProcess()
     {
-        $suppliers = Supplier::join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
+        $suppliers = static::join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
                              ->select('suppliers.*')->where('supplier_processes.status', SupplierProcess::statusOpened)
                              ->distinct()
                              ->get();
         return $suppliers;
+    }
+
+    /**
+     * @return Supplier[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function allAsList()
+    {
+        return static::all()->mapWithKeys(function ($supplier) {
+            return [
+                $supplier->id => [
+                    'name'           => $supplier->name,
+                    'hasOpenProcess' => $supplier->hasOpenProcess(),
+                    'processes'      => $supplier->processes->mapWithKeys(function ($process) {
+                        return [
+                            $process->id => [
+                                'name'   => $process->name,
+                                'status' => $process->status
+                            ]
+                        ];
+                    })
+                ]
+            ];
+        });
     }
 
     public function closedProcess()
@@ -126,5 +151,4 @@ class Supplier extends Model
         }
         return $total;
     }
-
 }
