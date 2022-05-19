@@ -32,6 +32,13 @@ class BankProfile extends Model
             'branch_address'
         ];
 
+    public static function allAsList()
+    {
+        return static::all('id', 'name')->mapWithKeys(function ($bank) {
+            return [$bank->id => $bank->name];
+        });
+    }
+
     public function cashItems()
     {
         return $this->hasMany(BankCashItem::class, 'bank_profile_id');

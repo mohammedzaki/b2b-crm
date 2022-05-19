@@ -34,7 +34,7 @@ use Illuminate\Http\Response;
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
  *
- * @Controller(prefix="/bank-cash/{bankId}")
+ * @Controller(prefix="/bank-cash")
  * @Middleware({"web", "auth", "ability:admin,bank-cash"})
  */
 class BankCashController extends Controller
@@ -42,30 +42,54 @@ class BankCashController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param $bankId
+     * @param Request $request
      * @return \Illuminate\Http\Response
      * @Get("", as="bankCash.index")
      */
-    public function index($bankId)
+    public function index(Request $request)
     {
         $startDate = DateTime::today()->startOfDay();
         $endDate   = DateTime::today()->endOfDay();
         if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $bankId);
+            return $this->getBankCashItem($startDate, $endDate, 1, $request->bankId);
         } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $bankId);
+            return $this->getBankCashItem($startDate, $endDate, 0, $request->bankId);
         }
     }
 
-    private function getBankCashItem(DateTime $startDate, DateTime $endDate, $canEdit, $bankId, $chequeBookId = null, $viewName = 'cash.journal.bank-cash')
+    private function getBankCashItem(DateTime $startDate, DateTime $endDate, $canEdit, $bankId, $chequeBookId = null, $viewName = 'cash.journal.bank-cash', $dwField = null)
     {
+        $banks = BankProfile::allAsList();
+        if ($bankId == null) {
+            return view($viewName)->with([
+                                             'banks'  => $banks,
+                                             'bankId' => $bankId
+                                         ]);
+        }
         if ($chequeBookId == null) {
-            $bankCashItemsItems = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->get();
-            $chequeBookName     = '';
+            if (!empty($dwField)) {
+                $bankCashItemsItems = BankCashItem::whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED])
+                                                  ->whereNotNull($dwField)->get();
+            } else {
+                $bankCashItemsItems = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->get();
+            }
+            $chequeBookName = '';
         } else {
             $chequeBook         = BankChequeBook::find($chequeBookId);
             $chequeBookName     = $chequeBook->name;
             $bankCashItemsItems = $chequeBook->getBankCashItemsItems();
+        }
+        switch ($viewName) {
+            case "cash.journal.cheque-book":
+            case "cash.journal.withdraw-cheque":
+                $chequeStatuses = ChequeStatuses::withdrawStatuses();
+                break;
+            case "cash.journal.deposit-cheque":
+                $chequeStatuses = ChequeStatuses::depositStatuses();
+                break;
+            default:
+                $chequeStatuses = ChequeStatuses::all();
+                break;
         }
         $numbers['clients_number']         = Client::count();
         $numbers['suppliers_number']       = Supplier::count();
@@ -83,10 +107,10 @@ class BankCashController extends Controller
         $expenses                          = Expenses::all('id', 'name');
         $clients                           = Client::allAsList();
         $suppliers                         = Supplier::allAsList();
-        $chequeStatuses                    = ChequeStatuses::all();
         $employeeActions                   = collect(EmployeeActions::all())->toJson();
         $bankProfile                       = BankProfile::findOrFail($bankId);
         return view($viewName)->with([
+                                         'banks'           => $banks,
                                          'numbers'         => $numbers,
                                          'clients'         => $clients,
                                          'employees'       => $employees,
@@ -117,54 +141,55 @@ class BankCashController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @param $bankId
+     * @param Request $request
+     * @param $chequeBookId
      * @return \Illuminate\Http\Response
      * @Get("/{chequeBookId}/index", as="bankCash.chequeBooks")
      */
-    public function chequeBooks($bankId, $chequeBookId)
+    public function chequeBooks(Request $request, $chequeBookId)
     {
         $startDate = DateTime::today()->startOfDay();
         $endDate   = DateTime::today()->endOfDay();
         if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $bankId, $chequeBookId, 'cash.journal.cheque-book');
+            return $this->getBankCashItem($startDate, $endDate, 1, $request->bankId, $chequeBookId, 'cash.journal.cheque-book');
         } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $bankId, $chequeBookId, 'cash.journal.cheque-book');
+            return $this->getBankCashItem($startDate, $endDate, 0, $request->bankId, $chequeBookId, 'cash.journal.cheque-book');
         }
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @param $bankId
+     * @param Request $request
      * @return \Illuminate\Http\Response
      * @Get("/deposit-cheque", as="bankCash.depositChequeBook")
      */
-    public function depositChequeBook($bankId)
+    public function depositChequeBook(Request $request)
     {
         $startDate = DateTime::today()->startOfDay();
         $endDate   = DateTime::today()->endOfDay();
         if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $bankId, null, 'cash.journal.deposit-cheque');
+            return $this->getBankCashItem($startDate, $endDate, 1, $request->bankId, null, 'cash.journal.deposit-cheque', 'depositValue');
         } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $bankId, null, 'cash.journal.deposit-cheque');
+            return $this->getBankCashItem($startDate, $endDate, 0, $request->bankId, null, 'cash.journal.deposit-cheque', 'depositValue');
         }
     }
 
     /**
      * Display a listing of the resource.
      *
-     * @param $bankId
+     * @param Request $request
      * @return \Illuminate\Http\Response
      * @Get("/withdraw-cheque", as="bankCash.withdrawChequeBook")
      */
-    public function withdrawChequeBook($bankId)
+    public function withdrawChequeBook(Request $request)
     {
         $startDate = DateTime::today()->startOfDay();
         $endDate   = DateTime::today()->endOfDay();
         if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $bankId, null, 'cash.journal.withdraw-cheque');
+            return $this->getBankCashItem($startDate, $endDate, 1, $request->bankId, null, 'cash.journal.withdraw-cheque', 'withdrawValue');
         } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $bankId, null, 'cash.journal.withdraw-cheque');
+            return $this->getBankCashItem($startDate, $endDate, 0, $request->bankId, null, 'cash.journal.withdraw-cheque', 'withdrawValue');
         }
     }
 
@@ -176,7 +201,7 @@ class BankCashController extends Controller
      * @throws ValidationException
      * @Post("", as="bankCash.store")
      */
-    public function store(Request $request, $bankId)
+    public function store(Request $request)
     {
         $request['user_id'] = auth()->user()->id;
         DB::beginTransaction();
@@ -400,14 +425,14 @@ class BankCashController extends Controller
      * @Get("/search", as="bankCash.search")
      * @Middleware({"ability:admin,bank-cash-edit"})
      */
-    public function search(Request $request, $id)
+    public function search(Request $request)
     {
         $startDate = DateTime::parse($request['targetdate'])->startOfDay();
         $endDate   = DateTime::parse($request['targetdate'])->endOfDay();
         if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $id);
+            return $this->getBankCashItem($startDate, $endDate, 1, $request->bankId);
         } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $id);
+            return $this->getBankCashItem($startDate, $endDate, 0, $request->bankId);
         }
     }
 
@@ -420,7 +445,7 @@ class BankCashController extends Controller
      * @throws ValidationException
      * @PUT("{id}", as="bankCash.update")
      */
-    public function update(Request $request, $bankId, $id)
+    public function update(Request $request, $id)
     {
         DB::beginTransaction();
         $request->user_id = auth()->user()->id;

@@ -10,6 +10,8 @@
         <link rel="stylesheet" href="/plugins/fullcalendar/main.css">
         <link href="{{ mix('css/app.css') }}" rel="stylesheet">
         @yield('styles')
+        @yield('styles-l1')
+        @yield('styles-l2')
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
         <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
         <!--[if lt IE 9]>

@@ -27,24 +27,6 @@ use Validator;
  */
 class BankProfileController
 {
-
-    protected function validator(array $data, $id = null)
-    {
-        $validator = Validator::make($data, [
-            'name'             => 'required|unique:bank_profiles,name,' . $id . '|min:5|max:255',
-            'statement_number' => 'required',
-            'branch_address'   => 'required'
-        ]);
-
-        $validator->setAttributeNames([
-                                          'name'             => 'اسم البنك',
-                                          'statement_number' => 'رقم الحساب',
-                                          'branch_address'   => 'عنوان الفرع'
-                                      ]);
-
-        return $validator;
-    }
-
     public function index()
     {
         $bankProfiles = BankProfile::all();
@@ -69,6 +51,23 @@ class BankProfileController
         }
     }
 
+    protected function validator(array $data, $id = null)
+    {
+        $validator = Validator::make($data, [
+            'name'             => 'required|unique:bank_profiles,name,' . $id . '|min:5|max:255',
+            'statement_number' => 'required',
+            'branch_address'   => 'required'
+        ]);
+
+        $validator->setAttributeNames([
+                                          'name'             => 'اسم البنك',
+                                          'statement_number' => 'رقم الحساب',
+                                          'branch_address'   => 'عنوان الفرع'
+                                      ]);
+
+        return $validator;
+    }
+
     public function edit($id)
     {
         $bankProfile = BankProfile::with('chequeBooks')->findOrFail($id);
@@ -87,6 +86,32 @@ class BankProfileController
 
             $bankProfile->update($request->all());
             return redirect()->back()->with('success', 'تم تعديل بيانات البنك.');
+        }
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     * @Get("cheque-book", as="bank-profile.chequeBook")
+     */
+    public function chequeBook(Request $request)
+    {
+        $banks = BankProfile::allAsList();
+        if (empty($request->bankId)) {
+            return view('bank-profile.cheque-book')->with([
+                                                              'banks'       => $banks,
+                                                              'bankId'      => null,
+                                                              'bankProfile' => null
+                                                          ]);
+        } else {
+            $bankProfile = BankProfile::with('chequeBooks')->findOrFail($request->bankId);
+            return view('bank-profile.cheque-book')->with([
+                                                              'banks'       => $banks,
+                                                              'bankId'      => $request->bankId,
+                                                              'bankProfile' => $bankProfile
+                                                          ]);
         }
     }
 

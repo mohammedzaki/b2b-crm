@@ -2,24 +2,36 @@
 
 @section('title', 'إصدار شيك منصرف')
 
-@section('form-header', "إصدار شيك منصرف - {$bankName}")
+@if(empty($bankId))
+    @section('form-header', "إصدار شيك منصرف")
+@else
+    @section('form-header', "إصدار شيك منصرف - {$bankName}")
+@endif
+
+@section('select-bank')
+    @include('common.select-bank', ['formConfig' => ['method' => 'GET', 'route' => ['bankCash.withdrawChequeBook', ''], 'id' => 'SearchForm']])
+@endsection
+
+@section("styles-l2")
+    <style>
+        .cell.handle-checkDelete {}
+        .cell.handle-depositValue { display: none; }
+        .cell.handle-withdrawValue {}
+        .cell.handle-recordDesc {}
+        .cell.handle-cbo_processes {}
+        .cell.handle-client_id {}
+        .cell.handle-supplier_id {}
+        .cell.handle-employee_id {}
+        .cell.handle-expenses_id {}
+        .cell.handle-cashing_date {}
+        .cell.handle-cheque_number {}
+        .cell.handle-cheque_status {}
+        .cell.handle-track-user-log {}
+    </style>
+@endsection
 
 @section('content')
-    <style>
-        .handle-checkDelete {}
-        .handle-depositValue { display: none; }
-        .handle-withdrawValue {}
-        .handle-recordDesc {}
-        .handle-cbo_processes {}
-        .handle-client_id {}
-        .handle-supplier_id {}
-        .handle-employee_id {}
-        .handle-expenses_id {}
-        .handle-cashing_date {}
-        .handle-cheque_number {}
-        .handle-cheque_status {}
-        .handle-track-user-log {}
-    </style>
+
     <!-- /.row -->
     @include('cash.journal._bank-cash-form')
 @endsection

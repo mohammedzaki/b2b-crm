@@ -1,32 +1,52 @@
-<style>
-    @media (min-width: 320px) and (max-width: 1440px) {
-        #dataTables-example_wrapper .col-sm-12 form {
-            overflow: auto;
+@section("styles-l1")
+    <style>
+        @media (min-width: 320px) and (max-width: 1440px) {
+            #dataTables-example_wrapper .col-sm-12 form {
+                overflow: auto;
+            }
+
+            .index .dataTables_wrapper .row {
+                margin-bottom: 10px;
+            }
         }
 
-        .index .dataTables_wrapper .row {
-            margin-bottom: 10px;
+        @media (min-width: 320px) and (max-width: 1295px) {
+            #dataTables-example_wrapper .col-sm-12 form {
+                overflow: auto;
+            }
+
+            .index .dataTables_wrapper .row {
+                margin-bottom: 10px;
+            }
         }
-    }
 
-    @media (min-width: 320px) and (max-width: 1295px) {
-        #dataTables-example_wrapper .col-sm-12 form {
-            overflow: auto;
+        tr.InSave {
+
         }
 
-        .index .dataTables_wrapper .row {
-            margin-bottom: 10px;
+        tr.InSave td {
+            background-color: red !important;
         }
-    }
-
-    tr.InSave {
-
-    }
-
-    tr.InSave td {
-        background-color: red !important;
-    }
-</style>
+        #bankCashTable { min-width: 1275px; }
+        .cell .form-group, .cell .form-group .form-control { width: 100%; }
+        .checkDelete { width: 100%; }
+        .cell.handle-checkDelete {width: 20px;}
+        .cell.handle-depositValue { width: 85px;}
+        .cell.handle-withdrawValue { width: 85px;}
+        .cell.handle-recordDesc { width: 85px;}
+        .cell.handle-cbo_processes { width: 85px;}
+        .cell.handle-client_id { width: 85px;}
+        .cell.handle-supplier_id { width: 85px;}
+        .cell.handle-employee_id { width: 85px;}
+        .cell.handle-expenses_id { width: 85px;}
+        .cell.handle-issuing_date { width: 85px;}
+        .cell.handle-cashing_date { width: 85px;}
+        .cell.handle-cheque_number { width: 150px;}
+        .cell.handle-cheque_status { width: 85px;}
+        .cell.handle-cheque_notes { width: 85px;}
+        .cell.handle-track-user-log { width: 85px;}
+    </style>
+@endsection
 
 <div class="row">
     <div class="col-lg-12">
@@ -34,640 +54,731 @@
     </div>
 </div>
 
-<!-- /.row -->
-<div class="row">
-    <div class="col-lg-12">
-        <div class="panel panel-default">
-            <div class="panel-heading">
-                وارد / منصرف - {{ $bankName }}
-            </div>
-            <!-- /.panel-heading -->
-            <div class="panel-body">
-                @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                @endif
+@yield('select-bank')
 
-                @if (session('error'))
-                    <div class="alert alert-danger">
-                        {{ session('error') }}
-                    </div>
-                @endif
-                <div class="row text-center">
-                    <div class="col-sm-6">
-                        <div class="alert alert-info"><label id="clock">Loading...</label></div>
-                        <script type="text/javascript">
-                            function refrClock() {
-                                var d = new Date();
-                                var day = d.getDay();
-                                var date = d.getDate();
-                                var month = d.getMonth();
-                                var year = d.getFullYear();
-                                var days = new Array("الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت");
-                                var months = new Array("يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "اكتوبر", "نوفمبر", "ديسمبر");
-                                document.getElementById("clock").innerHTML = days['{{ $numbers["current_dayOfWeek"] }}'] + " " + '{{ $numbers["current_dayOfMonth"] }}' + " " + months['{{ $numbers["current_month"] }}'] + " " + '{{ $numbers["current_year"] }}';
-                                setTimeout("refrClock()", 1000);
-                            }
-
-                            refrClock();
-                        </script>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="alert alert-danger">
-                            <label>معادلة الارصدة : <span
-                                        id="previousDayAmount">{{ $numbers['previousDayAmount'] }}</span>
-                                جنيه</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="alert alert-info">
-                            <label>الرصيد الحالى : <span id="currentAmount">{{ $numbers['currentAmount'] }}</span>
-                                جنيه</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="alert alert-success">
-                            <label>رصيد الشيكات الاجلة : <span
-                                        id="depositsAmount">{{ $numbers['depositsAmount'] }}</span>
-                                جنيه</label>
-                        </div>
-                    </div>
-                    <div class="col-sm-3">
-                        <div class="alert alert-success">
-                            <label>رصيد الشيكات المنصرفة : <span
-                                        id="withdrawsAmount">{{ $numbers['withdrawsAmount'] }}</span>
-                                جنيه</label>
-                        </div>
-                    </div>
+@if(!empty($bankId))
+    <!-- /.row -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    وارد / منصرف - {{ $bankName }}
                 </div>
-                <div class="table-responsive">
-                    <div class="dataTable_wrapper">
-                        <div id="dataTables-example_wrapper"
-                             class="dataTables_wrapper form-inline dt-bootstrap no-footer">
-
-                            <div class="row">
-                                <div class="col-sm-12">
-                                    {{ Form::open(['route' => ['bankCash.store', $bankId], 'id' => 'bankCashForm', "role" => "form"]) }}
-
-                                    <table class="table table-striped table-bordered table-hover dataTable no-footer"
-                                           id="bankCashTable" role="grid"
-                                           aria-describedby="dataTables-example_info">
-                                        <thead>
-                                        <tr role="row">
-                                            <th class="handle-checkDelete" rowspan="1" colspan="1" style="width:20px;">اختيار</th>
-                                            <th class="handle-depositValue" rowspan="1" colspan="1">وارد</th>
-                                            <th class="handle-withdrawValue" rowspan="1" colspan="1">منصرف</th>
-                                            <th class="handle-recordDesc" rowspan="1" colspan="1">بيان</th>
-                                            <th class="handle-cbo_processes" rowspan="1" colspan="1">اسم العملية</th>
-                                            <th class="handle-client_id" rowspan="1" colspan="1">اسم العميل</th>
-                                            <th class="handle-supplier_id" rowspan="1" colspan="1">اسم المورد</th>
-                                            <th class="handle-employee_id" rowspan="1" colspan="1">اسم الموظف</th>
-                                            <th class="handle-expenses_id" rowspan="1" colspan="1">اسم المصروف</th>
-                                            <th class="handle-cashing_date" rowspan="1" colspan="1">تاريخ الصرف</th>
-                                            <th class="handle-cheque_number" rowspan="1" colspan="1">رقم الشيك</th>
-                                            <th class="handle-cheque_status" rowspan="1" colspan="1">الحالة</th>
-                                            <th class="handle-track-user-log" rowspan="1" colspan="1">السجل</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody id="grid_FinancialCustodyDetails">
-                                        @forelse ($bankCashItems as $bankCashItem)
-                                            <tr class="gradeA odd ItemRow Saved" role="row">
-                                                <td class="handle-checkDelete">
-                                                    <input type="checkbox" value="" class="checkDelete">
-                                                </td>
-                                                <td class="handle-depositValue">
-                                                    <div class="form-group{{ $errors->has("depositValue") ? " has-error" : "" }}">
-                                                        {{ Form::text("depositValue", ($bankCashItem->depositValue > 0 ? $bankCashItem->depositValue : null),
-                                                                    array(
-                                                                        "class" => "form-control IsNumberDecimal depositValue",
-                                                                        "id" => "",
-                                                                        "style" => "width:85px;",
-                                                                        "onchange" => "AddNewRow(this)",
-                                                                        "onblur" => "OnRowLeave(this)",
-                                                                        "onfocus" => "OnRowFocus(this)")
-                                                                    )
-                                                        }}
-                                                        @if ($errors->has("depositValue"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("depositValue") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td class="handle-withdrawValue">
-                                                    <div class="form-group{{ $errors->has("withdrawValue") ? " has-error" : "" }}">
-                                                        {{ Form::text("withdrawValue", ($bankCashItem->withdrawValue > 0 ? $bankCashItem->withdrawValue : null),
-                                                                    array(
-                                                                        "class" => "form-control IsNumberDecimal withdrawValue",
-                                                                        "id" => "",
-                                                                        "style" => "width:85px;",
-                                                                        "onchange" => "AddNewRow(this)",
-                                                                        "onblur" => "OnRowLeave(this)",
-                                                                        "onfocus" => "OnRowFocus(this)")
-                                                                    )
-                                                        }}
-                                                        @if ($errors->has("withdrawValue"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("withdrawValue") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td class="handle-recordDesc">
-                                                    <div class="form-group{{ $errors->has("recordDesc") ? " has-error" : "" }}">
-                                                        {{ Form::text("recordDesc", $bankCashItem->recordDesc,
-                                                                    array(
-                                                                        "class" => "form-control recordDesc",
-                                                                        "id" => "",
-                                                                        "style" => "width:85px;",
-                                                                        "onchange" => "AddNewRow(this)",
-                                                                        "onblur" => "OnRowLeave(this)",
-                                                                        "onfocus" => "OnRowFocus(this)")
-                                                                    )
-                                                        }}
-                                                        @if ($errors->has("recordDesc"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("recordDesc") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td class="handle-cbo_processes">
-                                                    <div class="form-group{{ $errors->has("cbo_processes") ? " has-error" : "" }}">
-                                                        {{ Form::select("cbo_processes", [$bankCashItem->cbo_processes => $bankCashItem->cbo_processes], $bankCashItem->cbo_processes,
-                                                                    array(
-                                                                        "class" => "form-control cbo_processes",
-                                                                        "placeholder" => "",
-                                                                        "id" => "",
-                                                                        "style" => "width:85px;",
-                                                                        "onchange" => "AddNewRow(this)",
-                                                                        "onblur" => "OnRowLeave(this)",
-                                                                        "onfocus" => "OnRowFocus(this)")
-                                                                        )
-                                                        }}
-                                                        @if ($errors->has("cbo_processes"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("cbo_processes") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-
-                                                </td>
-                                                <td class="handle-client_id">
-                                                    <div class="form-group{{ $errors->has("client_id") ? " has-error" : "" }}">
-                                                        {{ Form::select("client_id", [$bankCashItem->client_id => $bankCashItem->client_id], $bankCashItem->client_id,
-                                                            array(
-                                                                "class" => "form-control client_id",
-                                                                "placeholder" => "",
-                                                                "id" => "",
-                                                                "style" => "width:85px;",
-                                                                "onchange" => "AddNewRow(this)",
-                                                                "onblur" => "OnRowLeave(this)",
-                                                                "onfocus" => "OnRowFocus(this)")
-                                                            )
-                                                        }}
-                                                        @if ($errors->has("client_id"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("client_id") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td class="handle-supplier_id">
-                                                    <div class="form-group{{ $errors->has("supplier_id") ? " has-error" : "" }}">
-                                                        {{ Form::select("supplier_id", [$bankCashItem->supplier_id => $bankCashItem->supplier_id], $bankCashItem->supplier_id,
-                                                            array(
-                                                                "class" => "form-control supplier_id",
-                                                                "placeholder" => "",
-                                                                "id" => "",
-                                                                "style" => "width:85px;",
-                                                                "onchange" => "AddNewRow(this)",
-                                                                "onblur" => "OnRowLeave(this)",
-                                                                "onfocus" => "OnRowFocus(this)")
-                                                            )
-                                                        }}
-                                                        @if ($errors->has("supplier_id"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("supplier_id") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td class="handle-employee_id">
-                                                    <div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">
-                                                        {{ Form::select("employee_id", $employees, $bankCashItem->employee_id,
-                                                            array(
-                                                                "class" => "form-control employee_id",
-                                                                "placeholder" => "",
-                                                                "id" => "",
-                                                                "style" => "width:85px;",
-                                                                "onchange" => "AddNewRow(this)",
-                                                                "onblur" => "OnRowLeave(this)",
-                                                                "onfocus" => "OnRowFocus(this)")
-                                                            )
-                                                        }}
-                                                        @if ($errors->has("employee_id"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("employee_id") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td class="handle-expenses_id">
-                                                    <div class="form-group{{ $errors->has("expenses_id") ? " has-error" : "" }}">
-                                                        {{ Form::select("expenses_id", [$bankCashItem->expenses_id => $bankCashItem->expenses_id], $bankCashItem->expenses_id,
-                                                            array(
-                                                                "class" => "form-control expenses_id",
-                                                                "placeholder" => "",
-                                                                "id" => "",
-                                                                "style" => "width:85px;",
-                                                                "onchange" => "AddNewRow(this)",
-                                                                "onblur" => "OnRowLeave(this)",
-                                                                "onfocus" => "OnRowFocus(this)")
-                                                            )
-                                                        }}
-                                                        @if ($errors->has("expenses_id"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("expenses_id") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td class="handle-cashing_date">
-                                                    <div class="form-group{{ $errors->has("cashing_date") ? " has-error" : "" }}">
-                                                        {{ Form::text("cashing_date", $bankCashItem->cashing_date,
-                                                                    array(
-                                                                        "class" => "form-control datepickerCommon cashing_date",
-                                                                        "id" => "",
-                                                                        "style" => "width:85px;",
-                                                                        "onchange" => "AddNewRow(this)",
-                                                                        "onblur" => "OnRowLeave(this)",
-                                                                        "onfocus" => "OnRowFocus(this)")
-                                                                    )
-                                                        }}
-
-                                                        @if ($errors->has("cashing_date"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("cashing_date") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td class="handle-cheque_number">
-                                                    <div class="form-group{{ $errors->has("cheque_number") ? " has-error" : "" }}">
-                                                        {{ Form::text("cheque_number", $bankCashItem->cheque_number,
-                                                                    array(
-                                                                        "class" => "form-control cheque_number",
-                                                                        "id" => "",
-                                                                        "style" => "width:150px;",
-                                                                        "onchange" => "AddNewRow(this)",
-                                                                        "onblur" => "OnRowLeave(this)",
-                                                                        "onfocus" => "OnRowFocus(this)")
-                                                                    )
-                                                        }}
-                                                        @if ($errors->has("cheque_number"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("cheque_number") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td class="handle-cheque_status">
-                                                    <div class="form-group{{ $errors->has("cheque_status") ? " has-error" : "" }}">
-                                                        {{ Form::select("cheque_status", $chequeStatuses, $bankCashItem->cheque_status,
-                                                            array(
-                                                                "class" => "form-control cheque_status",
-                                                                "placeholder" => "",
-                                                                "id" => "",
-                                                                "style" => "width:85px;",
-                                                                "onchange" => "AddNewRow(this)",
-                                                                "onblur" => "OnRowLeave(this)",
-                                                                "onfocus" => "OnRowFocus(this)")
-                                                            )
-                                                        }}
-                                                        @if ($errors->has("cheque_status"))
-                                                            <label for="inputError" class="control-label">
-                                                                {{ $errors->first("cheque_status") }}
-                                                            </label>
-                                                        @endif
-                                                    </div>
-                                                </td>
-                                                <td class="handle-track-user-log">
-                                                    <div class="form-group track-user-log">
-                                                        {{ link_to_route('userLog.search', 'عرض', array('row_id' => $bankCashItem->id), array('class' => 'btn btn-primary')) }}
-                                                    </div>
-                                                </td>
-                                                <td hidden>
-                                                    <input type="hidden" class="id" onchange="AddNewRow(this)"
-                                                           onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)"
-                                                           value="{{ $bankCashItem->id }}">
-                                                </td>
-                                                <td hidden>
-                                                    <input type="hidden" class="saveStatus"
-                                                           onchange="AddNewRow(this)"
-                                                           onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)"
-                                                           value="{{ $bankCashItem->saveStatus }}">
-                                                </td>
-                                            </tr>
-                                        @empty
-                                        @endforelse
-                                        @if(empty($canAddRow))
-                                        <tr class="gradeA odd ItemRow" role="row">
-                                            <td class="handle-checkDelete">
-                                                <input type="checkbox" value="" class="checkDelete">
-                                            </td>
-                                            <td class="handle-depositValue">
-                                                <div class="form-group{{ $errors->has("depositValue") ? " has-error" : "" }}">
-                                                    {{ Form::text("depositValue", null,
-                                                                array(
-                                                                    "class" => "form-control IsNumberDecimal depositValue",
-                                                                    "id" => "",
-                                                                    "style" => "width:85px;",
-                                                                    "onchange" => "AddNewRow(this)",
-                                                                    "onblur" => "OnRowLeave(this)",
-                                                                    "onfocus" => "OnRowFocus(this)")
-                                                                )
-                                                    }}
-                                                    @if ($errors->has("depositValue"))
-                                                        <label for="inputError" class="control-label">
-                                                            {{ $errors->first("depositValue") }}
-                                                        </label>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td class="handle-withdrawValue">
-                                                <div class="form-group{{ $errors->has("withdrawValue") ? " has-error" : "" }}">
-                                                    {{ Form::text("withdrawValue", null,
-                                                                array(
-                                                                    "class" => "form-control IsNumberDecimal withdrawValue",
-                                                                    "id" => "",
-                                                                    "style" => "width:85px;",
-                                                                    "onchange" => "AddNewRow(this)",
-                                                                    "onblur" => "OnRowLeave(this)",
-                                                                    "onfocus" => "OnRowFocus(this)")
-                                                                )
-                                                    }}
-                                                    @if ($errors->has("withdrawValue"))
-                                                        <label for="inputError" class="control-label">
-                                                            {{ $errors->first("withdrawValue") }}
-                                                        </label>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td class="handle-recordDesc">
-                                                <div class="form-group{{ $errors->has("recordDesc") ? " has-error" : "" }}">
-                                                    {{ Form::text("recordDesc", null,
-                                                                array(
-                                                                    "class" => "form-control recordDesc",
-                                                                    "id" => "",
-                                                                    "style" => "width:85px;",
-                                                                    "onchange" => "AddNewRow(this)",
-                                                                    "onblur" => "OnRowLeave(this)",
-                                                                    "onfocus" => "OnRowFocus(this)")
-                                                                )
-                                                    }}
-                                                    @if ($errors->has("recordDesc"))
-                                                        <label for="inputError" class="control-label">
-                                                            {{ $errors->first("recordDesc") }}
-                                                        </label>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td class="handle-cbo_processes">
-                                                <div class="form-group{{ $errors->has("cbo_processes") ? " has-error" : "" }}">
-                                                    {{ Form::select("cbo_processes", [], null,
-                                                                array(
-                                                                    "class" => "form-control cbo_processes",
-                                                                    "placeholder" => "",
-                                                                    "id" => "",
-                                                                    "style" => "width:85px;",
-                                                                    "onchange" => "AddNewRow(this)",
-                                                                    "onblur" => "OnRowLeave(this)",
-                                                                    "onfocus" => "OnRowFocus(this)")
-                                                                    )
-                                                    }}
-                                                    @if ($errors->has("cbo_processes"))
-                                                        <label for="inputError" class="control-label">
-                                                            {{ $errors->first("cbo_processes") }}
-                                                        </label>
-                                                    @endif
-                                                </div>
-
-                                            </td>
-                                            <td class="handle-client_id">
-                                                <div class="form-group{{ $errors->has("client_id") ? " has-error" : "" }}">
-                                                    {{ Form::select("client_id", [], null,
-                                                        array(
-                                                            "class" => "form-control client_id",
-                                                            "placeholder" => "",
-                                                            "id" => "client_id",
-                                                            "style" => "width:85px;",
-                                                            "onchange" => "AddNewRow(this)",
-                                                            "onblur" => "OnRowLeave(this)",
-                                                            "onfocus" => "OnRowFocus(this)")
-                                                        )
-                                                    }}
-                                                    @if ($errors->has("client_id"))
-                                                        <label for="inputError" class="control-label">
-                                                            {{ $errors->first("client_id") }}
-                                                        </label>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td class="handle-supplier_id">
-                                                <div class="form-group{{ $errors->has("supplier_id") ? " has-error" : "" }}">
-                                                    {{ Form::select("supplier_id", [], null,
-                                                        array(
-                                                            "class" => "form-control supplier_id",
-                                                            "placeholder" => "",
-                                                            "id" => "",
-                                                            "style" => "width:85px;",
-                                                            "onchange" => "AddNewRow(this)",
-                                                            "onblur" => "OnRowLeave(this)",
-                                                            "onfocus" => "OnRowFocus(this)")
-                                                        )
-                                                    }}
-                                                    @if ($errors->has("supplier_id"))
-                                                        <label for="inputError" class="control-label">
-                                                            {{ $errors->first("supplier_id") }}
-                                                        </label>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td class="handle-employee_id">
-                                                <div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">
-                                                    {{ Form::select("employee_id", $employees, null,
-                                                        array(
-                                                            "class" => "form-control employee_id",
-                                                            "placeholder" => "",
-                                                            "id" => "",
-                                                            "style" => "width:85px;",
-                                                            "onchange" => "AddNewRow(this)",
-                                                            "onblur" => "OnRowLeave(this)",
-                                                            "onfocus" => "OnRowFocus(this)")
-                                                        )
-                                                    }}
-                                                    @if ($errors->has("employee_id"))
-                                                        <label for="inputError" class="control-label">
-                                                            {{ $errors->first("employee_id") }}
-                                                        </label>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td class="handle-expenses_id">
-                                                <div class="form-group{{ $errors->has("expenses_id") ? " has-error" : "" }}">
-                                                    {{ Form::select("expenses_id", [], null,
-                                                        array(
-                                                            "class" => "form-control expenses_id",
-                                                            "placeholder" => "",
-                                                            "id" => "",
-                                                            "style" => "width:85px;",
-                                                            "onchange" => "AddNewRow(this)",
-                                                            "onblur" => "OnRowLeave(this)",
-                                                            "onfocus" => "OnRowFocus(this)")
-                                                        )
-                                                    }}
-                                                    @if ($errors->has("expenses_id"))
-                                                        <label for="inputError" class="control-label">
-                                                            {{ $errors->first("expenses_id") }}
-                                                        </label>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td class="handle-cashing_date">
-                                                <div class="form-group{{ $errors->has("cashing_date") ? " has-error" : "" }}">
-                                                    {{ Form::text("cashing_date", null,
-                                                                array(
-                                                                    "class" => "form-control datepickerCommon cashing_date",
-                                                                    "id" => "",
-                                                                    "style" => "width:85px;",
-                                                                    "onchange" => "AddNewRow(this)",
-                                                                    "onblur" => "OnRowLeave(this)",
-                                                                    "onfocus" => "OnRowFocus(this)")
-                                                                )
-                                                    }}
-
-                                                    @if ($errors->has("cashing_date"))
-                                                        <label for="inputError" class="control-label">
-                                                            {{ $errors->first("cashing_date") }}
-                                                        </label>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td class="handle-cheque_number">
-                                                <div class="form-group{{ $errors->has("cheque_number") ? " has-error" : "" }}">
-                                                    {{ Form::text("cheque_number", null,
-                                                                array(
-                                                                    "class" => "form-control cheque_number",
-                                                                    "id" => "",
-                                                                    "style" => "width:150px;",
-                                                                    "onchange" => "AddNewRow(this)",
-                                                                    "onblur" => "OnRowLeave(this)",
-                                                                    "onfocus" => "OnRowFocus(this)")
-                                                                )
-                                                    }}
-                                                    @if ($errors->has("cheque_number"))
-                                                        <label for="inputError" class="control-label">
-                                                            {{ $errors->first("cheque_number") }}
-                                                        </label>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td class="handle-cheque_status">
-                                                <div class="form-group{{ $errors->has("cheque_status") ? " has-error" : "" }}">
-                                                    {{ Form::select("cheque_status", $chequeStatuses, null,
-                                                        array(
-                                                            "class" => "form-control cheque_status",
-                                                            "placeholder" => "",
-                                                            "id" => "",
-                                                            "style" => "width:85px;",
-                                                            "onchange" => "AddNewRow(this)",
-                                                            "onblur" => "OnRowLeave(this)",
-                                                            "onfocus" => "OnRowFocus(this)")
-                                                        )
-                                                    }}
-                                                    @if ($errors->has("cheque_status"))
-                                                        <label for="inputError" class="control-label">
-                                                            {{ $errors->first("cheque_status") }}
-                                                        </label>
-                                                    @endif
-                                                </div>
-                                            </td>
-                                            <td class="handle-track-user-log">
-                                                <div class="form-group">
-
-                                                </div>
-                                            </td>
-                                            <td hidden>
-                                                <input type="hidden" class="id" onchange="AddNewRow(this)"
-                                                       onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)"
-                                                       value="-1">
-                                            </td>
-                                            <td hidden>
-                                                <input type="hidden" class="saveStatus" onchange="AddNewRow(this)"
-                                                       onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)"
-                                                       value="0">
-                                            </td>
-                                        </tr>
-                                        @endif
-                                        </tbody>
-                                    </table>
-                                    <input type="hidden" id="canEdit" name="canEdit" value="{{ $canEdit }}"/>
-                                    {{ Form::close() }}
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <a href="{{ url("/bank-cash") }}" class="btn btn-success">جديد</a>
-                        <button type="button" class="btn btn-danger" onclick="removeSelected()">حذف</button>
-                        <button type="button" class="btn btn-primary" onclick="lockSaveAll()">حفظ</button>
-                    </div>
-                    @if(Entrust::ability('admin', 'deposit-withdraw-edit'))
-                        <div class="col-md-6">
-                            <!-- Date Picker-->
-                            {{ Form::open(['route' => ['bankCash.search', $bankId], 'method' => 'get']) }}
-                            <div class="col-md-10">
-                                <input type="text" id="targetdate" name="targetdate" readonly
-                                       class="form-control datepickerCommon">
-                            </div>
-                            <div class="col-md-2" style="padding-left: 0; padding-right: 0;">
-                                <button type="submit" class="btn btn-danger form-control">بحث</button>
-                            </div>
-                            {{ Form::close() }}
+                <!-- /.panel-heading -->
+                <div class="panel-body">
+                    @if (session('success'))
+                        <div class="alert alert-success">
+                            {{ session('success') }}
                         </div>
                     @endif
+
+                    @if (session('error'))
+                        <div class="alert alert-danger">
+                            {{ session('error') }}
+                        </div>
+                    @endif
+                    <div class="row text-center">
+                        <div class="col-sm-6">
+                            <div class="alert alert-info"><label id="clock">Loading...</label></div>
+                            <script type="text/javascript">
+                                function refrClock() {
+                                    var d = new Date();
+                                    var day = d.getDay();
+                                    var date = d.getDate();
+                                    var month = d.getMonth();
+                                    var year = d.getFullYear();
+                                    var days = new Array("الأحد", "الاثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت");
+                                    var months = new Array("يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو", "يوليو", "أغسطس", "سبتمبر", "اكتوبر", "نوفمبر", "ديسمبر");
+                                    document.getElementById("clock").innerHTML = days['{{ $numbers["current_dayOfWeek"] }}'] + " " + '{{ $numbers["current_dayOfMonth"] }}' + " " + months['{{ $numbers["current_month"] }}'] + " " + '{{ $numbers["current_year"] }}';
+                                    setTimeout("refrClock()", 1000);
+                                }
+
+                                refrClock();
+                            </script>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="alert alert-danger">
+                                <label>معادلة الارصدة : <span
+                                            id="previousDayAmount">{{ $numbers['previousDayAmount'] }}</span>
+                                    جنيه</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="alert alert-info">
+                                <label>الرصيد الحالى : <span id="currentAmount">{{ $numbers['currentAmount'] }}</span>
+                                    جنيه</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="alert alert-success">
+                                <label>رصيد الشيكات الاجلة : <span
+                                            id="depositsAmount">{{ $numbers['depositsAmount'] }}</span>
+                                    جنيه</label>
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="alert alert-success">
+                                <label>رصيد الشيكات المنصرفة : <span
+                                            id="withdrawsAmount">{{ $numbers['withdrawsAmount'] }}</span>
+                                    جنيه</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <div class="dataTable_wrapper">
+                            <div id="dataTables-example_wrapper"
+                                 class="dataTables_wrapper form-inline dt-bootstrap no-footer">
+
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        {{ Form::open(['route' => ['bankCash.store', $bankId], 'id' => 'bankCashForm', "role" => "form"]) }}
+
+                                        <table class="table table-striped table-bordered table-hover dataTable no-footer"
+                                               id="bankCashTable" role="grid"
+                                               aria-describedby="dataTables-example_info">
+                                            <thead>
+                                            <tr role="row">
+                                                <th class="cell handle-checkDelete" rowspan="1" colspan="1">اختيار</th>
+                                                <th class="cell handle-depositValue" rowspan="1" colspan="1">وارد</th>
+                                                <th class="cell handle-withdrawValue" rowspan="1" colspan="1">منصرف</th>
+                                                <th class="cell handle-recordDesc" rowspan="1" colspan="1">بيان</th>
+                                                <th class="cell handle-cbo_processes" rowspan="1" colspan="1">اسم العملية</th>
+                                                <th class="cell handle-client_id" rowspan="1" colspan="1">اسم العميل</th>
+                                                <th class="cell handle-supplier_id" rowspan="1" colspan="1">اسم المورد</th>
+                                                <th class="cell handle-employee_id" rowspan="1" colspan="1">اسم الموظف</th>
+                                                <th class="cell handle-expenses_id" rowspan="1" colspan="1">اسم المصروف</th>
+                                                <th class="cell handle-issuing_date" rowspan="1" colspan="1">تاريخ الصرف</th>
+                                                <th class="cell handle-cashing_date" rowspan="1" colspan="1">تاريخ التحصيل</th>
+                                                <th class="cell handle-cheque_number" rowspan="1" colspan="1">رقم الشيك</th>
+                                                <th class="cell handle-cheque_status" rowspan="1" colspan="1">الحالة</th>
+                                                <th class="cell handle-cheque_notes" rowspan="1" colspan="1">ملاحظات</th>
+                                                <th class="cell handle-track-user-log" rowspan="1" colspan="1">السجل</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="grid_FinancialCustodyDetails">
+                                            @forelse ($bankCashItems as $bankCashItem)
+                                                <tr class="gradeA odd ItemRow Saved" role="row">
+                                                    <td class="cell handle-checkDelete">
+                                                        <input type="checkbox" value="" class="checkDelete">
+                                                    </td>
+                                                    <td class="cell handle-depositValue">
+                                                        <div class="form-group{{ $errors->has("depositValue") ? " has-error" : "" }}">
+                                                            {{ Form::text("depositValue", ($bankCashItem->depositValue > 0 ? $bankCashItem->depositValue : null),
+                                                                        array(
+                                                                            "class" => "form-control IsNumberDecimal depositValue",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                        )
+                                                            }}
+                                                            @if ($errors->has("depositValue"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("depositValue") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-withdrawValue">
+                                                        <div class="form-group{{ $errors->has("withdrawValue") ? " has-error" : "" }}">
+                                                            {{ Form::text("withdrawValue", ($bankCashItem->withdrawValue > 0 ? $bankCashItem->withdrawValue : null),
+                                                                        array(
+                                                                            "class" => "form-control IsNumberDecimal withdrawValue",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                        )
+                                                            }}
+                                                            @if ($errors->has("withdrawValue"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("withdrawValue") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-recordDesc">
+                                                        <div class="form-group{{ $errors->has("recordDesc") ? " has-error" : "" }}">
+                                                            {{ Form::text("recordDesc", $bankCashItem->recordDesc,
+                                                                        array(
+                                                                            "class" => "form-control recordDesc",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                        )
+                                                            }}
+                                                            @if ($errors->has("recordDesc"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("recordDesc") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-cbo_processes">
+                                                        <div class="form-group{{ $errors->has("cbo_processes") ? " has-error" : "" }}">
+                                                            {{ Form::select("cbo_processes", [$bankCashItem->cbo_processes => $bankCashItem->cbo_processes], $bankCashItem->cbo_processes,
+                                                                        array(
+                                                                            "class" => "form-control cbo_processes",
+                                                                            "placeholder" => "",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                            )
+                                                            }}
+                                                            @if ($errors->has("cbo_processes"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("cbo_processes") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+
+                                                    </td>
+                                                    <td class="cell handle-client_id">
+                                                        <div class="form-group{{ $errors->has("client_id") ? " has-error" : "" }}">
+                                                            {{ Form::select("client_id", [$bankCashItem->client_id => $bankCashItem->client_id], $bankCashItem->client_id,
+                                                                array(
+                                                                    "class" => "form-control client_id",
+                                                                    "placeholder" => "",
+                                                                    "id" => "",
+
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("client_id"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("client_id") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-supplier_id">
+                                                        <div class="form-group{{ $errors->has("supplier_id") ? " has-error" : "" }}">
+                                                            {{ Form::select("supplier_id", [$bankCashItem->supplier_id => $bankCashItem->supplier_id], $bankCashItem->supplier_id,
+                                                                array(
+                                                                    "class" => "form-control supplier_id",
+                                                                    "placeholder" => "",
+                                                                    "id" => "",
+
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("supplier_id"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("supplier_id") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-employee_id">
+                                                        <div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">
+                                                            {{ Form::select("employee_id", $employees, $bankCashItem->employee_id,
+                                                                array(
+                                                                    "class" => "form-control employee_id",
+                                                                    "placeholder" => "",
+                                                                    "id" => "",
+
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("employee_id"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("employee_id") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-expenses_id">
+                                                        <div class="form-group{{ $errors->has("expenses_id") ? " has-error" : "" }}">
+                                                            {{ Form::select("expenses_id", [$bankCashItem->expenses_id => $bankCashItem->expenses_id], $bankCashItem->expenses_id,
+                                                                array(
+                                                                    "class" => "form-control expenses_id",
+                                                                    "placeholder" => "",
+                                                                    "id" => "",
+
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("expenses_id"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("expenses_id") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-issuing_date">
+                                                        <div class="form-group{{ $errors->has("issuing_date") ? " has-error" : "" }}">
+                                                            {{ Form::text("issuing_date", $bankCashItem->issuing_date,
+                                                                        array(
+                                                                            "class" => "form-control datepickerCommon issuing_date",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                        )
+                                                            }}
+
+                                                            @if ($errors->has("issuing_date"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("issuing_date") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-cashing_date">
+                                                        <div class="form-group{{ $errors->has("cashing_date") ? " has-error" : "" }}">
+                                                            {{ Form::text("cashing_date", $bankCashItem->cashing_date,
+                                                                        array(
+                                                                            "class" => "form-control datepickerCommon cashing_date",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                        )
+                                                            }}
+
+                                                            @if ($errors->has("cashing_date"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("cashing_date") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-cheque_number">
+                                                        <div class="form-group{{ $errors->has("cheque_number") ? " has-error" : "" }}">
+                                                            {{ Form::text("cheque_number", $bankCashItem->cheque_number,
+                                                                        array(
+                                                                            "class" => "form-control cheque_number",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                        )
+                                                            }}
+                                                            @if ($errors->has("cheque_number"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("cheque_number") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-cheque_status">
+                                                        <div class="form-group{{ $errors->has("cheque_status") ? " has-error" : "" }}">
+                                                            {{ Form::select("cheque_status", $chequeStatuses, $bankCashItem->cheque_status,
+                                                                array(
+                                                                    "class" => "form-control cheque_status",
+                                                                    "placeholder" => "",
+                                                                    "id" => "",
+
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("cheque_status"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("cheque_status") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-cheque_notes">
+                                                        <div class="form-group{{ $errors->has("cheque_notes") ? " has-error" : "" }}">
+                                                            {{ Form::text("cheque_notes", $bankCashItem->cheque_notes,
+                                                                array(
+                                                                    "class" => "form-control cheque_notes",
+                                                                    "placeholder" => "",
+                                                                    "id" => "",
+
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("cheque_notes"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("cheque_notes") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-track-user-log">
+                                                        <div class="form-group track-user-log">
+                                                            {{ link_to_route('userLog.search', 'عرض', array('row_id' => $bankCashItem->id), array('class' => 'btn btn-primary')) }}
+                                                        </div>
+                                                    </td>
+                                                    <td hidden>
+                                                        <input type="hidden" class="id" onchange="AddNewRow(this)"
+                                                               onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)"
+                                                               value="{{ $bankCashItem->id }}">
+                                                    </td>
+                                                    <td hidden>
+                                                        <input type="hidden" class="saveStatus"
+                                                               onchange="AddNewRow(this)"
+                                                               onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)"
+                                                               value="{{ $bankCashItem->saveStatus }}">
+                                                    </td>
+                                                </tr>
+                                            @empty
+                                            @endforelse
+                                            @if(empty($canAddRow))
+                                                <tr class="gradeA odd ItemRow" role="row">
+                                                    <td class="cell handle-checkDelete">
+                                                        <input type="checkbox" value="" class="checkDelete">
+                                                    </td>
+                                                    <td class="cell handle-depositValue">
+                                                        <div class="form-group{{ $errors->has("depositValue") ? " has-error" : "" }}">
+                                                            {{ Form::text("depositValue", null,
+                                                                        array(
+                                                                            "class" => "form-control IsNumberDecimal depositValue",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                        )
+                                                            }}
+                                                            @if ($errors->has("depositValue"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("depositValue") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-withdrawValue">
+                                                        <div class="form-group{{ $errors->has("withdrawValue") ? " has-error" : "" }}">
+                                                            {{ Form::text("withdrawValue", null,
+                                                                        array(
+                                                                            "class" => "form-control IsNumberDecimal withdrawValue",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                        )
+                                                            }}
+                                                            @if ($errors->has("withdrawValue"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("withdrawValue") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-recordDesc">
+                                                        <div class="form-group{{ $errors->has("recordDesc") ? " has-error" : "" }}">
+                                                            {{ Form::text("recordDesc", null,
+                                                                        array(
+                                                                            "class" => "form-control recordDesc",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                        )
+                                                            }}
+                                                            @if ($errors->has("recordDesc"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("recordDesc") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-cbo_processes">
+                                                        <div class="form-group{{ $errors->has("cbo_processes") ? " has-error" : "" }}">
+                                                            {{ Form::select("cbo_processes", [], null,
+                                                                        array(
+                                                                            "class" => "form-control cbo_processes",
+                                                                            "placeholder" => "",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                            )
+                                                            }}
+                                                            @if ($errors->has("cbo_processes"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("cbo_processes") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+
+                                                    </td>
+                                                    <td class="cell handle-client_id">
+                                                        <div class="form-group{{ $errors->has("client_id") ? " has-error" : "" }}">
+                                                            {{ Form::select("client_id", [], null,
+                                                                array(
+                                                                    "class" => "form-control client_id",
+                                                                    "placeholder" => "",
+                                                                    "id" => "client_id",
+
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("client_id"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("client_id") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-supplier_id">
+                                                        <div class="form-group{{ $errors->has("supplier_id") ? " has-error" : "" }}">
+                                                            {{ Form::select("supplier_id", [], null,
+                                                                array(
+                                                                    "class" => "form-control supplier_id",
+                                                                    "placeholder" => "",
+                                                                    "id" => "",
+
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("supplier_id"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("supplier_id") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-employee_id">
+                                                        <div class="form-group{{ $errors->has("employee_id") ? " has-error" : "" }}">
+                                                            {{ Form::select("employee_id", $employees, null,
+                                                                array(
+                                                                    "class" => "form-control employee_id",
+                                                                    "placeholder" => "",
+                                                                    "id" => "",
+
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("employee_id"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("employee_id") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-expenses_id">
+                                                        <div class="form-group{{ $errors->has("expenses_id") ? " has-error" : "" }}">
+                                                            {{ Form::select("expenses_id", [], null,
+                                                                array(
+                                                                    "class" => "form-control expenses_id",
+                                                                    "placeholder" => "",
+                                                                    "id" => "",
+
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("expenses_id"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("expenses_id") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-issuing_date">
+                                                        <div class="form-group{{ $errors->has("issuing_date") ? " has-error" : "" }}">
+                                                            {{ Form::text("issuing_date", null,
+                                                                        array(
+                                                                            "class" => "form-control datepickerCommon issuing_date",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                        )
+                                                            }}
+
+                                                            @if ($errors->has("issuing_date"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("issuing_date") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-cashing_date">
+                                                        <div class="form-group{{ $errors->has("cashing_date") ? " has-error" : "" }}">
+                                                            {{ Form::text("cashing_date", null,
+                                                                        array(
+                                                                            "class" => "form-control datepickerCommon cashing_date",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                        )
+                                                            }}
+
+                                                            @if ($errors->has("cashing_date"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("cashing_date") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-cheque_number">
+                                                        <div class="form-group{{ $errors->has("cheque_number") ? " has-error" : "" }}">
+                                                            {{ Form::text("cheque_number", null,
+                                                                        array(
+                                                                            "class" => "form-control cheque_number",
+                                                                            "id" => "",
+
+                                                                            "onchange" => "AddNewRow(this)",
+                                                                            "onblur" => "OnRowLeave(this)",
+                                                                            "onfocus" => "OnRowFocus(this)")
+                                                                        )
+                                                            }}
+                                                            @if ($errors->has("cheque_number"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("cheque_number") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-cheque_status">
+                                                        <div class="form-group{{ $errors->has("cheque_status") ? " has-error" : "" }}">
+                                                            {{ Form::select("cheque_status", $chequeStatuses, null,
+                                                                array(
+                                                                    "class" => "form-control cheque_status",
+                                                                    "placeholder" => "",
+                                                                    "id" => "",
+
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("cheque_status"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("cheque_status") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-cheque_notes">
+                                                        <div class="form-group{{ $errors->has("cheque_notes") ? " has-error" : "" }}">
+                                                            {{ Form::text("cheque_notes", null,
+                                                                array(
+                                                                    "class" => "form-control cheque_notes",
+                                                                    "placeholder" => "",
+                                                                    "id" => "",
+
+                                                                    "onchange" => "AddNewRow(this)",
+                                                                    "onblur" => "OnRowLeave(this)",
+                                                                    "onfocus" => "OnRowFocus(this)")
+                                                                )
+                                                            }}
+                                                            @if ($errors->has("cheque_notes"))
+                                                                <label for="inputError" class="control-label">
+                                                                    {{ $errors->first("cheque_notes") }}
+                                                                </label>
+                                                            @endif
+                                                        </div>
+                                                    </td>
+                                                    <td class="cell handle-track-user-log">
+                                                        <div class="form-group">
+
+                                                        </div>
+                                                    </td>
+                                                    <td hidden>
+                                                        <input type="hidden" class="id" onchange="AddNewRow(this)"
+                                                               onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)"
+                                                               value="-1">
+                                                    </td>
+                                                    <td hidden>
+                                                        <input type="hidden" class="saveStatus"
+                                                               onchange="AddNewRow(this)"
+                                                               onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)"
+                                                               value="0">
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                            </tbody>
+                                        </table>
+                                        <input type="hidden" id="canEdit" name="canEdit" value="{{ $canEdit }}"/>
+                                        {{ Form::close() }}
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <a href="{{ url("/bank-cash") }}" class="btn btn-success">جديد</a>
+                            <button type="button" class="btn btn-danger" onclick="removeSelected()">حذف</button>
+                            <button type="button" class="btn btn-primary" onclick="lockSaveAll()">حفظ</button>
+                        </div>
+                        @if(Entrust::ability('admin', 'deposit-withdraw-edit'))
+                            <div class="col-md-6">
+                                <!-- Date Picker-->
+                                {{ Form::open(['route' => ['bankCash.search', $bankId], 'method' => 'get']) }}
+                                <input type="hidden" name="bankId" value="{{ $bankId }}">
+                                <div class="col-md-10">
+                                    <input type="text" id="targetdate" name="targetdate" readonly
+                                           class="form-control datepickerCommon">
+                                </div>
+                                <div class="col-md-2" style="padding-left: 0; padding-right: 0;">
+                                    <button type="submit" class="btn btn-danger form-control">بحث</button>
+                                </div>
+                                {{ Form::close() }}
+                            </div>
+                        @endif
+                    </div>
                 </div>
+                <!-- /.panel-body -->
             </div>
-            <!-- /.panel-body -->
+            <!-- /.panel -->
         </div>
-        <!-- /.panel -->
+        <!-- /.col-lg-12 -->
     </div>
-    <!-- /.col-lg-12 -->
-</div>
 
 @section('scripts')
     <script>
         var expenses = {!! $expenses !!};
+        var bankId = {{ $bankId }};
         var employeeActions = {!! $employeeActions !!};
         var suppliers = {!! $suppliers !!};
         var clients = {!! $clients !!};
         var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id,
-            recordDesc, cheque_number, cheque_status, saveStatus, id, flag, canEdit, currentAmount, withdrawsAmount,
-            depositsAmount, cashing_date, is_paid;
+            recordDesc, cheque_number, cheque_status, cheque_book_id = null, cheque_notes, saveStatus, id, flag, canEdit, currentAmount,
+            withdrawsAmount, depositsAmount, issuing_date, cashing_date, is_paid;
         var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
         var loadAll = false;
-        var canAddRow = @if(empty($canAddRow)) true; @else {!! $canAddRow !!}; @endif
+        var canAddRow = @if(empty($canAddRow)) true;
+        @else {!! $canAddRow !!};@endif
         LockAll();
         SetFinancialCustodyDetailsProcess();
         currentAmount = $("#currentAmount");
         withdrawsAmount = $("#withdrawsAmount");
         depositsAmount = $("#depositsAmount");
-
+        @if(!empty($chequeBookId))
+            cheque_book_id = {{ $chequeBookId }};
+        @endif
         function LoadProcess(rowIndex) {
             client_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .client_id');
             supplier_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .supplier_id');
@@ -688,7 +799,7 @@
             supplier_id.empty();
             supplier_id.append($("<option></option>"));
             @if(!empty($chequeBookId))
-                cheque_number.attr("disabled", "disabled");
+            cheque_number.attr("disabled", "disabled");
             @endif
 
             if (client_idVal > 0) {
@@ -821,6 +932,8 @@
             expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
             cheque_number = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_number');
             cheque_status = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_status');
+            cheque_notes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_notes');
+            issuing_date = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .issuing_date');
             cashing_date = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cashing_date');
             is_paid = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .is_paid');
             id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .id');
@@ -862,11 +975,11 @@
                 cbo_processes.parent().removeClass("has-error");
                 expenses_id.parent().removeClass("has-error");
             }
-            if (cashing_date.val() === '') {
-                cashing_date.parent().addClass("has-error");
+            if (issuing_date.val() === '') {
+                issuing_date.parent().addClass("has-error");
                 flag = false;
             } else {
-                cashing_date.parent().removeClass("has-error");
+                issuing_date.parent().removeClass("has-error");
             }
             return flag;
         }
@@ -891,20 +1004,24 @@
                 employee_id: employee_id.val(),
                 expenses_id: expenses_id.val(),
                 payMethod: 0,
-                bank_profile_id: '{{ $bankId }}',
+                bank_profile_id: bankId,
                 cheque_number: cheque_number.val(),
                 cheque_status: cheque_status.val(),
+                cheque_notes: cheque_notes.val(),
+                issuing_date: issuing_date.val(),
                 cashing_date: cashing_date.val(),
+                cheque_book_id: cheque_book_id,
                 is_paid: is_paid.val(),
                 saveStatus: saveStatus.val()
             };
             //used to determine the http verb to use [add=POST], [update=PUT]
             var type = "POST"; //for creating new resource
-            var saveurl = '{{ url("/bank-cash/${bankId}") }}';
+            var saveurl = '{{ url("/bank-cash") }}';
             if (saveStatus.val() === '1' || (saveStatus.val() === '2' && canEdit === '1')) {
                 type = "PUT"; //for updating existing resource
                 saveurl += '/' + id.val();
             }
+            saveurl += '?bankId=' + bankId;
             checkDelete.parent().parent().addClass('InSave');
             $.ajax({
                 type: type,
@@ -1055,31 +1172,35 @@
             SetCurrentRowIndex(CellChildInput);
             if ($(AfterCurrentRow).hasClass("ItemRow") === false && canAddRow) {
                 $("#bankCashTable").append('<tr class="gradeA odd ItemRow" role="row"> ' +
-                    '<td class="handle-checkDelete"> <input type="checkbox" value="" class="checkDelete"> </td>' +
+                    '<td class="cell handle-checkDelete"> <input type="checkbox" value="" class="checkDelete"> </td>' +
 
-                    '<td class="handle-depositValue"> <div class="form-group{{$errors->has("depositValue") ? " has-error" : ""}}">{{Form::text("depositValue", null, array( "class"=> "form-control IsNumberDecimal depositValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("depositValue")) <label for="inputError" class="control-label">{{$errors->first("depositValue")}}</label> @endif </div></td> ' +
+                    '<td class="cell handle-depositValue"> <div class="form-group{{$errors->has("depositValue") ? " has-error" : ""}}">{{Form::text("depositValue", null, array( "class"=> "form-control IsNumberDecimal depositValue", "id"=> "",  "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("depositValue")) <label for="inputError" class="control-label">{{$errors->first("depositValue")}}</label> @endif </div></td> ' +
 
-                    '<td class="handle-withdrawValue"> <div class="form-group{{$errors->has("withdrawValue") ? " has-error" : ""}}">{{Form::text("withdrawValue", null, array( "class"=> "form-control IsNumberDecimal withdrawValue", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("withdrawValue")) <label for="inputError" class="control-label">{{$errors->first("withdrawValue")}}</label> @endif </div></td>' +
+                    '<td class="cell handle-withdrawValue"> <div class="form-group{{$errors->has("withdrawValue") ? " has-error" : ""}}">{{Form::text("withdrawValue", null, array( "class"=> "form-control IsNumberDecimal withdrawValue", "id"=> "",  "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("withdrawValue")) <label for="inputError" class="control-label">{{$errors->first("withdrawValue")}}</label> @endif </div></td>' +
 
-                    '<td class="handle-recordDesc"> <div class="form-group{{$errors->has("recordDesc") ? " has-error" : ""}}">{{Form::text("recordDesc", null, array( "class"=> "form-control recordDesc", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("recordDesc")) <label for="inputError" class="control-label">{{$errors->first("recordDesc")}}</label> @endif </div></td>' +
+                    '<td class="cell handle-recordDesc"> <div class="form-group{{$errors->has("recordDesc") ? " has-error" : ""}}">{{Form::text("recordDesc", null, array( "class"=> "form-control recordDesc", "id"=> "",  "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("recordDesc")) <label for="inputError" class="control-label">{{$errors->first("recordDesc")}}</label> @endif </div></td>' +
 
-                    '<td class="handle-cbo_processes"> <div class="form-group{{$errors->has("cbo_processes") ? " has-error" : ""}}">{{Form::select("cbo_processes", [], null, array( "class"=> "form-control cbo_processes", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cbo_processes")) <label for="inputError" class="control-label">{{$errors->first("cbo_processes")}}</label> @endif </div></td>' +
+                    '<td class="cell handle-cbo_processes"> <div class="form-group{{$errors->has("cbo_processes") ? " has-error" : ""}}">{{Form::select("cbo_processes", [], null, array( "class"=> "form-control cbo_processes", "placeholder"=> "", "id"=> "",  "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cbo_processes")) <label for="inputError" class="control-label">{{$errors->first("cbo_processes")}}</label> @endif </div></td>' +
 
-                    '<td class="handle-client_id"> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", [], null, array( "class"=> "form-control client_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td>' +
+                    '<td class="cell handle-client_id"> <div class="form-group{{$errors->has("client_id") ? " has-error" : ""}}">{{Form::select("client_id", [], null, array( "class"=> "form-control client_id", "placeholder"=> "", "id"=> "",  "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("client_id")) <label for="inputError" class="control-label">{{$errors->first("client_id")}}</label> @endif </div></td>' +
 
-                    '<td class="handle-supplier_id"> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td> ' +
+                    '<td class="cell handle-supplier_id"> <div class="form-group{{$errors->has("supplier_id") ? " has-error" : ""}}">{{Form::select("supplier_id", [], null, array( "class"=> "form-control supplier_id", "placeholder"=> "", "id"=> "",  "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("supplier_id")) <label for="inputError" class="control-label">{{$errors->first("supplier_id")}}</label> @endif </div></td> ' +
 
-                    '<td class="handle-employee_id"> <div class="form-group{{$errors->has("employee_id") ? " has-error" : ""}}">{{Form::select("employee_id", $employees, null, array( "class"=> "form-control employee_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("employee_id")) <label for="inputError" class="control-label">{{$errors->first("employee_id")}}</label> @endif </div></td> ' +
+                    '<td class="cell handle-employee_id"> <div class="form-group{{$errors->has("employee_id") ? " has-error" : ""}}">{{Form::select("employee_id", $employees, null, array( "class"=> "form-control employee_id", "placeholder"=> "", "id"=> "",  "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("employee_id")) <label for="inputError" class="control-label">{{$errors->first("employee_id")}}</label> @endif </div></td> ' +
 
-                    '<td class="handle-expenses_id"> <div class="form-group{{$errors->has("expenses_id") ? " has-error" : ""}}">{{Form::select("expenses_id", [], null, array( "class"=> "form-control expenses_id", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("expenses_id")) <label for="inputError" class="control-label">{{$errors->first("expenses_id")}}</label> @endif </div></td>' +
+                    '<td class="cell handle-expenses_id"> <div class="form-group{{$errors->has("expenses_id") ? " has-error" : ""}}">{{Form::select("expenses_id", [], null, array( "class"=> "form-control expenses_id", "placeholder"=> "", "id"=> "",  "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("expenses_id")) <label for="inputError" class="control-label">{{$errors->first("expenses_id")}}</label> @endif </div></td>' +
 
-                    '<td class="handle-cashing_date"> <div class="form-group{{ $errors->has("cashing_date") ? " has-error" : "" }}"> {{ Form::text("cashing_date", null, array("class" => "form-control datepickerCommon cashing_date", "id" => "", "style" => "width:85px;", "onchange" => "AddNewRow(this)", "onblur" => "OnRowLeave(this)", "onfocus" => "OnRowFocus(this)") ) }} @if ($errors->has("cashing_date")) <label for="inputError" class="control-label"> {{ $errors->first("cashing_date") }} </label> @endif </div> </td>' +
+                    '<td class="cell handle-issuing_date"> <div class="form-group{{ $errors->has("issuing_date") ? " has-error" : "" }}"> {{ Form::text("issuing_date", null, array("class" => "form-control datepickerCommon issuing_date", "id" => "",  "onchange" => "AddNewRow(this)", "onblur" => "OnRowLeave(this)", "onfocus" => "OnRowFocus(this)") ) }} @if ($errors->has("issuing_date")) <label for="inputError" class="control-label"> {{ $errors->first("issuing_date") }} </label> @endif </div> </td>' +
 
-                    '<td class="handle-cheque_number"> <div class="form-group{{$errors->has("cheque_number") ? " has-error" : ""}}">{{Form::text("cheque_number", null, array( "class"=> "form-control cheque_number", "id"=> "", "style"=> "width:150px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cheque_number")) <label for="inputError" class="control-label">{{$errors->first("cheque_number")}}</label> @endif </div></td> ' +
+                    '<td class="cell handle-cashing_date"> <div class="form-group{{ $errors->has("cashing_date") ? " has-error" : "" }}"> {{ Form::text("cashing_date", null, array("class" => "form-control datepickerCommon cashing_date", "id" => "",  "onchange" => "AddNewRow(this)", "onblur" => "OnRowLeave(this)", "onfocus" => "OnRowFocus(this)") ) }} @if ($errors->has("cashing_date")) <label for="inputError" class="control-label"> {{ $errors->first("cashing_date") }} </label> @endif </div> </td>' +
 
-                    '<td class="handle-cheque_status"> <div class="form-group{{$errors->has("cheque_status") ? " has-error" : ""}}">{{Form::select("cheque_status", $chequeStatuses, null, array( "class"=> "form-control cheque_status", "placeholder"=> "", "id"=> "", "style"=> "width:85px;", "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cheque_status")) <label for="inputError" class="control-label">{{$errors->first("cheque_status")}}</label> @endif </div></td> ' +
+                    '<td class="cell handle-cheque_number"> <div class="form-group{{$errors->has("cheque_number") ? " has-error" : ""}}">{{Form::text("cheque_number", null, array( "class"=> "form-control cheque_number", "id"=> "",  "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cheque_number")) <label for="inputError" class="control-label">{{$errors->first("cheque_number")}}</label> @endif </div></td> ' +
 
-                    '<td class="handle-track-user-log"> <div class="form-group track-user-log"></div> </td>' +
+                    '<td class="cell handle-cheque_status"> <div class="form-group{{$errors->has("cheque_status") ? " has-error" : ""}}">{{Form::select("cheque_status", $chequeStatuses, null, array( "class"=> "form-control cheque_status", "placeholder"=> "", "id"=> "",  "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cheque_status")) <label for="inputError" class="control-label">{{$errors->first("cheque_status")}}</label> @endif </div></td> ' +
+
+                    '<td class="cell handle-cheque_notes"> <div class="form-group{{$errors->has("cheque_notes") ? " has-error" : ""}}">{{Form::text("cheque_notes", null, array( "class"=> "form-control cheque_notes", "placeholder"=> "", "id"=> "",  "onchange"=> "AddNewRow(this)", "onblur"=> "OnRowLeave(this)", "onfocus"=> "OnRowFocus(this)") )}}@if ($errors->has("cheque_notes")) <label for="inputError" class="control-label">{{$errors->first("cheque_notes")}}</label> @endif </div></td> ' +
+
+                    '<td class="cell handle-track-user-log"> <div class="form-group track-user-log"></div> </td>' +
 
                     '<td hidden><input type="hidden" class="id" onchange="AddNewRow(this)" onblur="OnRowLeave(this)" onfocus="OnRowFocus(this)" value="-1"></td>' +
 
@@ -1145,9 +1266,9 @@
                         expenses_id.append('<option value="' + expense.id + '">' + expense.name + '</option>');
                     });
                     @if(!empty($chequeBookId))
-                        cheque_number.attr("disabled", "disabled");
+                    cheque_number.attr("disabled", "disabled");
                     @endif
-                    break;
+                        break;
                 case "recordDesc":
                     break;
                 case "cbo_processes":
@@ -1263,6 +1384,8 @@
             expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
             cheque_number = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_number');
             cheque_status = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_status');
+            cheque_notes = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_notes');
+            issuing_date = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .issuing_date');
             cashing_date = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cashing_date');
             id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .id');
             saveStatus = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .saveStatus');
@@ -1278,6 +1401,8 @@
             expenses_id.attr("disabled", "disabled");
             cheque_number.attr("disabled", "disabled");
             cheque_status.attr("disabled", "disabled");
+            cheque_notes.attr("disabled", "disabled");
+            issuing_date.attr("disabled", "disabled");
             cashing_date.attr("disabled", "disabled");
         }
 
@@ -1300,3 +1425,5 @@
 
     </script>
 @endsection
+
+@endif
