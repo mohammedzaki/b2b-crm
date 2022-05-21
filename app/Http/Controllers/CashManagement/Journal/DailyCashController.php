@@ -16,6 +16,7 @@ use App\Constants\EmployeeActions;
 use App\Constants\PaymentMethods;
 use App\Exceptions\ValidationException;
 use App\Extensions\DateTime;
+use App\Helpers\Helpers;
 use App\Http\Controllers\Controller;
 use App\Models\Client;
 use App\Models\ClientProcess;
@@ -30,7 +31,6 @@ use DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Validator;
-use App\Helpers\Helpers;
 
 /**
  * Description of DailyCashController
@@ -69,43 +69,14 @@ class DailyCashController extends Controller
         $depositWithdrawsItems             = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->get();
         $numbers['withdrawsAmount']        = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
         $numbers['depositsAmount']         = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
-        $numbers['currentAmount']          = $this->calculateCurrentAmount($endDate);
-        $numbers['previousDayAmount']      = $this->calculateCurrentAmount($endDate->addDay(-1));
-
-        $employees       = Employee::all('id', 'name')->mapWithKeys(function ($emp) {
-            return [$emp->id => $emp->name];
-        });
-        $expenses        = Expenses::all('id', 'name');
-        $clients         = Client::all()->mapWithKeys(function ($client) {
-            return [$client->id => [
-                'name'           => $client->name,
-                'hasOpenProcess' => $client->hasOpenProcess(),
-                'processes'      => $client->processes->mapWithKeys(function ($process) {
-                    return [$process->id => [
-                        'name'   => $process->name,
-                        'status' => $process->status
-                    ]
-                    ];
-                })
-            ]
-            ];
-        });
-        $suppliers       = Supplier::all()->mapWithKeys(function ($supplier) {
-            return [$supplier->id => [
-                'name'           => $supplier->name,
-                'hasOpenProcess' => $supplier->hasOpenProcess(),
-                'processes'      => $supplier->processes->mapWithKeys(function ($process) {
-                    return [$process->id => [
-                        'name'   => $process->name,
-                        'status' => $process->status
-                    ]
-                    ];
-                })
-            ]
-            ];
-        });
-        $payMethods      = PaymentMethods::all();
-        $employeeActions = collect(EmployeeActions::all())->toJson();
+        $numbers['currentAmount']          = DepositWithdraw::calculateCurrentAmount($endDate);
+        $numbers['previousDayAmount']      = DepositWithdraw::calculateCurrentAmount($endDate->addDay(-1));
+        $employees                         = Employee::allAsList();
+        $expenses                          = Expenses::all('id', 'name');
+        $clients                           = Client::allAsList();
+        $suppliers                         = Supplier::allAsList();
+        $payMethods                        = PaymentMethods::all();
+        $employeeActions                   = collect(EmployeeActions::all())->toJson();
 
         return view('cash.journal.daily-cash')->with([
                                                          'numbers'          => $numbers,
@@ -118,17 +89,6 @@ class DailyCashController extends Controller
                                                          'canEdit'          => $canEdit,
                                                          'employeeActions'  => $employeeActions
                                                      ]);
-    }
-
-    private function calculateCurrentAmount($endDate = null, $startDate = '2000-01-01 00:00:00')
-    {
-        if (!isset($endDate)) {
-            $endDate = DateTime::today()->format('Y-m-d 00:00:00');
-        }
-        $depositValue  = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
-        $withdrawValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
-        $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
-        return round(($depositValue + $openingAmount) - $withdrawValue, Helpers::getDecimalPointCount());
     }
 
     /**
@@ -164,7 +124,7 @@ class DailyCashController extends Controller
         return response()->json([
                                     'success'       => true,
                                     'id'            => $depositWithdraw->id,
-                                    'currentAmount' => $this->calculateCurrentAmount(),
+                                    'currentAmount' => DepositWithdraw::calculateCurrentAmount(),
                                     'message'       => 'تم اضافة وارد جديد.'
                                 ]);
     }
@@ -294,7 +254,7 @@ class DailyCashController extends Controller
         return response()->json(array(
                                     'success'       => true,
                                     'rowsIds'       => $rowsIds,
-                                    'currentAmount' => $this->calculateCurrentAmount(),
+                                    'currentAmount' => DepositWithdraw::calculateCurrentAmount(),
                                     'message'       => 'تم حفظ الوارد.',
                                     //'errors' => $validator->getMessageBag()->toArray()
                                 ));
@@ -315,7 +275,7 @@ class DailyCashController extends Controller
         $rowsIds = [];
 
         foreach ($all['rowsIds'] as $id) {
-            $depositWithdraw                = DepositWithdraw::findOrFail($id);
+            $depositWithdraw = DepositWithdraw::findOrFail($id);
             DepositWithdraw::where('id', $id)->first()->delete();
             $this->checkProcessClosed($depositWithdraw);
             $this->resetDiscountBorrows($depositWithdraw);
@@ -324,7 +284,7 @@ class DailyCashController extends Controller
         return response()->json(array(
                                     'success'       => true,
                                     'rowsIds'       => $rowsIds,
-                                    'currentAmount' => $this->calculateCurrentAmount(),
+                                    'currentAmount' => DepositWithdraw::calculateCurrentAmount(),
                                     'message'       => 'تم حذف الوارد.',
                                     //'errors' => $validator->getMessageBag()->toArray()
                                 ));
@@ -425,7 +385,7 @@ class DailyCashController extends Controller
                                     'success'       => true,
                                     'id'            => $depositWithdraw->id,
                                     //'$depositWithdraw->cbo_processe' => $depositWithdraw->cbo_processes,
-                                    'currentAmount' => $this->calculateCurrentAmount(),
+                                    'currentAmount' => DepositWithdraw::calculateCurrentAmount(),
                                     'message'       => 'تم تعديل وارد جديد.',
                                     //'errors' => $validator->getMessageBag()->toArray()
                                 ));

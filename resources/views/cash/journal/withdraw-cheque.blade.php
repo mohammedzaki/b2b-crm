@@ -9,7 +9,7 @@
 @endif
 
 @section('select-bank')
-    @include('common.select-bank', ['formConfig' => ['method' => 'GET', 'route' => ['bankCash.withdrawChequeBook', ''], 'id' => 'SearchForm']])
+    @include('common.select-bank', ['formConfig' => ['method' => 'GET', 'route' => ['bank-cash.withdrawChequeBook', ''], 'id' => 'SearchForm']])
 @endsection
 
 @section("styles-l2")

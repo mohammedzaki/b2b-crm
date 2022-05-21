@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Extensions\DateTime;
+use App\Helpers\Helpers;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -92,5 +94,13 @@ class DepositWithdraw extends Model {
     
     public function employeeLogBorrowBillings() {
         return $this->hasMany(EmployeeBorrowBilling::class, 'deposit_id', 'id');
+    }
+
+    public static function calculateCurrentAmount($endDate = '2099-01-01 00:00:00', $startDate = '2000-01-01 00:00:00')
+    {
+        $depositValue  = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+        $withdrawValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
+        $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
+        return round(($depositValue + $openingAmount) - $withdrawValue, Helpers::getDecimalPointCount());
     }
 }

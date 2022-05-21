@@ -8,7 +8,7 @@
     @section('form-header', "وارد / منصرف بنك - {$bankName}")
 @endif
 @section('select-bank')
-    @include('common.select-bank', ['formConfig' => ['method' => 'GET', 'route' => ['bankCash.index', ''], 'id' => 'SearchForm']])
+    @include('common.select-bank', ['formConfig' => ['method' => 'GET', 'route' => ['bank-cash.index', ''], 'id' => 'SearchForm']])
 @endsection
 
 @section("styles-l2")
@@ -32,7 +32,6 @@
 @endsection
 
 @section('content')
-
     <!-- /.row -->
     @include('cash.journal._bank-cash-form')
 @endsection

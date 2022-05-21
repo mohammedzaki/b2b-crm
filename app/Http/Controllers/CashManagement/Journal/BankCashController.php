@@ -44,7 +44,7 @@ class BankCashController extends Controller
      *
      * @param Request $request
      * @return \Illuminate\Http\Response
-     * @Get("", as="bankCash.index")
+     * @Get("", as="bank-cash.index")
      */
     public function index(Request $request)
     {
@@ -82,19 +82,21 @@ class BankCashController extends Controller
         switch ($viewName) {
             case "cash.journal.cheque-book":
             case "cash.journal.withdraw-cheque":
-                $chequeStatuses = ChequeStatuses::withdrawStatuses();
+                $chequeStatuses        = ChequeStatuses::withdrawStatuses();
+                $depositDefaultStatus  = ChequeStatuses::POSTDATED;
+                $withdrawDefaultStatus = ChequeStatuses::POSTDATED;
                 break;
             case "cash.journal.deposit-cheque":
-                $chequeStatuses = ChequeStatuses::depositStatuses();
+                $chequeStatuses        = ChequeStatuses::depositStatuses();
+                $depositDefaultStatus  = ChequeStatuses::POSTDATED;
+                $withdrawDefaultStatus = ChequeStatuses::POSTDATED;
                 break;
             default:
-                $chequeStatuses = ChequeStatuses::all();
+                $chequeStatuses        = ChequeStatuses::all();
+                $depositDefaultStatus  = ChequeStatuses::BANK_DEPOSIT;
+                $withdrawDefaultStatus = ChequeStatuses::BANK_WITHDRAW;
                 break;
         }
-        $numbers['clients_number']         = Client::count();
-        $numbers['suppliers_number']       = Supplier::count();
-        $numbers['process_number']         = ClientProcess::count();
-        $numbers['Supplierprocess_number'] = SupplierProcess::count();
         $numbers['current_dayOfWeek']      = $startDate->dayOfWeek;
         $numbers['current_dayOfMonth']     = $startDate->day;
         $numbers['current_month']          = $startDate->month - 1;
@@ -110,20 +112,22 @@ class BankCashController extends Controller
         $employeeActions                   = collect(EmployeeActions::all())->toJson();
         $bankProfile                       = BankProfile::findOrFail($bankId);
         return view($viewName)->with([
-                                         'banks'           => $banks,
-                                         'numbers'         => $numbers,
-                                         'clients'         => $clients,
-                                         'employees'       => $employees,
-                                         'suppliers'       => $suppliers,
-                                         'expenses'        => $expenses,
-                                         'bankCashItems'   => $bankCashItemsItems,
-                                         'chequeStatuses'  => $chequeStatuses,
-                                         'canEdit'         => $canEdit,
-                                         'employeeActions' => $employeeActions,
-                                         'bankId'          => $bankId,
-                                         'bankName'        => $bankProfile->name,
-                                         'chequeBookName'  => $chequeBookName,
-                                         'chequeBookId'    => $chequeBookId
+                                         'banks'                 => $banks,
+                                         'numbers'               => $numbers,
+                                         'clients'               => $clients,
+                                         'employees'             => $employees,
+                                         'suppliers'             => $suppliers,
+                                         'expenses'              => $expenses,
+                                         'bankCashItems'         => $bankCashItemsItems,
+                                         'chequeStatuses'        => $chequeStatuses,
+                                         'canEdit'               => $canEdit,
+                                         'employeeActions'       => $employeeActions,
+                                         'bankId'                => $bankId,
+                                         'bankName'              => $bankProfile->name,
+                                         'chequeBookName'        => $chequeBookName,
+                                         'chequeBookId'          => $chequeBookId,
+                                         'depositDefaultStatus'  => $depositDefaultStatus,
+                                         'withdrawDefaultStatus' => $withdrawDefaultStatus
                                      ]);
     }
 
@@ -144,7 +148,7 @@ class BankCashController extends Controller
      * @param Request $request
      * @param $chequeBookId
      * @return \Illuminate\Http\Response
-     * @Get("/{chequeBookId}/index", as="bankCash.chequeBooks")
+     * @Get("/{chequeBookId}/index", as="bank-cash.chequeBooks")
      */
     public function chequeBooks(Request $request, $chequeBookId)
     {
@@ -162,7 +166,7 @@ class BankCashController extends Controller
      *
      * @param Request $request
      * @return \Illuminate\Http\Response
-     * @Get("/deposit-cheque", as="bankCash.depositChequeBook")
+     * @Get("/deposit-cheque", as="bank-cash.depositChequeBook")
      */
     public function depositChequeBook(Request $request)
     {
@@ -180,7 +184,7 @@ class BankCashController extends Controller
      *
      * @param Request $request
      * @return \Illuminate\Http\Response
-     * @Get("/withdraw-cheque", as="bankCash.withdrawChequeBook")
+     * @Get("/withdraw-cheque", as="bank-cash.withdrawChequeBook")
      */
     public function withdrawChequeBook(Request $request)
     {
@@ -199,7 +203,7 @@ class BankCashController extends Controller
      * @param  Request $request
      * @return Response
      * @throws ValidationException
-     * @Post("", as="bankCash.store")
+     * @Post("", as="bank-cash.store")
      */
     public function store(Request $request)
     {
@@ -333,7 +337,7 @@ class BankCashController extends Controller
      *
      * @param  Request $request
      * @return Response
-     * @Post("/lockSaveAll", as="bankCash.lockSaveAll")
+     * @Post("/lockSaveAll", as="bank-cash.lockSaveAll")
      */
     public function lockSaveAll(Request $request)
     {
@@ -359,7 +363,7 @@ class BankCashController extends Controller
      *
      * @param  Request $request
      * @return Response
-     * @Post("/removeSelected", as="bankCash.removeSelected")
+     * @Post("/removeSelected", as="bank-cash.removeSelected")
      * @throws \Exception
      */
     public function removeSelected(Request $request)
@@ -422,7 +426,7 @@ class BankCashController extends Controller
      * @param Request $request
      * @param  int $id
      * @return Response
-     * @Get("/search", as="bankCash.search")
+     * @Get("/search", as="bank-cash.search")
      * @Middleware({"ability:admin,bank-cash-edit"})
      */
     public function search(Request $request)
@@ -443,7 +447,7 @@ class BankCashController extends Controller
      * @param  int $id
      * @return Response
      * @throws ValidationException
-     * @PUT("{id}", as="bankCash.update")
+     * @PUT("{id}", as="bank-cash.update")
      */
     public function update(Request $request, $id)
     {

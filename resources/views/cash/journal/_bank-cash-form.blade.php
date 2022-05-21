@@ -111,7 +111,7 @@
                         </div>
                         <div class="col-sm-3">
                             <div class="alert alert-success">
-                                <label>رصيد الشيكات الاجلة : <span
+                                <label>رصيد الشيكات تحت التحصيل : <span
                                             id="depositsAmount">{{ $numbers['depositsAmount'] }}</span>
                                     جنيه</label>
                             </div>
@@ -131,7 +131,7 @@
 
                                 <div class="row">
                                     <div class="col-sm-12">
-                                        {{ Form::open(['route' => ['bankCash.store', $bankId], 'id' => 'bankCashForm', "role" => "form"]) }}
+                                        {{ Form::open(['route' => ['bank-cash.store', $bankId], 'id' => 'bankCashForm', "role" => "form"]) }}
 
                                         <table class="table table-striped table-bordered table-hover dataTable no-footer"
                                                id="bankCashTable" role="grid"
@@ -736,7 +736,7 @@
                         @if(Entrust::ability('admin', 'deposit-withdraw-edit'))
                             <div class="col-md-6">
                                 <!-- Date Picker-->
-                                {{ Form::open(['route' => ['bankCash.search', $bankId], 'method' => 'get']) }}
+                                {{ Form::open(['route' => ['bank-cash.search', $bankId], 'method' => 'get']) }}
                                 <input type="hidden" name="bankId" value="{{ $bankId }}">
                                 <div class="col-md-10">
                                     <input type="text" id="targetdate" name="targetdate" readonly
@@ -759,25 +759,26 @@
 
 @section('scripts')
     <script>
-        var expenses = {!! $expenses !!};
-        var bankId = {{ $bankId }};
-        var employeeActions = {!! $employeeActions !!};
-        var suppliers = {!! $suppliers !!};
-        var clients = {!! $clients !!};
+        var expenses = [{!! $expenses !!}][0];
+        var bankId = [{{ $bankId }}][0];
+        var employeeActions = [{!! $employeeActions !!}][0];
+        var suppliers = [{!! $suppliers !!}][0];
+        var clients = [{!! $clients !!}][0];
         var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id, expenses_id,
             recordDesc, cheque_number, cheque_status, cheque_book_id = null, cheque_notes, saveStatus, id, flag, canEdit, currentAmount,
             withdrawsAmount, depositsAmount, issuing_date, cashing_date, is_paid;
         var CurrentCell, CurrentCellName, CurrentRow, AfterCurrentRow, currentRowIndex, lastRowIndex = -1, rowCount = 1;
         var loadAll = false;
-        var canAddRow = @if(empty($canAddRow)) true;
-        @else {!! $canAddRow !!};@endif
+        var depositDefaultStatus = {!! $depositDefaultStatus !!};
+        var withdrawDefaultStatus = {!! $withdrawDefaultStatus !!};
+        var canAddRow = @if(empty($canAddRow)) true; @else {!! $canAddRow !!}; @endif
         LockAll();
         SetFinancialCustodyDetailsProcess();
         currentAmount = $("#currentAmount");
         withdrawsAmount = $("#withdrawsAmount");
         depositsAmount = $("#depositsAmount");
         @if(!empty($chequeBookId))
-            cheque_book_id = {{ $chequeBookId }};
+            cheque_book_id = '{{ $chequeBookId }}';
         @endif
         function LoadProcess(rowIndex) {
             client_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .client_id');
@@ -1248,6 +1249,7 @@
             employee_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .employee_id');
             expenses_id = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .expenses_id');
             cheque_number = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_number');
+            cheque_status = $('#grid_FinancialCustodyDetails tr:eq(' + rowIndex + ') .cheque_status');
             switch (cellName) {
                 case "depositValue":
                     withdrawValue.val('');
@@ -1256,6 +1258,7 @@
                     expenses_id.empty();
                     expenses_id.append($("<option></option>"));
                     cheque_number.removeAttr("disabled");
+                    cheque_status.val(depositDefaultStatus);
                     break;
                 case "withdrawValue":
                     depositValue.val('');
@@ -1268,6 +1271,7 @@
                     @if(!empty($chequeBookId))
                     cheque_number.attr("disabled", "disabled");
                     @endif
+                    cheque_status.val(withdrawDefaultStatus);
                         break;
                 case "recordDesc":
                     break;

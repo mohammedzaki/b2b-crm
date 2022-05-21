@@ -39,15 +39,19 @@
 
             @if(Entrust::ability('admin', 'deposit-withdraw'))
                 <li>
-                    <a href="{{ route('depositwithdraw.index') }}"><i class="fa fa-briefcase fa-fw"></i> وارد /
-                        منصرف</a>
+                    <a href="{{ route('depositwithdraw.index') }}"><i class="fa fa-briefcase fa-fw"></i> وارد / منصرف</a>
+                </li>
+            @endif
+
+            @if(Entrust::ability('admin', 'cash-flow'))
+                <li>
+                    <a href="{{ route('cash-flow.index') }}"><i class="fa fa-usd fa-fw"></i> شاشة الارصدة</a>
                 </li>
             @endif
 
             @if(Entrust::ability('admin', 'financial-custody-items'))
                 <li>
-                    <a href="{{ route('financialCustodyItems.index') }}"><i class="fa fa-briefcase fa-fw"></i> مصروفات
-                        عهدتي</a>
+                    <a href="{{ route('financialCustodyItems.index') }}"><i class="fa fa-file fa-fw"></i> مصروفات عهدتي</a>
                 </li>
             @endif
 
@@ -59,14 +63,14 @@
 
             @if(Entrust::ability('admin', 'manage-bank-profile'))
                 <li>
-                    <a href="client-processes"><i class="fa fa-bank fa-fw"></i>إدارة البنوك<span
+                    <a href="client-processes"><i class="fa fa-bank fa-fw"></i> إدارة البنوك<span
                                 class="fa arrow"></span></a>
                     <ul class="nav nav-second-level collapse">
                         <li><a href="{{ route('bank-profile.index') }}">الكل</a></li>
-                        <li><a href="{{ route('bankCash.index') }}">وارد/منصرف</a></li>
+                        <li><a href="{{ route('bank-cash.index') }}">وارد/منصرف</a></li>
                         <li><a href="{{ route('bank-profile.chequeBook') }}">دفتر الشيكات</a></li>
-                        <li><a href="{{ route('bankCash.depositChequeBook') }}">الشيكات الواردة</a></li>
-                        <li><a href="{{ route('bankCash.withdrawChequeBook') }}">الشيكات المنصرفة</a></li>
+                        <li><a href="{{ route('bank-cash.depositChequeBook') }}">الشيكات الواردة</a></li>
+                        <li><a href="{{ route('bank-cash.withdrawChequeBook') }}">الشيكات المنصرفة</a></li>
                         <li><a href="{{ route('bank-profile.create') }}">أضف بنك جديد</a></li>
                         <li><a href="{{ route('bank-profile.trash') }}">المحذوفات</a></li>
                     </ul>
@@ -75,7 +79,7 @@
 
             @if(Entrust::ability('admin', 'show-user-log'))
                 <li>
-                    <a href="{{ route('userLog.index') }}"><i class="fa fa-file-pdf-o fa-fw"></i>سجلات المستخدمين</a>
+                    <a href="{{ route('userLog.index') }}"><i class="fa fa-file-pdf-o fa-fw"></i> سجلات المستخدمين</a>
                 </li>
             @endif
 

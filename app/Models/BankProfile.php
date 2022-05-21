@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Constants\ChequeStatuses;
 
 /**
  * App\Models\Expenses
@@ -44,13 +45,83 @@ class BankProfile extends Model
         return $this->hasMany(BankCashItem::class, 'bank_profile_id');
     }
 
+    public function getCurrentChequeBook()
+    {
+        return $this->chequeBooks()->first();
+    }
+
     public function chequeBooks()
     {
         return $this->hasMany(BankChequeBook::class, 'bank_profile_id');
     }
 
-    public function getCurrentChequeBook()
+    public function deposits()
     {
-        return $this->chequeBooks()->first();
+        return $this->cashItems()->whereIn('cheque_status', [ChequeStatuses::BANK_DEPOSIT, ChequeStatuses::ATM_DEPOSIT]);
+    }
+
+    public function depositCheques()
+    {
+        return $this->cashItems()->whereIn('cheque_status', [ChequeStatuses::USED_PAID]);
+    }
+
+    public function withdraws()
+    {
+        return $this->cashItems()->whereIn('cheque_status', [ChequeStatuses::BANK_WITHDRAW, ChequeStatuses::ATM_WITHDRAW]);
+    }
+
+    public function withdrawCheques()
+    {
+        return $this->cashItems()->whereIn('cheque_status', [ChequeStatuses::USED_PAID]);
+    }
+
+    public function postdatedDepositCheques()
+    {
+        return $this->cashItems()->whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED]);
+    }
+
+    public function postdatedWithdrawCheques()
+    {
+        return $this->cashItems()->whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED]);
+    }
+
+    public function totalDeposits()
+    {
+        return $this->deposits()->sum('depositValue');
+    }
+
+    public function totalDepositCheques()
+    {
+        return $this->depositCheques()->sum('depositValue');
+    }
+
+    public function totalWithdraws()
+    {
+        return $this->withdraws()->sum('withdrawValue');
+    }
+
+    public function totalWithdrawCheques()
+    {
+        return $this->withdrawCheques()->sum('withdrawValue');
+    }
+
+    public function totalPostdatedDepositCheques()
+    {
+        return $this->postdatedDepositCheques()->sum('depositValue');
+    }
+
+    public function totalPostdatedWithdrawCheques()
+    {
+        return $this->postdatedWithdrawCheques()->sum('withdrawValue');
+    }
+
+    public function currentAmount()
+    {
+        return ($this->totalDeposits() + $this->totalDepositCheques()) - ($this->totalWithdraws() + $this->totalWithdrawCheques());
+    }
+
+    public function cashBalance()
+    {
+        return 0;
     }
 }
