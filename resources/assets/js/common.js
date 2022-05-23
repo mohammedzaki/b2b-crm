@@ -6,26 +6,30 @@ window.roundDecimals = function (value, decimals) {
 }
 
 $(document).ready(function () {
-    
-    $(".IsNumberOnly").keypress(function (evt) {
-        evt = (evt) ? evt : window.event;
-        var charCode = (evt.which) ? evt.which : evt.keyCode;
-        console.log(charCode, evt);
+
+    window.IsNumberOnly = function (evt) {
+        evt = evt ? evt : window.event;
+        var charCode = evt.which ? evt.which : evt.keyCode;
+        //console.log(charCode, evt);
         if (charCode > 31 && (charCode < 48 || charCode > 57)) {
             return false;
         }
         return true;
-    });
+    }
 
-    $(".IsNumberDecimal").keypress(function (evt) {
-        evt = (evt) ? evt : window.event;
-        var charCode = (evt.which) ? evt.which : evt.keyCode;
-        console.log(charCode, evt);
+    window.IsNumberDecimal = function (evt) {
+        evt = evt ? evt : window.event;
+        var charCode = evt.which ? evt.which : evt.keyCode;
+        //console.log(charCode, evt);
         if (charCode > 31 && (charCode < 48 || charCode > 57) && charCode != 46) {
             return false;
         }
         return true;
-    });
+    }
+
+    $(".IsNumberDecimal").keypress(IsNumberDecimal);
+
+    $(".IsNumberOnly").keypress(IsNumberOnly);
     
     $(".datepickerCommon").flatpickr({
         enableTime: false,

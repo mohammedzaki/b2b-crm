@@ -32,7 +32,7 @@ class BankChequeBook extends Model
 
     public function totalUsedNumbers()
     {
-        return 0;
+        return BankCashItem::where('cheque_book_id', $this->id)->count();
     }
 
     public function getNewChequeNumber()
@@ -44,14 +44,18 @@ class BankChequeBook extends Model
     {
         $bankCashItemsItems = collect(BankCashItem::where('cheque_book_id', $this->id)->get());
         $allBankCashItemsItems = collect();
-        for ($i = $this->start_number; $i < $this->end_number; $i++)
+        for ($i = $this->start_number; $i <= $this->end_number; $i++)
         {
             $item = $bankCashItemsItems->where('cheque_number', $i)->first();
             if(empty($item))
-                $allBankCashItemsItems->push(new BankCashItem(['cheque_book_id' => $this->id, 'cheque_number' => $i]));
+                $allBankCashItemsItems->push(new BankCashItem(['cheque_book_id' => $this->id, 'cheque_number' => $i, 'bank_profile_id' => $this->bank_profile_id]));
             else
                 $allBankCashItemsItems->push($item);
         }
         return $allBankCashItemsItems;
+    }
+
+    public function bankProfile() {
+        return $this->belongsTo(BankProfile::class)->withTrashed();
     }
 }

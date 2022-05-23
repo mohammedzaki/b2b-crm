@@ -37,6 +37,7 @@
                         <thead>
                         <tr>
                             <th>اسم الدفتر</th>
+                            <th>اسم البنك</th>
                             <th>الرقم التسلسلي من</th>
                             <th>الرقم التسلسلي الي</th>
                             <th>الشيكات المستخدمة حاليا</th>
@@ -44,18 +45,19 @@
                         </tr>
                         </thead>
                         <tbody id="prcoess_items">
-                        @forelse ($bankProfile->chequeBooks as $cheque)
+                        @forelse ($chequeBooks as $chequeBook)
                             <tr role="row">
-                                <td>{{ $cheque->name }}</td>
-                                <td>{{ $cheque->start_number }}</td>
-                                <td>{{ $cheque->end_number }}</td>
-                                <td>{{ $cheque->totalUsedNumbers() }}</td>
+                                <td>{{ $chequeBook->name }}</td>
+                                <td>{{ $chequeBook->bankProfile->name }}</td>
+                                <td>{{ $chequeBook->start_number }}</td>
+                                <td>{{ $chequeBook->end_number }}</td>
+                                <td>{{ $chequeBook->totalUsedNumbers() }}</td>
                                 <td>
-                                    {{ Form::open(['method' => 'DELETE', 'route' => ['bank-profile.cheque-book.destroy', $bankProfile->id, $cheque->id], 'onsubmit' => 'return ConfirmDelete()', 'style' => 'display: inline-block;']) }}
+                                    {{ Form::open(['method' => 'DELETE', 'route' => ['bank-profile.cheque-book.destroy', $chequeBook->bank_profile_id, $chequeBook->id], 'onsubmit' => 'return ConfirmDelete()', 'style' => 'display: inline-block;']) }}
                                     {{ Form::button('حذف', array('type' => 'submit', 'class' => 'btn btn-danger')) }}
                                     {{ Form::close() }}
-                                    {{ link_to_route('bank-profile.cheque-book.edit', 'تعديل', ['bank_profile' => $bankProfile->id, 'cheque_book' => $cheque->id], array('class' => 'btn btn-primary')) }}
-                                    {{ link_to_route('bank-cash.chequeBooks', 'الشيكات', ['bankId' => $bankProfile->id, 'chequeBookId' => $cheque->id], array('class' => 'btn btn-primary')) }}
+                                    {{ link_to_route('bank-profile.cheque-book.edit', 'تعديل', ['bank_profile' => $chequeBook->bank_profile_id, 'cheque_book' => $chequeBook->id], array('class' => 'btn btn-primary')) }}
+                                    {{ link_to_route('bank-cash.chequeBooks', 'الشيكات', ['bankId' => $chequeBook->bank_profile_id, 'chequeBookId' => $chequeBook->id], array('class' => 'btn btn-primary')) }}
                                 </td>
                             </tr>
                         @empty
@@ -64,15 +66,17 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="col-lg-3 ">
-                    <div class="form-group">
-                        <label for="inputError" class="control-label">
-                        </label>
-                        <button class="btn btn-lg btn-block btn-success" type="button" id="btnUpdateJobProfile">
-                            إضافة دفتر جديد
-                        </button>
+                @if($bankId !== 'all')
+                    <div class="col-lg-3 ">
+                        <div class="form-group">
+                            <label for="inputError" class="control-label">
+                            </label>
+                            <button class="btn btn-lg btn-block btn-success" type="button" id="btnUpdateJobProfile">
+                                إضافة دفتر جديد
+                            </button>
+                        </div>
                     </div>
-                </div>
+                @endif
             </div>
             <!-- /.panel-body -->
         </div>
@@ -90,7 +94,7 @@
         @if(isset($bankId))
         $('#btnUpdateJobProfile').on({
             'click': function () {
-                var link = "{{ route('bank-profile.cheque-book.create', ['bankId' => $bankProfile->id]) }}";
+                var link = "{{ route('bank-profile.cheque-book.create', ['bankId' => $bankId]) }}";
                 window.location.href = link;
             }
         });

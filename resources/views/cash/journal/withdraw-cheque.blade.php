@@ -23,6 +23,7 @@
         .cell.handle-supplier_id {}
         .cell.handle-employee_id {}
         .cell.handle-expenses_id {}
+        .cell.handle-issuing_date {}
         .cell.handle-cashing_date {}
         .cell.handle-cheque_number {}
         .cell.handle-cheque_status {}
@@ -31,7 +32,12 @@
 @endsection
 
 @section('content')
-
     <!-- /.row -->
     @include('cash.journal._bank-cash-form')
+@endsection
+
+@section('scripts-l2')
+    <script type="text/javascript">
+        document.querySelector('th.cell.handle-cashing_date').innerHTML = "تاريخ الصرف";
+    </script>
 @endsection

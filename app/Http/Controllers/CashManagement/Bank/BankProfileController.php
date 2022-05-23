@@ -12,6 +12,7 @@
 
 namespace App\Http\Controllers\CashManagement\Bank;
 
+use App\Models\BankChequeBook;
 use App\Models\BankProfile;
 use Illuminate\Http\Request;
 use Validator;
@@ -106,11 +107,14 @@ class BankProfileController
                                                               'bankProfile' => null
                                                           ]);
         } else {
-            $bankProfile = BankProfile::with('chequeBooks')->findOrFail($request->bankId);
+            $bankId = $request->bankId === 'all' ? null : $request->bankId;
+            $chequeBooks = BankChequeBook::with('bankProfile')->when($bankId, function ($query, $bankId) {
+                return $query->where('bank_profile_id', $bankId);
+            })->get(); //BankProfile::with('chequeBooks')->findOrFail($request->bankId);
             return view('bank-profile.cheque-book')->with([
                                                               'banks'       => $banks,
                                                               'bankId'      => $request->bankId,
-                                                              'bankProfile' => $bankProfile
+                                                              'chequeBooks' => $chequeBooks
                                                           ]);
         }
     }

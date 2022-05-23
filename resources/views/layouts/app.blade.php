@@ -35,6 +35,7 @@
         <script src="/plugins/moment/moment.min.js"></script>
         <script src="/plugins/fullcalendar/main.js"></script>
         <!-- /#wrapper -->
+        @yield('scripts-l2')
         @yield('scripts')
     </body>
 

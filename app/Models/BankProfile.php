@@ -33,11 +33,21 @@ class BankProfile extends Model
             'branch_address'
         ];
 
-    public static function allAsList()
+    /**
+     * @param bool $addSelectAllOpt
+     * @return BankProfile[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function allAsList($addSelectAllOpt = true)
     {
-        return static::all('id', 'name')->mapWithKeys(function ($bank) {
-            return [$bank->id => $bank->name];
-        });
+        $res = static::all('id', 'name');
+        $all = [];
+        if($addSelectAllOpt) {
+            $all['all'] = 'الكل';
+        }
+        foreach ($res as $bank) {
+            $all[$bank->id] = $bank->name;
+        }
+        return $all;
     }
 
     public function cashItems()
