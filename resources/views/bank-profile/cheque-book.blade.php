@@ -71,7 +71,7 @@
                         <div class="form-group">
                             <label for="inputError" class="control-label">
                             </label>
-                            <button class="btn btn-lg btn-block btn-success" type="button" id="btnUpdateJobProfile">
+                                     <button class="btn btn-lg btn-block btn-success" type="button" id="btnUpdateJobProfile">
                                 إضافة دفتر جديد
                             </button>
                         </div>
@@ -82,7 +82,6 @@
         </div>
         <!-- /.panel -->
     </div>
-
 </div>
 @endif
 

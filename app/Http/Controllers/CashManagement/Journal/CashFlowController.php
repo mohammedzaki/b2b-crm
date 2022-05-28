@@ -15,6 +15,7 @@ namespace App\Http\Controllers\CashManagement\Journal;
 use App\Http\Controllers\Controller;
 use App\Models\BankProfile;
 use App\Models\DepositWithdraw;
+use App\Models\FinancialCustody;
 use Illuminate\Http\Response;
 
 /**
@@ -25,7 +26,8 @@ use Illuminate\Http\Response;
  * @Controller(prefix="/cash-flow")
  * @Middleware({"web", "auth", "ability:admin,cash-flow"})
  */
-class CashFlowController extends Controller
+class CashFlowController extends
+    Controller
 {
     /**
      * Display a listing of the resource.
@@ -40,17 +42,22 @@ class CashFlowController extends Controller
 
     private function getItems($startDate = '2000-01-01 00:00:00', $endDate = '2099-01-01 00:00:00')
     {
+        $totalDW   = DepositWithdraw::calculateCurrentAmount($endDate);
+        $totalFC   = FinancialCustody::totalRemainingDeposits();
         $cashItems = collect([
                                  [
                                      'name'                     => 'خزينة الشركة',
-                                     'deposit'                  => DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue'),
-                                     'depositCheques'           => 0,
-                                     'withdraw'                 => DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue'),
-                                     'withdrawCheques'          => 0,
-                                     'currentAmount'            => DepositWithdraw::calculateCurrentAmount($endDate),
+                                     'currentAmount'            => $totalDW,
                                      'postdatedDepositCheques'  => 0,
                                      'postdatedWithdrawCheques' => 0,
-                                     'cashBalance'              => DepositWithdraw::calculateCurrentAmount($endDate)
+                                     'cashBalance'              => $totalDW
+                                 ],
+                                 [
+                                     'name'                     => 'إجمالي العهد المتبقية',
+                                     'currentAmount'            => $totalFC,
+                                     'postdatedDepositCheques'  => 0,
+                                     'postdatedWithdrawCheques' => 0,
+                                     'cashBalance'              => $totalFC
                                  ]
                              ]);
 
@@ -58,10 +65,6 @@ class CashFlowController extends Controller
             return [
                 [
                     'name'                     => $bank->name,
-                    'deposit'                  => $bank->totalDeposits(),
-                    'depositCheques'           => $bank->totalDepositCheques(),
-                    'withdraw'                 => $bank->totalWithdraws(),
-                    'withdrawCheques'          => $bank->totalWithdrawCheques(),
                     'currentAmount'            => $bank->currentAmount(),
                     'postdatedDepositCheques'  => $bank->totalPostdatedDepositCheques(),
                     'postdatedWithdrawCheques' => $bank->totalPostdatedWithdrawCheques(),

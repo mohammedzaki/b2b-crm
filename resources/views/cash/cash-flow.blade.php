@@ -37,16 +37,11 @@
                             <tr>
                                 <th>اسم الخزينة</th>
 
-                                <th>الوارد</th>
-                                <th>الشيكات الواردة</th>
+                                <th>الرصيد الفعلي</th>
 
-                                <th>المنصرف</th>
-                                <th>الشيكات المنصرفة</th>
+                                <th>شيكات تحت التحصيل</th>
 
-                                <th>الرصيد الحالى</th>
-
-                                <th>الشيكات الواردة تحت التحصيل</th>
-                                <th>الشيكات المنصرفة تحت التحصيل</th>
+                                <th>شيكات منصرفة اجل</th>
 
                                 <th>معادلة الارصدة</th>
                             </tr>
@@ -56,15 +51,10 @@
                                 <tr role="row">
                                     <td>{{ $item['name'] }}</td>
 
-                                    <td>{{ $item['deposit'] }}</td>
-                                    <td>{{ $item['depositCheques'] }}</td>
-
-                                    <td>{{ $item['withdraw'] }}</td>
-                                    <td>{{ $item['withdrawCheques'] }}</td>
-
                                     <td>{{ $item['currentAmount'] }}</td>
 
                                     <td>{{ $item['postdatedDepositCheques'] }}</td>
+
                                     <td>{{ $item['postdatedWithdrawCheques'] }}</td>
 
                                     <td>{{ $item['cashBalance'] }}</td>
@@ -77,15 +67,10 @@
                                 <tr role="row">
                                     <td>الاجمالي</td>
 
-                                    <td>{{ $sumDeposit }}</td>
-                                    <td>{{ $sumDepositCheques }}</td>
-
-                                    <td>{{ $sumWithdraw }}</td>
-                                    <td>{{ $sumWithdrawCheques }}</td>
-
                                     <td>{{ $sumCurrentAmount }}</td>
 
                                     <td>{{ $sumPostdatedDepositCheques }}</td>
+
                                     <td>{{ $sumPostdatedWithdrawCheques }}</td>
 
                                     <td>{{ $sumCashBalance }}</td>

@@ -65,34 +65,70 @@ class BankProfile extends Model
         return $this->hasMany(BankChequeBook::class, 'bank_profile_id');
     }
 
+    public function cashDeposits()
+    {
+        return $this->cashItems()
+                    ->whereIn('cheque_status', [ChequeStatuses::BANK_DEPOSIT, ChequeStatuses::ATM_DEPOSIT])
+                    ->whereNotNull('depositValue');
+    }
+
+    public function chequeDeposits()
+    {
+        return $this->cashItems()
+                    ->whereIn('cheque_status', [ChequeStatuses::USED_PAID])
+                    ->whereNotNull('depositValue');
+    }
+
     public function deposits()
     {
-        return $this->cashItems()->whereIn('cheque_status', [ChequeStatuses::BANK_DEPOSIT, ChequeStatuses::ATM_DEPOSIT]);
-    }
-
-    public function depositCheques()
-    {
-        return $this->cashItems()->whereIn('cheque_status', [ChequeStatuses::USED_PAID]);
-    }
-
-    public function withdraws()
-    {
-        return $this->cashItems()->whereIn('cheque_status', [ChequeStatuses::BANK_WITHDRAW, ChequeStatuses::ATM_WITHDRAW]);
-    }
-
-    public function withdrawCheques()
-    {
-        return $this->cashItems()->whereIn('cheque_status', [ChequeStatuses::USED_PAID]);
+        return $this->cashItems()
+                    ->whereIn('cheque_status', [ChequeStatuses::USED_PAID, ChequeStatuses::BANK_DEPOSIT, ChequeStatuses::ATM_DEPOSIT])
+                    ->whereNotNull('depositValue');
     }
 
     public function postdatedDepositCheques()
     {
-        return $this->cashItems()->whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED]);
+        return $this->cashItems()
+                    ->whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED])
+                    ->whereNotNull('depositValue');
+    }
+
+    public function cashWithdraws()
+    {
+        return $this->cashItems()
+                    ->whereIn('cheque_status', [ChequeStatuses::BANK_WITHDRAW, ChequeStatuses::ATM_WITHDRAW])
+                    ->whereNotNull('withdrawValue');
+    }
+
+    public function chequeWithdraws()
+    {
+        return $this->cashItems()
+                    ->whereIn('cheque_status', [ChequeStatuses::USED_PAID])
+                    ->whereNotNull('withdrawValue');
+    }
+
+    public function withdraws()
+    {
+        return $this->cashItems()
+                    ->whereIn('cheque_status', [ChequeStatuses::USED_PAID, ChequeStatuses::BANK_WITHDRAW, ChequeStatuses::ATM_WITHDRAW])
+                    ->whereNotNull('withdrawValue');
     }
 
     public function postdatedWithdrawCheques()
     {
-        return $this->cashItems()->whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED]);
+        return $this->cashItems()
+                    ->whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED])
+                    ->whereNotNull('withdrawValue');
+    }
+
+    public function totalCashDeposits()
+    {
+        return $this->cashDeposits()->sum('depositValue');
+    }
+
+    public function totalChequeDeposits()
+    {
+        return $this->chequeDeposits()->sum('depositValue');
     }
 
     public function totalDeposits()
@@ -100,24 +136,24 @@ class BankProfile extends Model
         return $this->deposits()->sum('depositValue');
     }
 
-    public function totalDepositCheques()
+    public function totalPostdatedDepositCheques()
     {
-        return $this->depositCheques()->sum('depositValue');
+        return $this->postdatedDepositCheques()->sum('depositValue');
+    }
+
+    public function totalCashWithdraws()
+    {
+        return $this->cashWithdraws()->sum('withdrawValue');
+    }
+
+    public function totalChequeWithdraws()
+    {
+        return $this->chequeWithdraws()->sum('withdrawValue');
     }
 
     public function totalWithdraws()
     {
         return $this->withdraws()->sum('withdrawValue');
-    }
-
-    public function totalWithdrawCheques()
-    {
-        return $this->withdrawCheques()->sum('withdrawValue');
-    }
-
-    public function totalPostdatedDepositCheques()
-    {
-        return $this->postdatedDepositCheques()->sum('depositValue');
     }
 
     public function totalPostdatedWithdrawCheques()
@@ -127,11 +163,11 @@ class BankProfile extends Model
 
     public function currentAmount()
     {
-        return ($this->totalDeposits() + $this->totalDepositCheques()) - ($this->totalWithdraws() + $this->totalWithdrawCheques());
+        return $this->totalDeposits() - $this->totalWithdraws();
     }
 
     public function cashBalance()
     {
-        return 0;
+        return ($this->currentAmount() + $this->totalPostdatedDepositCheques()) - $this->totalPostdatedWithdrawCheques();
     }
 }

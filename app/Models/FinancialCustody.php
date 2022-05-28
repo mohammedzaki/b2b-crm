@@ -65,9 +65,17 @@ class FinancialCustody extends Model
             'created_at'
         ];
 
-    public function totalDeposits()
+    /**
+     * @return int
+     */
+    public static function totalRemainingDeposits()
     {
-        return $this->deposits()->sum('withdrawValue');
+        $all   = static::whereNull('approved_at')->get();
+        $total = 0;
+        foreach ($all as $index => $item) {
+            $total += $item->totalDeposits() - $item->totalWithdraws();
+        }
+        return $total;
     }
 
     public function deposits()
@@ -80,9 +88,9 @@ class FinancialCustody extends Model
                             ]);
     }
 
-    public function totalRefundedDeposits()
+    public function totalDeposits()
     {
-        return $this->refundedDeposits()->sum('depositValue') + $this->totalWithdraws();
+        return $this->deposits()->sum('withdrawValue');
     }
 
     public function refundedDeposits()
@@ -95,14 +103,19 @@ class FinancialCustody extends Model
                             ]);
     }
 
-    public function totalWithdraws()
+    public function totalRefundedDeposits()
     {
-        return $this->withdraws()->sum('withdrawValue');
+        return $this->refundedDeposits()->sum('depositValue') + $this->totalWithdraws();
     }
 
     public function withdraws()
     {
         return $this->hasMany(FinancialCustodyItem::class, 'financial_custody_id');
+    }
+
+    public function totalWithdraws()
+    {
+        return $this->withdraws()->sum('withdrawValue');
     }
 
     public function employee()
