@@ -41,6 +41,7 @@ class SupplierDetailed extends BaseReport
         $processes = [];
         foreach ($this->processIds as $id) {
             $supplierProcess                         = SupplierProcess::findOrFail($id);
+            if($supplierProcess instanceof SupplierProcess);
             $processes[$id]['processName']           = $supplierProcess->name;
             $processes[$id]['processTotalPrice']     = $supplierProcess->total_price;
             $processes[$id]['processTotalPaid']      = $supplierProcess->totalWithdrawals() + $supplierProcess->discount_value;

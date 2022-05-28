@@ -58,6 +58,16 @@ class BankCashController extends
         }
     }
 
+    /**
+     * @param DateTime $startDate
+     * @param DateTime $endDate
+     * @param $canEdit
+     * @param $bankId
+     * @param null $chequeBookId
+     * @param string $viewName
+     * @param null $depositOrWithdrawField
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     private function getBankCashItem(DateTime $startDate, DateTime $endDate, $canEdit, $bankId, $chequeBookId = null, $viewName = 'cash.journal.bank-cash', $depositOrWithdrawField = null)
     {
         $banks = BankProfile::allAsList();
@@ -68,23 +78,22 @@ class BankCashController extends
                                          ]);
         }
         if ($chequeBookId == null) {
-            $id = $bankId === 'all' ? null : $bankId;
-            $bankCashItemsItems = BankCashItem::whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED])
-                                              ->when($depositOrWithdrawField, function ($query, $depositOrWithdrawField) {
-                                                  return $query->whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED])
-                                                               ->whereNotNull($depositOrWithdrawField);
-                                              }, function ($query) use ($startDate, $endDate) {
-                                                  return $query->whereBetween('due_date', [$startDate, $endDate]);
-                                              })
-                                              ->when($id, function ($query, $id) {
-                                                  return $query->where('bank_profile_id', $id);
-                                              })
-                                              ->get();
+            $id             = $bankId === 'all' ? null : $bankId;
+            $bankCashItems  = BankCashItem::whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED])
+                                          ->when($depositOrWithdrawField, function ($query, $depositOrWithdrawField) {
+                                              return $query->whereNotNull($depositOrWithdrawField);
+                                          }, function ($query) use ($startDate, $endDate) {
+                                              return $query->whereBetween('due_date', [$startDate, $endDate]);
+                                          })
+                                          ->when($id, function ($query, $id) {
+                                              return $query->where('bank_profile_id', $id);
+                                          })
+                                          ->get();
             $chequeBookName = '';
         } else {
-            $chequeBook         = BankChequeBook::find($chequeBookId);
-            $chequeBookName     = $chequeBook->name;
-            $bankCashItemsItems = $chequeBook->getBankCashItemsItems();
+            $chequeBook     = BankChequeBook::find($chequeBookId);
+            $chequeBookName = $chequeBook->name;
+            $bankCashItems  = $chequeBook->getBankCashItemsItems();
         }
         switch ($viewName) {
             case "cash.journal.cheque-book":
@@ -108,14 +117,27 @@ class BankCashController extends
         $numbers['current_dayOfMonth'] = $startDate->day;
         $numbers['current_month']      = $startDate->month - 1;
         $numbers['current_year']       = $startDate->year;
-        $numbers['withdrawsAmount']    = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
-        $numbers['depositsAmount']     = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
-        $numbers['currentAmount']      = $this->calculateCurrentAmount($endDate);
-        $numbers['previousDayAmount']  = $this->calculateCurrentAmount($endDate->addDay(-1));
+
         if ($bankId == 'all') {
-            $bankProfileName = 'الكل';
+            $bankProfileName                     = 'الكل';
+            $numbers['postdatedWithdrawCheques'] = 0;
+            $numbers['postdatedDepositCheques']  = 0;
+            $numbers['currentAmount']            = 0;
+            $numbers['cashBalance']              = 0;
+            $BankProfiles                        = BankProfile::all();
+            foreach ($BankProfiles as $index => $bank) {
+                $numbers['postdatedWithdrawCheques'] += $bank->totalPostdatedWithdrawCheques();
+                $numbers['postdatedDepositCheques']  += $bank->totalPostdatedDepositCheques();
+                $numbers['currentAmount']            += $bank->currentAmount();
+                $numbers['cashBalance']              += $bank->cashBalance();
+            }
         } else {
-            $bankProfileName = BankProfile::findOrFail($bankId)->name;
+            $bankProfile                         = BankProfile::findOrFail($bankId);
+            $bankProfileName                     = $bankProfile->name;
+            $numbers['postdatedWithdrawCheques'] = $bankProfile->totalPostdatedWithdrawCheques();
+            $numbers['postdatedDepositCheques']  = $bankProfile->totalPostdatedDepositCheques();
+            $numbers['currentAmount']            = $bankProfile->currentAmount();
+            $numbers['cashBalance']              = $bankProfile->cashBalance();
         }
         return view($viewName)->with([
                                          'banks'                 => $banks,
@@ -125,7 +147,7 @@ class BankCashController extends
                                          'employees'             => Employee::allAsList(),
                                          'suppliers'             => Supplier::allAsList(),
                                          'expenses'              => Expenses::all('id', 'name'),
-                                         'bankCashItems'         => $bankCashItemsItems,
+                                         'bankCashItems'         => $bankCashItems,
                                          'chequeStatuses'        => $chequeStatuses,
                                          'canEdit'               => $canEdit,
                                          'employeeActions'       => collect(EmployeeActions::all())->toJson(),
@@ -136,17 +158,6 @@ class BankCashController extends
                                          'depositDefaultStatus'  => $depositDefaultStatus,
                                          'withdrawDefaultStatus' => $withdrawDefaultStatus
                                      ]);
-    }
-
-    private function calculateCurrentAmount($endDate = null, $startDate = '2000-01-01 00:00:00')
-    {
-        if (!isset($endDate)) {
-            $endDate = DateTime::today()->format('Y-m-d 00:00:00');
-        }
-        $depositValue  = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
-        $withdrawValue = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
-        $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
-        return round(($depositValue + $openingAmount) - $withdrawValue, Helpers::getDecimalPointCount());
     }
 
     /**
@@ -337,6 +348,17 @@ class BankCashController extends
                 $process->checkProcessMustClosed();
             }
         }
+    }
+
+    private function calculateCurrentAmount($endDate = null, $startDate = '2000-01-01 00:00:00')
+    {
+        if (!isset($endDate)) {
+            $endDate = DateTime::today()->format('Y-m-d 00:00:00');
+        }
+        $depositValue  = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+        $withdrawValue = BankCashItem::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
+        $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
+        return round(($depositValue + $openingAmount) - $withdrawValue, Helpers::getDecimalPointCount());
     }
 
     /**

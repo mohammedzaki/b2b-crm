@@ -48,7 +48,7 @@ class CostCenter extends BaseReport implements IReport
                 'processName'            => $process->name,
                 'processNum'             => $process->id,
                 'processDate'            => $process->created_at,
-                'processExpenses'        => $this->getProcessExpences($process),
+                'processExpenses'        => $this->getProcessExpenses($process),
                 'processSuppliers'       => $this->getProcessSuppliers($process),
                 'manpowerHoursCost'      => $this->getManpowerHoursCost($process),
                 'companyExpenses'        => $this->getCompanyExpenses($process),
@@ -69,7 +69,7 @@ class CostCenter extends BaseReport implements IReport
         return $data;
     }
 
-    private function getProcessExpences(ClientProcess $process)
+    private function getProcessExpenses(ClientProcess $process)
     {
         $processExpences            = $process->expenses()->map(function ($item, $key) {
             return [

@@ -7,7 +7,8 @@ use App\Models\Client;
 use App\Models\ClientProcess;
 use App\Reports\V2\BaseReport;
 
-class ClientDetailed extends BaseReport
+class ClientDetailed extends
+    BaseReport
 {
 
     public
@@ -29,6 +30,10 @@ class ClientDetailed extends BaseReport
         $this->printRouteAction = 'reports.client.accountStatement.printPDF';
     }
 
+    /**
+     * @param bool $withUserLog
+     * @return array
+     */
     public function getReportData($withUserLog = false)
     {
         $client                   = Client::findOrFail($this->clientId);
@@ -40,9 +45,9 @@ class ClientDetailed extends BaseReport
         $processes                = [];
 
         foreach ($this->processIds as $id) {
-            $clientProcess                 = ClientProcess::findOrFail($id);
-            $processes[$id]['processName'] = $clientProcess->name;
-
+            $clientProcess = ClientProcess::findOrFail($id);
+            if ($clientProcess instanceof ClientProcess);
+            $processes[$id]['processName']           = $clientProcess->name;
             $processes[$id]['processTotalPrice']     = ($clientProcess->total_price + $clientProcess->taxesValue()) - $clientProcess->source_discount_value;
             $processes[$id]['processTotalPaid']      = $clientProcess->totalDeposits() + $clientProcess->discount_value;
             $processes[$id]['processTotalRemaining'] = $clientProcess->total_price_taxes - $clientProcess->totalDeposits();
@@ -56,6 +61,7 @@ class ClientDetailed extends BaseReport
             $index             = 0;
             $totalDepositValue = 0;
             foreach ($clientProcess->items as $item) {
+                $processes[$id]['processDetails'][$index]['pending']    = "";
                 $processes[$id]['processDetails'][$index]['date']       = DateTime::parseToDateFormat($item->created_at);
                 $processes[$id]['processDetails'][$index]['remaining']  = "";
                 $processes[$id]['processDetails'][$index]['paid']       = "";
@@ -69,6 +75,7 @@ class ClientDetailed extends BaseReport
                 $index++;
             }
             if ($clientProcess->has_discount == TRUE) {
+                $processes[$id]['processDetails'][$index]['pending']    = "";
                 $processes[$id]['processDetails'][$index]['date']       = DateTime::parseToDateFormat($clientProcess->created_at);
                 $processes[$id]['processDetails'][$index]['remaining']  = "";
                 $processes[$id]['processDetails'][$index]['paid']       = $clientProcess->discount_value;
@@ -79,6 +86,7 @@ class ClientDetailed extends BaseReport
                 $index++;
             }
             if ($clientProcess->has_source_discount == TRUE) {
+                $processes[$id]['processDetails'][$index]['pending']    = "";
                 $processes[$id]['processDetails'][$index]['date']       = DateTime::parseToDateFormat($clientProcess->created_at);
                 $processes[$id]['processDetails'][$index]['remaining']  = "";
                 $processes[$id]['processDetails'][$index]['paid']       = "";
@@ -89,6 +97,7 @@ class ClientDetailed extends BaseReport
                 $index++;
             }
             if ($clientProcess->require_invoice == TRUE) {
+                $processes[$id]['processDetails'][$index]['pending']    = "";
                 $processes[$id]['processDetails'][$index]['date']       = DateTime::parseToDateFormat($clientProcess->created_at);
                 $processes[$id]['processDetails'][$index]['remaining']  = "";
                 $processes[$id]['processDetails'][$index]['paid']       = "";
@@ -98,9 +107,10 @@ class ClientDetailed extends BaseReport
                 $processes[$id]['processDetails'][$index]['desc']       = "قيمة الضريبة المضافة";
                 $index++;
             }
-            $items = $withUserLog ? $clientProcess->depositsWithTrashed : $clientProcess->deposits;
+            $items = $withUserLog ? $clientProcess->depositsWithTrashed() : $clientProcess->deposits();
             foreach ($items as $deposit) {
                 $totalDepositValue                                      += $deposit->depositValue;
+                $processes[$id]['processDetails'][$index]['pending']    = $deposit->pendingStatus;
                 $processes[$id]['processDetails'][$index]['date']       = DateTime::parseToDateFormat($deposit->due_date);
                 $processes[$id]['processDetails'][$index]['remaining']  = $clientProcess->total_price_taxes - $totalDepositValue;
                 $processes[$id]['processDetails'][$index]['paid']       = $deposit->depositValue;
@@ -108,7 +118,7 @@ class ClientDetailed extends BaseReport
                 $processes[$id]['processDetails'][$index]['unitPrice']  = "";
                 $processes[$id]['processDetails'][$index]['quantity']   = "";
                 $processes[$id]['processDetails'][$index]['desc']       = $deposit->recordDesc;
-                if($withUserLog) {
+                if ($withUserLog) {
                     $processes[$id]['processDetails'][$index]['deleted'] = $deposit->deleted_at;
                     $processes[$id]['processDetails'][$index]['id']      = $deposit->id;
                 }

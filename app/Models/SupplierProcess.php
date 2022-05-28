@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
+use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use DB;
 
 /**
  * App\Models\SupplierProcess
@@ -113,28 +113,46 @@ class SupplierProcess extends Model {
 
     public function dwWithdrawals()
     {
-        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
-                                                                                  ['supplier_id', "=", $this->supplier_id],
-                                                                                  ['withdrawValue', ">", 0]
-                                                                              ])->select(DB::raw('NULL as pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
+        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')
+                    ->where([
+                                ['supplier_id', "=", $this->supplier_id],
+                                ['withdrawValue', ">", 0]
+                            ])
+                    ->select(DB::raw('NULL as pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
     }
 
     public function fcWithdrawals()
     {
-        return $this->hasMany(FinancialCustodyItem::class, 'cbo_processes')->where([
-                                                                                       ['supplier_id', "=", $this->supplier_id],
-                                                                                       ['withdrawValue', ">", 0]
-                                                                                   ])->select(DB::raw('IF(ISNULL(approved_at),1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc', 'deleted_at', 'id');
+        return $this->hasMany(FinancialCustodyItem::class, 'cbo_processes')
+                    ->where([
+                                ['supplier_id', "=", $this->supplier_id],
+                                ['withdrawValue', ">", 0]
+                            ])
+                    ->select(DB::raw('IF(ISNULL(approved_at),1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc', 'deleted_at', 'id');
+    }
+
+    public function bankWithdrawals()
+    {
+        return $this->hasMany(BankCashItem::class, 'cbo_processes')
+                    ->where([
+                                ['supplier_id', "=", $this->supplier_id],
+                                ['withdrawValue', ">", 0]
+                            ])
+                    ->select(DB::raw('IF(cheque_status <> 1 OR cheque_status <> 7,1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc', 'deleted_at', 'id');
     }
 
     public function withdrawals()
     {
-        return collect($this->dwWithdrawals)->merge($this->fcWithdrawals)->sortBy('due_date');
+        return collect($this->dwWithdrawals)
+            ->merge($this->fcWithdrawals)
+            ->merge($this->bankWithdrawals)->sortBy('due_date');
     }
 
     public function withdrawalsWithTrashed()
     {
-        return collect($this->dwWithdrawals()->withTrashed()->get())->merge($this->fcWithdrawals()->withTrashed()->get())->sortBy('due_date');
+        return collect($this->dwWithdrawals()->withTrashed()->get())
+            ->merge($this->fcWithdrawals()->withTrashed()->get())
+            ->merge($this->bankWithdrawals()->withTrashed()->get())->sortBy('due_date');
     }
 
     public function totalWithdrawals() {

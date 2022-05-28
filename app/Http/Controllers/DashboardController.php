@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Constants\ChequeStatuses;
 use App\Http\Requests;
+use App\Models\BankCashItem;
 use App\Models\Client;
-use App\Models\Supplier;
 use App\Models\ClientProcess;
+use App\Models\DepositWithdraw;
 use App\Models\Employee;
 use App\Models\Expenses;
-use App\Models\SupplierProcess;
-use App\Models\DepositWithdraw;
 use App\Models\Facility;
-use Validator;
+use App\Models\Supplier;
+use App\Models\SupplierProcess;
 
 /**
  * @Controller(prefix="/")
@@ -62,4 +62,24 @@ class DashboardController extends Controller {
         return view('dashboard', compact(['numbers', 'clients', 'employees', 'suppliers', 'expenses']));
     }
 
+    /**
+     * Show the application dashboard.
+     *
+     * @return \Illuminate\Http\Response
+     * @Get("/getCalendarItems", as="getCalendarItems")
+     * @Middleware({"auth"})
+     */
+    public function getCalendarItems()
+    {
+        $bankCashItems = BankCashItem::whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED])->get();
+        return $bankCashItems->mapWithKeys(function ($item, $index) {
+            return [
+                $index => [
+                    "title" => $item->recordDesc . ' ' . $item->cheque_number,
+                    "start" => $item->cashing_date,
+                    "end"   => $item->cashing_date
+                ]
+            ];
+        });
+    }
 }

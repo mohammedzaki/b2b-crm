@@ -158,7 +158,7 @@
                         <div class="col-sm-6">
                             <div class="alert alert-danger">
                                 <label>معادلة الارصدة : <span
-                                            id="previousDayAmount">{{ $numbers['previousDayAmount'] }}</span>
+                                            id="previousDayAmount">{{ $numbers['cashBalance'] }}</span>
                                     جنيه</label>
                             </div>
                         </div>
@@ -171,14 +171,14 @@
                         <div class="col-sm-3">
                             <div class="alert alert-success">
                                 <label>رصيد الشيكات تحت التحصيل : <span
-                                            id="depositsAmount">{{ $numbers['depositsAmount'] }}</span>
+                                            id="depositsAmount">{{ $numbers['postdatedDepositCheques'] }}</span>
                                     جنيه</label>
                             </div>
                         </div>
                         <div class="col-sm-3">
                             <div class="alert alert-success">
                                 <label>رصيد الشيكات المنصرفة : <span
-                                            id="withdrawsAmount">{{ $numbers['withdrawsAmount'] }}</span>
+                                            id="withdrawsAmount">{{ $numbers['postdatedWithdrawCheques'] }}</span>
                                     جنيه</label>
                             </div>
                         </div>

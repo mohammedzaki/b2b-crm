@@ -34,7 +34,7 @@
                                     <label> مسلسل :</label> {{ $process['processNum'] }}
                                 </div>
                             </th>
-                            <th colspan="6">
+                            <th @if($withUserLog) colspan="7" @else colspan="6" @endif>
                                 <div>
                                     <label> اسم العملية :</label> {{ $process['processName'] }}
                                 </div>
@@ -53,7 +53,7 @@
                     </thead>
                     <tbody>
                     @forelse ($process['processDetails'] as $details)
-                        <tr class="odd @if(isset($details['deleted'])) isDeleted @endif">
+                        <tr class="odd @if(isset($details['deleted'])) isDeleted @endif @if($details['pending']) isPending @endif">
                             <td> {{ $details['date'] }} </td>
                             <td> {{ $details['remaining'] }} </td>
                             <td class="redColor"> {{ $details['paid'] }} </td>
@@ -70,7 +70,7 @@
                         <td class="redColor">{{ $process['processTotalRemaining'] }}</td>
                         <td class="redColor">{{ $process['processTotalPaid'] }}</td>
                         <td colspan="3" class="redColor">{{ $process['processTotalPrice'] }}</td>
-                        <td class="redColor">
+                        <td @if($withUserLog) colspan="2" @endif class="redColor">
                             الاجمالـــــــــــــــــــــــــــــــــــى
                         </td>
                     </tr>
@@ -117,7 +117,7 @@
                         <td class="redColor">{{ $allProcessTotalRemaining }}</td>
                         <td class="redColor">{{ $allProcessTotalPaid }}</td>
                         <td colspan="3" class="redColor">{{ $allProcessesTotalPrice }}</td>
-                        <td class="redColor">
+                        <td @if($withUserLog) colspan="2" @endif class="redColor">
                             الاجمالـــــــــــــــــــــــــــــــــــى
                         </td>
                     </tr>
