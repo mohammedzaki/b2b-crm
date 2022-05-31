@@ -76,32 +76,32 @@ class BankCashItem extends Model
 
     public function items()
     {
-        return $this->hasMany('App\Models\ClientProcessItem', 'process_id');
+        return $this->hasMany('App\Models\ClientProcessItem', 'process_id')->withTrashed();
     }
 
     public function employee()
     {
-        return $this->belongsTo('App\Models\Employee', 'employee_id');
+        return $this->belongsTo('App\Models\Employee', 'employee_id')->withTrashed();
     }
 
     public function client()
     {
-        return $this->belongsTo('App\Models\Client', 'client_id');
+        return $this->belongsTo('App\Models\Client', 'client_id')->withTrashed();
     }
 
     public function supplier()
     {
-        return $this->belongsTo('App\Models\Supplier', 'supplier_id');
+        return $this->belongsTo('App\Models\Supplier', 'supplier_id')->withTrashed();
     }
 
     public function expenses()
     {
-        return $this->belongsTo('App\Models\Expenses', 'expenses_id');
+        return $this->belongsTo('App\Models\Expenses', 'expenses_id')->withTrashed();
     }
 
     public function bank()
     {
-        return $this->belongsTo(BankProfile::class, 'bank_profile_id');
+        return $this->belongsTo(BankProfile::class, 'bank_profile_id')->withTrashed();
     }
 
     /**
