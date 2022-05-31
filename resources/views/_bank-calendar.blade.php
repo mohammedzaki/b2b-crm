@@ -14,6 +14,9 @@
         .table-bordered td, .table-bordered th {
             border: 1px solid #dee2e6;
         }
+        .fc-list-event-time {
+            display:none;
+        }
     </style>
 @endsection
 @section('scripts')
@@ -38,18 +41,31 @@
 
 
             var calendar = new Calendar(calendarEl, {
+                initialView: 'listYear',
                 headerToolbar: {
                     start: 'title', // will normally be on the left. if RTL, will be on the right
-                    center: '',
+                    center: 'dayGridMonth,listMonth,listYear',
                     end: 'today prevYear,prev,next,nextYear' // will normally be on the right. if RTL, will be on the left
                 },
+
                 themeSystem: 'bootstrap',
                 locale: 'ar',
                 direction: 'rtl',
                 firstDay: 6,
                 buttonText: {
                     today: 'الشهر الحالي',
+                    dayGridMonth: 'عرض شبكي',
+                    listMonth: 'عرض اجندة',
+                    listYear: 'عرض الكل'
                 },
+                eventDidMount: function(info) {
+                    $(info.el).tooltip({
+                        title: info.event.extendedProps.description,
+                        container: 'body',
+                        delay: { "show": 50, "hide": 50 }
+                    });
+                },
+
                 //Random default events
                 events: [
 
@@ -68,8 +84,7 @@
                         failure: function() {
                             alert('there was an error while fetching events!');
                         },
-                        color: 'yellow',   // a non-ajax option
-                        textColor: 'black' // a non-ajax option
+                        color: 'yellow'
                     }
 
                     // any other sources...

@@ -107,7 +107,7 @@ class SupplierDetailed extends BaseReport
                 $processes[$id]['processDetails'][$index]['totalPrice'] = "";
                 $processes[$id]['processDetails'][$index]['unitPrice']  = "";
                 $processes[$id]['processDetails'][$index]['quantity']   = "";
-                $processes[$id]['processDetails'][$index]['desc']       = $withdrawal->recordDesc;
+                $processes[$id]['processDetails'][$index]['desc']       = isset($withdrawal->bank_profile_id) ? $withdrawal->getDescription(false) : $withdrawal->recordDesc;
                 if ($withUserLog) {
                     $processes[$id]['processDetails'][$index]['deleted'] = $withdrawal->deleted_at;
                     $processes[$id]['processDetails'][$index]['id']      = $withdrawal->id;

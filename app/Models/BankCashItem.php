@@ -46,8 +46,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\DepositWithdraw whereWithdrawValue($value)
  * @mixin \Eloquent
  */
-class BankCashItem extends Model {
-
+class BankCashItem extends Model
+{
     use SoftDeletes;
     protected $table = "bank_cashes";
     protected $dates = ['deleted_at', 'due_date'];
@@ -74,27 +74,51 @@ class BankCashItem extends Model {
     ];
 
 
-    public function items() {
+    public function items()
+    {
         return $this->hasMany('App\Models\ClientProcessItem', 'process_id');
     }
 
-    public function employee() {
-        return $this->hasOne('App\Models\Employee', 'id');
-    }
-    
-    public function client() {
-        return $this->hasOne('App\Models\Client', 'id');
-    }
-    
-    public function supplier() {
-        return $this->hasOne('App\Models\Supplier', 'id');
+    public function employee()
+    {
+        return $this->belongsTo('App\Models\Employee', 'employee_id');
     }
 
-    public function expenses() {
-        return $this->hasOne('App\Models\Expenses', 'id');
+    public function client()
+    {
+        return $this->belongsTo('App\Models\Client', 'client_id');
     }
-    
-    public function bank() {
-        return $this->belongsTo(BankProfile::class);
+
+    public function supplier()
+    {
+        return $this->belongsTo('App\Models\Supplier', 'supplier_id');
+    }
+
+    public function expenses()
+    {
+        return $this->belongsTo('App\Models\Expenses', 'expenses_id');
+    }
+
+    public function bank()
+    {
+        return $this->belongsTo(BankProfile::class, 'bank_profile_id');
+    }
+
+    /**
+     * @param bool $addFor
+     * @return string
+     */
+    public function getDescription($addFor = true)
+    {
+        $for = $addFor ? (isset($this->client_id) ? ", عميل: {$this->client->name}" : ", مورد: {$this->supplier->name}") : '';
+        return " شيك رقم: {$this->cheque_number}, {$this->bank->name}, {$this->recordDesc} {$for}";
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return isset($this->withdrawValue) ? "شيك منصرف بقيمة:{$this->withdrawValue}" : "شيك وارد بقيمة: {$this->depositValue}";
     }
 }

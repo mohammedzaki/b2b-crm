@@ -117,7 +117,7 @@ class ClientDetailed extends
                 $processes[$id]['processDetails'][$index]['totalPrice'] = "";
                 $processes[$id]['processDetails'][$index]['unitPrice']  = "";
                 $processes[$id]['processDetails'][$index]['quantity']   = "";
-                $processes[$id]['processDetails'][$index]['desc']       = $deposit->recordDesc;
+                $processes[$id]['processDetails'][$index]['desc']       = isset($deposit->bank_profile_id) ? $deposit->getDescription(false) : $deposit->recordDesc;
                 if ($withUserLog) {
                     $processes[$id]['processDetails'][$index]['deleted'] = $deposit->deleted_at;
                     $processes[$id]['processDetails'][$index]['id']      = $deposit->id;

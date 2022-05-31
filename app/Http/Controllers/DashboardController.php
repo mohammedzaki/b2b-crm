@@ -18,8 +18,10 @@ use App\Models\SupplierProcess;
  * @Controller(prefix="/")
  * @Middleware({"web"})
  */
-class DashboardController extends Controller {
-    
+class DashboardController extends
+    Controller
+{
+
     /**
      * Show the application dashboard.
      *
@@ -28,21 +30,22 @@ class DashboardController extends Controller {
      * @Get("/", as="home")
      * @Middleware({"auth"})
      */
-    public function index() {
+    public function index()
+    {
         $numbers['clients_number']         = Client::count();
         $numbers['suppliers_number']       = Supplier::count();
         $numbers['process_number']         = ClientProcess::count();
         $numbers['Supplierprocess_number'] = SupplierProcess::count();
         // TODO: must re-program
-        $numbers['current_amount']         = ((DepositWithdraw::sum('depositValue') + Facility::sum('opening_amount')) - DepositWithdraw::sum('withdrawValue'));
-        $clients                           = Client::select('id', 'name')->get();
-        $employees                         = Employee::select('id', 'name')->get();
-        $suppliers                         = Supplier::select('id', 'name')->get();
-        $expenses                          = Expenses::all();
-        $clients_tmp                       = [];
-        $employees_tmp                     = [];
-        $suppliers_tmp                     = [];
-        $expenses_tmp                      = [];
+        $numbers['current_amount'] = ((DepositWithdraw::sum('depositValue') + Facility::sum('opening_amount')) - DepositWithdraw::sum('withdrawValue'));
+        $clients                   = Client::select('id', 'name')->get();
+        $employees                 = Employee::select('id', 'name')->get();
+        $suppliers                 = Supplier::select('id', 'name')->get();
+        $expenses                  = Expenses::all();
+        $clients_tmp               = [];
+        $employees_tmp             = [];
+        $suppliers_tmp             = [];
+        $expenses_tmp              = [];
         foreach ($clients as $client) {
             $clients_tmp[$client->id] = $client->name;
         }
@@ -72,12 +75,15 @@ class DashboardController extends Controller {
     public function getCalendarItems()
     {
         $bankCashItems = BankCashItem::whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED])->get();
-        return $bankCashItems->mapWithKeys(function ($item, $index) {
+        return $bankCashItems->mapWithKeys(function (BankCashItem $item, $index) {
             return [
                 $index => [
-                    "title" => $item->recordDesc . ' ' . $item->cheque_number,
-                    "start" => $item->cashing_date,
-                    "end"   => $item->cashing_date
+                    "title"           => $item->getTitle() . ' ... ' . $item->getDescription(),
+                    "start"           => $item->cashing_date,
+                    "description"     => $item->getDescription(),
+                    "backgroundColor" => isset($item->withdrawValue) ? 'red' : 'green',
+                    "borderColor"     => isset($item->withdrawValue) ? 'red' : 'green',
+                    "end"             => $item->cashing_date
                 ]
             ];
         });

@@ -7,6 +7,7 @@ use App\Extensions\DateTime;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Constants\ChequeStatuses;
 
 /**
  * App\Models\ClientProcess
@@ -144,7 +145,7 @@ class ClientProcess extends
                                 ['client_id', "=", $this->client_id],
                                 ['depositValue', ">", 0],
                             ])
-                    ->select(DB::raw('IF(cheque_status <> 1 OR cheque_status <> 7,1,NULL) AS pendingStatus, bank_cashes.*'));
+                    ->select(DB::raw('IF(cheque_status <> ' . ChequeStatuses::POSTDATED . ' OR cheque_status <> ' . ChequeStatuses::POSTPONED . ',1,NULL) AS pendingStatus, bank_cashes.*'));
     }
 
     public function dwDeposits()
@@ -185,7 +186,7 @@ class ClientProcess extends
                                 ['client_id', "=", $this->client_id],
                                 ['withdrawValue', ">", 0]
                             ])
-                    ->select(DB::raw('IF(cheque_status <> 1 OR cheque_status <> 7,1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
+                    ->select(DB::raw('IF(cheque_status <> ' . ChequeStatuses::POSTDATED . ' OR cheque_status <> ' . ChequeStatuses::POSTPONED . ',1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
     }
 
     public function expenses()
@@ -242,7 +243,6 @@ class ClientProcess extends
 
     public function depositsWithTrashed()
     {
-        //return $this->deposits()->withTrashed();
         return collect($this->dwDeposits()->withTrashed()->get())->merge($this->bankDeposits()->withTrashed()->get())->sortBy('due_date');
     }
 

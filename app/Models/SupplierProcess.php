@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Constants\ChequeStatuses;
 use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -138,7 +139,7 @@ class SupplierProcess extends Model {
                                 ['supplier_id', "=", $this->supplier_id],
                                 ['withdrawValue', ">", 0]
                             ])
-                    ->select(DB::raw('IF(cheque_status <> 1 OR cheque_status <> 7,1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc', 'deleted_at', 'id');
+                    ->select(DB::raw('IF(cheque_status <> ' . ChequeStatuses::POSTDATED . ' OR cheque_status <> ' . ChequeStatuses::POSTPONED . ',1,NULL) AS pendingStatus, bank_cashes.*'));
     }
 
     public function withdrawals()
