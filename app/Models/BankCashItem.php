@@ -110,7 +110,14 @@ class BankCashItem extends Model
      */
     public function getDescription($addFor = true)
     {
-        $for = $addFor ? (isset($this->client_id) ? ", عميل: {$this->client->name}" : ", مورد: {$this->supplier->name}") : '';
+        $for = '';
+        if ($addFor) {
+            if (isset($this->client_id)) {
+                $for = ", عميل: {$this->client->name}";
+            } elseif (isset($this->supplier_id)) {
+                $for = ", مورد: {$this->supplier->name}";
+            }
+        }
         return " شيك رقم: {$this->cheque_number}, {$this->bank->name}, {$this->recordDesc} {$for}";
     }
 
