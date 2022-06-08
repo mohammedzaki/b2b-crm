@@ -63,7 +63,7 @@ class CashFlowController extends
 
         $banks = BankProfile::all()->mapWithKeys(function (BankProfile $bank) {
             return [
-                [
+                $bank->id => [
                     'name'                     => $bank->name,
                     'currentAmount'            => $bank->currentAmount(),
                     'postdatedDepositCheques'  => $bank->totalPostdatedDepositCheques(),
