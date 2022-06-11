@@ -74,6 +74,28 @@
                             الاجمالـــــــــــــــــــــــــــــــــــى
                         </td>
                     </tr>
+                    @if(count($process['processGuarantee']) > 0)
+                    <tr class="processHeader">
+                        <th @if($withUserLog) colspan="8" @else colspan="7" @endif>
+                            <div class="text-center">
+                                <label> خطابات الضمان</label>
+                            </div>
+                        </th>
+                    </tr>
+                    @endif
+                    @forelse ($process['processGuarantee'] as $details)
+                        <tr class="odd @if(isset($details['deleted'])) isDeleted @endif @if($details['pending']) isPending @endif">
+                            <td> {{ $details['date'] }} </td>
+                            <td> {{ $details['remaining'] }} </td>
+                            <td class="redColor"> {{ $details['paid'] }} </td>
+                            <td> {{ $details['totalPrice'] }} </td>
+                            <td> {{ $details['unitPrice'] }} </td>
+                            <td> {{ $details['quantity'] }} </td>
+                            <td> {{ $details['desc'] }} </td>
+                            @if($withUserLog) <td> @if(isset($details['id'])) {{ link_to_route('userLog.search', 'عرض', array('row_id' => $details['id']), array('class' => 'btn btn-primary')) }} @endif </td> @endif
+                        </tr>
+                    @empty
+                    @endforelse
                     </tbody>
                 </table>
                 @if(count($processes) > 1)

@@ -20,7 +20,7 @@ use Validator;
 /**
  * @Controller(prefix="loans")
  * @Resource("loans")
- * @Middleware({"web", "auth"})
+ * @Middleware({"web", "auth", "ability:admin,loans"})
  */
 class LoansController extends Controller {
 

@@ -24,7 +24,7 @@ use Validator;
  *
  * @Controller(prefix="bank-profile")
  * @Resource("bank-profile")
- * @Middleware({"web", "auth", "ability:admin,bank-profile"})
+ * @Middleware({"web", "auth", "ability:admin,bank-cash"})
  */
 class BankProfileController
 {

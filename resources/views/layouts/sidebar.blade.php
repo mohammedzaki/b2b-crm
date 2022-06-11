@@ -61,7 +61,7 @@
                 </li>
             @endif
 
-            @if(Entrust::ability('admin', 'manage-bank-profile'))
+            @if(Entrust::ability('admin', 'bank-cash'))
                 <li>
                     <a href="client-processes"><i class="fa fa-bank fa-fw"></i> إدارة البنوك<span
                                 class="fa arrow"></span></a>

@@ -12,7 +12,7 @@ use Validator;
 /**
  * @Controller(prefix="/cheque-book/{bankId}")
  * @Resource("bank-profile.cheque-book")
- * @Middleware({"web", "auth", "ability:admin,bank-profile"})
+ * @Middleware({"web", "auth", "ability:admin,bank-cash"})
  */
 class ChequeBookController extends Controller
 {
