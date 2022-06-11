@@ -86,7 +86,7 @@ class FinancialCustodyItemsController extends Controller
         $employees       = Employee::all('id', 'name')->mapWithKeys(function ($emp) {
             return [$emp->id => $emp->name];
         });
-        $expenses        = Expenses::all('id', 'name');
+        $expenses        = Expenses::allAsList();
         $clients         = Client::all()->mapWithKeys(function ($client) {
             return [
                 $client->id => [

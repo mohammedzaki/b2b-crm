@@ -26,7 +26,7 @@ class ExpensesReportController extends Controller {
      * @Get("/", as="reports.expenses.index")
      */
     public function index() {
-        $expenses = Expenses::all(['id', 'name']);
+        $expenses = Expenses::allAsList(false);
         return view('reports.expenses.index', compact("expenses"));
     }
 

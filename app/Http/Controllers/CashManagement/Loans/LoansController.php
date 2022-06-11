@@ -13,6 +13,7 @@
 namespace App\Http\Controllers\CashManagement\Loans;
 
 use App\Http\Controllers\Controller;
+use App\Models\BankProfile;
 use App\Models\Loans;
 use Illuminate\Http\Request;
 use Validator;
@@ -42,7 +43,14 @@ class LoansController extends Controller {
     }
 
     public function create() {
-        return view('loans.create');
+        $saves = BankProfile::allAsList(false, true);
+        return view('loans.create')->with([
+            'loanTypes' => [
+                1 => 'بنوك بفوائد',
+                2 => 'افراد'
+            ],
+            'saves' => $saves
+        ]);
     }
 
     public function store(Request $request) {

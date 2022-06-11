@@ -149,6 +149,7 @@ class BankCashController extends
             $numbers['currentAmount']            = $bankProfile->currentAmount();
             $numbers['cashBalance']              = $bankProfile->cashBalance();
         }
+
         return view($viewName)->with([
                                          'banks'                 => $banks,
                                          'bankProfiles'          => BankProfile::allAsList(false),
@@ -156,7 +157,7 @@ class BankCashController extends
                                          'clients'               => Client::allAsList(),
                                          'employees'             => Employee::allAsList(),
                                          'suppliers'             => Supplier::allAsList(),
-                                         'expenses'              => Expenses::all('id', 'name'),
+                                         'expenses'              => Expenses::allAsList(),
                                          'bankCashItems'         => $bankCashItems,
                                          'chequeStatuses'        => $chequeStatuses,
                                          'canEdit'               => $canEdit ? 1 : 0,

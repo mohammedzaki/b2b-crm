@@ -37,12 +37,15 @@ class BankProfile extends Model
      * @param bool $addSelectAllOpt
      * @return BankProfile[]|\Illuminate\Database\Eloquent\Collection
      */
-    public static function allAsList($addSelectAllOpt = true)
+    public static function allAsList($addSelectAllOpt = true, $addLocalSave = false)
     {
         $res = static::all('id', 'name');
         $all = [];
         if($addSelectAllOpt) {
             $all['all'] = 'الكل';
+        }
+        if($addLocalSave) {
+            $all['0'] = 'خزنة الشركة';
         }
         foreach ($res as $bank) {
             $all[$bank->id] = $bank->name;

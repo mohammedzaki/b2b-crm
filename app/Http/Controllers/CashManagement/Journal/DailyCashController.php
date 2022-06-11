@@ -72,7 +72,7 @@ class DailyCashController extends Controller
         $numbers['currentAmount']          = DepositWithdraw::calculateCurrentAmount($endDate);
         $numbers['previousDayAmount']      = DepositWithdraw::calculateCurrentAmount($endDate->addDay(-1));
         $employees                         = Employee::allAsList();
-        $expenses                          = Expenses::all('id', 'name');
+        $expenses                          = Expenses::allAsList();
         $clients                           = Client::allAsList();
         $suppliers                         = Supplier::allAsList();
         $payMethods                        = PaymentMethods::all();

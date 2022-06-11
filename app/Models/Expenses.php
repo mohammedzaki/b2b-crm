@@ -28,7 +28,21 @@ class Expenses extends Model
     
     public $startDate;
     public $endDate;
-    
+
+
+    /**
+     * @param bool $addLoans
+     * @return Expenses[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function allAsList($addLoans = true)
+    {
+        $res = static::all('id', 'name');
+        if($addLoans) {
+            $res = collect([0 => ['id' => 0, 'name' => 'قروض']])->merge($res);
+        }
+        return $res;
+    }
+
     public function getTotalPaid() {
         return $this->paidItems()->sum('withdrawValue');
     }

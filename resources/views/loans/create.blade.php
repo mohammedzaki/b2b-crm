@@ -23,8 +23,8 @@
         </div>
     @endif
 
-    {{ Form::open(['route' => 'expenses.store']) }}
-        @include('expenses._form')
+    {{ Form::open(['route' => 'loans.store']) }}
+        @include('loans._form')
     {{ Form::close() }}
 
 </div>
