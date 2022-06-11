@@ -124,6 +124,24 @@ class ClientDetailed extends
                 }
                 $index++;
             }
+            $index             = 0;
+            $itemsGG = $withUserLog ? $clientProcess->bankGuaranteeDeposits()->withTrashed()->get() : $clientProcess->bankGuaranteeDeposits;
+            $processes[$id]['processGuarantee'] = [];
+            foreach ($itemsGG as $deposit) {
+                $processes[$id]['processGuarantee'][$index]['pending']    = $deposit->pendingStatus;
+                $processes[$id]['processGuarantee'][$index]['date']       = DateTime::parseToDateFormat($deposit->due_date);
+                $processes[$id]['processGuarantee'][$index]['remaining']  = '';
+                $processes[$id]['processGuarantee'][$index]['paid']       = $deposit->depositValue;
+                $processes[$id]['processGuarantee'][$index]['totalPrice'] = '';
+                $processes[$id]['processGuarantee'][$index]['unitPrice']  = '';
+                $processes[$id]['processGuarantee'][$index]['quantity']   = '';
+                $processes[$id]['processGuarantee'][$index]['desc']       = isset($deposit->bank_profile_id) ? $deposit->getDescription(false) : $deposit->recordDesc;
+                if ($withUserLog) {
+                    $processes[$id]['processGuarantee'][$index]['deleted'] = $deposit->deleted_at;
+                    $processes[$id]['processGuarantee'][$index]['id']      = $deposit->id;
+                }
+                $index++;
+            }
         }
         $data = [
             'clientName'               => $clientName,

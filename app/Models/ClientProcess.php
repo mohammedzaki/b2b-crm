@@ -144,8 +144,20 @@ class ClientProcess extends
                     ->where([
                                 ['client_id', "=", $this->client_id],
                                 ['depositValue', ">", 0],
+                                ['cheque_status', "<>", ChequeStatuses::GUARANTEE],
                             ])
                     ->select(DB::raw('IF(cheque_status <> ' . ChequeStatuses::POSTDATED . ' OR cheque_status <> ' . ChequeStatuses::POSTPONED . ',1,NULL) AS pendingStatus, bank_cashes.*'));
+    }
+
+    public function bankGuaranteeDeposits()
+    {
+        return $this->hasMany(BankCashItem::class, 'cbo_processes')
+            ->where([
+                ['client_id', "=", $this->client_id],
+                ['depositValue', ">", 0],
+                ['cheque_status', "=", ChequeStatuses::GUARANTEE],
+            ])
+            ->select(DB::raw('1 AS pendingStatus, bank_cashes.*'));
     }
 
     public function dwDeposits()

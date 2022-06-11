@@ -71,6 +71,7 @@
                         <li><a href="{{ route('bank-profile.chequeBook') }}">دفتر الشيكات</a></li>
                         <li><a href="{{ route('bank-cash.depositChequeBook') }}">الشيكات الواردة</a></li>
                         <li><a href="{{ route('bank-cash.withdrawChequeBook') }}">الشيكات المنصرفة</a></li>
+                        <li><a href="{{ route('bank-cash.guaranteeChequeBook') }}">شيكات خطاب ضمان</a></li>
                         <li><a href="{{ route('bank-profile.create') }}">أضف بنك جديد</a></li>
                         <li><a href="{{ route('bank-profile.trash') }}">المحذوفات</a></li>
                     </ul>
@@ -140,6 +141,16 @@
                         <li><a href="{{ route('supplier.index') }}">الكل</a></li>
                         <li><a href="{{ route('supplier.create') }}">أضف جديد</a></li>
                         <li><a href="{{ route('supplier.trash') }}">المحذوفات</a></li>
+                    </ul>
+                </li>
+            @endif
+
+            @if(Entrust::ability('admin', 'new-outgoing'))
+                <li>
+                    <a href="loans"><i class="fa fa-files-o fa-fw"></i> قرض جديد<span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level collapse">
+                        <li><a href="{{ route('loans.index') }}">الكل</a></li>
+                        <li><a href="{{ route('loans.create') }}">أضف جديد</a></li>
                     </ul>
                 </li>
             @endif

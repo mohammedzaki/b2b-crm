@@ -51,11 +51,7 @@ class BankCashController extends
     {
         $startDate = DateTime::today()->startOfDay();
         $endDate   = DateTime::today()->endOfDay();
-        if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $request->bankId);
-        } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $request->bankId);
-        }
+        return $this->getBankCashItem($startDate, $endDate, auth()->user()->hasRole('admin'), $request->bankId);
     }
 
     /**
@@ -79,16 +75,25 @@ class BankCashController extends
         }
         if ($chequeBookId == null) {
             $id             = $bankId === 'all' ? null : $bankId;
-            $bankCashItems  = BankCashItem::whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED])
-                                          ->when($depositOrWithdrawField, function ($query, $depositOrWithdrawField) {
-                                              return $query->whereNotNull($depositOrWithdrawField);
-                                          }, function ($query) use ($startDate, $endDate) {
-                                              return $query->whereBetween('due_date', [$startDate, $endDate]);
-                                          })
-                                          ->when($id, function ($query, $id) {
-                                              return $query->where('bank_profile_id', $id);
-                                          })
-                                          ->get();
+            $bankCashItems = BankCashItem:: //whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED])
+                when($depositOrWithdrawField == 'guarantee', function ($query) {
+                    return $query->whereIn('cheque_status', [ChequeStatuses::GUARANTEE]);
+                })
+                ->when($depositOrWithdrawField != 'guarantee', function ($query) {
+                    return $query->whereIn('cheque_status', [ChequeStatuses::POSTDATED, ChequeStatuses::POSTPONED]);
+                })
+                ->when(($depositOrWithdrawField && $depositOrWithdrawField != 'guarantee'),
+                    function ($query) use ($depositOrWithdrawField) {
+                        return $query->whereNotNull($depositOrWithdrawField);
+                    },
+                    function ($query) use ($startDate, $endDate) {
+                        return $query->whereBetween('due_date', [$startDate, $endDate]);
+                    }
+                )
+                ->when($id, function ($query, $id) {
+                    return $query->where('bank_profile_id', $id);
+                })
+                ->get();
             $chequeBookName = '';
         } else {
             $chequeBook     = BankChequeBook::find($chequeBookId);
@@ -105,6 +110,11 @@ class BankCashController extends
             case "cash.journal.deposit-cheque":
                 $chequeStatuses        = ChequeStatuses::depositStatuses();
                 $depositDefaultStatus  = ChequeStatuses::POSTDATED;
+                $withdrawDefaultStatus = ChequeStatuses::POSTDATED;
+                break;
+            case "cash.journal.guarantee-cheque":
+                $chequeStatuses        = ChequeStatuses::depositStatuses();
+                $depositDefaultStatus  = ChequeStatuses::GUARANTEE;
                 $withdrawDefaultStatus = ChequeStatuses::POSTDATED;
                 break;
             default:
@@ -149,7 +159,7 @@ class BankCashController extends
                                          'expenses'              => Expenses::all('id', 'name'),
                                          'bankCashItems'         => $bankCashItems,
                                          'chequeStatuses'        => $chequeStatuses,
-                                         'canEdit'               => $canEdit,
+                                         'canEdit'               => $canEdit ? 1 : 0,
                                          'employeeActions'       => collect(EmployeeActions::all())->toJson(),
                                          'bankId'                => $bankId,
                                          'bankName'              => $bankProfileName,
@@ -172,11 +182,7 @@ class BankCashController extends
     {
         $startDate = DateTime::today()->startOfDay();
         $endDate   = DateTime::today()->endOfDay();
-        if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $request->bankId, $chequeBookId, 'cash.journal.cheque-book');
-        } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $request->bankId, $chequeBookId, 'cash.journal.cheque-book');
-        }
+        return $this->getBankCashItem($startDate, $endDate, auth()->user()->hasRole('admin'), $request->bankId, $chequeBookId, 'cash.journal.cheque-book');
     }
 
     /**
@@ -190,11 +196,21 @@ class BankCashController extends
     {
         $startDate = DateTime::today()->startOfDay();
         $endDate   = DateTime::today()->endOfDay();
-        if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $request->bankId, null, 'cash.journal.deposit-cheque', 'depositValue');
-        } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $request->bankId, null, 'cash.journal.deposit-cheque', 'depositValue');
-        }
+        return $this->getBankCashItem($startDate, $endDate, auth()->user()->hasRole('admin'), $request->bankId, null, 'cash.journal.deposit-cheque', 'depositValue');
+    }
+
+    /**
+     * Display a listing of the resource.
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response
+     * @Get("/guarantee-cheque", as="bank-cash.guaranteeChequeBook")
+     */
+    public function guaranteeChequeBook(Request $request)
+    {
+        $startDate = DateTime::today()->startOfDay();
+        $endDate   = DateTime::today()->endOfDay();
+        return $this->getBankCashItem($startDate, $endDate, auth()->user()->hasRole('admin'), $request->bankId, null, 'cash.journal.guarantee-cheque', 'guarantee');
     }
 
     /**
@@ -208,11 +224,7 @@ class BankCashController extends
     {
         $startDate = DateTime::today()->startOfDay();
         $endDate   = DateTime::today()->endOfDay();
-        if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $request->bankId, null, 'cash.journal.withdraw-cheque', 'withdrawValue');
-        } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $request->bankId, null, 'cash.journal.withdraw-cheque', 'withdrawValue');
-        }
+        return $this->getBankCashItem($startDate, $endDate, auth()->user()->hasRole('admin'), $request->bankId, null, 'cash.journal.withdraw-cheque', 'withdrawValue');
     }
 
     /**
@@ -462,11 +474,7 @@ class BankCashController extends
     {
         $startDate = DateTime::parse($request['targetdate'])->startOfDay();
         $endDate   = DateTime::parse($request['targetdate'])->endOfDay();
-        if (auth()->user()->hasRole('admin')) {
-            return $this->getBankCashItem($startDate, $endDate, 1, $request->bankId);
-        } else {
-            return $this->getBankCashItem($startDate, $endDate, 0, $request->bankId);
-        }
+        return $this->getBankCashItem($startDate, $endDate, auth()->user()->hasRole('admin'), $request->bankId);
     }
 
     /**

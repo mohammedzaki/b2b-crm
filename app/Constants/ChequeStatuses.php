@@ -19,6 +19,7 @@ class ChequeStatuses
     const STOPPED   = 5;
     const USED_PAID = 6;
     const POSTPONED = 7;
+    const GUARANTEE = 8;
 
     const BANK_DEPOSIT    = 31;
     const BANK_WITHDRAW   = 32;
@@ -36,6 +37,7 @@ class ChequeStatuses
         $chequeStatuses[ChequeStatuses::STOPPED]         = "متوقف";
         $chequeStatuses[ChequeStatuses::USED_PAID]       = "مستخدم (تم الصرف)";
         $chequeStatuses[ChequeStatuses::POSTPONED]       = "تأجيل الشيك للسداد";
+        $chequeStatuses[ChequeStatuses::GUARANTEE]       = "خطاب ضمان";
         $chequeStatuses[ChequeStatuses::BANK_DEPOSIT]    = "ايداع شباك";
         $chequeStatuses[ChequeStatuses::BANK_WITHDRAW]   = "سحب شباك";
         $chequeStatuses[ChequeStatuses::ATM_DEPOSIT]     = "ايداع ATM";
@@ -57,6 +59,7 @@ class ChequeStatuses
         $chequeStatuses[ChequeStatuses::STOPPED]   = "متوقف";
         $chequeStatuses[ChequeStatuses::USED_PAID] = "مستخدم (تم الصرف)";
         $chequeStatuses[ChequeStatuses::POSTPONED] = "تأجيل الشيك للسداد";
+        $chequeStatuses[ChequeStatuses::GUARANTEE] = "خطاب ضمان";
         return $chequeStatuses;
     }
 
@@ -70,6 +73,7 @@ class ChequeStatuses
         $chequeStatuses[ChequeStatuses::REJECTED]  = "مرفوض";
         $chequeStatuses[ChequeStatuses::USED_PAID] = "مستخدم (تم التحصيل)";
         $chequeStatuses[ChequeStatuses::POSTPONED] = "تأجيل الشيك للسداد";
+        $chequeStatuses[ChequeStatuses::GUARANTEE] = "خطاب ضمان";
         return $chequeStatuses;
     }
 

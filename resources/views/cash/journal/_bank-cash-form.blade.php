@@ -740,12 +740,12 @@
 @section('scripts')
     <script type="text/javascript">
         $(function () {
-            var expenses = [{!! $expenses !!}][0];
-            var employeeActions = [{!! $employeeActions !!}][0];
-            var suppliers = [{!! $suppliers !!}][0];
-            var clients = [{!! $clients !!}][0];
-            var depositDefaultStatus = [{!! $depositDefaultStatus !!}][0];
-            var withdrawDefaultStatus = [{!! $withdrawDefaultStatus !!}][0];
+            var expenses = {!! $expenses !!};
+            var employeeActions = {!! $employeeActions !!};
+            var suppliers = {!! $suppliers !!};
+            var clients = {!! $clients !!};
+            var depositDefaultStatus = {!! $depositDefaultStatus !!};
+            var withdrawDefaultStatus = {!! $withdrawDefaultStatus !!};
             var bankId = '{{ $bankId }}';
 
             var checkDelete, depositValue, withdrawValue, cbo_processes, client_id, supplier_id, employee_id,
