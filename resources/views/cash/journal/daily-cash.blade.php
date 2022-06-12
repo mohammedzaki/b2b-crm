@@ -661,6 +661,7 @@
 @section('scripts')
     <script>
         var expenses = {!! $expenses !!};
+        var loans = {!! $loans !!};
         var employeeActions = {!! $employeeActions !!};
         var suppliers = {!! $suppliers !!};
         var clients = {!! $clients !!};
@@ -749,14 +750,23 @@
                         expenses_id.append('<option value="' + employeeAction.id + '">' + employeeAction.name + '</option>');
                     }
                 });
-            } else if (expenses_idVal > 0) {
+            } else if (expenses_idVal >= 0) {
                 $.each(expenses, function (i, expense) {
-                    if (expense.id == expenses_idVal) {
-                        expenses_id.append('<option selected value="' + expense.id + '">' + expense.name + '</option>');
-                    } else {
-                        expenses_id.append('<option value="' + expense.id + '">' + expense.name + '</option>');
-                    }
+                    // if (expense.id == expenses_idVal) {
+                    //     expenses_id.append('<option selected value="' + expense.id + '">' + expense.name + '</option>');
+                    // } else {
+                    expenses_id.append('<option value="' + expense.id + '">' + expense.name + '</option>');
+                    // }
                 });
+                expenses_id.val(expenses_idVal);
+                if (expenses_idVal == '0') {
+                    // cbo_processes.empty();
+                    // cbo_processes.append($("<option></option>").attr("value", -1).text(''));
+                    $.each(loans, function (i, loan) {
+                        cbo_processes.append($("<option></option>").attr("value", loan.id).text(loan.name));
+                    });
+                    cbo_processes.val(cbo_processesVal);
+                }
             }
         }
 
@@ -1131,6 +1141,12 @@
                         depositValue.val('');
                     }
                     cbo_processes.empty();
+                    if (expenses_id.val() === '0') {
+                        cbo_processes.append($("<option></option>").attr("value", -1).text(''));
+                        $.each(loans, function (i, loan) {
+                            cbo_processes.append($("<option></option>").attr("value", loan.id).text(loan.name));
+                        });
+                    }
                     break;
                 case "notes":
                     break;

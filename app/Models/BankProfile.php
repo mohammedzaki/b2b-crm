@@ -166,7 +166,8 @@ class BankProfile extends Model
 
     public function currentAmount()
     {
-        return $this->totalDeposits() - $this->totalWithdraws();
+        $loanAmount = Loans::where('save_id', '=', $this->id)->sum('amount');
+        return ($this->totalDeposits() + $loanAmount) - $this->totalWithdraws();
     }
 
     public function cashBalance()

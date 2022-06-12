@@ -24,13 +24,29 @@ class Loans extends Model
     //
     protected $fillable = [
         'name',
-        'lender',
-        'interest'
+        'lender_name',
+        'loan_type',
+        'save_id',
+        'date',
+        'amount',
+        'interest',
+        'duration_per_years',
+        'amount_after_interest',
+        'monthly_installment'
     ];
     
     public $startDate;
     public $endDate;
-    
+
+    /**
+     * @param bool $addLoans
+     * @return Expenses[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function allAsList()
+    {
+        return static::all('id', 'name');
+    }
+
     public function getTotalPaid() {
         return $this->paidItems()->sum('withdrawValue');
     }

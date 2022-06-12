@@ -24,6 +24,7 @@ use App\Models\DepositWithdraw;
 use App\Models\Employee;
 use App\Models\EmployeeBorrowBilling;
 use App\Models\Expenses;
+use App\Models\Loans;
 use App\Models\OpeningAmount;
 use App\Models\Supplier;
 use App\Models\SupplierProcess;
@@ -58,6 +59,7 @@ class DailyCashController extends Controller
 
     private function getDepositWithdrawsItems(DateTime $startDate, DateTime $endDate, $canEdit)
     {
+        $depositWithdrawsItems             = DepositWithdraw::getDWItems($startDate, $endDate);
         $numbers['clients_number']         = Client::count();
         $numbers['suppliers_number']       = Supplier::count();
         $numbers['process_number']         = ClientProcess::count();
@@ -66,28 +68,22 @@ class DailyCashController extends Controller
         $numbers['current_dayOfMonth']     = $startDate->day;
         $numbers['current_month']          = $startDate->month - 1;
         $numbers['current_year']           = $startDate->year;
-        $depositWithdrawsItems             = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->get();
-        $numbers['withdrawsAmount']        = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
-        $numbers['depositsAmount']         = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
+        $numbers['withdrawsAmount']        = $depositWithdrawsItems->sum('withdrawValue');
+        $numbers['depositsAmount']         = $depositWithdrawsItems->sum('depositValue');
         $numbers['currentAmount']          = DepositWithdraw::calculateCurrentAmount($endDate);
         $numbers['previousDayAmount']      = DepositWithdraw::calculateCurrentAmount($endDate->addDay(-1));
-        $employees                         = Employee::allAsList();
-        $expenses                          = Expenses::allAsList();
-        $clients                           = Client::allAsList();
-        $suppliers                         = Supplier::allAsList();
-        $payMethods                        = PaymentMethods::all();
-        $employeeActions                   = collect(EmployeeActions::all())->toJson();
 
         return view('cash.journal.daily-cash')->with([
                                                          'numbers'          => $numbers,
-                                                         'clients'          => $clients,
-                                                         'employees'        => $employees,
-                                                         'suppliers'        => $suppliers,
-                                                         'expenses'         => $expenses,
+                                                         'clients'          => Client::allAsList(),
+                                                         'employees'        => Employee::allAsList(),
+                                                         'suppliers'        => Supplier::allAsList(),
+                                                         'expenses'         => Expenses::allAsList(),
+                                                         'loans'            => Loans::allAsList(),
                                                          'depositWithdraws' => $depositWithdrawsItems,
-                                                         'payMethods'       => $payMethods,
-                                                         'canEdit'          => $canEdit,
-                                                         'employeeActions'  => $employeeActions
+                                                         'payMethods'       => PaymentMethods::all(),
+                                                         'canEdit'          => $canEdit ? 1 : 0,
+                                                         'employeeActions'  => collect(EmployeeActions::all())->toJson()
                                                      ]);
     }
 
@@ -333,11 +329,7 @@ class DailyCashController extends Controller
     {
         $startDate = DateTime::parse($request['targetdate'])->startOfDay();
         $endDate   = DateTime::parse($request['targetdate'])->endOfDay();
-        if (auth()->user()->hasRole('admin')) {
-            return $this->getDepositWithdrawsItems($startDate, $endDate, 1);
-        } else {
-            return $this->getDepositWithdrawsItems($startDate, $endDate, 0);
-        }
+        return $this->getDepositWithdrawsItems($startDate, $endDate, auth()->user()->hasRole('admin'));
     }
 
     /**

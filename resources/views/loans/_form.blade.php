@@ -10,7 +10,7 @@
         	    {{ Form::text('name', null, 
         	        array(
         	            'class' => 'form-control', 
-        	            'placeholder' => 'ادخل اسم القرض')
+        	            'placeholder' => '')
         	        )
         	    }}
         	    @if ($errors->has('name'))
@@ -19,6 +19,21 @@
         	    </label>
         	    @endif
         	</div>
+
+            <div class="form-group{{ $errors->has('lender_name') ? ' has-error' : '' }}">
+                {{ Form::label('lender_name', 'اسم المقرض') }}
+                {{ Form::text('lender_name', null,
+                    array(
+                        'class' => 'form-control',
+                        'placeholder' => '')
+                    )
+                }}
+                @if ($errors->has('lender_name'))
+                    <label for="inputError" class="control-label">
+                        {{ $errors->first('lender_name') }}
+                    </label>
+                @endif
+            </div>
 
             <div class="form-group{{ $errors->has('loan_type') ? ' has-error' : '' }}">
                 {{ Form::label('loan_type', 'نوع القرض') }}
@@ -56,7 +71,7 @@
                 {{ Form::text('date', null,
                     array(
                         'class' => 'form-control datepickerCommon',
-                        'placeholder' => 'ادخل التاريج')
+                        'placeholder' => '')
                     )
                 }}
                 @if ($errors->has('date'))
@@ -71,7 +86,7 @@
                 {{ Form::text('amount', null,
                     array(
                         'class' => 'form-control IsNumberDecimal',
-                        'placeholder' => 'ادخل قيمة القرض')
+                        'placeholder' => '')
                     )
                 }}
                 @if ($errors->has('amount'))
@@ -86,7 +101,7 @@
                 {{ Form::text('interest', null,
                     array(
                         'class' => 'form-control IsNumberDecimal',
-                        'placeholder' => 'ادخل فايدة القرض')
+                        'placeholder' => '')
                     )
                 }}
                 @if ($errors->has('interest'))
@@ -96,33 +111,33 @@
                 @endif
             </div>
 
-            <div class="form-group{{ $errors->has('duration') ? ' has-error' : '' }}">
-                {{ Form::label('duration', 'عدد السنوات') }}
-                {{ Form::text('duration', null,
+            <div class="form-group{{ $errors->has('duration_per_years') ? ' has-error' : '' }}">
+                {{ Form::label('duration_per_years', 'عدد السنوات') }}
+                {{ Form::text('duration_per_years', null,
                     array(
                         'class' => 'form-control IsNumberOnly',
-                        'placeholder' => 'ادخل عدد السنوات')
+                        'placeholder' => '')
                     )
                 }}
-                @if ($errors->has('duration'))
+                @if ($errors->has('duration_per_years'))
                     <label for="inputError" class="control-label">
-                        {{ $errors->first('duration') }}
+                        {{ $errors->first('duration_per_years') }}
                     </label>
                 @endif
             </div>
 
-            <div class="form-group{{ $errors->has('loan_after_interest') ? ' has-error' : '' }}">
-                {{ Form::label('loan_after_interest', 'القيمة بالفائدة') }}
-                {{ Form::text('loan_after_interest', null,
+            <div class="form-group{{ $errors->has('amount_after_interest') ? ' has-error' : '' }}">
+                {{ Form::label('amount_after_interest', 'القيمة بالفائدة') }}
+                {{ Form::text('amount_after_interest', null,
                     array(
                         'class' => 'form-control IsNumberDecimal',
                         'readonly' => 'readonly',
                         'placeholder' => '')
                     )
                 }}
-                @if ($errors->has('loan_after_interest'))
+                @if ($errors->has('amount_after_interest'))
                     <label for="inputError" class="control-label">
-                        {{ $errors->first('loan_after_interest') }}
+                        {{ $errors->first('amount_after_interest') }}
                     </label>
                 @endif
             </div>

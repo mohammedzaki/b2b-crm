@@ -20,6 +20,7 @@ use App\Models\Employee;
 use App\Models\Expenses;
 use App\Models\FinancialCustody;
 use App\Models\FinancialCustodyItem;
+use App\Models\Loans;
 use App\Models\Supplier;
 use App\Models\SupplierProcess;
 use DB;
@@ -49,11 +50,7 @@ class FinancialCustodyItemsController extends Controller
         $startDate = DateTime::today()->startOfDay();
         $endDate   = DateTime::today()->endOfDay();
         $id        = $request['id'];
-        if (auth()->user()->hasRole('admin')) {
-            return $this->getFinancialCustodyItems($startDate, $endDate, 1, $request, false, $id);
-        } else {
-            return $this->getFinancialCustodyItems($startDate, $endDate, 0, $request, false, $id);
-        }
+        return $this->getFinancialCustodyItems($startDate, $endDate, auth()->user()->hasRole('admin'), $request, false, $id);
     }
 
     private function getFinancialCustodyItems(DateTime $startDate, DateTime $endDate, $canEdit, Request $request, $viewAll = false, $id = null)
@@ -77,69 +74,32 @@ class FinancialCustodyItemsController extends Controller
         $amounts['depositsAmount']     = $depositValue;
         $amounts['currentAmount']      = round(($depositValue - $withdrawValue), Helpers::getDecimalPointCount());
         if (!$viewAll) {
-            $financialCustodyItems = $currentFinancialCustody->withdraws()->whereBetween('due_date', [$startDate, $endDate])->get();
+            $financialCustodyItems = $currentFinancialCustody->withdraws()->whereBetween('due_date', [
+                $startDate,
+                $endDate,
+            ])->get();
         } else {
             $financialCustodyItems = $currentFinancialCustody->withdraws;
         }
-
-
-        $employees       = Employee::all('id', 'name')->mapWithKeys(function ($emp) {
-            return [$emp->id => $emp->name];
-        });
-        $expenses        = Expenses::allAsList();
-        $clients         = Client::all()->mapWithKeys(function ($client) {
-            return [
-                $client->id => [
-                    'name'           => $client->name,
-                    'hasOpenProcess' => $client->hasOpenProcess(),
-                    'processes'      => $client->processes->mapWithKeys(function ($process) {
-                        return [
-                            $process->id => [
-                                'name'   => $process->name,
-                                'status' => $process->status
-                            ]
-                        ];
-                    })
-                ]
-            ];
-        });
-        $suppliers       = Supplier::all()->mapWithKeys(function ($supplier) {
-            return [
-                $supplier->id => [
-                    'name'           => $supplier->name,
-                    'hasOpenProcess' => $supplier->hasOpenProcess(),
-                    'processes'      => $supplier->processes->mapWithKeys(function ($process) {
-                        return [
-                            $process->id => [
-                                'name'   => $process->name,
-                                'status' => $process->status
-                            ]
-                        ];
-                    })
-                ]
-            ];
-        });
-        $payMethods      = PaymentMethods::all();
-        $employeeActions = collect(EmployeeActions::all())->whereIn('id', [EmployeeActions::LongBorrow, EmployeeActions::SmallBorrow])->toJson();
-
         return view('financial-custody.expenses-items')->with([
-                                                                  'employee_id'              => $currentFinancialCustody->employee->id,
-                                                                  'employee_name'            => $currentFinancialCustody->employee->name,
-                                                                  'approved_at'              => $currentFinancialCustody->approved_at,
-                                                                  'approved_by'              => isset($currentFinancialCustody->approved_at) ? $currentFinancialCustody->approved_by_data->load('employee')->name : null,
-                                                                  'amounts'                  => $amounts,
-                                                                  'clients'                  => $clients,
-                                                                  'employees'                => $employees,
-                                                                  'suppliers'                => $suppliers,
-                                                                  'expenses'                 => $expenses,
-                                                                  'payMethods'               => $payMethods,
-                                                                  'employeeActions'          => $employeeActions,
-                                                                  'financialCustodyItems'    => $financialCustodyItems,
-                                                                  'canEdit'                  => $canEdit,
-                                                                  'targetDate'               => $startDate,
-                                                                  'financialCustodyId'       => $id,
-                                                                  'financialCustodyDeposits' => $financialCustodyDeposits
-                                                              ]);
+            'employee_id'              => $currentFinancialCustody->employee->id,
+            'employee_name'            => $currentFinancialCustody->employee->name,
+            'approved_at'              => $currentFinancialCustody->approved_at,
+            'approved_by'              => isset($currentFinancialCustody->approved_at) ? $currentFinancialCustody->approved_by_data->load('employee')->name : null,
+            'amounts'                  => $amounts,
+            'clients'                  => Client::allAsList(),
+            'employees'                => Employee::allAsList(),
+            'suppliers'                => Supplier::allAsList(),
+            'expenses'                 => Expenses::allAsList(),
+            'loans'                    => Loans::allAsList(),
+            'payMethods'               => PaymentMethods::all(),
+            'employeeActions'          => collect(EmployeeActions::allForFc())->toJson(),
+            'financialCustodyItems'    => $financialCustodyItems,
+            'canEdit'                  => $canEdit ? 1 : 0,
+            'targetDate'               => $startDate,
+            'financialCustodyId'       => $id,
+            'financialCustodyDeposits' => $financialCustodyDeposits,
+        ]);
     }
 
     /**
@@ -178,7 +138,7 @@ class FinancialCustodyItemsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request $request
+     * @param Request $request
      * @return Response
      * @throws \Exception
      */
@@ -191,11 +151,11 @@ class FinancialCustodyItemsController extends Controller
             $request['saveStatus']   = 1;
             $financialCustodyItem    = $currentFinancialCustody->withdraws()->create($request->all());
             return response()->json([
-                                        'success'       => true,
-                                        'id'            => $financialCustodyItem->id,
-                                        'currentAmount' => $this->calculateCurrentAmount($request),
-                                        'message'       => 'تم اضافة وارد جديد.'
-                                    ]);
+                'success'       => true,
+                'id'            => $financialCustodyItem->id,
+                'currentAmount' => $this->calculateCurrentAmount($request),
+                'message'       => 'تم اضافة وارد جديد.',
+            ]);
         } catch (\Exception $ex) {
             throw new ValidationException("حدث حطأ في حفظ البيانات. {$ex->getMessage()}");
         }
@@ -212,7 +172,7 @@ class FinancialCustodyItemsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request $request
+     * @param Request $request
      * @return Response
      * @Post("/acceptItems", as="financialCustodyItems.acceptItems")
      * @throws ValidationException
@@ -227,21 +187,21 @@ class FinancialCustodyItemsController extends Controller
             $date = DateTime::parse($request->due_date);
             foreach ($all['rowsIds'] as $id) {
                 FinancialCustodyItem::where('id', $id)->update([
-                                                                   'saveStatus'  => 2,
-                                                                   'approved_at' => DateTime::now(),
-                                                                   'approved_by' => $c_user_id
-                                                               ]);
+                    'saveStatus'  => 2,
+                    'approved_at' => DateTime::now(),
+                    'approved_by' => $c_user_id,
+                ]);
                 $this->checkProcessClosed($id);
                 $rowsIds[$id] = "Done";
             }
             DB::commit();
-            return response()->json(array(
-                                        'success'       => true,
-                                        'rowsIds'       => $rowsIds,
-                                        'currentAmount' => $this->calculateCurrentAmount($request),
-                                        'message'       => 'تم حفظ الوارد.',
-                                        //'errors' => $validator->getMessageBag()->toArray()
-                                    ));
+            return response()->json([
+                'success'       => true,
+                'rowsIds'       => $rowsIds,
+                'currentAmount' => $this->calculateCurrentAmount($request),
+                'message'       => 'تم حفظ الوارد.',
+                //'errors' => $validator->getMessageBag()->toArray()
+            ]);
         } catch (\Exception $ex) {
             DB::rollBack();
             throw new ValidationException("حدث حطأ في حفظ البيانات. {$ex->getMessage()}");
@@ -264,7 +224,7 @@ class FinancialCustodyItemsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request $request
+     * @param Request $request
      * @return Response
      * @Post("/unlockItems", as="financialCustodyItems.unlockItems")
      * @throws ValidationException
@@ -282,22 +242,22 @@ class FinancialCustodyItemsController extends Controller
                 DepositWithdraw::where('id', $financialCustodyItem->daily_cash_refund_id)->delete();
 
                 FinancialCustodyItem::where('id', $id)->update([
-                                                                   'saveStatus'  => 1,
-                                                                   // 'daily_cash_id'        => null,
-                                                                   // 'daily_cash_refund_id' => null,
-                                                                   'approved_at' => null,
-                                                                   'approved_by' => null
-                                                               ]);
+                    'saveStatus'  => 1,
+                    // 'daily_cash_id'        => null,
+                    // 'daily_cash_refund_id' => null,
+                    'approved_at' => null,
+                    'approved_by' => null,
+                ]);
                 $rowsIds[$id] = "Done";
             }
             DB::commit();
-            return response()->json(array(
-                                        'success'       => true,
-                                        'rowsIds'       => $rowsIds,
-                                        'currentAmount' => $this->calculateCurrentAmount($request),
-                                        'message'       => 'تم حفظ الوارد.',
-                                        //'errors' => $validator->getMessageBag()->toArray()
-                                    ));
+            return response()->json([
+                'success'       => true,
+                'rowsIds'       => $rowsIds,
+                'currentAmount' => $this->calculateCurrentAmount($request),
+                'message'       => 'تم حفظ الوارد.',
+                //'errors' => $validator->getMessageBag()->toArray()
+            ]);
         } catch (\Exception $ex) {
             DB::rollBack();
             throw new ValidationException("حدث حطأ في حفظ البيانات. {$ex->getMessage()}");
@@ -307,7 +267,7 @@ class FinancialCustodyItemsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request $request
+     * @param Request $request
      * @return Response
      * @Post("/removeItems", as="financialCustodyItems.removeItems")
      * @throws \Exception
@@ -323,19 +283,19 @@ class FinancialCustodyItemsController extends Controller
             $rowsIds[$id] = "Done";
         }
 
-        return response()->json(array(
-                                    'success'       => true,
-                                    'rowsIds'       => $rowsIds,
-                                    'currentAmount' => $this->calculateCurrentAmount($request),
-                                    'message'       => 'تم حذف الوارد.',
-                                    //'errors' => $validator->getMessageBag()->toArray()
-                                ));
+        return response()->json([
+            'success'       => true,
+            'rowsIds'       => $rowsIds,
+            'currentAmount' => $this->calculateCurrentAmount($request),
+            'message'       => 'تم حذف الوارد.',
+            //'errors' => $validator->getMessageBag()->toArray()
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request $request
+     * @param Request $request
      * @return Response
      * @Post("/financialCustodyRefund", as="financialCustodyItems.financialCustodyRefund")
      * @throws \Exception
@@ -354,24 +314,24 @@ class FinancialCustodyItemsController extends Controller
             foreach ($currentFinancialCustody->withdraws as $financialCustodyItem) {
                 if (!isset($financialCustodyItem->approved_at)) {
                     $financialCustodyItem->update([
-                                                      'saveStatus'  => 2,
-                                                      'approved_at' => DateTime::now(),
-                                                      'approved_by' => $c_user_id
-                                                  ]);
+                        'saveStatus'  => 2,
+                        'approved_at' => DateTime::now(),
+                        'approved_by' => $c_user_id,
+                    ]);
                     $this->checkProcessClosed($financialCustodyItem->id);
                 }
             }
             $date = DateTime::parse($request->due_date);
             DepositWithdraw::create([
-                                        'depositValue'         => ($currentFinancialCustody->totalDeposits() - $currentFinancialCustody->totalWithdraws()),
-                                        'recordDesc'           => "رد {$currentFinancialCustody->description}",
-                                        'employee_id'          => $currentFinancialCustody->employee_id,
-                                        'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
-                                        'financial_custody_id' => $currentFinancialCustody->id,
-                                        'user_id'              => $c_user_id,
-                                        'payMethod'            => PaymentMethods::CASH,
-                                        'due_date'             => $date
-                                    ]);
+                'depositValue'         => ($currentFinancialCustody->totalDeposits() - $currentFinancialCustody->totalWithdraws()),
+                'recordDesc'           => "رد {$currentFinancialCustody->description}",
+                'employee_id'          => $currentFinancialCustody->employee_id,
+                'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
+                'financial_custody_id' => $currentFinancialCustody->id,
+                'user_id'              => $c_user_id,
+                'payMethod'            => PaymentMethods::CASH,
+                'due_date'             => $date,
+            ]);
             $currentFinancialCustody->approved_at = DateTime::now();
             $currentFinancialCustody->approved_by = auth()->user()->id;
             $currentFinancialCustody->save();
@@ -386,7 +346,7 @@ class FinancialCustodyItemsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  Request $request
+     * @param Request $request
      * @return Response
      * @Post("/financialCustodyReopen", as="financialCustodyItems.financialCustodyReopen")
      * @Middleware({"web", "auth", "ability:admin,financial-custody-reopen"})
@@ -403,11 +363,28 @@ class FinancialCustodyItemsController extends Controller
                 $currentFinancialCustody = FinancialCustody::find($id);
             }
             DepositWithdraw::where([
-                                       ['financial_custody_id', '=', $currentFinancialCustody->id],
-                                       ['expenses_id', '=', EmployeeActions::FinancialCustodyRefund],
-                                       ['withdrawValue', '=', NULL, 'or'],
-                                       ['withdrawValue', '=', 0]
-                                   ])->forceDelete();
+                [
+                    'financial_custody_id',
+                    '=',
+                    $currentFinancialCustody->id,
+                ],
+                [
+                    'expenses_id',
+                    '=',
+                    EmployeeActions::FinancialCustodyRefund,
+                ],
+                [
+                    'withdrawValue',
+                    '=',
+                    NULL,
+                    'or',
+                ],
+                [
+                    'withdrawValue',
+                    '=',
+                    0,
+                ],
+            ])->forceDelete();
             $currentFinancialCustody->approved_at = null;
             $currentFinancialCustody->approved_by = null;
             $currentFinancialCustody->save();
@@ -422,24 +399,20 @@ class FinancialCustodyItemsController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int $id
+     * @param int $id
      * @return Response
      */
     public function show(Request $request, $id)
     {
         $startDate = DateTime::today()->startOfDay();
         $endDate   = DateTime::today()->endOfDay();
-        if (auth()->user()->hasRole('admin')) {
-            return $this->getFinancialCustodyItems($startDate, $endDate, 1, $request);
-        } else {
-            return $this->getFinancialCustodyItems($startDate, $endDate, 0, $request);
-        }
+        return $this->getFinancialCustodyItems($startDate, $endDate, auth()->user()->hasRole('admin'), $request);
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int $id
+     * @param int $id
      * @return Response
      */
     public function edit(Request $request, $id)
@@ -450,8 +423,8 @@ class FinancialCustodyItemsController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  Request $request
-     * @param  int $id
+     * @param Request $request
+     * @param int $id
      * @return Response
      */
     public function update(Request $request, $id)
@@ -461,21 +434,21 @@ class FinancialCustodyItemsController extends Controller
         $request['user_id'] = auth()->user()->id;
         unset($request['due_date']); // to prevent changing the date
         $financialCustodyItem->update($request->all());
-        return response()->json(array(
-                                    'success'       => true,
-                                    'id'            => $financialCustodyItem->id,
-                                    //'$financialCustodyItem->cbo_processe' => $financialCustodyItem->cbo_processes,
-                                    'currentAmount' => $this->calculateCurrentAmount($request),
-                                    'message'       => 'تم تعديل وارد جديد.',
-                                    //'errors' => $validator->getMessageBag()->toArray()
-                                ));
+        return response()->json([
+            'success'       => true,
+            'id'            => $financialCustodyItem->id,
+            //'$financialCustodyItem->cbo_processe' => $financialCustodyItem->cbo_processes,
+            'currentAmount' => $this->calculateCurrentAmount($request),
+            'message'       => 'تم تعديل وارد جديد.',
+            //'errors' => $validator->getMessageBag()->toArray()
+        ]);
 
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
+     * @param int $id
      * @return Response
      * @throws \Exception
      */
@@ -487,19 +460,19 @@ class FinancialCustodyItemsController extends Controller
             FinancialCustodyItem::where('id', $id)->first()->delete();
             $rowsIds[$id] = "Done";
         }
-        return response()->json(array(
-                                    'success'       => true,
-                                    'rowsIds'       => $rowsIds,
-                                    'currentAmount' => $this->calculateCurrentAmount($request),
-                                    'message'       => 'تم حذف الوارد.',
-                                    //'errors' => $validator->getMessageBag()->toArray()
-                                ));
+        return response()->json([
+            'success'       => true,
+            'rowsIds'       => $rowsIds,
+            'currentAmount' => $this->calculateCurrentAmount($request),
+            'message'       => 'تم حذف الوارد.',
+            //'errors' => $validator->getMessageBag()->toArray()
+        ]);
     }
 
     /**
      * Display the specified resource.
      *
-     * @param  int $id
+     * @param int $id
      * @return Response
      * @Get("/search", as="financialCustodyItems.search")
      */
@@ -514,11 +487,7 @@ class FinancialCustodyItemsController extends Controller
             $startDate = DateTime::today()->startOfDay();
             $endDate   = DateTime::today()->endOfDay();
         }
-        if (auth()->user()->hasRole('admin')) {
-            return $this->getFinancialCustodyItems($startDate, $endDate, 1, $request, $viewAll, $id);
-        } else {
-            return $this->getFinancialCustodyItems($startDate, $endDate, 0, $request, $viewAll, $id);
-        }
+        return $this->getFinancialCustodyItems($startDate, $endDate, auth()->user()->hasRole('admin'), $request, $viewAll, $id);
     }
 
 }

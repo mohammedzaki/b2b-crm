@@ -96,11 +96,19 @@ class DepositWithdraw extends Model {
         return $this->hasMany(EmployeeBorrowBilling::class, 'deposit_id', 'id');
     }
 
+    public static function getDWItems($startDate = '2000-01-01 00:00:00', $endDate = '2099-01-01 00:00:00')
+    {
+        return static::whereBetween('due_date', [$startDate, $endDate])->get();
+    }
+
     public static function calculateCurrentAmount($endDate = '2099-01-01 00:00:00', $startDate = '2000-01-01 00:00:00')
     {
-        $depositValue  = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('depositValue');
-        $withdrawValue = DepositWithdraw::whereBetween('due_date', [$startDate, $endDate])->sum('withdrawValue');
-        $openingAmount = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
-        return round(($depositValue + $openingAmount) - $withdrawValue, Helpers::getDecimalPointCount());
+        $depositWithdrawsItems = static::getDWItems($startDate, $endDate);
+        $depositValue          = $depositWithdrawsItems->sum('depositValue');
+        $withdrawValue         = $depositWithdrawsItems->sum('withdrawValue');
+        $openingAmount         = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
+        $loansAmount         = Loans::whereBetween('date', [$startDate, $endDate])
+            ->where('save_id', '=', 0)->sum('amount');
+        return round(($depositValue + $openingAmount + $loansAmount) - $withdrawValue, Helpers::getDecimalPointCount());
     }
 }

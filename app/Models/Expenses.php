@@ -25,7 +25,7 @@ class Expenses extends Model
     protected $fillable = [
         'name'
     ];
-    
+
     public $startDate;
     public $endDate;
 
@@ -36,14 +36,15 @@ class Expenses extends Model
      */
     public static function allAsList($addLoans = true)
     {
-        $res = static::all('id', 'name');
-        if($addLoans) {
-            $res = collect([0 => ['id' => 0, 'name' => 'قروض']])->merge($res);
+        $all = static::all('id', 'name');
+        if ($addLoans) {
+            $all = collect([0 => ['id' => 0, 'name' => 'قروض']])->merge($all);
         }
-        return $res;
+        return $all;
     }
 
-    public function getTotalPaid() {
+    public function getTotalPaid()
+    {
         return $this->paidItems()->sum('withdrawValue');
     }
 
@@ -56,10 +57,10 @@ class Expenses extends Model
             $this->endDate = DateTime::parse('31-12-2017');
         }
         return $this->hasMany(DepositWithdraw::class, 'expenses_id')->where([
-                                                                                ['employee_id', '=', null],
-                                                                                ['due_date', '>=', $this->startDate],
-                                                                                ['due_date', '<=', $this->endDate]
-                                                                            ]);
+            ['employee_id', '=', null],
+            ['due_date', '>=', $this->startDate],
+            ['due_date', '<=', $this->endDate]
+        ]);
     }
 
     public function fcItems()
@@ -68,13 +69,14 @@ class Expenses extends Model
             $this->endDate = DateTime::parse('31-12-2017');
         }
         return $this->hasMany(FinancialCustodyItem::class, 'expenses_id')->where([
-                                                                                ['employee_id', '=', null],
-                                                                                ['due_date', '>=', $this->startDate],
-                                                                                ['due_date', '<=', $this->endDate]
-                                                                            ]);
+            ['employee_id', '=', null],
+            ['due_date', '>=', $this->startDate],
+            ['due_date', '<=', $this->endDate]
+        ]);
     }
 
-    public function paidItems() {
+    public function paidItems()
+    {
         return collect($this->dwItems)->merge($this->fcItems)->sortBy('due_date');
     }
 }

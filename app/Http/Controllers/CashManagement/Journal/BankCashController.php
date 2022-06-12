@@ -21,6 +21,7 @@ use App\Models\Client;
 use App\Models\ClientProcess;
 use App\Models\Employee;
 use App\Models\Expenses;
+use App\Models\Loans;
 use App\Models\OpeningAmount;
 use App\Models\Supplier;
 use App\Models\SupplierProcess;
@@ -158,6 +159,7 @@ class BankCashController extends
                                          'employees'             => Employee::allAsList(),
                                          'suppliers'             => Supplier::allAsList(),
                                          'expenses'              => Expenses::allAsList(),
+                                         'loans'                 => Loans::allAsList(),
                                          'bankCashItems'         => $bankCashItems,
                                          'chequeStatuses'        => $chequeStatuses,
                                          'canEdit'               => $canEdit ? 1 : 0,
