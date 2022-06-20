@@ -177,7 +177,7 @@ class ClientProcess extends
                                 ['client_id', "=", $this->client_id],
                                 ['withdrawValue', ">", 0],
                             ])
-                    ->select(DB::raw('NULL as pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
+                    ->select(DB::raw('NULL as pendingStatus, deposit_withdraws.*'));
     }
 
     public function fcExpenses()
@@ -188,7 +188,7 @@ class ClientProcess extends
                                 ['withdrawValue', ">", 0],
                                 ['approved_at', '=', null]
                             ])
-                    ->select(DB::raw('IF(ISNULL(approved_at),1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
+                    ->select(DB::raw('IF(ISNULL(approved_at),1,NULL) AS pendingStatus, financial_custody_items.*'));
     }
 
     public function bankExpenses()
@@ -198,7 +198,7 @@ class ClientProcess extends
                                 ['client_id', "=", $this->client_id],
                                 ['withdrawValue', ">", 0]
                             ])
-                    ->select(DB::raw('IF(cheque_status <> ' . ChequeStatuses::POSTDATED . ' OR cheque_status <> ' . ChequeStatuses::POSTPONED . ',1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
+                    ->select(DB::raw('IF(cheque_status <> ' . ChequeStatuses::POSTDATED . ' OR cheque_status <> ' . ChequeStatuses::POSTPONED . ',1,NULL) AS pendingStatus, bank_cashes.*'));
     }
 
     public function expenses()

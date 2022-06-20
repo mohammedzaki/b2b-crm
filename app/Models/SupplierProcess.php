@@ -119,7 +119,7 @@ class SupplierProcess extends Model {
                                 ['supplier_id', "=", $this->supplier_id],
                                 ['withdrawValue', ">", 0]
                             ])
-                    ->select(DB::raw('NULL as pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc');
+                    ->select(DB::raw('NULL as pendingStatus, deposit_withdraws.*'));
     }
 
     public function fcWithdrawals()
@@ -129,7 +129,7 @@ class SupplierProcess extends Model {
                                 ['supplier_id', "=", $this->supplier_id],
                                 ['withdrawValue', ">", 0]
                             ])
-                    ->select(DB::raw('IF(ISNULL(approved_at),1,NULL) AS pendingStatus'), 'withdrawValue', 'due_date', 'recordDesc', 'deleted_at', 'id');
+                    ->select(DB::raw('IF(ISNULL(approved_at),1,NULL) AS pendingStatus, financial_custody_items.*'));
     }
 
     public function bankWithdrawals()
@@ -153,7 +153,8 @@ class SupplierProcess extends Model {
     {
         return collect($this->dwWithdrawals()->withTrashed()->get())
             ->merge($this->fcWithdrawals()->withTrashed()->get())
-            ->merge($this->bankWithdrawals()->withTrashed()->get())->sortBy('due_date');
+            ->merge($this->bankWithdrawals()->withTrashed()->get())
+            ->sortBy('due_date');
     }
 
     public function totalWithdrawals() {
