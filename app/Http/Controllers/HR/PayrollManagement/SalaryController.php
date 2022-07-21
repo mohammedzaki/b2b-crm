@@ -20,6 +20,7 @@ use App\Models\Attendance;
 use App\Models\DepositWithdraw;
 use App\Models\Employee;
 use App\Models\EmployeeBorrowBilling;
+use App\Models\FinancialCustody;
 use App\Reports\Employee\Salary;
 use Illuminate\Http\Request;
 use DB;
@@ -30,11 +31,12 @@ use Debugbar;
  * Description of SalaryController
  *
  * @author Mohammed Zaki mohammedzaki.dev@gmail.com
- * 
+ *
  * @Controller(prefix="salary")
  * @Middleware({"web", "auth"})
  */
-class SalaryController {
+class SalaryController
+{
 
     /**
      * Display the specified resource.
@@ -45,19 +47,6 @@ class SalaryController {
     public function index(Request $request)
     {
         return view('salary.index')->with($this->getBasicData());
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  Employee  $employee
-     * @return \Illuminate\Http\Response
-     * @Get("/{employee}", as="salary.show")
-     */
-    public function show(Request $request, Employee $employee)
-    {
-        $data = array_merge($this->getBasicData($employee->id, $request->date), $this->getData($employee, DateTime::parse($request->date)));
-        return view('salary.show')->with($data);
     }
 
     private function getBasicData($employee_id = 0, $date = '')
@@ -72,54 +61,75 @@ class SalaryController {
         ];
     }
 
+    /**
+     * Display the specified resource.
+     *
+     * @param  Employee $employee
+     * @return \Illuminate\Http\Response
+     * @Get("/{employee}", as="salary.show")
+     */
+    public function show(Request $request, Employee $employee)
+    {
+        $data = array_merge($this->getBasicData($employee->id, $request->date), $this->getData($employee, DateTime::parse($request->date)));
+        return view('salary.show')->with($data);
+    }
+
     private function getData(Employee $employee, DateTime $date)
     {
         $employeeName = $employee->name;
         $monthNum     = $date->month;
         $hourlyRate   = $employee->salaryPerHour();
         $attendances  = Attendance::where([
-                    ['employee_id', '=', $employee->id]
-                ])
-                ->whereYear('date', $date->year)
-                ->whereMonth('date', $date->month)
-                ->orderBy('date', 'asc')->get()
-                ->mapWithKeys(function ($attendance) {
-            return [
-                $attendance->id => [
-                    'id'                         => $attendance->id,
-                    'processName'                => $attendance->process ? $attendance->process->name : 'عمليات ادارية',
-                    'employeeName'               => $attendance->employee->name,
-                    'workingHours'               => $attendance->workingHoursToString(),
-                    'date'                       => DateTime::parse($attendance->date)->format('l, d-m-Y'),
-                    'GuardianshipValue'          => $attendance->employeeGuardianship(),
-                    'GuardianshipReturnValue'    => $attendance->employeeGuardianshipReturn(),
-                    'borrowValue'                => $attendance->employeeSmallBorrow(),
-                    'absentTypeName'             => $attendance->absentType ? $attendance->absentType->name : null,
-                    'totalWorkingHoursInSeconds' => $attendance->workingHoursToSeconds(),
-                    'salary_deduction'           => $attendance->salary_deduction,
-                    'absent_deduction'           => $attendance->absent_deduction,
-                    'mokaf'                      => $attendance->mokaf,
-                    'date'                       => $attendance->date,
-                    'shift'                      => $attendance->shift,
-                    'check_in'                   => $attendance->check_in,
-                    'check_out'                  => $attendance->check_out,
-                    'notes'                      => $attendance->notes,
-                    'employee_id'                => $attendance->employee_id,
-                    'process_id'                 => $attendance->process_id
-                ]
-            ];
-        });
+                                              ['employee_id', '=', $employee->id]
+                                          ])
+                                  ->whereYear('date', $date->year)
+                                  ->whereMonth('date', $date->month)
+                                  ->orderBy('date', 'asc')->get()
+                                  ->mapWithKeys(function ($attendance) {
+                                      return [
+                                          $attendance->id => [
+                                              'id'                         => $attendance->id,
+                                              'processName'                => $attendance->process ? $attendance->process->name : 'عمليات ادارية',
+                                              'employeeName'               => $attendance->employee->name,
+                                              'workingHours'               => $attendance->workingHoursToString(),
+                                              'date'                       => DateTime::parse($attendance->date)->format('l, d-m-Y'),
+                                              'borrowValue'                => $attendance->employeeSmallBorrow(),
+                                              'absentTypeName'             => $attendance->absentType ? $attendance->absentType->name : null,
+                                              'totalWorkingHoursInSeconds' => $attendance->workingHoursToSeconds(),
+                                              'salary_deduction'           => $attendance->salary_deduction,
+                                              'absent_deduction'           => $attendance->absent_deduction,
+                                              'mokaf'                      => $attendance->mokaf,
+                                              'date'                       => $attendance->date,
+                                              'shift'                      => $attendance->shift,
+                                              'check_in'                   => $attendance->check_in,
+                                              'check_out'                  => $attendance->check_out,
+                                              'notes'                      => $attendance->notes,
+                                              'employee_id'                => $attendance->employee_id,
+                                              'process_id'                 => $attendance->process_id
+                                          ]
+                                      ];
+                                  });
         $attendances instanceof \Illuminate\Support\Collection;
-        $totalSalaryDeduction         = $attendances->sum('salary_deduction');
-        $totalAbsentDeduction         = $attendances->sum('absent_deduction');
-        $totalBonuses                 = $attendances->sum('mokaf');
-        $totalGuardianshipValue       = $attendances->sum('GuardianshipValue');
-        $totalGuardianshipReturnValue = $attendances->sum('GuardianshipReturnValue');
-        $totalSmallBorrowValue        = $attendances->sum('borrowValue');
-        $totalWorkingHoursInSeconds   = $attendances->sum('totalWorkingHoursInSeconds');
-        $totalHoursSalary             = round(($totalWorkingHoursInSeconds * (($hourlyRate / 60) / 60)), Helpers::getDecimalPointCount());
-        $totalWorkingHours            = Helpers::hoursMinutsToString($totalWorkingHoursInSeconds);
-        $LongBorrowValue              = 0;
+        $employeeFinancialCustodys = FinancialCustody::where([
+                                                                 ['employee_id', '=', $employee->id]
+                                                             ])
+                                                     ->whereYear('due_date', $date->year)
+                                                     ->whereMonth('due_date', $date->month)->get();
+
+        $totalSalaryDeduction             = $attendances->sum('salary_deduction');
+        $totalAbsentDeduction             = $attendances->sum('absent_deduction');
+        $totalBonuses                     = $attendances->sum('mokaf');
+        $totalFinancialCustodyValue       = $employeeFinancialCustodys->sum(function (FinancialCustody $fin) {
+            return $fin->totalDeposits();
+        });
+        $totalFinancialCustodyRefundValue = $employeeFinancialCustodys->sum(function (FinancialCustody $fin) {
+            return $fin->totalRefundedDeposits();
+        });
+        $totalSmallBorrowValue            = $attendances->sum('borrowValue');
+        $totalWorkingHoursInSeconds       = $attendances->sum('totalWorkingHoursInSeconds');
+        $totalHoursSalary                 = round(($totalWorkingHoursInSeconds * (($hourlyRate / 60) / 60)), Helpers::getDecimalPointCount());
+        $totalWorkingHours                = Helpers::hoursMinutsToString($totalWorkingHoursInSeconds);
+        $LongBorrowValue                  = 0;
         if (count($attendances) > 0) {
             $attendance      = $attendances->first();
             $att             = new Attendance($attendance);
@@ -133,47 +143,47 @@ class SalaryController {
         $totalLongBorrowValue = $LongBorrowValue;
         $totalBorrowValue     = $totalSmallBorrowValue + $totalLongBorrowValue;
         $totalSalary          = ($totalHoursSalary + $totalBonuses);
-        $totalNetSalary       = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalGuardianshipValue - $totalGuardianshipReturnValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
+        $totalNetSalary       = $totalSalary - ($totalSalaryDeduction + $totalAbsentDeduction + ($totalFinancialCustodyValue - $totalFinancialCustodyRefundValue) + $totalSmallBorrowValue + $totalLongBorrowValue);
 
         $salaryIsPaid    = FALSE;
         $depositWithdraw = DepositWithdraw::where([
-                    ['employee_id', '=', $employee->id],
-                    ['expenses_id', '=', EmployeeActions::TakeSalary]
-                ])
-                ->whereYear('notes', $date->year)
-                ->whereMonth('notes', $date->month)
-                ->first();
+                                                      ['employee_id', '=', $employee->id],
+                                                      ['expenses_id', '=', EmployeeActions::TakeSalary]
+                                                  ])
+                                          ->whereYear('notes', $date->year)
+                                          ->whereMonth('notes', $date->month)
+                                          ->first();
         if (empty($depositWithdraw)) {
             $salaryIsPaid = TRUE;
         } else {
             $salaryIsPaid = FALSE;
         }
         return [
-            'employeeName'                 => $employeeName,
-            'monthNum'                     => $monthNum,
-            'attendances'                  => $attendances,
-            'hourlyRate'                   => $hourlyRate,
-            'totalWorkingHours'            => $totalWorkingHours,
-            'totalSalaryDeduction'         => $totalSalaryDeduction,
-            'totalAbsentDeduction'         => $totalAbsentDeduction,
-            'totalBonuses'                 => $totalBonuses,
-            'totalSalary'                  => $totalSalary,
-            'totalHoursSalary'             => $totalHoursSalary,
-            'totalNetSalary'               => $totalNetSalary,
-            'totalGuardianshipValue'       => $totalGuardianshipValue,
-            'totalGuardianshipReturnValue' => $totalGuardianshipReturnValue,
-            'totalBorrowValue'             => $totalBorrowValue,
-            'totalLongBorrowValue'         => $totalLongBorrowValue,
-            'totalSmallBorrowValue'        => $totalSmallBorrowValue,
-            'salaryIsPaid'                 => $salaryIsPaid
+            'employeeName'                     => $employeeName,
+            'monthNum'                         => $monthNum,
+            'attendances'                      => $attendances,
+            'hourlyRate'                       => $hourlyRate,
+            'totalWorkingHours'                => $totalWorkingHours,
+            'totalSalaryDeduction'             => $totalSalaryDeduction,
+            'totalAbsentDeduction'             => $totalAbsentDeduction,
+            'totalBonuses'                     => $totalBonuses,
+            'totalSalary'                      => $totalSalary,
+            'totalHoursSalary'                 => $totalHoursSalary,
+            'totalNetSalary'                   => $totalNetSalary,
+            'totalFinancialCustodyValue'       => $totalFinancialCustodyValue,
+            'totalFinancialCustodyRefundValue' => $totalFinancialCustodyRefundValue,
+            'totalBorrowValue'                 => $totalBorrowValue,
+            'totalLongBorrowValue'             => $totalLongBorrowValue,
+            'totalSmallBorrowValue'            => $totalSmallBorrowValue,
+            'salaryIsPaid'                     => $salaryIsPaid
         ];
     }
 
     /**
      * @return \Illuminate\Http\Response
-     * @Get("guardianship/{employee_id}", as="salary.guardianship")
+     * @Get("financialCustody/{employee_id}", as="salary.financialCustody")
      */
-    public function guardianship(Request $request, $employee_id)
+    public function financialCustody(Request $request, $employee_id)
     {
         $employees = Employee::all();
         $dt        = DateTime::parse($request->date);
@@ -181,52 +191,102 @@ class SalaryController {
             $employees_tmp[$employee->id] = $employee->name;
         }
         if ($employee_id == "all") {
-            $employeeGuardianships = []; //Attendance::all();
-            $employee_id           = 0;
-            $date                  = null;
+            $employeeFinancialCustodys = []; //Attendance::all();
+            $employee_id               = 0;
+            $date                      = null;
         } else {
-            $employee              = Employee::findOrFail($employee_id);
-            $employeeGuardianships = $employee->employeeGuardianships($dt);
+            $employee                  = Employee::findOrFail($employee_id);
+            $employeeFinancialCustodys = $employee->employeeFinancialCustodys($dt);
         }
-        $date                         = $request->date;
-        $employee_id                  = $employee_id;
-        $totalGuardianshipValue       = 0;
-        $totalGuardianshipReturnValue = 0;
+        $date                             = $request->date;
+        $employee_id                      = $employee_id;
+        $totalFinancialCustodyValue       = 0;
+        $totalFinancialCustodyRefundValue = 0;
 
-        foreach ($employeeGuardianships as $guardianship) {
-            $totalGuardianshipValue       += $guardianship->withdrawValue;
-            $totalGuardianshipReturnValue += $guardianship->depositValue;
+        foreach ($employeeFinancialCustodys as $financialCustody) {
+            $totalFinancialCustodyValue       += $financialCustody->withdrawValue;
+            $totalFinancialCustodyRefundValue += $financialCustody->depositValue;
         }
         $employees = $employees_tmp;
-        return view("salary.guardianship", compact(['employees', 'employeeGuardianships', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'employee_id', 'date']));
+        return view("salary.financialCustody", compact(['employees', 'employeeFinancialCustodys', 'totalFinancialCustodyValue', 'totalFinancialCustodyRefundValue', 'employee_id', 'date']));
     }
 
     /**
      * @return \Illuminate\Http\Response
-     * @Get("guardianshipaway/{employee_id}", as="salary.guardianshipaway")
+     * @Get("financialCustodyaway/{employee_id}", as="salary.financialCustodyaway")
+     * @throws Exception
      */
-    public function guardianshipaway(Request $request, $employee_id)
+    public function financialCustodyAway(Request $request, $employee_id)
     {
-        $employee               = Employee::findOrFail($employee_id);
-        $newDate                = DateTime::parse($request->date);
-        $newDate->addMonth(1);
-        $depositWithdraw        = DepositWithdraw::findOrFail($employee->lastGuardianshipId());
-        $depositWithdraw->notes = $newDate->startOfMonth();
-        $depositWithdraw->save();
-        return redirect()->back()->with('success', 'تم الترحيل');
+        $c_user_id = auth()->user()->id;
+        DB::beginTransaction();
+        try {
+            $currentFinancialCustody = $this->getCurrentFinancialCustody($employee_id);
+            $employee                = Employee::find($employee_id);
+            $allItemsApproved        = !$currentFinancialCustody->hasNotApprovedItems();
+            $awayDate                = DateTime::parse($request->date)->lastOfMonth();
+            $dueDate                 = DateTime::parse($request->date)->addMonth(1)->firstOfMonth();
+            if ($awayDate->isFriday()) {
+                $awayDate = $awayDate->subDay(1);
+            }
+            if ($dueDate->isFriday()) {
+                $dueDate = $awayDate->addDay(1);
+            }
+            if ($allItemsApproved) {
+                $depositValue = ($currentFinancialCustody->totalDeposits() - $currentFinancialCustody->totalRefundedDeposits());
+                DepositWithdraw::create([
+                                            'depositValue'         => $depositValue,
+                                            'recordDesc'           => "رد {$currentFinancialCustody->description}",
+                                            'employee_id'          => $currentFinancialCustody->employee_id,
+                                            'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
+                                            'financial_custody_id' => $currentFinancialCustody->id,
+                                            'user_id'              => $c_user_id,
+                                            'payMethod'            => PaymentMethods::CASH,
+                                            'due_date'             => $awayDate
+                                        ]);
+                $currentFinancialCustody->approved_at = DateTime::now();
+                $currentFinancialCustody->approved_by = auth()->user()->id;
+                $currentFinancialCustody->save();
+                $monthName           = $dueDate->getMonthName();
+                $newFinancialCustody = [
+                    'user_id'     => $c_user_id,
+                    'description' => "عهدة شراء شهر {$monthName} ",
+                    'notes'       => '',
+                    'approved_by' => null,
+                    'approved_at' => null,
+                    'due_date'    => $dueDate
+                ];
+                $newFinancialCustody = $employee->financialCustodies()->create($newFinancialCustody);
+                DepositWithdraw::create([
+                                            'withdrawValue'        => $depositValue,
+                                            'recordDesc'           => "باقي العهدة المرحلة {$currentFinancialCustody->description}",
+                                            'employee_id'          => $currentFinancialCustody->employee_id,
+                                            'expenses_id'          => EmployeeActions::FinancialCustody,
+                                            'financial_custody_id' => $newFinancialCustody->id,
+                                            'user_id'              => $c_user_id,
+                                            'payMethod'            => PaymentMethods::CASH,
+                                            'due_date'             => $dueDate
+                                        ]);
+                DB::commit();
+                return redirect()->back()->with('success', 'تم الترحيل');
+            } else {
+                return redirect()->back()->with('error', 'لم يتم الترحيل! يجب الموافقة علي باقي بنود العهدة الحالية');
+            }
+        } catch (\Exception $ex) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->with('error', "حدث خطأ في حفظ البيانات. {$ex->getMessage()}");
+        }
     }
 
-    /**
-     * @return \Illuminate\Http\Response
-     * @Get("guardianshipback/{employee_id}", as="salary.guardianshipback")
-     */
-    public function guardianshipback(Request $request, $employee_id)
+    private function getCurrentFinancialCustody($employee_id)
     {
-        $employee               = Employee::findOrFail($employee_id);
-        $depositWithdraw        = DepositWithdraw::findOrFail($employee->lastGuardianshipId());
-        $depositWithdraw->notes = null;
-        $depositWithdraw->save();
-        return redirect()->back()->with('success', 'تم الغاء ترحيل العهدة');
+        $currentEmployee         = Employee::find($employee_id);
+        $currentFinancialCustody = $currentEmployee->currentFinancialCustody();
+
+        if ($currentFinancialCustody == null) {
+            abort(403, 'عفوا لا يوجد عهدة مسجلة. ');
+        }
+        return $currentFinancialCustody;
     }
 
     /**
@@ -238,17 +298,17 @@ class SalaryController {
         $date = DateTime::parse($request->date);
 
         $employeeBorrowBilling        = DB::table('employees')
-                ->join('employee_borrows', 'employee_borrows.employee_id', '=', 'employees.id')
-                ->join('employee_borrow_billing', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
-                ->distinct()
-                ->where([
-                    ['paying_status', '=', EmployeeBorrowBilling::UN_PAID],
-                    ['employees.id', '=', $employee_id]
-                ])
-                ->whereYear('due_date', $date->year)
-                ->whereMonth('due_date', $date->month)
-                ->select('employee_borrow_billing.id')
-                ->get();
+                                          ->join('employee_borrows', 'employee_borrows.employee_id', '=', 'employees.id')
+                                          ->join('employee_borrow_billing', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
+                                          ->distinct()
+                                          ->where([
+                                                      ['paying_status', '=', EmployeeBorrowBilling::UN_PAID],
+                                                      ['employees.id', '=', $employee_id]
+                                                  ])
+                                          ->whereYear('due_date', $date->year)
+                                          ->whereMonth('due_date', $date->month)
+                                          ->select('employee_borrow_billing.id')
+                                          ->get();
         $data                         = collect(EmployeeBorrowBilling::findOrFail($employeeBorrowBilling->first()->id))->except(['id']);
         $borrowBilling                = EmployeeBorrowBilling::create($data->all());
         $borrowBilling->paying_status = EmployeeBorrowBilling::POSTPONED;
@@ -294,25 +354,25 @@ class SalaryController {
         $all['notes']         = $dt;
 
         $depositWithdraw = DepositWithdraw::where([
-                    ['employee_id', '=', $employee_id],
-                    ['expenses_id', '=', EmployeeActions::TakeSalary]
-                ])
-                ->whereYear('notes', $dt->year)
-                ->whereMonth('notes', $dt->month)
-                ->first();
+                                                      ['employee_id', '=', $employee_id],
+                                                      ['expenses_id', '=', EmployeeActions::TakeSalary]
+                                                  ])
+                                          ->whereYear('notes', $dt->year)
+                                          ->whereMonth('notes', $dt->month)
+                                          ->first();
 
         $employeeBorrowBilling = DB::table('employees')
-                ->join('employee_borrows', 'employee_borrows.employee_id', '=', 'employees.id')
-                ->join('employee_borrow_billing', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
-                ->distinct()
-                ->where([
-                    ['paying_status', '=', EmployeeBorrowBilling::UN_PAID],
-                    ['employees.id', '=', $employee_id]
-                ])
-                ->whereYear('due_date', $dt->year)
-                ->whereMonth('due_date', $dt->month)
-                ->select('employee_borrow_billing.id')
-                ->first();
+                                   ->join('employee_borrows', 'employee_borrows.employee_id', '=', 'employees.id')
+                                   ->join('employee_borrow_billing', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
+                                   ->distinct()
+                                   ->where([
+                                               ['paying_status', '=', EmployeeBorrowBilling::UN_PAID],
+                                               ['employees.id', '=', $employee_id]
+                                           ])
+                                   ->whereYear('due_date', $dt->year)
+                                   ->whereMonth('due_date', $dt->month)
+                                   ->select('employee_borrow_billing.id')
+                                   ->first();
         if (!empty($employeeBorrowBilling->id)) {
             $borrowBilling                = EmployeeBorrowBilling::findOrFail($employeeBorrowBilling->id);
             $borrowBilling->paid_amount   += $borrowBilling->getRemaining();

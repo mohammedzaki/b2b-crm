@@ -32,7 +32,7 @@ use App\Models\ClientProcess; ?>
                 تقرير مركز التكلفة
             </div>
             <!-- /.panel-heading -->
-            {{ Form::open(["route" => "reports.process.cost-center.view-report"]) }}
+            {{ Form::open(["route" => "reports.process.costCenter.viewReport", 'method' => 'get']) }}
             <div class="panel-body">
 
                 <div class="legend">

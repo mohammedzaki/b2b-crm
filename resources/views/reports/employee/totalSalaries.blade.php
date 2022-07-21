@@ -53,8 +53,8 @@
                                                     <td>{{ $employee['totalBorrow'] }}</td>
                                                     <td>{{ $employee['salaryDeduction'] }}</td>
                                                     <td>{{ $employee['bonuses'] }}</td>
-                                                    <td>{{ $employee['guardianshipValue'] }}</td>
-                                                    <td>{{ $employee['guardianshipReturnValue'] }}</td>
+                                                    <td>{{ $employee['financialCustodyValue'] }}</td>
+                                                    <td>{{ $employee['financialCustodyRefundValue'] }}</td>
                                                     <td>{{ $employee['netSalary'] }}</td>
                                                 </tr>
                                                 @empty
@@ -71,8 +71,8 @@
                                                     <td>{{ $totalBorrowValue }}</td>
                                                     <td>{{ $totalSalaryDeduction }}</td>
                                                     <td>{{ $totalBonuses }}</td>
-                                                    <td>{{ $totalGuardianshipValue }}</td>
-                                                    <td>{{ $totalGuardianshipReturnValue }}</td>
+                                                    <td>{{ $totalFinancialCustodyValue }}</td>
+                                                    <td>{{ $totalFinancialCustodyRefundValue }}</td>
                                                     <td>{{ $totalNetSalary }}</td>
                                                 </tr>
                                             </tbody>

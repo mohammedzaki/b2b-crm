@@ -11,7 +11,7 @@ return [
       | any other location as required by the application or its packages.
      */
 
-    'name'              => 'برنامج حسابات',
+    'name'              => 'برنامج الحسابات',
     /*
       |--------------------------------------------------------------------------
       | Application Environment
@@ -160,6 +160,7 @@ return [
         App\Providers\RouteServiceProvider::class,
         App\Providers\AnnotationsServiceProvider::class,
         App\Providers\ResponseMacroServiceProvider::class,
+        App\UserLog\Providers\UserLogServiceProvider::class,
     ],
     /*
       |--------------------------------------------------------------------------

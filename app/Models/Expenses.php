@@ -25,25 +25,58 @@ class Expenses extends Model
     protected $fillable = [
         'name'
     ];
-    
+
     public $startDate;
     public $endDate;
-    
-    public function getTotalPaid() {
+
+
+    /**
+     * @param bool $addLoans
+     * @return Expenses[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function allAsList($addLoans = true)
+    {
+        $all = static::all('id', 'name');
+        if ($addLoans) {
+            $all = collect([0 => ['id' => 0, 'name' => 'قروض']])->merge($all);
+        }
+        return $all;
+    }
+
+    public function getTotalPaid()
+    {
         return $this->paidItems()->sum('withdrawValue');
     }
-    
-    public function paidItems() {
+
+    public function dwItems()
+    {
         if (!isset($this->startDate)) {
             $this->startDate = DateTime::parse('01-01-2017');
-        } 
+        }
         if (!isset($this->endDate)) {
             $this->endDate = DateTime::parse('31-12-2017');
         }
         return $this->hasMany(DepositWithdraw::class, 'expenses_id')->where([
-                    ['employee_id', '=', null],
-                    ['due_date', '>=', $this->startDate],
-                    ['due_date', '<=', $this->endDate]
+            ['employee_id', '=', null],
+            ['due_date', '>=', $this->startDate],
+            ['due_date', '<=', $this->endDate]
         ]);
+    }
+
+    public function fcItems()
+    {
+        if (!isset($this->endDate)) {
+            $this->endDate = DateTime::parse('31-12-2017');
+        }
+        return $this->hasMany(FinancialCustodyItem::class, 'expenses_id')->where([
+            ['employee_id', '=', null],
+            ['due_date', '>=', $this->startDate],
+            ['due_date', '<=', $this->endDate]
+        ]);
+    }
+
+    public function paidItems()
+    {
+        return collect($this->dwItems)->merge($this->fcItems)->sortBy('due_date');
     }
 }

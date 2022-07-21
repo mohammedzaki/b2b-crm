@@ -47,7 +47,7 @@
                                 @forelse ($employeeBorrows as $item)
                                 <tr role="row">
                                     <td class="text-center">{{ $item->id }}</td>
-                                    <td>{{ $item->employee->name }}</td>
+                                    <td>{{ $item->employee()->withTrashed()->get()[0]->name }}</td>
                                     <td>{{ $item->borrow_reason }}</td>
                                     <td>{{ $item->amount }}</td>
                                     <td>{{ $item->pay_amount }}</td>

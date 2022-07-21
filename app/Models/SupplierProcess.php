@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Constants\ChequeStatuses;
+use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -110,15 +112,57 @@ class SupplierProcess extends Model {
         return $this->belongsTo(ClientProcess::class);
     }
 
-    public function withdrawals() {
-        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
-                    ['supplier_id', "=", $this->supplier_id],
-                    ['withdrawValue', ">", 0],
-        ]);
+    public function dwWithdrawals()
+    {
+        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')
+                    ->where([
+                                ['supplier_id', "=", $this->supplier_id],
+                                ['withdrawValue', ">", 0]
+                            ])
+                    ->select(DB::raw('NULL as pendingStatus, deposit_withdraws.*'));
+    }
+
+    public function fcWithdrawals()
+    {
+        return $this->hasMany(FinancialCustodyItem::class, 'cbo_processes')
+                    ->where([
+                                ['supplier_id', "=", $this->supplier_id],
+                                ['withdrawValue', ">", 0]
+                            ])
+                    ->select(DB::raw('IF(ISNULL(approved_at),1,NULL) AS pendingStatus, financial_custody_items.*'));
+    }
+
+    public function bankWithdrawals()
+    {
+        return $this->hasMany(BankCashItem::class, 'cbo_processes')
+                    ->where([
+                                ['supplier_id', "=", $this->supplier_id],
+                                ['withdrawValue', ">", 0]
+                            ])
+                    ->select(DB::raw('IF(cheque_status <> ' . ChequeStatuses::POSTDATED . ' OR cheque_status <> ' . ChequeStatuses::POSTPONED . ',1,NULL) AS pendingStatus, bank_cashes.*'));
+    }
+
+    public function withdrawals()
+    {
+        return collect($this->dwWithdrawals)
+            ->merge($this->fcWithdrawals)
+            ->merge($this->bankWithdrawals)->sortBy('due_date');
+    }
+
+    public function withdrawalsWithTrashed()
+    {
+        return collect($this->dwWithdrawals()->withTrashed()->get())
+            ->merge($this->fcWithdrawals()->withTrashed()->get())
+            ->merge($this->bankWithdrawals()->withTrashed()->get())
+            ->sortBy('due_date');
     }
 
     public function totalWithdrawals() {
         return $this->withdrawals()->sum('withdrawValue');
+    }
+
+    public function totalRemaining() {
+        return $this->totalPriceAfterTaxes() - $this->totalWithdrawals();
     }
 
     public function totalPriceAfterTaxes() {

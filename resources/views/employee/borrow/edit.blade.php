@@ -4,7 +4,7 @@
 
 <div class="row">
     <div class="col-lg-12">
-        <h1 class="page-header">عمليه جديدة عميل <small>تعديل بيانات عملية</small></h1>
+        <h1 class="page-header">سلفية موظف <small>تعديل بيانات </small></h1>
     </div>
 </div>
 <!-- /.row -->
@@ -36,14 +36,5 @@
             @include('employee.borrow._form', ['model' => 'edit', 'items' => $borrow->items])
         @endif
     {{ Form::close() }}
-
-    <script type="text/javascript">
-        @if (session('error'))
-            var processItemsCount = {{ count(old('items')) }};
-        @else
-            var processItemsCount = {{ count($borrow->items) }};
-        @endif
-    </script>
-
 </div>
 @endsection

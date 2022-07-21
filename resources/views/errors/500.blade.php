@@ -24,7 +24,13 @@
                 text-align: center;
                 display: table-cell;
                 vertical-align: middle;
-            }
+            }51
+
+            Cover image for A complete guide to HTTP request methods
+            Nlogn profile image
+            Nlogn
+            A complete guide to HTTP request methods
+            #http #techtalks #node #computerscience
 
             .content {
                 text-align: center;

@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Client;
 use App\Models\ClientProcess;
 use App\Extensions\DateTime;
-use App\Reports\Process\CostCenter;
+use App\Reports\V2\Process\CostCenter;
 
 /**
  * @Controller(prefix="/reports/process/cost-center")
@@ -50,21 +50,27 @@ class CostCenterController extends Controller {
 
     /**
      * Show the Index Page
-     * @Any("view-report", as="reports.process.cost-center.view-report")
+     * @Get("view-report", as="reports.process.costCenter.viewReport")
+     * @param Request $request
+     * @return CostCenter
      */
     public function viewReport(Request $request) {
         $this->report->clientId = $request->client_id;
         $this->report->processIds = $request->processes;
+        $this->report->withLetterHead = $request->withLetterHead;
         return $this->report->preview();
     }
 
     /**
      * Show the Index Page
-     * @Get("print-pdf", as="reports.process.cost-center.print-pdf")
+     * @Get("print-pdf", as="reports.process.costCenter.printPDF")
+     * @param Request $request
+     * @return void
      */
     public function printPDF(Request $request) {
         $this->report->clientId = $request->client_id;
         $this->report->processIds = $request->processes;
+        $this->report->withLetterHead = $request->withLetterHead;
         return $this->report->exportPDF();
     }
 

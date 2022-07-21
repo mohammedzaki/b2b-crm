@@ -20,6 +20,7 @@ class Handler extends ExceptionHandler {
         \Illuminate\Database\Eloquent\ModelNotFoundException::class,
         \Illuminate\Session\TokenMismatchException::class,
         \Illuminate\Validation\ValidationException::class,
+        ValidationException::class
     ];
 
     /**
@@ -48,9 +49,12 @@ class Handler extends ExceptionHandler {
         // Convert all non-http exceptions to a proper 500 http exception
         // if we don't do this exceptions are shown as a default template
         // instead of our own view in resources/views/errors/500.blade.php
-        if ($this->shouldReport($exception) && !$this->isHttpException($exception) && !config('app.debug')) {
+        if ($request->expectsJson()) {
+            return response()->jsonException($exception);
+        } elseif ($this->shouldReport($exception) && !$this->isHttpException($exception) && !config('app.debug')) {
             $exception = new ServerErrorException('Whoops!', 500);
         }
+
         return parent::render($request, $exception);
     }
 

@@ -11,7 +11,6 @@
 <!-- /.row -->
 
 <div class="row">
-
     @if (session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
@@ -29,7 +28,7 @@
     {{ Form::close() }}
 
     <script type="text/javascript">
-        var processItemsCount = {{ count(old('items')) }};
+        var processItemsCount = 0;
     </script>
 
 </div>

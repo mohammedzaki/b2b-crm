@@ -4,7 +4,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use DB;
 
 /**
  * App\Models\Supplier
@@ -37,46 +36,74 @@ use DB;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Supplier withoutTrashed()
  * @mixin \Eloquent
  */
-class Supplier extends Model {
+class Supplier extends Model
+{
 
     use SoftDeletes;
 
     protected $dates = ['deleted_at'];
-    protected $fillable = [
-        'name',
-        'address',
-        'telephone',
-        'mobile',
-        'debit_limit'
-    ];
+    protected $fillable
+                     = [
+            'name',
+            'address',
+            'telephone',
+            'mobile',
+            'debit_limit'
+        ];
 
-    public function processes() {
-        return $this->hasMany(SupplierProcess::class);
-    }
-
-    public function closedProcess() {
-        return $this->hasMany(SupplierProcess::class)->where('status', SupplierProcess::statusClosed);
-    }
-
-    public function openProcess() {
-        return $this->hasMany(SupplierProcess::class)->where('status', SupplierProcess::statusOpened);
-    }
-
-    public static function allHasOpenProcess() {
-        $suppliers = Supplier::join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
-                ->select('suppliers.*')->where('supplier_processes.status', SupplierProcess::statusOpened)
-                ->distinct()
-                ->get();
+    /**
+     * @return Supplier[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function allHasOpenProcess()
+    {
+        $suppliers = static::join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
+                             ->select('suppliers.*')->where('supplier_processes.status', SupplierProcess::statusOpened)
+                             ->distinct()
+                             ->get();
         return $suppliers;
     }
 
-    public function hasOpenProcess() {
+    /**
+     * @return Supplier[]|\Illuminate\Database\Eloquent\Collection
+     */
+    public static function allAsList()
+    {
+        return static::all()->mapWithKeys(function ($supplier) {
+            return [
+                $supplier->id => [
+                    'name'           => $supplier->name,
+                    'hasOpenProcess' => $supplier->hasOpenProcess(),
+                    'processes'      => $supplier->processes->mapWithKeys(function ($process) {
+                        return [
+                            $process->id => [
+                                'name'   => $process->name,
+                                'status' => $process->status
+                            ]
+                        ];
+                    })
+                ]
+            ];
+        });
+    }
+
+    public function closedProcess()
+    {
+        return $this->hasMany(SupplierProcess::class)->where('status', SupplierProcess::statusClosed);
+    }
+
+    public function openProcess()
+    {
+        return $this->hasMany(SupplierProcess::class)->where('status', SupplierProcess::statusOpened);
+    }
+
+    public function hasOpenProcess()
+    {
         $supplier = Supplier::join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
-                ->select('suppliers.*')->where([
-                    ['supplier_processes.status', "=", SupplierProcess::statusOpened],
-                    ['suppliers.id', '=', $this->id]])
-                ->distinct()
-                ->get();
+                            ->select('suppliers.*')->where([
+                                                               ['supplier_processes.status', "=", SupplierProcess::statusOpened],
+                                                               ['suppliers.id', '=', $this->id]])
+                            ->distinct()
+                            ->get();
 
         if ($supplier->count() > 0) {
             return TRUE;
@@ -85,13 +112,14 @@ class Supplier extends Model {
         }
     }
 
-    public function hasClosedProcess() {
+    public function hasClosedProcess()
+    {
         $supplier = Supplier::join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
-                ->select('suppliers.*')->where([
-                    ['supplier_processes.status', "=", SupplierProcess::statusClosed],
-                    ['suppliers.id', '=', $this->id]])
-                ->distinct()
-                ->get();
+                            ->select('suppliers.*')->where([
+                                                               ['supplier_processes.status', "=", SupplierProcess::statusClosed],
+                                                               ['suppliers.id', '=', $this->id]])
+                            ->distinct()
+                            ->get();
 
         if ($supplier->count() > 0) {
             return TRUE;
@@ -100,25 +128,27 @@ class Supplier extends Model {
         }
     }
 
-    public function getTotalPaid() {
-        return DB::table('suppliers')
-                        ->join('supplier_processes', 'supplier_processes.supplier_id', '=', 'suppliers.id')
-                        ->join('deposit_withdraws', 'supplier_processes.id', '=', 'deposit_withdraws.cbo_processes')
-                        ->join('deposit_withdraws as dw', 'suppliers.id', '=', 'deposit_withdraws.supplier_id')
-                        ->distinct()
-                        ->where([
-                            ['suppliers.id', '=', $this->id]
-                        ])
-                        ->select(['deposit_withdraws.withdrawValue', 'deposit_withdraws.cbo_processes'])
-                        ->get()->sum('withdrawValue');
-    }
-
-    public function getTotalRemaining() {
+    public function getTotalRemaining()
+    {
         return $this->getTotalDeal() - $this->getTotalPaid();
     }
 
-    public function getTotalDeal() {
+    public function getTotalDeal()
+    {
         return $this->processes()->sum('total_price_taxes');
     }
 
+    public function processes()
+    {
+        return $this->hasMany(SupplierProcess::class);
+    }
+
+    public function getTotalPaid()
+    {
+        $total = 0;
+        foreach ($this->processes as $process) {
+            $total += $process->totalWithdrawals();
+        }
+        return $total;
+    }
 }

@@ -4,9 +4,10 @@ namespace App\Models;
 
 use App\Constants\PaymentMethods;
 use App\Extensions\DateTime;
+use DB;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use DB;
+use App\Constants\ChequeStatuses;
 
 /**
  * App\Models\ClientProcess
@@ -36,6 +37,7 @@ use DB;
  * @property \Carbon\Carbon|null $updated_at
  * @property-read \App\Models\Client $client
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DepositWithdraw[] $deposits
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\DepositWithdraw[] $depositsWithTrashed
  * @property-read \App\Models\Employee $employee
  * @property-read \App\Models\Invoice|null $invoice
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\ClientProcessItem[] $items
@@ -72,94 +74,155 @@ use DB;
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Attendance[] $manpowerCost
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\SupplierProcess[] $suppliers
  */
-class ClientProcess extends Model {
+class ClientProcess extends
+    Model
+{
 
     use SoftDeletes;
-
-    protected $dates    = ['deleted_at'];
-    protected $fillable = [
-        'name',
-        'client_id',
-        'employee_id',
-        'notes',
-        'has_discount',
-        'status',
-        'discount_percentage',
-        'discount_value',
-        'discount_reason',
-        'require_invoice',
-        'has_source_discount',
-        'source_discount_percentage',
-        'source_discount_value',
-        'invoice_billed',
-        'total_price',
-        'total_price_taxes',
-        'taxes_value',
-        'taxes_percentage',
-        'invoice_id'
-    ];
 
     const invoiceUnBilled = 0;
     const invoiceBilled   = 1;
     const statusClosed    = 'closed';
     const statusOpened    = 'active';
+    protected $dates = ['deleted_at'];
+    protected $fillable
+                     = [
+            'name',
+            'client_id',
+            'employee_id',
+            'notes',
+            'has_discount',
+            'status',
+            'discount_percentage',
+            'discount_value',
+            'discount_reason',
+            'require_invoice',
+            'has_source_discount',
+            'source_discount_percentage',
+            'source_discount_value',
+            'invoice_billed',
+            'total_price',
+            'total_price_taxes',
+            'taxes_value',
+            'taxes_percentage',
+            'invoice_id'
+        ];
 
-    public function client() {
+    public static function allOpened()
+    {
+        return ClientProcess::where('status', static::statusOpened);
+    }
+
+    public function client()
+    {
         return $this->belongsTo(Client::class)->withTrashed();
     }
 
-    public function items() {
+    public function items()
+    {
         return $this->hasMany(ClientProcessItem::class, 'process_id');
     }
 
-    public function suppliers() {
+    public function suppliers()
+    {
         return $this->hasMany(SupplierProcess::class, 'client_process_id');
     }
 
-    public function invoice() {
+    public function invoice()
+    {
         return $this->belongsTo(Invoice::class);
     }
 
-    public function employee() {
+    public function employee()
+    {
         return $this->belongsTo(Employee::class);
     }
 
-    public function deposits() {
-        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
-                    ['client_id', "=", $this->client_id],
-                    ['depositValue', ">", 0],
-        ]);
-    }
-    
-    public function expenses() {
-        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')->where([
-                    ['client_id', "=", $this->client_id],
-                    ['withdrawValue', ">", 0],
-        ]);
+    public function bankDeposits()
+    {
+        return $this->hasMany(BankCashItem::class, 'cbo_processes')
+                    ->where([
+                                ['client_id', "=", $this->client_id],
+                                ['depositValue', ">", 0],
+                                ['cheque_status', "<>", ChequeStatuses::GUARANTEE],
+                            ])
+                    ->select(DB::raw('IF(cheque_status <> ' . ChequeStatuses::POSTDATED . ' OR cheque_status <> ' . ChequeStatuses::POSTPONED . ',1,NULL) AS pendingStatus, bank_cashes.*'));
     }
 
-    public function manpowerCost() {
-        return $this->hasMany(Attendance::class, 'process_id')
-                ->select(
-                        'employee_id', 
-                        DB::raw('count(employee_id) as totalDays'), 
-                        DB::raw('SUM(working_hours_in_seconds) as working_hours_in_seconds'))
-                ->groupBy('employee_id');
+    public function bankGuaranteeDeposits()
+    {
+        return $this->hasMany(BankCashItem::class, 'cbo_processes')
+            ->where([
+                ['client_id', "=", $this->client_id],
+                ['depositValue', ">", 0],
+                ['cheque_status', "=", ChequeStatuses::GUARANTEE],
+            ])
+            ->select(DB::raw('1 AS pendingStatus, bank_cashes.*'));
     }
 
-    public function companyExpences() {
-        
+    public function dwDeposits()
+    {
+        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')
+                    ->where([
+                                ['client_id', "=", $this->client_id],
+                                ['depositValue', ">", 0],
+                            ])
+                    ->select(DB::raw('NULL AS pendingStatus, deposit_withdraws.*'));
     }
 
-    public function totalDeposits() {
-        return $this->deposits()->sum('depositValue');
+    public function dwExpenses()
+    {
+        return $this->hasMany(DepositWithdraw::class, 'cbo_processes')
+                    ->where([
+                                ['client_id', "=", $this->client_id],
+                                ['withdrawValue', ">", 0],
+                            ])
+                    ->select(DB::raw('NULL as pendingStatus, deposit_withdraws.*'));
     }
 
-    public function totalRemaining() {
-        return $this->total_price_taxes - $this->totalDeposits();
+    public function fcExpenses()
+    {
+        return $this->hasMany(FinancialCustodyItem::class, 'cbo_processes')
+                    ->where([
+                                ['client_id', "=", $this->client_id],
+                                ['withdrawValue', ">", 0],
+                                ['approved_at', '=', null]
+                            ])
+                    ->select(DB::raw('IF(ISNULL(approved_at),1,NULL) AS pendingStatus, financial_custody_items.*'));
     }
 
-    public function payRemaining($invoice_no) {
+    public function bankExpenses()
+    {
+        return $this->hasMany(BankCashItem::class, 'cbo_processes')
+                    ->where([
+                                ['client_id', "=", $this->client_id],
+                                ['withdrawValue', ">", 0]
+                            ])
+                    ->select(DB::raw('IF(cheque_status <> ' . ChequeStatuses::POSTDATED . ' OR cheque_status <> ' . ChequeStatuses::POSTPONED . ',1,NULL) AS pendingStatus, bank_cashes.*'));
+    }
+
+    public function expenses()
+    {
+        return collect($this->dwExpenses)->merge($this->fcExpenses)->merge($this->bankExpenses)->sortBy('due_date');
+    }
+
+    public function manpowerCost()
+    {
+        return $this->hasMany(Attendance::class, 'process_id');
+//                ->select(
+//                        'employee_id',
+//                        DB::raw('count(employee_id) as totalDays'),
+//                        DB::raw('SUM(working_hours_in_seconds) as working_hours_in_seconds'))
+//                ->groupBy('employee_id');
+    }
+
+    public function companyExpences()
+    {
+
+    }
+
+    public function payRemaining($invoice_no)
+    {
         if ($this->totalRemaining() > 0) {
             $all = [
                 'due_date'      => DateTime::now(),
@@ -175,7 +238,28 @@ class ClientProcess extends Model {
         $this->checkProcessMustClosed();
     }
 
-    public function checkProcessMustClosed() {
+    public function totalRemaining()
+    {
+        return $this->total_price_taxes - $this->totalDeposits();
+    }
+
+    public function totalDeposits()
+    {
+        return $this->deposits()->sum('depositValue');
+    }
+
+    public function deposits()
+    {
+        return collect($this->dwDeposits)->merge($this->bankDeposits)->sortBy('due_date');
+    }
+
+    public function depositsWithTrashed()
+    {
+        return collect($this->dwDeposits()->withTrashed()->get())->merge($this->bankDeposits()->withTrashed()->get())->sortBy('due_date');
+    }
+
+    public function checkProcessMustClosed()
+    {
         if ($this->totalRemaining() == 0) {
             $this->status = static::statusClosed;
             $this->save();
@@ -187,15 +271,12 @@ class ClientProcess extends Model {
         }
     }
 
-    public function taxesValue() {
+    public function taxesValue()
+    {
         if ($this->require_invoice == TRUE) {
             return $this->taxes_value;
         }
         return 0;
-    }
-
-    public static function allOpened() {
-        return ClientProcess::where('status', static::statusOpened);
     }
 
 }

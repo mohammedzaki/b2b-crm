@@ -2,7 +2,10 @@
 
 namespace App\Models;
 
+use App\Extensions\DateTime;
+use App\Helpers\Helpers;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * App\Models\DepositWithdraw
@@ -47,9 +50,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class DepositWithdraw extends Model {
 
-    //use SoftDeletes;
+    use SoftDeletes;
 
-    //protected $dates = ['deleted_at'];
+    protected $dates = ['deleted_at', 'due_date'];
     protected $fillable = [
         'depositValue',
         'withdrawValue',
@@ -60,7 +63,9 @@ class DepositWithdraw extends Model {
         'employee_id',
         'supplier_id',
         'expenses_id',
-        
+        'financial_custody_id',
+
+        'user_id',
         'payMethod',
         'notes',
         'due_date'
@@ -89,5 +94,21 @@ class DepositWithdraw extends Model {
     
     public function employeeLogBorrowBillings() {
         return $this->hasMany(EmployeeBorrowBilling::class, 'deposit_id', 'id');
+    }
+
+    public static function getDWItems($startDate = '2000-01-01 00:00:00', $endDate = '2099-01-01 00:00:00')
+    {
+        return static::whereBetween('due_date', [$startDate, $endDate])->get();
+    }
+
+    public static function calculateCurrentAmount($endDate = '2099-01-01 00:00:00', $startDate = '2000-01-01 00:00:00')
+    {
+        $depositWithdrawsItems = static::getDWItems($startDate, $endDate);
+        $depositValue          = $depositWithdrawsItems->sum('depositValue');
+        $withdrawValue         = $depositWithdrawsItems->sum('withdrawValue');
+        $openingAmount         = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
+        $loansAmount         = Loans::whereBetween('date', [$startDate, $endDate])
+            ->where('save_id', '=', 0)->sum('amount');
+        return round(($depositValue + $openingAmount + $loansAmount) - $withdrawValue, Helpers::getDecimalPointCount());
     }
 }

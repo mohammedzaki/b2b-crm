@@ -14,18 +14,8 @@ use Validator;
  * @Controller(prefix="/reports/employees/borrow/long")
  * @Middleware({"web", "auth"})
  */
-class LongReportController extends Controller {
-
-    protected function validator(array $data)
-    {
-        $validator = Validator::make($data, [
-        ]);
-
-        $validator->setAttributeNames([
-        ]);
-
-        return $validator;
-    }
+class LongReportController extends Controller
+{
 
     /**
      * Show the Index Page
@@ -40,17 +30,17 @@ class LongReportController extends Controller {
                     'name'             => $employee['name'],
                     'hasUnpaidBorrows' => $employee->hasUnpaidBorrow(),
                     'borrows'          => $employee->longBorrows->mapWithKeys(function ($borrow) {
-                                return [
-                                    $borrow['id'] => [
-                                        'id'             => $borrow->id,
-                                        'borrow_reason'  => $borrow->borrow_reason,
-                                        'total'          => $borrow->amount,
-                                        'totalPaid'      => $borrow->totalPaid(),
-                                        'totalRemaining' => $borrow->totalRemaining(),
-                                        'active'         => count($borrow->unPaidAmounts) > 0
-                                    ]
-                                ];
-                            }),
+                        return [
+                            $borrow['id'] => [
+                                'id'             => $borrow->id,
+                                'borrow_reason'  => $borrow->borrow_reason,
+                                'total'          => $borrow->amount,
+                                'totalPaid'      => $borrow->totalPaid(),
+                                'totalRemaining' => $borrow->totalRemaining(),
+                                'active'         => count($borrow->unPaidAmounts) > 0
+                            ]
+                        ];
+                    }),
                 ]
             ];
         });
@@ -63,20 +53,12 @@ class LongReportController extends Controller {
      */
     public function viewReport(Request $request)
     {
-        /*
-         * $emp                                = Employee::findOrFail($request->employee_id);
-          $employee['employeeName']           = $emp->name;
-          $employee['employeeNum']            = $emp->id;
-         */
 
-        $employee = Employee::findOrFail($request->employee_id)->get()->mapWithKeys(function ($emp) {
-            return [
-                'employeeName' => $emp->name,
-                'employeeNum'  => $emp->id,
-            ];
-        });
+        $emp                      = Employee::findOrFail($request->employee_id);
+        $employee['employeeName'] = $emp->name;
+        $employee['employeeNum']  = $emp->id;
 
-        $employee['borrowDetails'] = EmployeeBorrow::whereIn('id', $request->selectedIds)->get()->mapWithKeys(function ($borrow) {
+        $employee['borrowDetails']          = EmployeeBorrow::whereIn('id', $request->selectedIds)->get()->mapWithKeys(function ($borrow) {
             return [
                 $borrow->id => [
                     'desc'       => $borrow->borrow_reason,
@@ -86,17 +68,17 @@ class LongReportController extends Controller {
                     'date'       => $borrow->created_at,
                     'notes'      => '',
                     'amounts'    => $borrow->payAmounts->mapWithKeys(function ($amount) {
-                                return [
-                                    $amount->id => [
-                                        'desc'          => '',
-                                        'paid_amount'   => $amount->paid_amount,
-                                        'paying_status' => $amount->getStatus(),
-                                        'due_date'      => $amount->due_date,
-                                        'paid_date'     => $amount->paid_date,
-                                        'notes'         => $amount->notes
-                                    ]
-                                ];
-                            })
+                        return [
+                            $amount->id => [
+                                'desc'          => '',
+                                'paid_amount'   => $amount->paid_amount,
+                                'paying_status' => $amount->getStatus(),
+                                'due_date'      => $amount->due_date,
+                                'paid_date'     => $amount->paid_date,
+                                'notes'         => $amount->notes
+                            ]
+                        ];
+                    })
                 ]
             ];
         });
@@ -113,14 +95,25 @@ class LongReportController extends Controller {
      */
     public function printTotalPDF(Request $request)
     {
-        return $this->printPDF($request->ch_detialed, $request->withLetterHead, session('employees'), session('monthName'), session('totalWorkingHours'), session('totalHourlyRate'), session('totalSalary'), session('totalAbsentDeduction'), session('totalLongBorrowValue'), session('totalSmallBorrowValue'), session('totalBorrowValue'), session('totalSalaryDeduction'), session('totalBonuses'), session('totalGuardianshipValue'), session('totalGuardianshipReturnValue'), session('totalNetSalary'));
+        return $this->printPDF($request->ch_detialed, $request->withLetterHead, session('employees'), session('monthName'), session('totalWorkingHours'), session('totalHourlyRate'), session('totalSalary'), session('totalAbsentDeduction'), session('totalLongBorrowValue'), session('totalSmallBorrowValue'), session('totalBorrowValue'), session('totalSalaryDeduction'), session('totalBonuses'), session('totalFinancialCustodyValue'), session('totalFinancialCustodyRefundValue'), session('totalNetSalary'));
     }
 
-    private function printPDF($ch_detialed, $withLetterHead, $employees, $monthName, $totalWorkingHours, $totalHourlyRate, $totalSalary, $totalAbsentDeduction, $totalLongBorrowValue, $totalSmallBorrowValue, $totalBorrowValue, $totalSalaryDeduction, $totalBonuses, $totalGuardianshipValue, $totalGuardianshipReturnValue, $totalNetSalary)
+    private function printPDF($ch_detialed, $withLetterHead, $employees, $monthName, $totalWorkingHours, $totalHourlyRate, $totalSalary, $totalAbsentDeduction, $totalLongBorrowValue, $totalSmallBorrowValue, $totalBorrowValue, $totalSalaryDeduction, $totalBonuses, $totalFinancialCustodyValue, $totalFinancialCustodyRefundValue, $totalNetSalary)
     {
         $pdfReport              = new TotalSalaries($withLetterHead);
-        $pdfReport->htmlContent = view("reports.employee.borrow.long.pdf", compact('employees', 'monthName', 'totalWorkingHours', 'totalHourlyRate', 'totalSalary', 'totalAbsentDeduction', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'totalBorrowValue', 'totalSalaryDeduction', 'totalBonuses', 'totalGuardianshipValue', 'totalGuardianshipReturnValue', 'totalNetSalary'))->render();
+        $pdfReport->htmlContent = view("reports.employee.borrow.long.pdf", compact('employees', 'monthName', 'totalWorkingHours', 'totalHourlyRate', 'totalSalary', 'totalAbsentDeduction', 'totalLongBorrowValue', 'totalSmallBorrowValue', 'totalBorrowValue', 'totalSalaryDeduction', 'totalBonuses', 'totalFinancialCustodyValue', 'totalFinancialCustodyRefundValue', 'totalNetSalary'))->render();
         return $pdfReport->exportPDF();
+    }
+
+    protected function validator(array $data)
+    {
+        $validator = Validator::make($data, [
+        ]);
+
+        $validator->setAttributeNames([
+                                      ]);
+
+        return $validator;
     }
 
 }

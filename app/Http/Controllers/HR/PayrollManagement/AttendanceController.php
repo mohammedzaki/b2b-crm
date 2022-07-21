@@ -8,8 +8,8 @@ use App\Models\AbsentType;
 use App\Models\Attendance;
 use App\Models\ClientProcess;
 use App\Models\Employee;
-use Illuminate\Http\Request;
 use Auth;
+use Illuminate\Http\Request;
 use Validator;
 
 /**
@@ -17,7 +17,8 @@ use Validator;
  * @Resource("attendance")
  * @Middleware({"web", "auth"})
  */
-class AttendanceController extends Controller {
+class AttendanceController extends Controller
+{
 
     /**
      * Display a listing of the resource.
@@ -29,27 +30,10 @@ class AttendanceController extends Controller {
         $startDate = DateTime::today()->format('Y-m-d 00:00:00');
         $endDate   = DateTime::today()->format('Y-m-d 23:59:59');
 
-        return $this->getAttendanceItems('all', $startDate, $endDate, 1, TRUE);
+        return $this->getAttendanceItems('all', $startDate, $endDate, TRUE);
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     * @Get("search/{employee_id}", as="attendance.search")
-     */
-    public function search($employee_id, Request $request)
-    {
-        $user = Auth::user();
-        if (!$user->ability('admin', 'attendance-edit')) {
-            return response()->view('errors.403', [], 403);
-        }
-        $date = DateTime::parse($request['targetdate']);
-        return $this->getAttendanceItems($employee_id, $date, null, 1);
-    }
-
-    private function getAttendanceItems($id, $startDate, $endDate, $canEdit, $isToday = FALSE)
+    private function getAttendanceItems($id, $startDate, $endDate, $isToday = FALSE)
     {
         $employees = Employee::all()->mapWithKeys(function ($employee) {
             return [$employee->id => $employee->name];
@@ -57,21 +41,18 @@ class AttendanceController extends Controller {
         $dt        = DateTime::parse($startDate);
         $hasData   = FALSE;
         if ($id == "all") {
-            $attendances = []; //Attendance::all();
             $attendances = Attendance::whereBetween('date', [$startDate, $endDate])->orderBy('date', 'asc')->get();
-            $employee_id = 0;
             $startDate   = null;
             $id          = 0;
         } else {
-            $employee = Employee::findOrFail($id);
             if ($isToday) {
                 $attendances = Attendance::whereBetween('date', [$startDate, $endDate])->orderBy('date', 'asc')->get();
             } else {
                 $attendances = Attendance::where([
-                            ['employee_id', '=', $id]
-                        ]) 
-                        ->whereYear('date', $dt->year)
-                        ->whereMonth('date', $dt->month)->get();
+                                                     ['employee_id', '=', $id]
+                                                 ])
+                                         ->whereYear('date', $dt->year)
+                                         ->whereMonth('date', $dt->month)->get();
             }
             $hasData = TRUE;
         }
@@ -91,73 +72,31 @@ class AttendanceController extends Controller {
                 $attendance->absentTypeName = $attendance->absentType->name;
             }
         }
-        
-        return view('attendance.index', compact(['employees', 'attendances', 'date', 'employee_id', 'hasData']));
+
+        return view('attendance.index')->with([
+                                                  'employees'   => $employees,
+                                                  'attendances' => $attendances,
+                                                  'date'        => $date,
+                                                  'employee_id' => $employee_id,
+                                                  'hasData'     => $hasData
+                                              ]);
     }
 
-    protected function validatorCheckin(array $data, $id = null)
+    /**
+     * Display the specified resource.
+     *
+     * @param  int $id
+     * @return \Illuminate\Http\Response
+     * @Get("search/{employee_id}", as="attendance.search")
+     */
+    public function search($employee_id, Request $request)
     {
-        $validator = Validator::make($data, [
-                    'process_id'           => 'required_without:is_managment_process',
-                    'is_managment_process' => 'required_if:process_id,-1',
-                    'employee_id'          => 'exists:employees,id|required',
-                        //'notes' => 'string'
-        ]);
-
-        $validator->setAttributeNames([
-            'process_id'           => 'اسم العملية',
-            'employee_id'          => 'اسم الموظف',
-            'is_managment_process' => 'عمليات ادارية',
-                //'notes' => 'ملاحظات'
-        ]);
-
-        return $validator;
-    }
-
-    protected function validatorCheckout(array $data, $id = null)
-    {
-        $validator = Validator::make($data, [
-                    'employee_id' => 'exists:employees,id|required',
-                        //'notes' => 'string'
-        ]);
-
-        $validator->setAttributeNames([
-            'employee_id' => 'اسم الموظف',
-                //'notes' => 'ملاحظات'
-        ]);
-
-        return $validator;
-    }
-
-    public function getBasicData($checkin = true, $attendance = null)
-    {
-        $employees = Employee::all()->mapWithKeys(function ($employee) {
-            return [$employee->id => $employee->name];
-        });
-        $processes = ClientProcess::allOpened()->get()->mapWithKeys(function ($process) {
-            return [$process->id => $process->name];
-        });
-        $absentTypes = AbsentType::all()->mapWithKeys(function ($type) {
-            return [$type->id => $type->name];
-        });
-        $absentTypesInfo = AbsentType::all()->mapWithKeys(function ($type) {
-            return [
-                $type->id => [
-                    'salaryDeduction' => $type->salary_deduction,
-                    'editable'        => $type->editable_deduction
-                ]
-            ];
-        });
-        $employeesSalaries = Employee::all()->mapWithKeys(function ($employee) {
-            return [
-                $employee['id'] => [
-                    'dailySalary' => $employee->daily_salary
-                ]
-            ];
-        });
-        $employeesCheckinDates = [];
-        $checkinbtn            = FALSE;
-        return compact('attendance', 'employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn', 'employeesCheckinDates');
+        $user = Auth::user();
+        if (!$user->ability('admin', 'attendance-edit')) {
+            return response()->view('errors.403', [], 403);
+        }
+        $date = DateTime::parse($request['date']);
+        return $this->getAttendanceItems($employee_id, $date, null);
     }
 
     /**
@@ -170,6 +109,37 @@ class AttendanceController extends Controller {
         return view('attendance.create', $this->getBasicData());
     }
 
+    public function getBasicData($checkin = true, $attendance = null)
+    {
+        $employees             = Employee::all()->mapWithKeys(function ($employee) {
+            return [$employee->id => $employee->name];
+        });
+        $processes             = ClientProcess::allOpened()->get()->mapWithKeys(function ($process) {
+            return [$process->id => $process->name];
+        });
+        $absentTypes           = AbsentType::all()->mapWithKeys(function ($type) {
+            return [$type->id => $type->name];
+        });
+        $absentTypesInfo       = AbsentType::all()->mapWithKeys(function ($type) {
+            return [
+                $type->id => [
+                    'salaryDeduction' => $type->salary_deduction,
+                    'editable'        => $type->editable_deduction
+                ]
+            ];
+        });
+        $employeesSalaries     = Employee::all()->mapWithKeys(function ($employee) use ($attendance) {
+            return [
+                $employee['id'] => [
+                    'dailySalary' => $employee->currentJobProfile->daily_salary
+                ]
+            ];
+        });
+        $employeesCheckinDates = [];
+        $checkinbtn            = FALSE;
+        return compact('attendance', 'employees', 'employeesSalaries', 'processes', 'absentTypes', 'absentTypesInfo', 'checkin', 'checkinbtn', 'employeesCheckinDates');
+    }
+
     /**
      * @return \Illuminate\Http\Response
      * @Get("checkin", as="attendance.checkin")
@@ -177,6 +147,11 @@ class AttendanceController extends Controller {
     public function checkin()
     {
         return $this->createAttendance(TRUE);
+    }
+
+    function createAttendance($checkType = -1)
+    {
+        return view('attendance.create', $this->getBasicData($checkType));
     }
 
     /**
@@ -197,20 +172,16 @@ class AttendanceController extends Controller {
         return $this->createAttendance();
     }
 
-    function createAttendance($checkType = -1)
-    {
-        return view('attendance.create', $this->getBasicData($checkType));
-    }
-
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        $all = $request->all();
+        $all  = $request->all();
+        $date = DateTime::parse($all['date']);
         if (!empty($request->check_in)) {
             $validator = $this->validatorCheckin($all);
         } else {
@@ -220,36 +191,29 @@ class AttendanceController extends Controller {
             return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
             $attendance            = Attendance::where("employee_id", $all['employee_id'])
-                    ->orderBy('id', 'desc')
-                    ->first();
+                                               ->orderBy('id', 'desc')
+                                               ->first();
             $attendanceToday       = Attendance::where([
-                        ["date", "=", $all['date']],
-                        ["employee_id", "=", $all['employee_id']]
-                    ])
-                    ->orderBy('id', 'desc')
-                    ->first();
+                                                           ["date", "=", $date],
+                                                           ["employee_id", "=", $all['employee_id']]
+                                                       ])
+                                               ->orderBy('id', 'desc')
+                                               ->first();
             $attendanceBeforeToday = Attendance::where([
-                        ["date", "=", DateTime::parse($all['date'])->addDay(-1)],
-                        ["employee_id", "=", $all['employee_id']]
-                    ])
-                    ->orderBy('id', 'desc')
-                    ->first();
+                                                           ["date", "=", DateTime::parse($all['date'])->addDay(-1)],
+                                                           ["employee_id", "=", $all['employee_id']]
+                                                       ])
+                                               ->orderBy('id', 'desc')
+                                               ->first();
             if ($request->checkin == -1) {
                 $attendance          = Attendance::firstOrCreate([
-                            ["date", "=", $all['date']],
-                            ["employee_id", "=", $all['employee_id']]
-                ]);
+                                                                     ["date", "=", $date],
+                                                                     ["employee_id", "=", $all['employee_id']]
+                                                                 ]);
                 $all['absent_check'] = TRUE;
                 goto skip;
             } else if ($request->checkin == 0) {
-                
-            } else if (empty($attendance)) {
-                if (isset($request->is_second_shift)) {
-                    $errors['is_second_shift'] = "يجب تسجيل الوردية الاولى اولا";
-                    return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($errors);
-                } else if (empty($request->check_in)) {
-                    return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل حضور اولا')->withErrors($validator);
-                }
+
             } else if (!empty($attendanceToday)) {
                 if (isset($attendanceToday->absent_check)) {
                     return redirect()->back()->withInput($all)->with('error', 'لقد تم تسجيل غياب لهذا العامل يرجى التعديل من شاشة التعديل');
@@ -278,10 +242,10 @@ class AttendanceController extends Controller {
                 }
                 if (isset($attendanceToday->check_in) && isset($attendanceToday->check_out) && isset($request->is_second_shift)) {
                     $attendance   = Attendance::firstOrCreate([
-                                ["date", "=", $all['date']],
-                                ["employee_id", "=", $all['employee_id']],
-                                ["shift", "=", 2]
-                    ]);
+                                                                  ["date", "=", $date],
+                                                                  ["employee_id", "=", $all['employee_id']],
+                                                                  ["shift", "=", 2]
+                                                              ]);
                     $all['shift'] = 2;
                     goto skip;
                 }
@@ -292,13 +256,7 @@ class AttendanceController extends Controller {
                     $errors['is_second_shift'] = "يجب تسجيل الوردية الاولى اولا";
                     return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($errors);
                 } else if (isset($request->check_in)) {
-                    $checkinDate  = DateTime::parse($request->check_in);
-                    $checkoutDate = DateTime::parse($attendance->check_out);
-                    if (empty($attendance->check_out)) {
-                        return redirect()->back()->withInput($all)->with('error', 'يجب تسجيل انصراف اولا');
-                    } else if ($checkoutDate->gt($checkinDate)) {
-                        return redirect()->back()->withInput($all)->with('error', 'تاريخ الدخول اكبر من اخر تاريخ انصراف');
-                    }
+
                 } else if (isset($request->check_out)) {
                     $checkinDate  = DateTime::parse($attendance->check_in);
                     $checkoutDate = DateTime::parse($request->check_out);
@@ -310,10 +268,10 @@ class AttendanceController extends Controller {
                 }
             }
             $attendance   = Attendance::firstOrCreate([
-                        ["date", "=", $all['date']],
-                        ["employee_id", "=", $all['employee_id']],
-                        ["shift", "=", 1]
-            ]);
+                                                          ["date", "=", $date],
+                                                          ["employee_id", "=", $all['employee_id']],
+                                                          ["shift", "=", 1]
+                                                      ]);
             $all['shift'] = 1;
             skip:
             if (isset($request->is_managment_process)) {
@@ -328,10 +286,44 @@ class AttendanceController extends Controller {
         }
     }
 
+    protected function validatorCheckin(array $data, $id = null)
+    {
+        $validator = Validator::make($data, [
+            'process_id'           => 'required_without:is_managment_process',
+            'is_managment_process' => 'required_if:process_id,-1',
+            'employee_id'          => 'exists:employees,id|required',
+            //'notes' => 'string'
+        ]);
+
+        $validator->setAttributeNames([
+                                          'process_id'           => 'اسم العملية',
+                                          'employee_id'          => 'اسم الموظف',
+                                          'is_managment_process' => 'عمليات ادارية',
+                                          //'notes' => 'ملاحظات'
+                                      ]);
+
+        return $validator;
+    }
+
+    protected function validatorCheckout(array $data, $id = null)
+    {
+        $validator = Validator::make($data, [
+            'employee_id' => 'exists:employees,id|required',
+            //'notes' => 'string'
+        ]);
+
+        $validator->setAttributeNames([
+                                          'employee_id' => 'اسم الموظف',
+                                          //'notes' => 'ملاحظات'
+                                      ]);
+
+        return $validator;
+    }
+
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function show(Request $request, $id)
@@ -342,14 +334,14 @@ class AttendanceController extends Controller {
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
-        $attendance               = Attendance::findOrFail($id);
-        $check_out                = DateTime::parse($attendance->check_out);
-        $check_in                 = DateTime::parse($attendance->check_in);
+        $attendance = Attendance::findOrFail($id);
+        $check_out  = DateTime::parse($attendance->check_out);
+        $check_in   = DateTime::parse($attendance->check_in);
         //$attendance->check_out = $attendance->check_out
         $attendance->workingHours = $check_out->diffInHours($check_in);
         $attendance->employeeName = $attendance->employee->name;
@@ -368,15 +360,16 @@ class AttendanceController extends Controller {
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request $request
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, $id)
     {
         $attendance = Attendance::findOrFail($id);
         $all        = $request->all();
-        $validator  = $this->validatorCheckin($all, $attendance->id);
+
+        $validator = $this->validatorCheckin($all, $attendance->id);
 
         if ($validator->fails()) {
             return redirect()->back()->withInput($all)->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
@@ -397,7 +390,7 @@ class AttendanceController extends Controller {
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int  $id
+     * @param  int $id
      * @return \Illuminate\Http\Response
      */
     public function destroy($id)
@@ -416,10 +409,10 @@ class AttendanceController extends Controller {
     {
         $shift      = ($request->is_second_shift == "true" ? 2 : 1);
         $attendance = Attendance::where([
-                    ["date", "=", $request->date],
-                    ["employee_id", "=", $request->employee_id],
-                    ["shift", "=", $shift]
-                ])->first();
+                                            ["date", "=", $request->date],
+                                            ["employee_id", "=", $request->employee_id],
+                                            ["shift", "=", $shift]
+                                        ])->first();
         if (empty($attendance))
             return "";
         else

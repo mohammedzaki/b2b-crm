@@ -48,43 +48,45 @@ use App\Helpers\Helpers;
  * @property int|null $working_hours_in_seconds
  * @method static \Illuminate\Database\Eloquent\Builder|\App\Models\Attendance whereWorkingHoursInSeconds($value)
  */
-class Attendance extends Model {
+class Attendance extends Model
+{
 
-    protected $fillable = [
-        'date',
-        'shift',
-        'check_in',
-        'check_out',
-        'working_hours_in_seconds',
-        'absent_check',
-        'absent_type_id',
-        'salary_deduction',
-        'absent_deduction',
-        'mokaf',
-        'notes',
-        'employee_id',
-        'process_id'
-    ];
-
+    public    $workingHours;
+    public    $employeeName;
+    public    $processName;
+    public    $absentTypeName;
+    public    $FinancialCustodyValue;
+    public    $FinancialCustodyRefundValue;
+    public    $borrowValue;
+    public    $is_managment_process;
+    protected $fillable
+        = [
+            'date',
+            'shift',
+            'check_in',
+            'check_out',
+            'working_hours_in_seconds',
+            'absent_check',
+            'absent_type_id',
+            'salary_deduction',
+            'absent_deduction',
+            'mokaf',
+            'notes',
+            'employee_id',
+            'process_id'
+        ];
     /**
      * The attributes that should be mutated to dates.
      *
      * @var array
      */
-    protected $dates = [
-        //'check_in',
-        //'check_out',
-        'created_at',
-        'updated_at'
-    ];
-    public $workingHours;
-    public $employeeName;
-    public $processName;
-    public $absentTypeName;
-    public $GuardianshipValue;
-    public $GuardianshipReturnValue;
-    public $borrowValue;
-    public $is_managment_process;
+    protected $dates
+        = [
+            //'check_in',
+            //'check_out',
+            'created_at',
+            'updated_at'
+        ];
 
     public function employee()
     {
@@ -101,52 +103,30 @@ class Attendance extends Model {
         return $this->belongsTo(ClientProcess::class);
     }
 
-    public function employeeGuardianship()
+    public function employeeFinancialCustody()
     {
-        $startDate        = DateTime::parse($this->date)->startOfDay(); //->format('Y-m-d 00:00:00');
-        $endDate          = DateTime::parse($this->date)->endOfDay(); //->format('Y-m-d 23:59:59');
-        $depositWithdraws = DB::select("SELECT distinct dw.* from deposit_withdraws as dw
-JOIN employees emp ON dw.employee_id = emp.id
-WHERE emp.id = {$this->employee_id}
-AND dw.expenses_id = " . EmployeeActions::Guardianship . " 
-AND 
-((dw.due_date BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayFormat()}' AND dw.notes is null)
-OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayFormat()}')");
-
-        try {
-            //if ($this->shift == 1) {
-            $withdrawValue = 0;
-            foreach ($depositWithdraws as $key => $value) {
-                $withdrawValue += $value->withdrawValue;
-            }
-            return $withdrawValue;
-            //} else {
-            //    return 0;
-            //}
-        } catch (\Exception $exc) {
-            return 0;
-        }
+        $startDate                     = DateTime::parse($this->date)->startOfDay();
+        $endDate                       = DateTime::parse($this->date)->endOfDay();
+        $totalFinancialCustodyDeposits = DepositWithdraw::where([
+                                                                    ['employee_id', '=', $this->employee_id],
+                                                                    ['expenses_id', '=', EmployeeActions::FinancialCustody],
+                                                                    ['due_date', '>=', $startDate],
+                                                                    ['due_date', '<=', $endDate]
+                                                                ])->get()->sum('withdrawValue');
+        return $totalFinancialCustodyDeposits;
     }
 
-    public function employeeGuardianshipReturn()
+    public function employeeFinancialCustodyRefund()
     {
-        $startDate        = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
-        $endDate          = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
-        $depositWithdraws = DepositWithdraw::where([
-                    ['employee_id', '=', $this->employee_id],
-                    ['expenses_id', '=', EmployeeActions::GuardianshipReturn],
-                    ['due_date', '>=', $startDate],
-                    ['due_date', '<=', $endDate]
-        ]);
-        try {
-            if ($this->shift == 1) {
-                return $depositWithdraws->sum('depositValue');
-            } else {
-                return 0;
-            }
-        } catch (\Exception $exc) {
-            return 0;
-        }
+        $startDate                    = DateTime::parse($this->date)->startOfDay();
+        $endDate                      = DateTime::parse($this->date)->endOfDay();
+        $totalFinancialCustodyRefunds = DepositWithdraw::where([
+                                                                   ['employee_id', '=', $this->employee_id],
+                                                                   ['expenses_id', '=', EmployeeActions::FinancialCustodyRefund],
+                                                                   ['due_date', '>=', $startDate],
+                                                                   ['due_date', '<=', $endDate]
+                                                               ])->get()->sum('depositValue');
+        return $totalFinancialCustodyRefunds;
     }
 
     public function employeeSmallBorrow()
@@ -154,13 +134,19 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         $startDate        = DateTime::parse($this->date)->format('Y-m-d 00:00:00');
         $endDate          = DateTime::parse($this->date)->format('Y-m-d 23:59:59');
         $depositWithdraws = DepositWithdraw::where([
-                    ['employee_id', '=', $this->employee_id],
-                    ['expenses_id', '=', EmployeeActions::SmallBorrow],
-                    ['due_date', '>=', $startDate],
-                    ['due_date', '<=', $endDate]
-        ]);
+                                                       ['employee_id', '=', $this->employee_id],
+                                                       ['expenses_id', '=', EmployeeActions::SmallBorrow],
+                                                       ['due_date', '>=', $startDate],
+                                                       ['due_date', '<=', $endDate]
+                                                   ]);
+        $fci = FinancialCustodyItem::where([
+                                                       ['employee_id', '=', $this->employee_id],
+                                                       ['expenses_id', '=', EmployeeActions::SmallBorrow],
+                                                       ['due_date', '>=', $startDate],
+                                                       ['due_date', '<=', $endDate]
+                                                   ]);
         try {
-            return $depositWithdraws->sum('withdrawValue');
+            return $depositWithdraws->sum('withdrawValue') + $fci->sum('withdrawValue');
         } catch (\Exception $exc) {
             return 0;
         }
@@ -171,17 +157,17 @@ OR dw.notes BETWEEN '{$startDate->startDayFormat()}' and '{$endDate->endDayForma
         $startDate = DateTime::parse($this->date);
 
         $employeeBorrowBilling = EmployeeBorrowBilling::select('*')
-                ->join('employee_borrows', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
-                ->join('employees', 'employee_borrows.employee_id', '=', 'employees.id')
-                ->distinct()
-                ->where([
-                    ['employee_borrow_billing.paying_status', '!=', EmployeeBorrowBilling::POSTPONED],
-                    ['employee_borrow_billing.deposit_id', '=', NULL],
-                    ['employees.id', '=', $this->employee_id]
-                ])
-                ->whereYear('due_date', $startDate->year)
-                ->whereMonth('due_date', $startDate->month)
-                ->first();
+                                                      ->join('employee_borrows', 'employee_borrow_billing.employee_borrow_id', '=', 'employee_borrows.id')
+                                                      ->join('employees', 'employee_borrows.employee_id', '=', 'employees.id')
+                                                      ->distinct()
+                                                      ->where([
+                                                                  ['employee_borrow_billing.paying_status', '!=', EmployeeBorrowBilling::POSTPONED],
+                                                                  ['employee_borrow_billing.deposit_id', '=', NULL],
+                                                                  ['employees.id', '=', $this->employee_id]
+                                                              ])
+                                                      ->whereYear('due_date', $startDate->year)
+                                                      ->whereMonth('due_date', $startDate->month)
+                                                      ->first();
         if (empty($employeeBorrowBilling)) {
             return 0;
         }

@@ -26,10 +26,5 @@
     {{ Form::open(['route' => 'employeeBorrow.store']) }}
         @include('employee.borrow._form', ['items' => old('items')])
     {{ Form::close() }}
-
-    <script type="text/javascript">
-        var processItemsCount = {{ count(old('items')) }};
-    </script>
-
 </div>
 @endsection

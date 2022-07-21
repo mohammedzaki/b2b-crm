@@ -29,7 +29,7 @@
     {{ Form::close() }}
 
     <script type="text/javascript">
-        var processItemsCount = {{ count(old('items')) }};
+        var processItemsCount = 0;
     </script>
 
 </div>
