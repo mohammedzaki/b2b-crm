@@ -29,15 +29,7 @@ class ChequeStatuses
 
     public static function all()
     {
-        $chequeStatuses                                  = [];
-        $chequeStatuses[ChequeStatuses::POSTDATED]       = "أجل";
-        $chequeStatuses[ChequeStatuses::CANCELED]        = "ملغي";
-        $chequeStatuses[ChequeStatuses::NOT_USED]        = "غير مستخدم";
-        $chequeStatuses[ChequeStatuses::REJECTED]        = "مرفوض";
-        $chequeStatuses[ChequeStatuses::STOPPED]         = "متوقف";
-        $chequeStatuses[ChequeStatuses::USED_PAID]       = "مستخدم (تم الصرف)";
-        $chequeStatuses[ChequeStatuses::POSTPONED]       = "تأجيل الشيك للسداد";
-        $chequeStatuses[ChequeStatuses::GUARANTEE]       = "خطاب ضمان";
+        $chequeStatuses                                  = self::getChequeStatuses();
         $chequeStatuses[ChequeStatuses::BANK_DEPOSIT]    = "ايداع شباك";
         $chequeStatuses[ChequeStatuses::BANK_WITHDRAW]   = "سحب شباك";
         $chequeStatuses[ChequeStatuses::ATM_DEPOSIT]     = "ايداع ATM";
@@ -51,16 +43,7 @@ class ChequeStatuses
      */
     public static function withdrawStatuses()
     {
-        $chequeStatuses                            = [];
-        $chequeStatuses[ChequeStatuses::POSTDATED] = "أجل";
-        $chequeStatuses[ChequeStatuses::CANCELED]  = "ملغي";
-        $chequeStatuses[ChequeStatuses::NOT_USED]  = "غير مستخدم";
-        $chequeStatuses[ChequeStatuses::REJECTED]  = "مرفوض";
-        $chequeStatuses[ChequeStatuses::STOPPED]   = "متوقف";
-        $chequeStatuses[ChequeStatuses::USED_PAID] = "مستخدم (تم الصرف)";
-        $chequeStatuses[ChequeStatuses::POSTPONED] = "تأجيل الشيك للسداد";
-        $chequeStatuses[ChequeStatuses::GUARANTEE] = "خطاب ضمان";
-        return $chequeStatuses;
+        return self::getChequeStatuses();
     }
 
     /**
@@ -72,6 +55,23 @@ class ChequeStatuses
         $chequeStatuses[ChequeStatuses::POSTDATED] = "أجل";
         $chequeStatuses[ChequeStatuses::REJECTED]  = "مرفوض";
         $chequeStatuses[ChequeStatuses::USED_PAID] = "مستخدم (تم التحصيل)";
+        $chequeStatuses[ChequeStatuses::POSTPONED] = "تأجيل الشيك للسداد";
+        $chequeStatuses[ChequeStatuses::GUARANTEE] = "خطاب ضمان";
+        return $chequeStatuses;
+    }
+
+    /**
+     * @return array
+     */
+    public static function getChequeStatuses(): array
+    {
+        $chequeStatuses                            = [];
+        $chequeStatuses[ChequeStatuses::POSTDATED] = "أجل";
+        $chequeStatuses[ChequeStatuses::CANCELED]  = "ملغي";
+        $chequeStatuses[ChequeStatuses::NOT_USED]  = "غير مستخدم";
+        $chequeStatuses[ChequeStatuses::REJECTED]  = "مرفوض";
+        $chequeStatuses[ChequeStatuses::STOPPED]   = "متوقف";
+        $chequeStatuses[ChequeStatuses::USED_PAID] = "مستخدم (تم الصرف)";
         $chequeStatuses[ChequeStatuses::POSTPONED] = "تأجيل الشيك للسداد";
         $chequeStatuses[ChequeStatuses::GUARANTEE] = "خطاب ضمان";
         return $chequeStatuses;
