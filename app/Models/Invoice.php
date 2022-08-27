@@ -119,6 +119,7 @@ class Invoice extends Model {
 
     public function pay() {
         $this->status = static::PAID;
+        $this->invoice_due_date = DateTime::now();
         $this->save();
         foreach ($this->processes as $process) {
             $process->payRemaining($this->invoice_number);
