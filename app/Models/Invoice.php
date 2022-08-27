@@ -72,15 +72,15 @@ class Invoice extends Model {
     const PAID = 1;
 
     public function client() {
-        return $this->belongsTo(Client::class);
+        return $this->belongsTo(Client::class)->withTrashed();
     }
 
     public function items() {
-        return $this->hasMany(InvoiceItem::class, 'invoice_id');
+        return $this->hasMany(InvoiceItem::class, 'invoice_id')->withTrashed();
     }
 
     public function processes() {
-        return $this->hasMany(ClientProcess::class, 'invoice_id');
+        return $this->hasMany(ClientProcess::class, 'invoice_id')->withTrashed();
     }
 
     public function totalPaid() {
