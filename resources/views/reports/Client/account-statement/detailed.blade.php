@@ -39,6 +39,15 @@
                                     <label> اسم العملية :</label> {{ $process['processName'] }}
                                 </div>
                             </th>
+                            @if($withUserLog)
+                                <th>
+                                    <div>
+                                        {{ link_to_route('client.process.edit', 'إضافة بند جديد', ['id' => $process['processNum'], 'callback' => url()->full()], [
+        'class' => 'btn btn-primary',
+        'target' => '_self']) }}
+                                    </div>
+                                </th>
+                            @endif
                         </tr>
                         <tr>
                             <th>تاريخ</th>
