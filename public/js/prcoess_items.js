@@ -196,8 +196,7 @@ window.changeTaxesRate = function () {
     update_prices();
 };
 
-$(document).ready(function () {
-
+window.setProcessItemsEvents = function () {
     $(document).delegate(".unit_price, .quantity, .total_price", "focus", function (e) {
         var parent = $(this).parent().closest('tr');
         if (!parent.hasClass('skip')) {
@@ -286,6 +285,10 @@ $(document).ready(function () {
         }
     }
     update_prices();
+};
+
+$(document).ready(function () {
+    setProcessItemsEvents();
 });
 
 /***/ }),

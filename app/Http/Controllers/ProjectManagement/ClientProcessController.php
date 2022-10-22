@@ -220,8 +220,10 @@ class ClientProcessController extends Controller {
                 /* delete others if exists */
                 ClientProcessItem::where('process_id', $process->id)
                         ->whereNotIn('id', $items_ids)->forceDelete();
-
-                return redirect()->route('client.process.index')->with('success', 'تم تعديل بيانات عملية.');
+                if(isset($request->callback))
+                    return redirect($request->callback);
+                else
+                    return redirect()->route('client.process.index')->with('success', 'تم تعديل بيانات عملية.');
             }
         }
     }

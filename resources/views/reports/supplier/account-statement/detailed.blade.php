@@ -23,7 +23,7 @@
     </div>
 @endsection
 @section('reportHTML')
-    <div class="col-lg-12 no-padding">
+    <div class="col-lg-12 no-padding dataTable_wrapper">
         <div class="table-responsive">
             @forelse ($processes as $process)
                 <table class="table table-striped table-bordered table-hover">
@@ -39,6 +39,15 @@
                                 <label> اسم العملية :</label> {{ $process['processName'] }}
                             </div>
                         </th>
+                        @if($withUserLog)
+                            <th>
+                                <div>
+                                    {{ link_to_route('supplier.process.edit', 'إضافة بند جديد', ['id' => $process['processNum'], 'callback' => url()->full()], [
+    'class' => 'btn btn-primary',
+    'target' => '_self']) }}
+                                </div>
+                            </th>
+                        @endif
                     </tr>
                     <tr>
                         <th>تاريخ</th>
@@ -71,7 +80,7 @@
                         <td style="color: red;">{{ $process['processTotalPaid'] }}</td>
                         <td style="color: red;"
                             colspan="3">{{ $process['processTotalPrice'] }}</td>
-                        <td style="color: red;">
+                        <td style="color: red;" @if($withUserLog) colspan="2" @endif>
                             الاجمالـــــــــــــــــــــــــــــــــــى
                         </td>
                     </tr>

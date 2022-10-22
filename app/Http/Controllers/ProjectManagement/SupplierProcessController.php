@@ -200,22 +200,6 @@ class SupplierProcessController extends Controller {
             /* get supplier all processes */
             $supplier_processes           = $supplier->processes;
             $total_opened_processes_price = 0;
-
-//            foreach ($supplier_processes as $supplier_process) {
-//                /* count opened process only */
-//                if($supplier_process->status == "active" &&
-//                    $supplier_process->id != $process->id)
-//                {
-//                    $total_opened_processes_price += $supplier_process->total_price;
-//                }
-//            }
-            /* Can't create new process if supplier has exceeded the credit limit */
-            // if($total_opened_processes_price >= $supplier->credit_limit){
-//            if($supplier->credit_limit < ($total_opened_processes_price + $request->total_price)){
-//                return redirect()->back()->withInput($all)->with('error',
-//                    "خطأ في انشاء عملية جديدة، العميل ".$supplier->name." قد تعدى الحد اﻻئتماني المسموح له."
-//                );
-//            }else{
             if (isset($request->require_invoice)) {
                 $all['require_invoice'] = TRUE;
             } else {
@@ -252,10 +236,11 @@ class SupplierProcessController extends Controller {
             }
             /* delete others if exists */
             SupplierProcessItem::where('process_id', $process->id)
-                    ->whereNotIn('id', $items_ids)->forceDelete();
-
-            return redirect()->route('supplier.process.index')->with('success', 'تم تعديل بيانات عملية.');
-//            }
+                ->whereNotIn('id', $items_ids)->forceDelete();
+            if(isset($request->callback))
+                return redirect($request->callback);
+            else
+                return redirect()->route('supplier.process.index')->with('success', 'تم تعديل بيانات عملية.');
         }
     }
 

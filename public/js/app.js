@@ -31074,7 +31074,7 @@ $(document).ready(function () {
             return false;
         }
         return true;
-    }
+    };
 
     window.IsNumberDecimal = function (evt) {
         evt = evt ? evt : window.event;
@@ -31084,7 +31084,7 @@ $(document).ready(function () {
             return false;
         }
         return true;
-    }
+    };
 
     $(".IsNumberDecimal").keypress(IsNumberDecimal);
 

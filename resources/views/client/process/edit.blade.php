@@ -25,7 +25,7 @@
 
     {{ Form::model($process, 
             array(
-                'route' => array('client.process.update', $process->id),
+                'route' => ['client.process.update', $process->id, 'callback' => app('request')->input('callback')],
                 'method' => 'put'
             )
         ) 

@@ -10,7 +10,6 @@
 <!-- /.row -->
 
 <div class="row">
-
     @if (session('success'))
         <div class="alert alert-success">
             {{ session('success') }}
@@ -25,7 +24,7 @@
 
     {{ Form::model($process, 
             array(
-                'route' => array('supplier.process.update', $process->id),
+                'route' => ['supplier.process.update', $process->id, 'callback' => app('request')->input('callback')],
                 'method' => 'put'
             )
         ) 
@@ -44,6 +43,5 @@
             var processItemsCount = {{ count($process->items) }};
         @endif
     </script>
-
 </div>
 @endsection
