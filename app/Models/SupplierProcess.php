@@ -97,7 +97,7 @@ class SupplierProcess extends Model {
     const statusOpened = 'active';
 
     public function supplier() {
-        return $this->belongsTo(Supplier::class);
+        return $this->belongsTo(Supplier::class)->withTrashed();
     }
 
     public function items() {

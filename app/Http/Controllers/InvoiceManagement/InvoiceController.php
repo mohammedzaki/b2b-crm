@@ -16,7 +16,7 @@ use Exception;
 /**
  * @Controller(prefix="invoice")
  * @Resource("invoice")
- * @Middleware("web")
+ * @Middleware({"web", "auth", "ability:admin,query-invoice"})
  */
 class InvoiceController extends Controller
 {
