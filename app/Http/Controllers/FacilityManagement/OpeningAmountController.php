@@ -4,6 +4,7 @@ namespace App\Http\Controllers\FacilityManagement;
 
 use App\Extensions\DateTime;
 use App\Http\Controllers\Controller;
+use App\Models\BankProfile;
 use App\Models\Facility;
 use App\Models\OpeningAmount;
 use Illuminate\Http\Request;
@@ -18,13 +19,15 @@ class OpeningAmountController extends Controller {
 
     protected function validator(array $data) {
         $validator = Validator::make($data, [
-                    'reason' => 'max:255',
-                    'amount' => 'numeric',
+                    'reason' => 'required|max:255',
+                    'amount' => 'required|numeric',
+                    'save_id' => 'required',
         ]);
 
         $validator->setAttributeNames([
             'reason' => 'السبب',
             'amount' => 'قيمة الرصيد',
+            'save_id' => 'اسم الحساب',
         ]);
 
         return $validator;
@@ -32,11 +35,13 @@ class OpeningAmountController extends Controller {
 
     public function index() {
         $openingAmounts = OpeningAmount::all();
-        return view('facility.openingamount.index', compact('openingAmounts'));
+        $allBanks = BankProfile::allAsList();
+        return view('facility.openingamount.index', compact('openingAmounts', 'allBanks'));
     }
 
     public function create() {
-        return view('facility.openingamount.create');
+        $allBanks = BankProfile::allAsList(false, true, "حساب :");
+        return view('facility.openingamount.create', compact('allBanks'));
     }
 
     public function store(Request $request) {
@@ -49,7 +54,7 @@ class OpeningAmountController extends Controller {
             $all = $request->all();
 
             $openingAmount               = OpeningAmount::create($all);
-            $openingAmount->deposit_date = DateTime::parse($request['depositdate'])->format('Y-m-d');
+            $openingAmount->deposit_date = DateTime::parse($request['deposit_date'])->format('Y-m-d');
             $openingAmount->save();
             $this->updateFacilityOpeningAmount();
             return redirect()->route('facilityopeningamount.index')->with('success', 'تم اضافة رصيد جديد.');
@@ -58,8 +63,8 @@ class OpeningAmountController extends Controller {
 
     public function edit($id) {
         $openingAmount = OpeningAmount::findOrFail($id);
-
-        return view('facility.openingamount.edit', compact('openingAmount'));
+        $allBanks = BankProfile::allAsList(false, true, "حساب :");
+        return view('facility.openingamount.edit', compact('openingAmount', 'allBanks'));
     }
 
     public function update(Request $request, $id) {
@@ -71,7 +76,7 @@ class OpeningAmountController extends Controller {
             return redirect()->back()->withInput()->with('error', 'حدث حطأ في حفظ البيانات.')->withErrors($validator);
         } else {
             $openingAmount->update($all);
-            $openingAmount->deposit_date = DateTime::parse($request['depositdate'])->format('Y-m-d');
+            $openingAmount->deposit_date = DateTime::parse($request['deposit_date'])->format('Y-m-d');
             $openingAmount->save();
             $this->updateFacilityOpeningAmount();
             return redirect()->back()->with('success', 'تم تعديل بيانات الرصيد.');

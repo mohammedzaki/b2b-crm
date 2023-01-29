@@ -106,9 +106,10 @@ class DepositWithdraw extends Model {
         $depositWithdrawsItems = static::getDWItems($startDate, $endDate);
         $depositValue          = $depositWithdrawsItems->sum('depositValue');
         $withdrawValue         = $depositWithdrawsItems->sum('withdrawValue');
-        $openingAmount         = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])->sum('amount');
-        $loansAmount         = Loans::whereBetween('date', [$startDate, $endDate])
+        $openingAmounts         = OpeningAmount::whereBetween('deposit_date', [$startDate, $endDate])
             ->where('save_id', '=', 0)->sum('amount');
-        return round(($depositValue + $openingAmount + $loansAmount) - $withdrawValue, Helpers::getDecimalPointCount());
+        $loansAmounts         = Loans::whereBetween('date', [$startDate, $endDate])
+            ->where('save_id', '=', 0)->sum('amount');
+        return round(($depositValue + $openingAmounts + $loansAmounts) - $withdrawValue, Helpers::getDecimalPointCount());
     }
 }

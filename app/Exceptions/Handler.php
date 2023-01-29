@@ -52,7 +52,7 @@ class Handler extends ExceptionHandler {
         if ($request->expectsJson()) {
             return response()->jsonException($exception);
         } elseif ($this->shouldReport($exception) && !$this->isHttpException($exception) && !config('app.debug')) {
-            $exception = new ServerErrorException('Whoops!', 500);
+            //$exception = new ServerErrorException('Whoops!', 500);
         }
 
         return parent::render($request, $exception);

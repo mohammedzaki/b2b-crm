@@ -149,8 +149,8 @@ class DailyCashController extends Controller
     function setFinancialCustody(Employee $employee, Request &$request)
     {
         $currentFinancialCustody = $employee->currentFinancialCustody();
+        $date                    = DateTime::parse($request->due_date);
         if ($currentFinancialCustody == null) {
-            $date                    = DateTime::parse($request->due_date);
             $monthName               = $date->getMonthName();
             $currentFinancialCustody = [
                 'user_id'     => $request->user_id,
@@ -162,7 +162,12 @@ class DailyCashController extends Controller
             ];
             $currentFinancialCustody = $employee->financialCustodies()->create($currentFinancialCustody);
         }
-        $request['financial_custody_id'] = $currentFinancialCustody->id;
+        if ($date->month == DateTime::parse($currentFinancialCustody->due_date)->month) {
+            $request['financial_custody_id'] = $currentFinancialCustody->id;
+        } else {
+            DB::rollBack();
+            throw new ValidationException('يجب تسوية العهدة الحالية');
+        }
     }
 
     function payLongBorrow(Employee $employee, $depositValue, $due_date, $id, $is_update)

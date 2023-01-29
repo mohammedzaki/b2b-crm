@@ -37,7 +37,7 @@ class BankProfile extends Model
      * @param bool $addSelectAllOpt
      * @return BankProfile[]|\Illuminate\Database\Eloquent\Collection
      */
-    public static function allAsList($addSelectAllOpt = true, $addLocalSave = false)
+    public static function allAsList($addSelectAllOpt = true, $addLocalSave = false, $addPrefix = "")
     {
         $res = static::all('id', 'name');
         $all = [];
@@ -45,10 +45,10 @@ class BankProfile extends Model
             $all['all'] = 'الكل';
         }
         if($addLocalSave) {
-            $all['0'] = 'خزنة الشركة';
+            $all['0'] = $addPrefix . " " . 'خزنة الشركة';
         }
         foreach ($res as $bank) {
-            $all[$bank->id] = $bank->name;
+            $all[$bank->id] = $addPrefix . " " . $bank->name;
         }
         return $all;
     }
@@ -166,8 +166,9 @@ class BankProfile extends Model
 
     public function currentAmount()
     {
-        $loanAmount = Loans::where('save_id', '=', $this->id)->sum('amount');
-        return ($this->totalDeposits() + $loanAmount) - $this->totalWithdraws();
+        $loanAmounts = Loans::where('save_id', '=', $this->id)->sum('amount');
+        $openingAmounts = OpeningAmount::where('save_id', '=', $this->id)->sum('amount');
+        return ($this->totalDeposits() + $loanAmounts + $openingAmounts) - $this->totalWithdraws();
     }
 
     public function cashBalance()

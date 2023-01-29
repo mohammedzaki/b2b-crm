@@ -11,7 +11,7 @@
 <!-- /.row -->
 <div class="row">
     <div class="alert alert-danger">
-        ليس لديك صلاحية للدخول الي هذة الصفحة.
+        {{ $exception->getMessage() }}
     </div>
     <div class="alert alert-info">
         {{ link_to('/', 'اضغط هنا للرجوع الي الرئيسية') }}

@@ -15,7 +15,7 @@
                             'placeholder' => 'ادخل سبب الرصيد')
                         )
                     }}
-                    @if ($errors->has('borrow_reason'))
+                    @if ($errors->has('reason'))
                     <label for="inputError" class="control-label">
                         {{ $errors->first('reason') }}
                     </label>
@@ -36,9 +36,29 @@
                     </label>
                     @endif
                 </div>
+                <div class="form-group{{ $errors->has('save_id') ? ' has-error' : '' }}">
+                    {{ Form::label('save_id', 'اسم الحساب') }}
+                    {{ Form::select('save_id', $allBanks, isset($model) ? $openingAmount->save_id : null,
+                            array(
+                                'class' => 'form-control',
+                                'id' => 'save_id',
+                                'name' => 'save_id',
+                                'placeholder' => 'اختر الحساب')
+                            )
+                    }}
+                    @if ($errors->has('save_id'))
+                        <label for="inputError" class="control-label">
+                            {{ $errors->first('save_id') }}
+                        </label>
+                    @endif
+                </div>
                 <div class="form-group">
-                    {{ Form::label('depositdate', 'التاريخ') }}
-                    <input type="text"  id="depositdate" name="depositdate" readonly class="form-control">
+                    {{ Form::label('deposit_date', 'التاريخ') }}
+                    {{ Form::text('deposit_date', null, array(
+                                        "id" => "deposit_date",
+                                        'readonly' => 'true',
+                                        'class' => 'form-control datepickerCommon',
+                                        'placeholder' => 'ادخل التاريخ')) }}
                 </div>
             </div>
             <!-- /.panel-body -->
@@ -56,11 +76,3 @@
     </div>
 
 </div>
-
-@section('scripts')
-<script>
-    $(function () {
-        $("#depositdate").datepicker();
-    });
-</script>
-@endsection
