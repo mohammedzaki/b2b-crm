@@ -106,7 +106,7 @@ class FinancialCustodyItemsController extends Controller
      * @param Request $request
      * @return FinancialCustody|null
      */
-    private function getCurrentFinancialCustody(Request $request)
+    private function getCurrentFinancialCustody(Request $request, $checkMonth = true)
     {
         $employee_id        = $request->get('employee_id');
         $financialCustodyId = $request->get('f_id');
@@ -120,7 +120,13 @@ class FinancialCustodyItemsController extends Controller
             $currentFinancialCustody = $currentEmployee->currentFinancialCustody();
         }
         if ($currentFinancialCustody == null) { // || count($currentFinancialCustody->deposits) <= 0) {
-            abort(403, 'عفوا لا يوجد عهدة مسجلة. ');
+            abort(422, 'عفوا لا يوجد عهدة مسجلة. ');
+        }
+        if ($checkMonth) {
+            $date = DateTime::parse($request->due_date);
+            if ($date->month !== DateTime::parse($currentFinancialCustody->due_date)->month) {
+                abort(422, 'عفوا العهدة الحالية لا تصلح. يجب ان يكون التاريخ موافق لشهر العهدة برجاء ترحيل  باقي العهدة و فتح عهدة للشهر الجديد ');
+            }
         }
         return $currentFinancialCustody;
     }
@@ -212,12 +218,15 @@ class FinancialCustodyItemsController extends Controller
     private function checkProcessClosed($financialCustodyItemId)
     {
         $fItem = FinancialCustodyItem::where('id', $financialCustodyItemId)->first();
-
-        if (!empty($fItem->cbo_processes)) {
-            if (!empty($fItem->supplier_id)) {
-                $process = SupplierProcess::findOrFail($fItem->cbo_processes);
-                $process->checkProcessMustClosed();
+        try {
+            if (!empty($fItem->cbo_processes) && $fItem->cbo_processes != '-1') {
+                if (!empty($fItem->supplier_id)) {
+                    $process = SupplierProcess::withTrashed()->findOrFail($fItem->cbo_processes);
+                    $process->checkProcessMustClosed();
+                }
             }
+        } catch(\Exception $ex) {
+            dd($fItem);
         }
     }
 
@@ -306,35 +315,66 @@ class FinancialCustodyItemsController extends Controller
         DB::beginTransaction();
         try {
             $id = $request['id'];
+            $date = DateTime::parse($request->due_date);
             if (!isset($id) & empty($id)) {
-                $currentFinancialCustody = $this->getCurrentFinancialCustody($request);
+                $currentFinancialCustody = $this->getCurrentFinancialCustody($request, false);
             } else {
                 $currentFinancialCustody = FinancialCustody::find($id);
             }
-            foreach ($currentFinancialCustody->withdraws as $financialCustodyItem) {
-                if (!isset($financialCustodyItem->approved_at)) {
-                    $financialCustodyItem->update([
-                        'saveStatus'  => 2,
-                        'approved_at' => DateTime::now(),
-                        'approved_by' => $c_user_id,
+            if ($request['transfer'] != '2') {
+                foreach ($currentFinancialCustody->withdraws as $financialCustodyItem) {
+                    if (!isset($financialCustodyItem->approved_at)) {
+                        $financialCustodyItem->update([
+                            'saveStatus'  => 2,
+                            'approved_at' => DateTime::now(),
+                            'approved_by' => $c_user_id,
+                        ]);
+                        $this->checkProcessClosed($financialCustodyItem->id);
+                    }
+                }
+                $currentFinancialCustody->approved_at = DateTime::now();
+                $currentFinancialCustody->approved_by = auth()->user()->id;
+            }
+            $fcRemaining = ($currentFinancialCustody->totalDeposits() - $currentFinancialCustody->totalWithdraws());
+            $currentFinancialCustody->save();
+            if ($fcRemaining > 0) {
+                DepositWithdraw::create([
+                    'depositValue'         => $fcRemaining,
+                    'recordDesc'           => "رد {$currentFinancialCustody->description}",
+                    'employee_id'          => $currentFinancialCustody->employee_id,
+                    'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
+                    'financial_custody_id' => $currentFinancialCustody->id,
+                    'user_id'              => $c_user_id,
+                    'payMethod'            => PaymentMethods::CASH,
+                    'due_date'             => $date,
+                ]);
+                if ($request['transfer'] != '0') {
+                    //transferred_from
+                    $employee = Employee::findOrFail($currentFinancialCustody->employee_id);
+                    $monthName               = $date->getMonthName();
+                    $transferredFinancialCustody = [
+                        'user_id'     => $c_user_id,
+                        'description' => "عهدة شراء شهر {$monthName} ",
+                        'notes'       => '',
+                        'approved_by' => null,
+                        'approved_at' => null,
+                        'due_date'    => $request->due_date
+                    ];
+                    $transferredFinancialCustody = $employee->financialCustodies()->create($transferredFinancialCustody);
+                    DepositWithdraw::create([
+                        'withdrawValue'         => $fcRemaining,
+                        'recordDesc'           => "باقي عهدة مرحلة {$currentFinancialCustody->description}",
+                        'employee_id'          => $currentFinancialCustody->employee_id,
+                        'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
+                        'financial_custody_id' => $currentFinancialCustody->id,
+                        'user_id'              => $c_user_id,
+                        'payMethod'            => PaymentMethods::CASH,
+                        'due_date'             => $date,
                     ]);
-                    $this->checkProcessClosed($financialCustodyItem->id);
+                    $currentFinancialCustody->transferred_from = $transferredFinancialCustody->id;
+                    $currentFinancialCustody->save();
                 }
             }
-            $date = DateTime::parse($request->due_date);
-            DepositWithdraw::create([
-                'depositValue'         => ($currentFinancialCustody->totalDeposits() - $currentFinancialCustody->totalWithdraws()),
-                'recordDesc'           => "رد {$currentFinancialCustody->description}",
-                'employee_id'          => $currentFinancialCustody->employee_id,
-                'expenses_id'          => EmployeeActions::FinancialCustodyRefund,
-                'financial_custody_id' => $currentFinancialCustody->id,
-                'user_id'              => $c_user_id,
-                'payMethod'            => PaymentMethods::CASH,
-                'due_date'             => $date,
-            ]);
-            $currentFinancialCustody->approved_at = DateTime::now();
-            $currentFinancialCustody->approved_by = auth()->user()->id;
-            $currentFinancialCustody->save();
             DB::commit();
             return redirect()->route("financialCustodyItems.index", ['id' => $currentFinancialCustody->id])->with('success', 'تم تسوية العهدة.');
         } catch (\Exception $ex) {

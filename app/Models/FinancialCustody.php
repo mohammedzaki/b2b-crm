@@ -53,16 +53,17 @@ class FinancialCustody extends Model
 
     protected $fillable
         = [
-            'amount',
             'description',
             'notes',
             'due_date',
-            'user_id',
             'employee_id',
+            'user_id',
+            'transferred_from',
             'approved_by',
             'approved_at',
+            'created_at',
             'updated_at',
-            'created_at'
+            'deleted_at'
         ];
 
     /**
